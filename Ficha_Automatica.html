@@ -1,0 +1,1416 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Protocolo · Ficha 4ª Edição</title>
+<style>
+/* ===== PROTOCOLO 4ª ED — ESTILO ===== */
+:root{--bg:#0f0d0b;--panel:#18140f;--panel2:#1f1a13;--line:#332a1e;--line2:#443826;--ink:#d9d2c2;--dim:#a29679;--faint:#6d6350;--gold:#b8932f;--goldim:#7c6524;--red:#8e2020;
+--ec:#b8932f;--ecd:#7c6524;--eglow:rgba(184,147,47,.14);--band:0;}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font:14px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 50% -10%,var(--eglow),transparent 55%)}
+#fx-canvas{position:fixed;inset:0;pointer-events:none;z-index:6;opacity:.5}
+#fx-vign{position:fixed;inset:0;pointer-events:none;z-index:7;box-shadow:inset 0 0 calc(40px + var(--band)*34px) calc(var(--band)*7px) rgba(0,0,0,calc(.12 + var(--band)*.09));transition:box-shadow 1.2s}
+#fx-blood{position:fixed;inset:0;pointer-events:none;z-index:7;opacity:0;box-shadow:inset 0 0 120px 30px rgba(142,32,32,.55);transition:opacity .6s}
+body.lowvida #fx-blood{opacity:1;animation:bloodpulse 2.2s ease-in-out infinite}
+@keyframes bloodpulse{50%{box-shadow:inset 0 0 160px 46px rgba(142,32,32,.7)}}
+body.lowluc .wrap{animation:lucshake 7s ease-in-out infinite}
+@keyframes lucshake{0%,92%,100%{transform:none}94%{transform:translateX(1px) skewX(.12deg)}97%{transform:translateX(-1px)}}
+#whisper{position:fixed;z-index:8;pointer-events:none;font-family:ui-monospace,Consolas,monospace;font-size:12px;letter-spacing:2px;color:var(--ec);opacity:0;transition:opacity 2.4s;max-width:240px;text-shadow:0 0 8px var(--eglow)}
+#whisper.on{opacity:calc(.28 + var(--band)*.1)}
+.wrap{position:relative;z-index:5;max-width:1200px;margin:0 auto;padding:14px 16px 60px}
+/* header */
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px 16px;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:8px}
+h1{font-family:Georgia,'Times New Roman',serif;font-weight:400;font-size:26px;letter-spacing:8px;margin:0;color:var(--ink)}
+h1 b{color:var(--ec);font-weight:400}
+.sub{font-size:10px;letter-spacing:4px;color:var(--faint);text-transform:uppercase}
+.hbtns{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+button{cursor:pointer;font:inherit}
+.btn{background:var(--panel2);border:1px solid var(--line2);color:var(--dim);padding:6px 12px;border-radius:3px;font-size:12px;letter-spacing:.5px;transition:.18s}
+.btn:hover{color:var(--ink);border-color:var(--ec)}
+.btn.gold{border-color:var(--goldim);color:var(--gold)}
+.btn.gold:hover{border-color:var(--ec);color:var(--ec)}
+.btn.del{border-color:#4a2020;color:#b06a6a}.btn.del:hover{border-color:var(--red);color:#e08a8a}
+.btn.mini{padding:2px 8px;font-size:11px}
+.btn.on{border-color:var(--ec);color:var(--ec);background:rgba(0,0,0,.25)}
+/* tabs */
+.tabs{display:flex;gap:2px;flex-wrap:wrap;margin:10px 0 16px;border-bottom:1px solid var(--line)}
+.tabs button{background:none;border:none;border-bottom:2px solid transparent;color:var(--faint);padding:8px 13px;font-size:12px;letter-spacing:2.5px;text-transform:uppercase;transition:.2s}
+.tabs button:hover{color:var(--dim)}
+.tabs button.active{color:var(--ec);border-bottom-color:var(--ec)}
+.tabs .tglifo{font-size:14px;letter-spacing:0}
+/* dívida dock */
+#divDock{display:none;margin:0 0 12px;padding:7px 14px;border:1px solid #4a2020;background:rgba(142,32,32,.08);color:#c88;font-size:12px;letter-spacing:1px;border-radius:3px}
+#divDock.on{display:block}
+body[data-el="pac"] #divDock.on{animation:dockpulse 3s ease-in-out infinite;border-color:var(--ec)}
+@keyframes dockpulse{50%{background:rgba(163,38,56,.18)}}
+/* panels */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:900px){.grid2,.grid3{grid-template-columns:1fr}}
+.panel{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:14px 16px;margin-bottom:14px;overflow:hidden}
+.panel h2{font-family:Georgia,serif;font-weight:400;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:var(--ec);margin:0 0 12px;display:flex;align-items:baseline;gap:8px}
+.panel h2 small{font-size:10px;letter-spacing:1px;color:var(--faint);text-transform:none;font-family:system-ui}
+label{display:block;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--faint);margin:0 0 3px}
+input[type=text],input[type=number],select,textarea{width:100%;background:#0c0a08;border:1px solid var(--line);color:var(--ink);padding:7px 9px;border-radius:3px;font:inherit;outline:none;transition:border .2s}
+input:focus,select:focus,textarea:focus{border-color:var(--ecd)}
+textarea{resize:vertical;min-height:70px}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.row>div{flex:1;min-width:130px}
+.hint{font-size:11px;color:var(--faint);line-height:1.5;margin-top:6px}
+.rw{font-family:ui-monospace,Consolas,monospace;letter-spacing:3px;color:var(--ec);cursor:help;text-shadow:0 0 calc(var(--band)*2px) var(--eglow);filter:none}
+body[data-band="3"] .rw,body[data-band="4"] .rw,body[data-band="5"] .rw{animation:rwjit 5s steps(2) infinite}
+@keyframes rwjit{0%,96%{text-shadow:0 0 6px var(--eglow)}98%{text-shadow:-1px 0 var(--red),1px 0 var(--ec)}}
+/* atributos */
+.attrs{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+@media(max-width:700px){.attrs{grid-template-columns:repeat(2,1fr)}}
+.attr{background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:8px;text-align:center}
+.attr .an{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--dim)}
+.attr input{text-align:center;font-size:20px;font-family:Georgia,serif;border:none;background:none;color:var(--ink);margin:2px 0}
+.attr .ad{font-size:9px;color:var(--faint);letter-spacing:.5px}
+/* recursos */
+.recs{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.rec{background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:9px 11px}
+.rec .rn{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--dim);display:flex;justify-content:space-between}
+.rec .rn b{color:var(--faint);font-weight:400}
+.rec .rv{display:flex;align-items:center;gap:6px;margin-top:5px}
+.rec .rv input{width:56px;text-align:center;font-size:17px;font-family:Georgia,serif;padding:3px}
+.rec .rv .mx{color:var(--faint);font-size:13px}
+.rec .stp{background:none;border:1px solid var(--line2);color:var(--dim);width:24px;height:24px;border-radius:3px;line-height:1}
+.rec .stp:hover{border-color:var(--ec);color:var(--ec)}
+.bar{height:4px;background:#0c0a08;border-radius:2px;margin-top:7px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ec);transition:width .4s}
+body[data-el="ger"] .bar i{animation:breathe 4s ease-in-out infinite}
+@keyframes breathe{50%{filter:brightness(1.25)}}
+/* ruído tracker */
+.rtrack{display:flex;gap:3px;flex-wrap:wrap;margin-top:8px}
+.rseg{width:22px;height:26px;border:1px solid var(--line2);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:12px;color:transparent;cursor:pointer;transition:.15s;background:#0c0a08}
+.rseg:nth-child(4n){margin-right:7px}
+.rseg.on{border-color:var(--ec);color:var(--ec);background:var(--eglow);text-shadow:0 0 6px var(--eglow)}
+.rseg:hover{border-color:var(--dim)}
+/* perícias */
+.skills{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:4px 14px}
+.skill{display:flex;align-items:center;gap:7px;padding:3px 6px;border-radius:3px;font-size:12.5px;cursor:pointer;border:1px solid transparent;transition:.15s}
+.skill:hover{background:var(--panel2);border-color:var(--line)}
+.skill input[type=checkbox]{width:13px;height:13px;accent-color:var(--ec);cursor:pointer}
+.skill .nm{flex:1;color:var(--dim)}
+.skill.tr .nm{color:var(--ink)}
+.skill .at{font-size:9px;color:var(--faint);letter-spacing:1px;text-transform:uppercase}
+.skill .bn{font-family:Georgia,serif;color:var(--ec);min-width:26px;text-align:right}
+.sgroup{grid-column:1/-1;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--faint);border-bottom:1px solid var(--line);padding:8px 0 3px;margin-top:2px}
+/* chips condições */
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line2);border-radius:12px;padding:3px 11px;font-size:11px;color:var(--faint);cursor:pointer;transition:.15s;letter-spacing:.5px}
+.chip:hover{color:var(--dim);border-color:var(--dim)}
+.chip.on{border-color:var(--red);color:#d88;background:rgba(142,32,32,.12)}
+/* cards de habilidade / magia / talento */
+.hcard{background:var(--panel2);border:1px solid var(--line);border-left:2px solid var(--ecd);border-radius:3px;padding:9px 12px;margin-bottom:8px}
+.hcard .ht{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.hcard .ht b{font-family:Georgia,serif;font-weight:400;font-size:14px;color:var(--ink);letter-spacing:.5px}
+.tag{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ec);border:1px solid var(--ecd);border-radius:2px;padding:1px 6px}
+.tag.dark{color:var(--faint);border-color:var(--line2)}
+.tag.warn{color:#c66;border-color:#5a2a2a}
+.tag.ok{color:#8fae6a;border-color:#42552e}
+.hcard .hx{font-size:12.5px;color:var(--dim);margin-top:5px;line-height:1.55}
+.hcard .hx em{color:var(--ink);font-style:normal;font-weight:600}
+.hcard .src{margin-left:auto;font-size:9px;letter-spacing:1px;color:var(--faint);text-transform:uppercase}
+.hcard.locked{opacity:.55}
+.hcard.regra{border-left-color:var(--red)}
+.secband{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--faint);border-bottom:1px solid var(--line);padding:14px 0 5px;margin-bottom:10px}
+.secband b{color:var(--ec);font-weight:400}
+/* wallet */
+.wallet{display:flex;gap:14px;flex-wrap:wrap;align-items:center;background:var(--panel2);border:1px solid var(--line);border-radius:3px;padding:8px 14px;margin-bottom:12px;font-size:12px;color:var(--dim)}
+.wallet b{font-family:Georgia,serif;font-size:16px;color:var(--ec);font-weight:400}
+.wallet .neg b{color:#c66}
+/* maestrias */
+.mcard{background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:11px 13px;margin-bottom:10px}
+.mrail{display:flex;gap:5px;margin:8px 0}
+.mst{flex:1;text-align:center;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--faint);border:1px solid var(--line2);border-radius:2px;padding:4px 2px}
+.mst.on{color:var(--ec);border-color:var(--ec);background:var(--eglow)}
+.mst.next{border-style:dashed}
+/* fardo chips */
+.fchip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--ecd);border-radius:3px;padding:5px 11px;font-size:12px;color:var(--ink);background:var(--panel2);margin:0 6px 6px 0}
+.fchip small{color:var(--faint);font-size:10px}
+.fchip .x{color:var(--faint);cursor:pointer;padding:0 2px}.fchip .x:hover{color:var(--red)}
+/* ===== SINTONIZAR ===== */
+#sintwrap{position:relative;min-height:70vh;padding:20px 0 30px}
+#sintwrap .fala{ text-align:center;font-size:11px;letter-spacing:3px;color:var(--faint);margin:6px 0 26px;animation:falabr 6s ease-in-out infinite}
+@keyframes falabr{50%{opacity:.55}}
+.elring{display:flex;flex-wrap:wrap;justify-content:center;gap:20px;max-width:960px;margin:0 auto}
+.elc{--c:#888;position:relative;width:255px;min-height:190px;background:linear-gradient(180deg,#16120d,#100d09);border:1px solid var(--line2);border-radius:5px;padding:20px 18px 16px;cursor:pointer;text-align:center;transition:transform .3s,border-color .3s,box-shadow .3s;overflow:hidden}
+.elc:hover{transform:translateY(-6px) scale(1.02);border-color:var(--c);box-shadow:0 8px 40px -8px var(--c)}
+.elc .eg{font-size:44px;color:var(--c);display:block;text-shadow:0 0 22px var(--c);transition:.3s}
+.elc:hover .eg{transform:scale(1.12)}
+.elc .en{font-family:Georgia,serif;font-size:17px;letter-spacing:5px;text-transform:uppercase;margin:10px 0 2px;color:var(--ink)}
+.elc .ev{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--c)}
+.elc .ef{font-size:11px;color:var(--faint);margin-top:10px;line-height:1.5;font-style:italic}
+.elc.dim{opacity:.32;filter:grayscale(.7)}
+.elc.dim:hover{opacity:.75;filter:none}
+.elc.sel{border-color:var(--c);box-shadow:0 0 55px -10px var(--c);transform:scale(1.04)}
+.elc.sel::after{content:"⟑⋏⊙⌖◊ sintonizado";position:absolute;top:8px;right:10px;font-size:8px;letter-spacing:2px;color:var(--c);font-family:ui-monospace,monospace}
+@media(min-width:960px){.elring .elc:nth-child(1){transform:translateY(18px)}.elring .elc:nth-child(2){transform:translateY(-12px)}.elring .elc:nth-child(3){transform:translateY(10px)}.elring .elc:nth-child(4){transform:translateY(-6px)}.elring .elc:nth-child(5){transform:translateY(16px)}.elring .elc:nth-child(6){transform:translateY(-10px)}
+.elring .elc:hover{transform:translateY(-8px) scale(1.03)}}
+/* micro-temas nos cards */
+.elc[data-el=obs]::before{content:"⊙";position:absolute;left:10px;top:10px;font-size:11px;color:var(--c);opacity:.35;animation:blinkeye 5s infinite}
+@keyframes blinkeye{0%,90%,100%{opacity:.35}95%{opacity:0}}
+.elc[data-el=eco] .en{text-shadow:2px 2px 0 rgba(127,184,168,.25)}
+.elc[data-el=vaz]{box-shadow:inset 0 0 34px 6px #000}
+.elc[data-el=asc]::after{content:"";position:absolute;inset:auto 0 0 0;height:4px;background:repeating-linear-gradient(45deg,#b04a3a 0 6px,transparent 6px 12px);opacity:.5}
+.elc[data-el=pac]::before{content:"§";position:absolute;right:12px;bottom:8px;color:var(--c);opacity:.3;font-family:Georgia,serif}
+.elc[data-el=ger]::before{content:"";position:absolute;left:-20px;bottom:-20px;width:80px;height:80px;background:radial-gradient(circle,rgba(111,154,78,.4),transparent 70%);}
+/* altar */
+#altar{max-width:760px;margin:34px auto 0;border:1px solid var(--ecd);border-radius:5px;background:var(--panel);padding:20px 24px}
+#altar h3{font-family:Georgia,serif;font-weight:400;letter-spacing:5px;text-transform:uppercase;color:var(--ec);margin:0 0 4px;display:flex;gap:12px;align-items:center}
+#altar .mtier{border-left:2px solid var(--line2);padding:8px 0 8px 14px;margin:10px 0}
+#altar .mtier.on{border-left-color:var(--ec)}
+#altar .mtier .mt{font-size:10px;letter-spacing:2px;color:var(--ec);text-transform:uppercase}
+#altar .mtier.off .mt{color:var(--faint)}
+#altar .mtier .mx{font-size:12.5px;color:var(--dim);margin-top:3px}
+#altar .mtier.off .mx{color:var(--faint);font-family:ui-monospace,monospace;letter-spacing:2px}
+/* transição */
+#transOv{position:fixed;inset:0;z-index:60;pointer-events:none;opacity:0}
+#transOv.go{pointer-events:all;opacity:1}
+#transOv.t-obs{background:radial-gradient(circle at 50% 50%,transparent 0,#000 0);animation:iris 1.5s ease-in-out forwards}
+@keyframes iris{0%{background:radial-gradient(circle at 50% 50%,transparent 150%,#000 150%)}45%{background:radial-gradient(circle at 50% 50%,transparent 0%,#000 2%)}100%{background:radial-gradient(circle at 50% 50%,transparent 150%,#000 152%)}}
+#transOv.t-eco{background:#7fb8a822;animation:stutter 1.3s steps(1) forwards}
+@keyframes stutter{0%{opacity:1}14%{opacity:0}28%{opacity:.9}42%{opacity:0}60%{opacity:.7}74%{opacity:0}88%{opacity:.4}100%{opacity:0}}
+#transOv.t-vaz{animation:engolir 1.6s ease-in forwards}
+@keyframes engolir{0%{box-shadow:inset 0 0 0 0 #000}55%{box-shadow:inset 0 0 220px 48vmax #04050a}100%{box-shadow:inset 0 0 0 0 transparent}}
+#transOv.t-asc{background:repeating-linear-gradient(45deg,#b04a3a 0 14px,#1a0f0c 14px 28px);animation:ferrugem 1.4s ease-in-out forwards}
+@keyframes ferrugem{0%{transform:translateY(-100%)}45%{transform:translateY(0)}60%{transform:translateY(0)}100%{transform:translateY(100%)}}
+#transOv.t-pac{display:flex;align-items:center;justify-content:center;background:rgba(20,6,8,.85);animation:fade 1.6s forwards}
+#transOv.t-pac::after{content:"⚖";font-size:130px;color:#a32638;text-shadow:0 0 60px #a32638;animation:selo 1.6s cubic-bezier(.2,2.4,.4,1) forwards}
+@keyframes selo{0%{transform:scale(4);opacity:0}35%{transform:scale(1);opacity:1}75%{transform:scale(1);opacity:1}100%{transform:scale(1);opacity:0}}
+@keyframes fade{0%{opacity:1}80%{opacity:1}100%{opacity:0}}
+#transOv.t-ger{background:radial-gradient(circle at 20% 100%,#3d5a2a 0 8%,transparent 8%),radial-gradient(circle at 80% 90%,#3d5a2a 0 6%,transparent 6%),radial-gradient(circle at 50% 110%,#2c421f 0 10%,transparent 10%);background-color:transparent;animation:crescer 1.7s ease-in forwards}
+@keyframes crescer{0%{background-size:0 0,0 0,0 0;opacity:1}55%{background-size:600% 600%,500% 500%,700% 700%;opacity:1}100%{background-size:700% 700%,600% 600%,800% 800%;opacity:0}}
+/* ===== ROLETA ===== */
+#roleta{border:1px solid var(--ecd);border-radius:5px;background:linear-gradient(180deg,var(--panel2),#0d0a08);padding:18px;text-align:center;margin-top:18px}
+#roleta .rq{font-style:italic;color:var(--faint);font-size:12px;margin-bottom:12px}
+.slotbox{width:230px;height:56px;margin:0 auto 14px;border:1px solid var(--line2);border-radius:4px;overflow:hidden;position:relative;background:#0a0806}
+.slotbox::before,.slotbox::after{content:"";position:absolute;left:0;right:0;height:14px;z-index:2;pointer-events:none}
+.slotbox::before{top:0;background:linear-gradient(#0a0806,transparent)}
+.slotbox::after{bottom:0;background:linear-gradient(transparent,#0a0806)}
+#slotreel{transition:none}
+#slotreel div{height:56px;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:22px;letter-spacing:6px;text-transform:uppercase;color:var(--ink)}
+#slotreel div span{font-size:13px;color:var(--ec);margin-right:10px}
+.slotwin{animation:winflash .8s ease-out}
+@keyframes winflash{0%{box-shadow:0 0 0 0 var(--ec)}40%{box-shadow:0 0 60px 6px var(--ec)}100%{box-shadow:0 0 0 0 transparent}}
+/* toolbar talentos */
+.tbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;position:sticky;top:0;background:var(--bg);padding:8px 0;z-index:8;border-bottom:1px solid var(--line);margin-bottom:12px}
+.tbar input[type=text]{max-width:220px}
+.tbar select{max-width:170px;width:auto}
+/* ===== INVENTÁRIO ===== */
+.inv-top{display:flex;gap:18px;flex-wrap:wrap}
+.inv-left{flex:1 1 340px}.inv-right{flex:0 1 300px}
+#invGrid{position:relative;display:grid;gap:2px;background:#0a0806;border:1px solid var(--line);padding:2px;width:max-content;border-radius:3px}
+#invGrid .cell{width:38px;height:38px;background:#14100c;border-radius:2px}
+.piece{position:absolute;cursor:grab;z-index:5}
+.piece.dragging{opacity:.85;cursor:grabbing}
+.bag{display:flex;gap:10px;flex-wrap:wrap;min-height:56px;border:1px dashed var(--line2);border-radius:3px;padding:8px}
+.bagpiece{border-radius:3px;color:#0d0b0a;font-weight:700;font-size:9px;display:flex;align-items:center;justify-content:center;padding:3px;border:1px solid rgba(0,0,0,.35);text-align:center;line-height:1.05;cursor:grab;min-width:34px}
+.shape-editor{display:grid;grid-template-columns:repeat(5,22px);gap:2px;margin:6px 0}
+.sc{width:22px;height:22px;background:#0c0a08;border:1px solid var(--line);border-radius:2px;cursor:pointer}
+.sc.on{background:var(--ec);border-color:var(--ec)}
+.swatches{display:flex;gap:5px;margin:4px 0 8px;flex-wrap:wrap}
+.sw{width:20px;height:20px;border-radius:3px;cursor:pointer;border:2px solid transparent}
+.sw.sel{border-color:var(--ink)}
+/* ===== BIBLIOTECA ===== */
+.docgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.doc{background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:10px;display:flex;flex-direction:column;gap:6px}
+.doc .dth{height:100px;display:flex;align-items:center;justify-content:center;background:#0c0a08;border-radius:3px;overflow:hidden;font-size:34px;color:var(--faint);cursor:pointer}
+.doc .dth img{width:100%;height:100%;object-fit:cover}
+.doc input{font-size:11px;padding:4px 6px}
+.doc .dbtns{display:flex;gap:4px;justify-content:space-between}
+.dropzone{border:1px dashed var(--line2);border-radius:4px;padding:26px;text-align:center;color:var(--faint);font-size:12px;letter-spacing:1px;margin-bottom:14px;transition:.2s;cursor:pointer}
+.dropzone.over{border-color:var(--ec);color:var(--ec);background:var(--eglow)}
+/* ===== MODO SESSÃO ===== */
+#sessview{display:none}
+body.sess #mainview,body.sess .tabs{display:none}
+body.sess #sessview{display:block}
+.sessgrid{display:grid;grid-template-columns:1.15fr .85fr;gap:14px}
+@media(max-width:900px){.sessgrid{grid-template-columns:1fr}}
+.bigrec{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.bigrec .rec .rv input{font-size:24px;width:70px}
+.bigrec .rec .stp{width:34px;height:34px;font-size:16px}
+.slog{max-height:220px;overflow:auto;font-size:12px;color:var(--dim)}
+.slog div{border-bottom:1px solid var(--line);padding:4px 0}
+.snote{display:flex;gap:6px;margin-bottom:8px}
+.snlist{max-height:300px;overflow:auto}
+.snlist .sn{border-left:2px solid var(--ecd);padding:4px 10px;margin-bottom:6px;font-size:12.5px;color:var(--dim)}
+.snlist .sn b{color:var(--faint);font-weight:400;font-size:10px;margin-right:8px;font-family:ui-monospace,monospace}
+/* rolagem flutuante */
+#rollcard{position:fixed;right:22px;bottom:22px;z-index:70;background:var(--panel);border:1px solid var(--ec);border-radius:5px;padding:12px 18px;min-width:190px;opacity:0;transform:translateY(14px);transition:.3s;pointer-events:none;box-shadow:0 8px 40px -8px rgba(0,0,0,.8)}
+#rollcard.on{opacity:1;transform:none}
+#rollcard .rl{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--faint)}
+#rollcard .rt{font-family:Georgia,serif;font-size:26px;color:var(--ink)}
+#rollcard .rt small{font-size:12px;color:var(--faint)}
+#rollcard .rg{font-size:11px;letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+.g-crit{color:#e0c25a}.g-total{color:#8fae6a}.g-parcial{color:#c9a227}.g-falha{color:#c66}
+/* modal */
+#modal{position:fixed;inset:0;z-index:80;background:rgba(6,5,3,.78);display:none;align-items:flex-start;justify-content:center;padding:6vh 14px;overflow:auto}
+#modal.on{display:flex}
+#modalbox{background:var(--panel);border:1px solid var(--line2);border-radius:5px;max-width:640px;width:100%;padding:18px 20px}
+#modalbox h3{font-family:Georgia,serif;font-weight:400;letter-spacing:3px;text-transform:uppercase;color:var(--ec);margin:0 0 12px;font-size:14px}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--panel2);border:1px solid var(--goldim);color:var(--ink);padding:9px 16px;border-radius:4px;font-size:13px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:90}
+.toast.show{opacity:1}
+.foot{text-align:center;font-size:10px;color:var(--faint);letter-spacing:3px;margin-top:34px;font-family:ui-monospace,monospace}
+/* ===== TEMAS DE ELEMENTO ===== */
+body[data-el=obs]{--ec:#c9a227;--ecd:#8a6f1c;--eglow:rgba(201,162,39,.16)}
+body[data-el=eco]{--ec:#7fb8a8;--ecd:#4f7a6d;--eglow:rgba(127,184,168,.13)}
+body[data-el=vaz]{--ec:#7c8fb5;--ecd:#48566f;--eglow:rgba(90,107,140,.14);--bg:#0a0b10;--panel:#10121a;--panel2:#141724;--line:#232838;--line2:#2f374d}
+body[data-el=asc]{--ec:#c15a45;--ecd:#7d3527;--eglow:rgba(176,74,58,.15)}
+body[data-el=pac]{--ec:#c13a52;--ecd:#77202f;--eglow:rgba(163,38,56,.15)}
+body[data-el=ger]{--ec:#8dbb62;--ecd:#4f6d34;--eglow:rgba(111,154,78,.14)}
+/* eco: ghosting nos títulos, crescente com a banda */
+body[data-el=eco] h1,body[data-el=eco] .panel h2{text-shadow:calc(var(--band)*1.2px) calc(var(--band)*1.2px) 0 rgba(127,184,168,.35)}
+/* obs: olho que pisca nos títulos */
+body[data-el=obs][data-band="2"] .panel h2::after,body[data-el=obs][data-band="3"] .panel h2::after,body[data-el=obs][data-band="4"] .panel h2::after,body[data-el=obs][data-band="5"] .panel h2::after{content:"⊙";font-size:10px;color:var(--ec);animation:blinkeye 6s infinite}
+/* asc: listras de ferrugem e tremor */
+body[data-el=asc] .panel{border-image:repeating-linear-gradient(45deg,var(--ecd) 0 8px,var(--line) 8px 16px) 1}
+body[data-el=asc][data-band="4"] .wrap,body[data-el=asc][data-band="5"] .wrap{animation:servo 3.5s steps(2) infinite}
+@keyframes servo{0%,96%{transform:none}98%{transform:translate(1px,-1px)}}
+/* pacto: linha de assinatura sob os títulos */
+body[data-el=pac][data-band="2"] .panel h2,body[data-el=pac][data-band="3"] .panel h2,body[data-el=pac][data-band="4"] .panel h2,body[data-el=pac][data-band="5"] .panel h2{border-bottom:1px solid var(--ecd);padding-bottom:5px}
+/* germe: musgo nos cantos, cresce com a banda */
+body[data-el=ger] .panel::before{content:"";position:absolute;left:-30px;bottom:-30px;width:calc(40px + var(--band)*26px);height:calc(40px + var(--band)*26px);background:radial-gradient(circle,rgba(111,154,78,.28),transparent 70%);pointer-events:none}
+body[data-el=ger][data-band="4"] .panel::after,body[data-el=ger][data-band="5"] .panel::after{content:"❋";position:absolute;right:8px;bottom:4px;color:var(--ecd);font-size:11px;opacity:.6}
+/* vazio: a ficha some pelas bordas */
+body[data-el=vaz][data-band="3"] .tabs button:not(.active),body[data-el=vaz][data-band="4"] .tabs button:not(.active),body[data-el=vaz][data-band="5"] .tabs button:not(.active){opacity:.5}
+body[data-el=vaz][data-band="5"] .panel:not(:hover){opacity:.82;transition:opacity .8s}
+/* colapso 17–20: perturbador, nunca bloqueante */
+body[data-band="5"] h1{animation:aberra 4s steps(3) infinite}
+@keyframes aberra{0%,94%{text-shadow:none}96%{text-shadow:-2px 0 var(--red),2px 0 var(--ec)}98%{text-shadow:2px 0 var(--red),-2px 0 var(--ec)}}
+body[data-band="5"] .panel h2:not(:hover){filter:blur(.4px)}
+body[data-band="5"] .panel h2:hover,body[data-band="5"] h1:hover{animation:none;filter:none}
+/* calmar / reduced motion */
+body.calm *,body.calm *::before,body.calm *::after{animation:none!important;transition:none!important}
+body.calm #fx-canvas,body.calm #whisper{display:none}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}#fx-canvas{display:none}}
+@media(max-width:640px){h1{font-size:20px;letter-spacing:5px}.wrap{padding:10px 10px 50px}.elc{width:100%}}
+
+</style>
+</head>
+<body data-el="" data-band="0">
+<canvas id="fx-canvas"></canvas>
+<div id="fx-vign"></div><div id="fx-blood"></div>
+<div id="whisper"></div><div id="transOv"></div>
+<div class="wrap">
+<header>
+  <h1>PROTOCOLO<b id="h1g"></b></h1>
+  <span class="sub">ficha de personagem · 4ª edição · brasil, 2002</span>
+  <div class="hbtns">
+    <button class="btn" id="btnChars">Personagens</button>
+    <button class="btn" id="btnExp">Exportar</button>
+    <button class="btn" id="btnImp">Importar</button>
+    <button class="btn" id="btnMute" title="silenciar sussurros">🔇</button>
+    <button class="btn" id="btnCalm" title="reduzir efeitos visuais">🌫</button>
+    <button class="btn gold" id="btnSess">▶ Sessão</button>
+  </div>
+</header>
+<div id="divDock"></div>
+<div class="tabs" id="tabsrow"></div>
+<div id="mainview"></div>
+<div id="sessview"></div>
+<div class="foot" id="foot"></div>
+</div>
+<div id="rollcard"><div class="rl" id="rc_l"></div><div class="rt" id="rc_t"></div><div class="rg" id="rc_g"></div></div>
+<div id="modal"><div id="modalbox"></div></div>
+<div class="toast" id="toast"></div>
+<input type="file" id="impFile" accept="application/json" style="display:none">
+<input type="file" id="bibFile" accept="application/pdf,image/*" multiple style="display:none" onchange="bibAdd(this.files);this.value=''">
+<script>
+/* ============ PROTOCOLO 4ª ED — DADOS DOS LIVROS ============ */
+const ALFA={A:"⟟",B:"⌇",C:"☊",D:"⌖",E:"⋔",F:"⟒",G:"⊬",H:"⌭",I:"⊙",J:"⟡",K:"⌬",L:"⌰",M:"⋉",N:"⌯",O:"◊",P:"⊢",Q:"⌾",R:"⟑",S:"⊕",T:"⊥",U:"⋏",V:"⌖",W:"⍜",X:"⌘",Y:"⍟",Z:"⊗"};
+function alien(s){return s.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").split("").map(ch=>ALFA[ch]||ch).join("");}
+const W_RUIDO=alien("RUIDO"); /* ⟑⋏⊙⌖◊ */
+
+const ATTRS=[["car","Carne","o corpo e a força"],["ner","Nervo","velocidade e mãos"],["jui","Juízo","saber e notar"],["tem","Têmpera","o que segura a mente"],["lab","Lábia","o peso diante dos outros"]];
+
+const PERICIAS=[
+["Atletismo","car"],["Briga","car"],["Força Bruta","car"],
+["Acrobacia","ner"],["Furtividade","ner"],["Pilotagem","ner"],["Pontaria","ner"],["Mãos Hábeis","ner"],
+["Investigação","jui"],["Percepção","jui"],["Medicina","jui"],["Ciências","jui"],["Tecnologia","jui"],["Engenharia","jui"],["Ocultismo","jui"],["Sobrevivência","jui"],["História","jui"],["Línguas","jui"],["Burocracia","jui"],["Mídia","jui"],
+["Coragem","tem"],["Vigor Mental","tem"],["Intuição","tem"],["Fé","tem"],
+["Diplomacia","lab"],["Persuasão","lab"],["Enganação","lab"],["Intimidação","lab"],["Liderança","lab"],["Atuação","lab"]];
+
+const CONDICOES=[
+["Atordoado","Perde a Ação no próximo turno (ainda tem o Movimento)."],
+["Caído","No chão: corpo a corpo contra você tem +1; à distância, −1. Levantar custa o Movimento."],
+["Sangrando","Perde 1 de Vida por turno até ser estabilizado."],
+["Lento","Movimento pela metade e −1 na Defesa."],
+["Vulnerável","Ataques contra você têm +1 até o seu próximo turno."],
+["Desprevenido","Sem Reação; ataques contra você têm +1. Dura até o seu primeiro turno."],
+["Cego","Desvantagem em tudo que depende de ver; ataques contra você têm +1."],
+["Confuso","Desvantagem em ações que exijam foco; o mestre pode redirecionar uma ação."],
+["Apavorado","−1 em tudo enquanto a fonte do medo estiver à vista; não se aproxima dela de vontade."],
+["Em Pânico","Você foge ou congela diante da fonte; não consegue agir contra ela."],
+["Agarrado","Não se move; escapar é uma Ação (Força Bruta ou Acrobacia contra quem agarrou)."],
+["Exausto","−1 acumulativo em testes físicos. Vigor Mental ignora um deles, 1×/cena."],
+["Envenenado","Perde Vida ou sofre −1 a cada turno, conforme a fonte, por uma duração."],
+["Semeado (X)","Condição do Germe: X de dano no fim de cada turno. Não acumula (a maior substitui). Absorção não conta. Remover: Medicina (8), fogo, ou uma cena de tratamento."],
+["Inconsciente","Caído e fora de combate: não age, e golpes de perto acertam sem rolagem."]];
+
+const RAIZES=[
+{n:"Acadêmico",f:"Entre livros e cafés ruins.",per:["Ciências","História"],prof:"idioma extra, etiqueta acadêmica",rs:4000,item:"laptop velho + credencial universitária",c:["Erudição","1×/sessão, sabe um fato acadêmico sem teste."]},
+{n:"Detetive Particular",f:"Já seguiu marido infiel demais.",per:["Investigação","Percepção"],prof:"arrombamento, etiqueta do submundo",rs:3500,item:"distintivo falso + câmera + caderninho",c:["Faro","+1 para perceber mentira ou ocultação."]},
+{n:"Ex-Policial",f:"Saiu da corporação. As razões variam.",per:["Pontaria","Intimidação"],prof:"Armas Restritas, veículos comuns",rs:5000,item:"arma registrada + colete usado",c:["Contatos na Corporação","1×/sessão, uma informação ou favor de alguém na ativa."]},
+{n:"Profissional de Saúde",f:"Plantões ensinaram a não dormir.",per:["Medicina","Coragem"],prof:"ferramentas médicas",rs:8000,item:"kit médico + acesso a hospital",c:["Mãos Calejadas","Estabilizar não o abala; +1 em Medicina sob estresse."]},
+{n:"Hacker / TI",f:"Mora mais na internet que no corpo.",per:["Tecnologia","Mídia"],prof:"ferramentas técnicas, inglês técnico",rs:6000,item:"setup potente + HDs suspeitos",c:["Pegada Digital","1×/sessão, acha online algo trabalhoso."]},
+{n:"Operário / Técnico",f:"Conserta o que os outros quebram.",per:["Engenharia","Força Bruta"],prof:"ferramentas técnicas, veículos comuns",rs:2500,item:"caixa de ferramentas + veículo velho",c:["Jeitinho","Improvisa um conserto ou solução mecânica."]},
+{n:"Religioso",f:"Fé inabalável — até ver coisas.",per:["Fé","Persuasão"],prof:"etiqueta religiosa, idioma litúrgico",rs:2000,item:"símbolo religioso + texto sagrado",c:["Conforto Espiritual","1×/cena, recupera 1 de Lucidez de um aliado."]},
+{n:"Artista",f:"Vive de aplausos e contas atrasadas.",per:["Atuação","Diplomacia"],prof:"etiqueta artística, idioma extra",rs:3000,item:"equipamento de palco + guarda-roupa",c:["Plateia na Mão","1×/cena, +2 para cativar um público."]},
+{n:"Herdeiro",f:"Nunca trabalhou — e faz questão.",per:["Diplomacia","Persuasão"],prof:"etiqueta da alta sociedade, veículos comuns",rs:60000,item:"carro bom + contatos influentes",c:["Carteira Recheada","1×/sessão, resolve com dinheiro (dentro do plausível)."]},
+{n:"Lutador",f:"O corpo é o currículo.",per:["Briga","Atletismo"],prof:"armas brancas",rs:3000,item:"equipamento de treino + troféus",c:["Instinto de Ringue","+1 para agir primeiro num confronto físico."]},
+{n:"Motorista",f:"Conhece a cidade melhor que o GPS — que nem existe ainda.",per:["Pilotagem","Mídia"],prof:"veículos comuns e especiais",rs:2000,item:"veículo confiável + as ruas na cabeça",c:["Atalho","1×/sessão, conhece uma rota mais rápida ou uma saída."]},
+{n:"Ex-Militar",f:"Treinado para o pior.",per:["Furtividade","Força Bruta"],prof:"Armas Militares, explosivos, etiqueta militar",rs:5000,item:"equipamento tático + documentos antigos",c:["Treinamento","+1 contra ser pego de surpresa."]},
+{n:"Jornalista",f:"Faz a pergunta que ninguém quer.",per:["Investigação","Mídia"],prof:"idioma extra, etiqueta da imprensa",rs:4000,item:"credencial + gravador + contatos",c:["Fonte Confiável","1×/sessão, conhece quem sabe do assunto."]},
+{n:"Sobrevivente das Ruas",f:"A vida ensinou na marra.",per:["Furtividade","Sobrevivência"],prof:"arrombamento, etiqueta do submundo",rs:500,item:"mochila + uma rede marginal",c:["Faro de Perigo","+1 para sentir encrenca chegando."]},
+{n:"Funcionário Genérico",f:"Já viu de tudo no trabalho.",per:["Burocracia","Diplomacia"],prof:"etiqueta corporativa, veículos comuns",rs:3500,item:"crachá + conhecimento de processos",c:["Sobrevivente Corporativo","1×/sessão, sabe a papelada ou a pessoa que resolve."]},
+{n:"Interior / Mateiro",f:"Cresceu perto do silêncio.",per:["Sobrevivência","Percepção"],prof:"Armas Restritas (caça), veículos comuns",rs:1500,item:"facão + o saber do mato e dos bichos",c:["Filho da Terra","+1 em ambiente natural ou rural."]},
+{n:"Investigador do Oculto",f:"Lê fóruns estranhos de madrugada.",per:["Ocultismo","Mídia"],prof:"idioma morto, etiqueta de cultos",rs:2500,item:"anotações + amuleto duvidoso",ruido:1,c:["Já Vi Isso Antes","1×/sessão, reconhece um padrão sobrenatural."]}];
+
+/* ---- FARDOS (Dossiê de Fardos, 4ª ed.) ---- */
+/* h = habilidade: [nome, etiqueta, texto, req?{nv,ruido,req}] */
+const FARDOS={
+"Casca-Grossa":{f:"Quando o mundo mostra os dentes, alguém mostra os punhos.",vida:3,comb:"fol",cv:2,tre:["Briga","Atletismo","Força Bruta"],profs:"armas brancas, fogo leves, proteções",
+base:[["Treinamento de Combate","PASSIVA","Nunca sofre penalidade de improviso ou de não-proficiência com armas. Com um olhar (Ação Livre, 1×/cena por alvo), avalia o armamento de alguém: o mestre diz o bônus de dano da arma dele e se ele é treinado."],
+["Investida","AÇÃO","Mova-se até o deslocamento total e ataque no fim. Se avançou 3m+ em linha reta: +1 de dano, e num Total o alvo testa Força Bruta (7) ou é empurrado 1m e fica −1 na próxima ação. Num Parcial, você termina exposto: o alvo ganha +1 contra você até seu próximo turno."],
+["Encaixar o Golpe","REAÇÃO · 1×/CENA","Ao ser atingido, reduza aquele dano pela metade (arredonda para baixo). No nível 8, passa a 2×/cena."]],
+esc:[["Postura Defensiva","AÇÃO","+2 no seu Limiar de Defesa até seu próximo turno; gaste 1 Fôlego (Reação) para estender o +2 a um aliado adjacente contra um ataque."],
+["Contra-Ataque","REAÇÃO · REQ. ENCAIXAR O GOLPE","Quando um ataque corpo a corpo erra você, ataque de graça; num Total, desarma ou empurra 1m.",{req:"Encaixar o Golpe"}],
+["Empurrão de Guerra","AÇÃO","Ataque com dano pela metade; Parcial: alvo empurrado 3m ou Caído; Total: você escolhe, +1 se ele bater em obstáculo."],
+["Grito de Guerra","LIVRE · 1 FÔLEGO · 1×/CENA · NV 4","Aliados próximos saem de Apavorado, ganham +1 no próximo teste e resistem ao medo com Vantagem na cena.",{nv:4}],
+["Quebra-Guarda","AÇÃO · 1 FÔLEGO · NV 6","Seu ataque ignora a Absorção do alvo; num Total, a Absorção dele cai 1 até ser reparada.",{nv:6}],
+["Furacão","GATILHO · 1×/TURNO · NV 8","Ao reduzir um inimigo a 0, mova metade do deslocamento e ataque outro inimigo ao alcance.",{nv:8}],
+["Pele de Couro","PASSIVA","A carne de quem apanha muito: você tem Absorção 1 mesmo sem armadura."],
+["Placagem","AÇÃO","Investida que derruba: num Total, você e o alvo vão ao chão, ele Caído; você levanta de graça."],
+["Desarme Brutal","AÇÃO · 1 FÔLEGO","Força Bruta oposta; no sucesso, a arma dele voa para longe."],
+["Cabeçada","REAÇÃO · AGARRANDO/AGARRADO","Dano leve e o alvo testa Carne (7) ou fica Atordoado."],
+["Segundo Ataque","PASSIVA · NV 6","1×/rodada, se seu primeiro ataque foi Total, faça um segundo ataque com −2.",{nv:6}],
+["Guarda de Ferro","REAÇÃO · 1 FÔLEGO","Some a sua Carne ao Limiar de Defesa contra um único ataque."],
+["Rugir","LIVRE · 1×/CENA","Um inimigo à sua escolha testa Coragem (7) ou fica Apavorado de você."],
+["Fôlego de Boi","PASSIVA","+2 de Fôlego máximo, e o Respiro recupera Fôlego em dobro."],
+["Golpe Giratório","AÇÃO · 1 FÔLEGO","Ataque dois inimigos adjacentes com o mesmo golpe, dano cheio em ambos."],
+["Não Sai do Chão","PASSIVA","Não pode ser empurrado nem derrubado contra a vontade; escapar de Agarrado é Ação Livre."],
+["Investida Blindada","PASSIVA · REQ. INVESTIDA","Durante a Investida, ataques contra você têm −1; você entra protegendo a cabeça."],
+["Castigo","GATILHO","Quando um inimigo adjacente ataca um aliado seu, faça um ataque de oportunidade nele."],
+["Fúria Contida","AÇÃO · 1 FÔLEGO","Seu próximo ataque neste turno causa +2 de dano, mas você fica Vulnerável até o próximo turno."],
+["Osso Duro","PASSIVA","A primeira condição física que você sofreria em cada cena é ignorada."],
+["Marcar Presença","PASSIVA","Inimigos adjacentes a você sofrem −1 para atacar seus aliados: você é ameaça demais para ignorar."],
+["Levantar na Marra","REAÇÃO · 1 FÔLEGO","Quando é derrubado, levante-se na hora sem gastar Movimento."]],
+mae:[{n:"Berserker",s:"a dor como combustível",regra:["Risco da Fúria","A cada turno em Fúria, teste Coragem (7) ou ataque a criatura mais próxima — amiga ou inimiga."],st:[
+[["Sangue Fervendo","PASSIVA","Ao sofrer dano, recupere 1 de Fôlego (máx. 1×/turno)."],["Entrar em Fúria","AÇÃO","Entre em Fúria: +1 de dano corpo a corpo, −1 na Defesa, imune a Apavorado. Dura a cena ou até você acalmar."]],
+[["Fúria Crescente","PASSIVA","O bônus de dano da Fúria sobe conforme a sua Vida cai."],["Ignorar a Ferida","1×/CENA","Em Fúria, ignore os efeitos de uma condição por 1 turno."]],
+[["Não Vou Cair","PASSIVA","Em Fúria, ao chegar a 0 de Vida você segue de pé até o fim do seu próximo turno."],["Frenesi","GATILHO","Ao derrubar um inimigo, ataque outro imediatamente."]],
+[["Sede de Sangue","PASSIVA","Recupere Vida ao reduzir um inimigo a 0."],["Avatar da Carnificina","1×/SESSÃO","Um turno de Fúria absoluta: ataques sem custo e sem limite de alvos adjacentes; o mestre narra a saída."]]]},
+{n:"Lutador",s:"corpo a corpo puro",st:[
+[["Mãos de Pedra","PASSIVA","Desarmado, você causa dano como uma arma leve e nunca conta como improviso."],["Sequência","PASSIVA","Ao acertar corpo a corpo, +1 no próximo ataque contra o mesmo alvo (acumula na rodada)."]],
+[["Agarrão","AÇÃO","Teste de Briga: o alvo fica Agarrado."],["Nocaute","GATILHO","Contra alvo Atordoado ou Desprevenido, um Total o deixa Inconsciente."]],
+[["Fluxo de Combate","1×/RODADA","Um segundo golpe desarmado como Ação Livre."],["Quebra-Ossos","PASSIVA","Seu dano corpo a corpo aplica Lento num Total."]],
+[["Cem Mãos","AÇÃO","Ataque todos os inimigos adjacentes de uma vez."],["Imparável","PASSIVA","Imune a Agarrado, Caído e empurrão."]]]},
+{n:"Duelista",s:"um inimigo de cada vez",st:[
+[["Foco no Alvo","AÇÃO LIVRE","Marque um inimigo: +1 para acertá-lo, −1 contra os outros enquanto o foco durar."]],[],[],[]]}]},
+
+"Investigador":{f:"Todo mundo vê. Quase ninguém olha.",vida:2,comb:"sin",cv:2,tre:["Investigação","Percepção","Intuição"],profs:"arrombamento, fotografia e escuta, etiqueta do submundo",
+base:[["Linha de Raciocínio","AÇÃO LIVRE · 1×/CENA","Declare uma conexão entre duas pistas encontradas. Plausível? O mestre confirma e dá um rumo concreto (um lugar, um nome, um próximo passo). Se for um salto, role Investigação (7): sucesso confirma; falha diz que a conexão é real, mas falta uma peça — o mestre diz de que tipo."],
+["Olhar Treinado","AÇÃO LIVRE · 1×/CENA","+2 numa Investigação ou Percepção feita com calma. Além disso, pode perguntar ao mestre: “o que aqui está fora do lugar?” — resposta honesta, mesmo num Parcial."],
+["Nunca Esquece o Caso","PASSIVA","Memória perfeita de toda pista da campanha; 1×/sessão pede ao mestre que recite uma palavra por palavra. +1 contra tentativas de alterar ou confundir suas memórias — inclusive sobrenaturais. O Eco odeia você."]],
+esc:[["Reconstituição","AÇÃO · 1 SINTONIA","Investigação (7) numa cena. Parcial: um quadro congelado — o essencial do que houve. Total: uma sequência curta — o quê e em que ordem. Crítico: + um detalhe que ninguém deveria saber. É dedução, não magia: não vê o que não deixou rastro."],
+["Pressão Psicológica","REQ. LINHA DE RACIOCÍNIO","+2 em interrogatórios; num Parcial, o alvo ainda revela uma verdade. Num Total, você também descobre o que ele teme perder.",{req:"Linha de Raciocínio"}],
+["Perfil","AÇÃO (UMA CENA DE ESTUDO) · NV 4","Estude um suspeito: monte o Perfil. Contra ele: +1 para antecipar/opor, e 1×/cena pode perguntar ao mestre “qual o próximo passo dele?” — resposta honesta em uma frase.",{nv:4}],
+["Não Escapa","PASSIVA · REQ. PERFIL · NV 6","Contra alvos perfilados: você sempre acha um rastro (o mestre fornece), e disfarces deles não o enganam (Percepção 6 revela num olhar).",{nv:6,req:"Perfil"}],
+["Conexões Improváveis","1×/SESSÃO · NV 6","Declare uma ligação entre dois elementos da campanha. Plausível? Vira verdade. Se o mestre julgar falsa, você ganha em vez disso uma pista real sobre por que NÃO se conectam — errar também alimenta.",{nv:6}],
+["Faro de Mentira","PASSIVA · NV 6","Quando mentem diretamente para você, você sente (a mentira, não a verdade). Enganadores sobrenaturais forçam teste oposto: sua Intuição vs a Enganação deles.",{nv:6}],
+["Vasculhar","AÇÃO ESTENDIDA","Reviste um ambiente a fundo: Percepção (7). Parcial: acha o óbvio escondido. Total: + um item ou pista guardada com cuidado. Crítico: + algo que o próprio dono esqueceu que tinha."]],mae:[]},
+
+"Médico":{f:"Você decide quem vira cadáver.",vida:2,comb:"sin",cv:2,tre:["Medicina","Ciências","Intuição"],profs:"ferramentas médicas, veículos comuns, acesso hospitalar",
+regra:["Cura-Base","Ação · 1 Sintonia · Toque. Em condições calmas, cura automática de 1d2 + Juízo. Sob pressão, exige Medicina (7): Falha cura metade e você se expõe · Parcial cura normal · Total cura +1 · Crítico cura o máximo e remove uma condição leve."],
+base:[["Estabilizar","AÇÃO · TOQUE","Alguém a 0 de Vida: teste Medicina (7). Parcial: estável, mas inconsciente (acorda com 1 de Vida após a cena). Total: volta a 1 de Vida, consciente. Crítico: volta a 1 e pode agir imediatamente — adrenalina pura. Sem kit: Desvantagem."],
+["Triagem","AÇÃO LIVRE · 1×/CENA","Olhe um ferido: o mestre diz exatamente o que ele tem — Vida, condições, venenos, e o que mata mais rápido. Em vários feridos: você sabe a ordem certa; quem seguir sua triagem ganha +1 em testes de socorro."],
+["Mãos Firmes","PASSIVA","Você trata sob estresse como se estivesse calmo: a Cura-Base não exige teste em combate, e Medicina ignora penalidades de ambiente (escuro, chuva, veículo em movimento)."]],
+esc:[["Tratamento Intensivo","AÇÃO · 2 SINTONIA · 1×/CENA POR ALVO","O alvo recupera 1d4 + Juízo de Vida e remove Sangrando ou uma condição física leve."],
+["Farmacologia","AÇÃO (1 CENA DE PREPARO) · REQ. TRIAGEM","Prepara 2 doses por cena de trabalho (duram a sessão): Estimulante — ignora Exausto e +1 físico por uma cena; depois, Exausto. Sedativo — alvo testa Resistência (8) ou fica Lento; dose dupla apaga. Analgésico forte — ignora penalidades de ferimento por uma cena.",{req:"Triagem"}],
+["Calmante","AÇÃO · ADJACENTE (TOQUE OU VOZ)","Remove Apavorado, Confuso ou Em Pânico de um aliado; ele ainda ganha +1 no próximo teste de Coragem da cena."],
+["Cirurgia de Campo","AÇÃO ESTENDIDA (10+ MIN) · 2 SINTONIA · NV 6","Teste Medicina (8). Parcial: remove uma condição grave, mas o paciente sofre 1 de dano e fica Exausto. Total: remove limpo. Crítico: remove e o paciente cura 1d4. Falha: 1d2 de dano e a condição fica.",{nv:6}],
+["Estoque de Emergência","1×/SESSÃO · NV 4","Declara ter o suprimento certo à mão: antídoto comum, soro, dose, kit completo. Raros e anômalos ficam de fora.",{nv:4}],
+["Anatomia Aplicada","PASSIVA · NV 6","Você sabe consertar corpos; logo, sabe onde quebram. +1 em ataques precisos.",{nv:6}],
+["Contenção de Sangramento","REAÇÃO","Quando um aliado adjacente sofre Sangrando, remova a condição na hora, sem gastar sua ação."],
+["Overdose Controlada","AÇÃO · 1 SINTONIA + 1 LUCIDEZ","Force o corpo de alguém além do limite por 1 turno: ele age mesmo Inconsciente ou Atordoado — e depois cai de vez."],
+["Palavra que Acalma","AÇÃO LIVRE","Um paciente consciente para de entrar em pânico ou piorar por medo; coopera com o tratamento mesmo assustado."],
+["Leitura de Sintomas","AÇÃO","Diagnostique uma doença ou veneno que nunca viu, só pelos sintomas: Medicina (8) revela a natureza geral do problema."],
+["Cuidado Preventivo","DOWNTIME","Trate alguém entre casos para impedir o agravamento de uma condição crônica ou lesão mal curada."],
+["Mãos que Salvam Muitos","AÇÃO · 1 SINTONIA","Trate dois feridos adjacentes a você numa única ação; cada um recupera metade do valor normal da Cura-Base."],
+["Instinto Clínico","PASSIVA","Você percebe, à vista, se alguém próximo está doente ou ferido, mesmo que esconda bem."],
+["Remédio na Manga","1×/SESSÃO","Declare ter consigo o medicamento comum certo para a situação — não anômalo, mas exatamente o que falta."],
+["Sangue Frio","PASSIVA","Você não perde Lucidez ao lidar com ferimentos, mortes ou horrores médicos que já esperava encontrar no ofício."],
+["Última Tentativa","AÇÃO · 2 SINTONIA + 1 LUCIDEZ","Force uma reanimação onde não devia ser possível: Medicina (9). Total: funciona, com um custo definido pelo mestre. Falha: não funciona — e você sente o peso de ter tentado."]],
+mae:[{n:"Cirurgião",s:"cura pesada e reparo",st:[
+[["Mãos Precisas","PASSIVA","Cura-Base sobe para 1d4 + Juízo. Em qualquer Crítico de cura sua, o alvo também remove uma condição leve."],["Estancar","REAÇÃO · 1×/CENA","Aliado adjacente sofre Sangrando ou cai a 1/4 da Vida: você age fora do turno — remove Sangrando e cura 1d2."]],
+[["Operação","AÇÃO · 2 SINTONIA","Cura 2d4 + Juízo e remove uma condição grave. Sob fogo exige Medicina (8): Parcial cura metade."],["Reparo Profundo","AÇÃO ESTENDIDA (HORAS)","Restaura a função de um membro ou sentido danificado (condições duradouras; Sequelas só no Ápice)."]],
+[["Cirurgia Estável","1×/CENA","Declare antes: essa cura não falha, não complica e cura o valor máximo sem rolar."],["De Volta da Beira","AÇÃO · 3 SINTONIA · 1×/SESSÃO","Morto há até 2 turnos: Medicina (9). Total: volta com 1d4 de Vida e uma Sequela — ninguém volta inteiro. Parcial: volta com 1, Sequela + Exausto pela sessão. Falha: foi-se. Não pode ser Forçada."]],
+[["Bisturi Milagroso","DOWNTIME","Remove Sequelas físicas permanentes (uma por downtime, Medicina 9)."],["Sutura Perfeita","PASSIVA","Toda cura sua de 8+ de Vida remove também uma condição à escolha do paciente."]]]}]},
+
+"Faz-Tudo":{f:"Tudo que liga, desliga. Tudo que tranca, abre.",vida:1,comb:"sin",cv:3,tre:["Tecnologia","Ciências","Engenharia"],profs:"ferramentas técnicas, veículos comuns, inglês técnico",
+base:[["Mãos de Oficina","PASSIVA","Consertos e trabalhos técnicos levam metade do tempo, e você improvisa a ferramenta certa com sucata quando não a tem."],
+["Olho de Engenheiro","LIVRE · 1×/CENA","Encare um mecanismo, veículo ou dispositivo: o mestre diz como funciona e onde é o ponto fraco."],
+["Gambiarra de Combate","AÇÃO · 1 SINTONIA · 1×/CENA","Monte na hora um truque técnico do cenário — fumaça, um choque, um estrondo que distrai; num Total, o alvo fica Atordoado ou Cego por 1 turno."]],
+esc:[["Invadir Sistema","AÇÃO · 1 SINTONIA","Tecnologia para burlar uma fechadura eletrônica, câmera ou sistema de segurança."],
+["Armadilha Técnica","AÇÃO · PREPARA","Monte uma armadilha (choque, alarme, rede) num ponto; dispara quando alguém cruza."],
+["Sobrecarga","AÇÃO · 1 SINTONIA","Force um aparelho elétrico a estourar ou queimar: luzes, painel, motor."],
+["Torre Improvisada","AÇÃO · 2 SINTONIA · NV 6","Monte uma arma fixa improvisada que ataca sozinha por alguns turnos.",{nv:6}],
+["Pulso Eletromagnético","AÇÃO · 2 SINTONIA · NV 8","Um pulso apaga toda eletrônica na área por uma cena.",{nv:8}],
+["Suporte Vital","AÇÃO","Improvise um aparelho que mantém um ferido estável, substituindo Estabilizar."],
+["Chave-Mestra","PASSIVA","Abre qualquer fechadura mecânica comum sem teste, dado tempo."],
+["Grampo","AÇÃO · 1 SINTONIA","Plante uma escuta; ouça o que se diz naquele ambiente à distância."],
+["Rádio-Amador","PASSIVA","Monte comunicação improvisada; fale com quem devia estar fora de alcance."],
+["Blindagem de Campo","AÇÃO · 1 SINTONIA","Reforce uma cobertura: +1 de Absorção a quem se abriga nela."],
+["Desarmar Dispositivo","AÇÃO","Engenharia para neutralizar uma armadilha, carga ou aparelho perigoso."],
+["Motor Turbinado","PASSIVA","Veículos que você prepara ou dirige ganham +1 em perseguição."],
+["Ferramenta Certa","PASSIVA · 1×/CENA","Declare ter em mãos a ferramenta específica que a situação técnica pede."],
+["Remendo Rápido","AÇÃO · 1 SINTONIA","Conserte na hora um equipamento quebrado o bastante para uma última função."],
+["Interferência","AÇÃO · 1 SINTONIA","Embaralhe rádios, câmeras e sinais numa área por uma cena."],
+["Detonação Controlada","AÇÃO · 2 SINTONIA · REQ. EXPLOSIVOS","Abra uma parede ou porta com precisão, sem soterrar ninguém."]],mae:[]},
+
+"Atirador":{f:"Você termina frases.",vida:2,comb:"fol",cv:2,tre:["Pontaria","Percepção","Furtividade"],profs:"armas de fogo leves, armas Restritas, manutenção de armas",
+regra:["Posição Exposta","Ao atacar sem cobertura, escolha antes de rolar — Exposição Calculada: +2 de dano; inimigos têm +1 contra você até seu próximo turno. Na Mira de Todos (declare; fica imóvel): +3 de dano e o tiro ignora cobertura leve do alvo; inimigos têm +2 contra você. Atrás de cobertura, atira normal — seguro, sem bônus."],
+base:[["Mira Calma","AÇÃO · DURA ATÉ O DISPARO","Gaste a ação mirando um alvo visível: o próximo disparo contra ele ganha +2. Se sofrer dano antes de atirar, teste Coragem (7) ou a mira se perde."],
+["Olho de Águia","PASSIVA","+1 Percepção à distância; lê detalhes a distâncias absurdas. 1×/cena, aponta o ponto fraco de um alvo distante: você ou um aliado ganha +1 no próximo ataque contra ele."],
+["Recarga Instintiva","PASSIVA","Recarregar é Ação Livre fora de ataque direto. Sob fogo, recarrega como parte do Movimento."]],
+esc:[["Tiro Duplo","AÇÃO","Dois disparos na mesma ação (mesmo alvo ou alvos adjacentes entre si), ambos com −1, resolvidos separadamente. Consome munição em dobro."],
+["Tiro Supressor","AÇÃO · 1 FÔLEGO","Varre uma área Curta: até seu próximo turno, agir ali custa +2 de Limiar. Capangas testam Coragem (7) ou colam na cobertura — perdem a ação. Consome 1 carga extra."],
+["Tiro Perfurante","GATILHO · 1 FÔLEGO · 1×/CENA","Seu ataque ignora a Absorção. Num Crítico, a bala atravessa: quem estiver na linha atrás do alvo sofre dano = margem."],
+["Disparo Preciso","AÇÃO · REQ. MIRA CALMA · NV 6","Apenas no turno seguinte a Mira Calma. Parcial: dano +3. Total: dano +3 e escolha — derruba, desarma ou Sangrando. Crítico: contra alvo que nunca o viu, declare incapacitação (fora de combate, vivo) ou cause o dano máximo do acerto.",{nv:6,req:"Mira Calma"}],
+["Reposicionar","AÇÃO LIVRE · 1×/CENA","Após disparar, mova-se até Curto terminando em cobertura. Quem falhar em Percepção (7) perde sua posição."],
+["Tiro de Aviso","AÇÃO · 1×/CENA","Dispare de propósito para não acertar: capangas testam Coragem (7) ou recuam/congelam; nomeados ficam com −1 na próxima ação."],
+["Munição Contada","PASSIVA","Você sempre sabe quantas balas restam — nas suas armas e, ouvindo, nas dos outros. 1×/cena, declare: “ele está seco” (o mestre confirma se plausível)."]],mae:[]},
+
+"Sobrevivente":{f:"O mato só mata quem não escuta.",vida:2,comb:"fol",cv:2,tre:["Sobrevivência","Atletismo","Percepção"],profs:"armas Restritas (caça), navegação, veículos comuns",
+base:[["Instinto de Presa","REAÇÃO · 1×/CENA","Um instante antes do perigo se manifestar, o mestre avisa que algo vem e de onde. Você (e quem você alertar com um gesto) não pode ser surpreendido nesse momento, e você age primeiro na primeira rodada."],
+["Vida na Estrada","AÇÃO (TEMPO DE BUSCA)","Sobrevivência (6 ambiente generoso / 8 hostil). Parcial: o básico para um — água, abrigo precário, rota. Total: para o grupo, com conforto mínimo. Crítico: + algo valioso (atalho, esconderijo, recurso raro). Funciona até em ruína urbana."],
+["Couro Curtido","PASSIVA","+1 contra clima, fome, sede, exaustão e ambientes hostis; remove Exausto com metade do descanso; venenos naturais fracos não o afetam."]],
+esc:[["Rastrear","AÇÃO CONTÍNUA","Sobrevivência (6 trilha fresca / 8 fria / 10 apagada). Parcial: direção e quantos. Total: + idade da trilha, estado deles e um detalhe. Crítico: + algo que eles não queriam deixar para trás. Rastros anômalos: Limiar +1, e entender o que os fez pode custar Lucidez."],
+["Armadilheiro","AÇÃO (MONTAGEM: 1 CENA; RÁPIDA: AÇÃO + 1 FÔLEGO)","Com material do ambiente: laço (prende; Atletismo 8 solta) · fojo (1d4 + Caído) · alarme natural · espinhos (1 dano + Sangrando ao atravessar). Detectar: Percepção (8)."],
+["Faro do Anômalo","PASSIVA · NV 4 · RUÍDO ≥1","Sente quando lugar, criatura ou objeto é não-natural — arrepio direcional, cheiro errado. Alcance Curto; concentrando (Ação): Médio. Não diz o quê. Diz que e onde.",{nv:4,ruido:1}],
+["Resistência Sobrenatural","REAÇÃO · 1×/SESSÃO · NV 6","Ignora completamente um efeito ambiental, tóxico ou de exaustão que o incapacitaria — inclusive anômalo. Você sente o efeito… e ele escorre.",{nv:6}],
+["Segundo Pulmão","PASSIVA · NV 8","Ignora permanentemente um nível de Exausto; aguenta o dobro em privação; 1×/cena cruza sem teste um terreno que exigiria.",{nv:8}],
+["Orientação Certa","PASSIVA","Com céu, vento ou referência qualquer, você nunca se perde; sempre sabe o norte e o caminho de volta ao último acampamento."],
+["Leitura do Céu","AÇÃO LIVRE","Prevê o tempo das próximas horas sem teste — e sente quando o clima muda de um jeito que a natureza não explicaria."],
+["Nó Certo","PASSIVA","Cordas, laços e amarras suas não falham; escapar delas exige teste (9). Escalar com corda sua dá +1 a todos."],
+["Passo Firme","PASSIVA","Terreno difícil natural (mato fechado, lama, pedra solta) não reduz seu deslocamento."],
+["Pesca e Caça","DOWNTIME","Em ambiente natural, alimenta o grupo indefinidamente sem teste; sobra couro, banha e osso — material de troca e conserto."],
+["Carga de Mula","PASSIVA","+1 categoria de carga; marchas longas não o deixam Exausto."],
+["Instinto Territorial","PASSIVA","Ao entrar numa área nova, o mestre diz se algo grande ou perigoso “mora” ali — o mato conta quem manda nele."],
+["Água Limpa","PASSIVA","Identifica à vista água ou comida estragada, envenenada ou errada; com tempo, purifica o purificável sem teste."]],
+mae:[{n:"Caçador",s:"trilha, sustento e abate",st:[
+[["Olho de Caçador","PASSIVA","+1 em Rastrear; identifica criaturas por sinais. 1×/cena pergunta ao mestre “o que ela vai fazer?” sobre uma criatura rastreada — resposta honesta."],["Terreno Conhecido","PASSIVA","Nunca se perde; +1 em terreno difícil; 1×/sessão declara um atalho ou passagem que mapas não mostram."]],
+[["Bote","PASSIVA","+2 de dano no primeiro ataque contra presa que você rastreava; se ela não sabia de você, o ataque sobe um grau (Parcial→Total)."],["Autossuficiente","PASSIVA","Sustenta o grupo em qualquer lugar; 1×/dia monta acampamento seguro: o descanso ali nunca é interrompido por perigo mundano."]],
+[["Caçada Implacável","PASSIVA","Na trilha de um alvo, você sempre o reencontra: a trilha nunca esfria. Contra ele: +1 em Percepção e Intuição."],["Lar em Qualquer Lugar","AÇÃO (1 CENA) · 1×/SESSÃO","Refúgio improvisado: o descanso do grupo conta como Descanso Longo mesmo em território hostil."]],
+[["Predador Ápice","AÇÃO LIVRE · 1×/CENA","Marca uma presa: +1 em ataque, dano e defesa contra ela até cair. Se fugir, a Caçada Implacável já está contando."],["Aclimatação Total","PASSIVA","Você e o grupo (em Curto) ignoram penalidades de qualquer ambiente extremo."]]]},
+{n:"Predador",s:"emboscada e dano selvagem",st:[
+[["Tocaia","PASSIVA","Escondido e imóvel por 1+ turno: o primeiro ataque pega o alvo desprevenido e causa +2. Se o abater nesse golpe, ninguém sabe de onde veio — você continua oculto."],["Movimento Silencioso","PASSIVA","Furtividade não reduz seu deslocamento; seguir seus rastros exige Sobrevivência (9)."]],
+[["Golpe Brutal","GATILHO · 1×/CENA","Um acerto seu aplica Sangrando; num Total, o alvo também testa Coragem (7) ou fica Apavorado."],["Instinto Assassino","PASSIVA","Contra alvos com metade da Vida ou menos: +1 de dano, e você sente quais estão feridos sem teste."]],
+[],[]]}]},
+
+"Operador":{f:"Você não existe. É exatamente isso que te torna útil.",vida:2,comb:"fol",cv:2,tre:["Furtividade","Pilotagem","Enganação"],profs:"armas de fogo leves, veículos especiais, sistemas de segurança",
+base:[["Disfarce","AÇÃO (PREPARO: MINUTOS A HORAS)","Com preparo, assume identidade crível; só rola Enganação quando alguém tem motivo para duvidar. Parcial: passa, mas fica um fio solto. Total: passa limpo. Crítico: o disfarce rende — alguém o confunde com exatamente quem você queria ser. Sem disfarce ativo: +1 para não ser reconhecido."],
+["Olho Periférico","AÇÃO LIVRE · 1×/CENA","Ao entrar num lugar, o mestre lista: saídas, câmeras, guardas e a ameaça mais imediata. Se o quadro mudar depois, você nota primeiro."],
+["Treinamento de Operação","PASSIVA","+1 em Furtividade e invasão de locais controlados; +1 contra surpresa; algemas, cordas e fechaduras simples não o seguram — escapa com tempo, sem teste."]],
+esc:[["Eliminação Silenciosa","AÇÃO · ALVO DESPREVENIDO ADJACENTE","Briga ou Mãos Hábeis vs defesa. Parcial: incapacita, mas há ruído ou rastro. Total: silêncio — escolha apagado ou morto. Crítico: silêncio total e você arruma a cena."],
+["Identidade Falsa","REQ. DISFARCE · CRIADA EM DOWNTIME","Mantém até 2 identidades documentadas que passam em verificações comuns. Verificação profunda exige teste do verificador contra 9. Queimou uma? Downtime para recriar.",{req:"Disfarce"}],
+["Treinamento Cruzado","PASSIVA · NV 4","A agência ensinava de tudo: ganha uma perícia treinada extra à escolha.",{nv:4}],
+["Protocolo de Fuga","1×/SESSÃO · NV 6","Num cerco: declare a rota que já estava preparada. O grupo escapa da cena imediata; o mestre define o custo — o que fica para trás, quem viu.",{nv:6}],
+["Mãos Limpas","1×/SESSÃO · NV 8","Após uma cena, apaga sua presença: testemunhas lembram vagamente, registros somem, câmeras “falharam”. Não apaga as consequências. Apaga você delas.",{nv:8}],
+["Contra-Vigilância","PASSIVA","Sente quando é seguido ou observado (Intuição 6 confirma e localiza); +1 para despistar uma cauda."],
+["Bolso Profundo","PASSIVA","Esconde um item Leve no corpo: revistas comuns não acham; busca minuciosa exige teste contra 9."],
+["Sinais de Mão","PASSIVA","Código silencioso da equipe: passa instruções táticas ao grupo sem som; quem observa de fora não decifra."],
+["Queima de Arquivo","AÇÃO (DOWNTIME CURTO)","Apaga ou corrompe um registro específico sobre alguém: papel, foto, ficha, fita."],
+["Extração","AÇÃO · 1 FÔLEGO","Agarra um aliado adjacente e move o deslocamento total com ele, sem provocar reações."],
+["Kit de Campo","PASSIVA","Carrega sempre arrombamento, escuta e primeiros socorros compactos; em revista casual, nada parece suspeito."],
+["Vida de Fachada","REQ. IDENTIDADE FALSA","Uma das suas identidades tem vida real: emprego, vizinhos, histórico que testemunhas confirmam sem saber que mentem.",{req:"Identidade Falsa"}],
+["Instinto de Operação","PASSIVA","Quando um plano começa a azedar, você sente antes: o mestre avisa uma rodada antes de a complicação estourar."]],
+mae:[{n:"Fantasma",s:"infiltração total",st:[
+[["Cobertura","PASSIVA","Mantém disfarces por dias ou semanas sem testes diários; só rola em risco real. +1 Enganação social."],["Camaleão","PASSIVA","Minutos observando um grupo: adota maneirismo, gíria, postura. +1 para pertencer; as pessoas assumem que você “é dali”."]],
+[["Dupla Face","PASSIVA","Infiltrado numa organização: extrai 1 segredo por sessão de infiltração sem teste. Desconfiar de você exige um incidente — não um palpite."],["Voz e Trejeito","AÇÃO (UMA CENA DE ESTUDO)","Imita voz e maneirismos de alguém: por telefone/rádio engana até íntimos (testam contra 9); ao vivo, só à meia-luz."]],
+[["Agente Duplo","1×/ARCO","Revela que esteve infiltrado o tempo todo: retroativamente, você plantou, copiou ou sabotou algo durante a infiltração."],["Sou Quem Eu Quiser","1×/ARCO · PREPARO (CENA)","Assume a identidade de uma pessoa específica por uma cena: rosto, voz, assinatura. Íntimos testam Intuição (9)."]],
+[["Homem de Mil Faces","AÇÃO","Troca de “personagem” no meio da cena: casaco vira outro, postura muda, você É outro. Reconectar você ao de antes exige Percepção (10)."],["Ninguém Real","PASSIVA","Não existe prova estável de quem você é: fotos saem “não parecidas”, registros se contradizem, biometria falha. Até o sobrenatural tem Desvantagem para ler sua identidade."]]]},
+{n:"Assassino",s:"abate cirúrgico",st:[
+[["Golpe Furtivo","PASSIVA","+2 de dano contra alvos desprevenidos ou incapazes de reagir."],["Passo de Gato","PASSIVA","Furtividade sem reduzir deslocamento; vigilância casual não rola contra você — só atenção ativa."]],
+[["Lâmina Envenenada","AÇÃO (APLICAR; 2 DOSES POR PREPARO)","No acerto, o alvo testa Resistência (8) ou recebe à sua escolha: Sangrando, Lento ou −1 cumulativo."],["Eliminação Aprimorada","PASSIVA","Sua Eliminação Silenciosa funciona contra alvos alertas (Limiar +2). Contra desprevenidos, o Parcial dela conta como Total."]],
+[],[]]}]},
+
+"Sintonizador":{f:"Todo mundo paga para saber. Você é o que sobra depois do pagamento.",vida:1,comb:"sin",cv:3,tre:["Ocultismo","Intuição","Fé"],profs:"idioma morto, etiqueta de cultos, ferramentas rituais",
+regra:["Maestria Imposta","O Sintonizador não escolhe sua maestria. No primeiro ponto de Ruído, a fonte da exposição define o elemento que o marcou — para sempre. São seis maestrias, uma por elemento — e só uma delas será sua. (Na ficha: o elemento da aba Sintonizar define a trilha.)"],
+base:[["Conhecimento Proibido","PASSIVA","+1 em Ocultismo; reconhece símbolos, ritos e nomes que não deveria conhecer. 1×/sessão, pergunte ao mestre “o que a tradição diz sobre isto?” — a resposta vem inteira. E pode estar errada: tradição não é prova."],
+["Sentir o Véu","AÇÃO LIVRE · 1×/CENA","Sente presença, resíduo ou ponto fraco anômalo em Curto: direção e intensidade. Concentrando (Ação · 1 Sintonia): também o elemento envolvido."],
+["Mente Resignada","PASSIVA","+1 contra a primeira perda de Lucidez de cada cena; diante do seu próprio elemento, toda perda cai em 1 (mín. 0). Você já viu. Já pagou."]],
+esc:[["Ritual Menor","AÇÃO (RITUAL: MINUTOS) · 1 SINTONIA","Com tempo, giz, vela e voz baixa: um efeito utilitário menor do seu elemento (Grau 1, fora de combate). Ocultismo (6)."],
+["Foco Ritual","PASSIVA","Um objeto pessoal consagrado: 1×/cena, uma conjuração sua custa −1 de Sintonia. Se o foco for destruído, você sente — perde 1 Lucidez."],
+["Linguagem Morta","PASSIVA · NV 4","Lê idiomas que não deveriam ser legíveis: mortos, cifrados, impossíveis. Textos que custariam Lucidez lidos “de raspão” custam metade (mín. 1).",{nv:4}],
+["Contramágica","REAÇÃO · 2 SINTONIA · NV 6","Contra uma conjuração que você percebe: teste oposto (ou contra Grau +2). Total: interrompe — e o Refluxo é dele. Crítico: também ganha +2 na próxima ação contra a fonte.",{nv:6}],
+["Pacto Sussurrado","1×/SESSÃO · NV 6 · RUÍDO ≥2","Sussurre ao Outro Lado: +3 num teste ou uma informação. O preço vem junto — escolha na hora: 1 Lucidez, 1 Sina para o mestre, ou uma Dívida registrada.",{nv:6,ruido:2}],
+["Magia Maior","PASSIVA · NV 8 · RUÍDO ≥4","Destrava as magias de Grau 3 do seu elemento. (Grau 4: nível 12 e Ruído ≥6.)",{nv:8,ruido:4}],
+["Benzedura","AÇÃO · 1 SINTONIA","Reza e gesto de ofício, coisa de avó que funcionava: remove uma condição leve de alguém tocado, ou dá +1 no próximo teste dele contra o anômalo."]],
+mae:[{n:"Marcado pela Observação",el:"obs",s:"o que registra",st:[[],[],[],[]]},
+{n:"Marcado pelo Eco",el:"eco",s:"o que repete",st:[[],[],[],[]]},
+{n:"Marcado pelo Vazio",el:"vaz",s:"o que subtrai",st:[[],[],[],[]]},
+{n:"Marcado pela Ascensão",el:"asc",s:"o que acumula",st:[[],[],[],[]]},
+{n:"Marcado pelo Pacto",el:"pac",s:"o que troca",st:[[],[],[],[]]},
+{n:"Marcado pelo Germe",el:"ger",s:"o que infecta · hálito de terra molhada e algo doce demais",st:[
+[["Primeira Semente","PASSIVA","Você conhece a magia Broto Faminto automaticamente (não conta no limite) e a conjura com +1. Efeitos seus do Germe que compõem sozinhos continuam crescendo mesmo se você cair."],["Faro de Podridão","PASSIVA","Sente doença, infecção e carne morta em Curto — sabe o que está doente antes do dono saber. Carniça não o enjoa. Nunca mais enjoou."]],
+[["Enxerto","AÇÃO · 2 SINTONIA + 1 DE VIDA · TOQUE","Planta uma semente num alvo: 1 de dano por turno até ser tratada (Medicina 8 remove). Em aliado disposto, a semente come a doença dele — remove veneno ou infecção comum — e morre satisfeita."],["Casca de Fungo","AÇÃO · 1 SINTONIA + 1 DE VIDA · CENA","Uma couraça úmida cresce sobre você: Absorção 2. Quando absorve, range e fede — −1 em social e Furtividade enquanto durar."]],
+[["Jardim de Carniça","AÇÃO · 3 SINTONIA + 2 DE VIDA","Infesta uma área Curta por [Juízo] turnos: terreno difícil para inimigos, e quem começar o turno ali sofre 1 de dano (Resistência 8 nega). O chão respira. Devagar."],["Colher o Vivo","AÇÃO · 2 SINTONIA","Arranca vigor do que você infectou: recupera Vida igual ao dano que suas sementes e jardins causaram neste turno."]],
+[["Hospedeiro","PASSIVA","O Germe cuida do que é dele: imune a doença e veneno mundanos; 1×/cena, ao cair abaixo da metade da Vida, regenera 1d4. Cura de terceiros rende metade em você — seu corpo já tem dono."],["Floração","RITUAL (CENA) · 5 SINTONIA + 3 DE VIDA · 1×/ARCO","Um lugar inteiro vira viveiro por uma cena: portas brotam fechadas, paredes cedem, o ar pesa. Inimigos: −1 em tudo, e Coragem (8) ao entrar ou Apavorado. Quando acaba, o lugar nunca mais é o mesmo. Nem você."]]]}]}
+};
+
+/* ---- ELEMENTOS (Grimório dos Seis) ---- */
+const ELEMS=[
+{id:"obs",g:"⊙",n:"Observação",v:"registra",fr:"O que você vê fica registrado. O que registra você, também.",
+lei:["Lei do Registro","O que você vê através da Observação fica registrado — revisitável mentalmente e transmissível: um toque na testa compartilha o registro em flash. E espiar o anômalo tem preço: a coisa pode notar o olhar."],
+marca:["Você pisca pouco demais; quem conversa com você sente que está sendo anotado — −1 em interações calorosas, +1 em Percepção passiva.","Seus olhos refletem luz como vidro; em fotos, você está sempre olhando para a lente — mesmo de costas. Quem repara de perto testa Coragem (7) ou perde 1 Lucidez.","Você enxerga o quadro inteiro antes das pessoas nele — −1 para inspirar confiança, e 1×/cena o mestre aponta de graça o detalhe fora do lugar."],
+sus:["estão te observando","isso ficou registrado","não pisque","alguém consulta o seu arquivo","você está sempre olhando para a lente"]},
+{id:"eco",g:"☊",n:"Eco",v:"repete",fr:"O Eco não cria. Devolve — meio segundo atrasado.",
+lei:["Lei do Retorno","O Eco não cria — devolve. Toda magia do Eco exige uma fonte: algo que aconteceu, foi dito, foi feito. Sem fonte, não conjura. E o Sulco: repetir a mesma magia na mesma cena dá +1 cumulativo (máx +2)."],
+marca:["Você repete baixinho a última palavra dos outros, meio segundo depois — −1 em primeiras impressões, +1 para recordar diálogos com exatidão.","Seus passos ecoam duas vezes; relógios atrasam no seu pulso. Quem anda com você no silêncio, na primeira vez, testa Coragem (7).","Você responde perguntas um instante antes de serem feitas — −1 em interações calorosas, +1 para agir primeiro em qualquer confronto."],
+sus:["você já leu isso","você já leu isso","…atrasado","a resposta veio antes da pergunta","isso já aconteceu"]},
+{id:"vaz",g:"◌",n:"Vazio",v:"subtrai",fr:"O que se aproxima volta com menos do que tinha.",
+lei:["Lei da Subtração","O Vazio não adiciona — remove. Contra dano do Vazio, Absorção conta pela metade. E o que o Vazio apaga — luz, som, calor, memória — não volta sozinho: precisa ser reaceso, refeito, relembrado."],
+marca:["As pessoas esquecem seu rosto rápido demais — −1 para ser lembrado ou reconhecido, +1 para passar despercebido.","Sua sombra atrasa um instante; falta um reflexo seu no espelho de vez em quando — quem repara perde 1 Lucidez.","O silêncio te segue; sons somem ao seu redor — −1 em qualquer interação calorosa, +1 em Furtividade e Intimidação pela frieza."],
+sus:["sobra menos","o que faltava aqui?","ninguém lembra","o silêncio anda com você","onde foi parar"]},
+{id:"asc",g:"⌬",n:"Ascensão",v:"acumula",fr:"A carne é um rascunho. A Ascensão não teve paciência de esperar a versão final.",
+lei:["Sem Regra","A Ascensão é o único elemento cuja Sobrecarga não tem teto de Juízo — empilhe quanto quiser. Mas cada ponto além do seu Juízo soma +2 ao Refluxo. E a carne lembra: toda magia da Ascensão sobre si mesmo deixa um traço físico visível enquanto durar."],
+marca:["Um zumbido baixo sob a pele; relógios adiantam perto de você — −1 em contato gentil (mãos frias, duras demais), +1 em testes técnicos.","Uma junta range ao acordar; há algo duro sob o antebraço que médicos querem examinar — −1 social com quem nota o errado; máquinas simples funcionam melhor na sua mão.","Seu peso está errado para o seu tamanho; a voz carrega um sopro de estática — −1 com estranhos, e 1×/cena uma máquina próxima “coopera” de graça."],
+sus:["a carne é fraca, substitua-a","você ouviu o servo-motor?","nenhuma delas acha que terminou","um parafuso a mais","acumule"]},
+{id:"pac",g:"⚖",n:"Pacto",v:"troca",fr:"Tudo se anota. Nada se esquece.",
+lei:["Lei do Consentimento","O Pacto prefere acordos. Sobre alvos voluntários: conjure com +1 e sem resistência. Involuntários resistem, e a maioria dos efeitos exige o Nome, sangue ou algo pessoal. Forçar é possível — e sempre mancha. Cada barganha fica registrada."],
+marca:["Uma marca fina e elegante na pele, que ninguém lembra de ter visto surgir — −1 para esconder o que você é de quem entende, +1 em negociação formal.","As pessoas sentem, sem saber por quê, que devem algo a você — −1 em convívio casual; papéis e contratos que você toca não se perdem nem rasgam por acidente.","Sua assinatura aparece onde você nunca assinou — −1 em amizade desinteressada (tudo soa cláusula), e 1×/sessão você sabe o preço exato de alguém."],
+sus:["você aceita?","⚖ o Pacto cobra","assinado nas duas vias","sem data de validade","achou barato?"]},
+{id:"ger",g:"❋",n:"Germe",v:"infecta",fr:"O que você planta fica plantado.",
+lei:["Lei da Semeadura","O Germe não conjura efeitos: planta sementes. Todo efeito contínuo compõe sozinho, turno a turno, e não expira por tempo: precisa ser tratado, queimado ou arrancado. E a Sobrecarga do Germe não come Sintonia: come Vida."],
+marca:["Cheiro de terra molhada e de algo doce; plantas se inclinam de leve para você — −1 em ambientes assépticos e formais, imune a enjoo por cheiro.","Suas feridas fecham com um musgo fino; comida estraga rápido perto de você — −1 para dividir mesa e teto, +1 em Resistência contra doença e veneno.","Algo verde se move sob a sua pele quando ninguém olha; flores pequenas nascem onde você dorme — quem repara testa Coragem (7); venenos comuns não fazem mais efeito."],
+sus:["deixa crescer","a sala tem mais verde do que tinha","ignorar é adubo","ele lembra de cada doação","sem pressa"]}];
+
+const GRAUS=[{g:1,lim:6,rq:"⟑⋏⊙⌖◊ ≥1"},{g:2,lim:8,rq:"⟑⋏⊙⌖◊ ≥2 · nível 4"},{g:3,lim:10,rq:"⟑⋏⊙⌖◊ ≥4 · nível 8"},{g:4,lim:12,rq:"⟑⋏⊙⌖◊ ≥6 · nível 12"}];
+function grauOK(g,ru,nv){if(g===1)return ru>=1;if(g===2)return ru>=2&&nv>=4;if(g===3)return ru>=4&&nv>=8;return ru>=6&&nv>=12;}
+
+const MAGIAS_AUTO=["Reviver","Lança do Nada","Broto Faminto"];
+/* magias embutidas (parcial — o Grimório completo entra por fases; o editor cobre o resto) */
+const MAGIAS=[
+{el:"obs",g:1,n:"Catalogar",tipo:"INVENTÁRIO",cst:"1 Sintonia",exe:"Ação Livre",alc:"Visível (um ambiente)",dur:"Instantânea",p:"Inventário geral — o mestre lista os objetos notáveis.",t:"Inventário completo e anotado: tudo contado e classificado; o fora do lugar fica destacado.",c:"E o catálogo aponta uma ausência — o que deveria estar ali e não está.",sob:"+1 Sintonia = cataloga o interior de recipientes fechados não-trancados.",fal:"Excesso de Dados: tudo vira lista, até o irrelevante. Atordoado 1 turno."},
+{el:"obs",g:1,n:"Olho Emprestado",tipo:"SENSOR",cst:"1 Sintonia + 1 Lucidez",exe:"Ação",alc:"Toque (um ponto)",dur:"[Juízo] horas",p:"O olho registra; você confere o material ao voltar a Curto dele.",t:"Espia por ele à distância (Ação, mesma cidade) — cone fixo, sem som.",c:"Tem som, gira, e te alerta quando algo cruza o campo.",sob:"+1 Sintonia = +[Juízo] horas. Máx [Juízo] olhos; achá-lo: Percepção (10).",fal:"Olho Vadio: registros inúteis — e, num deles, algo olha de volta. 1 Lucidez."},
+{el:"obs",g:1,n:"Linha de Visão",tipo:"CANAL",cst:"1 Sintonia",exe:"Ação Livre",alc:"Curto (aliado voluntário)",dur:"Cena",p:"Flashes — 1×/turno, um de vocês “pisca” e vê 2 segundos pelo outro.",t:"Canal contínuo — qualquer um olha pelo outro como Ação Livre; dá até para mirar pelo que ele vê (−1).",c:"Canal perfeito: ambos veem ambos sem custo, e mirar pela visão alheia perde o −1.",sob:"+1 Sintonia = alcance Médio; +2 = +1 aliado na linha.",fal:"Linha Cruzada: por 1 turno, vocês dois só veem pelos olhos do outro."},
+{el:"obs",g:1,n:"Realçar",tipo:"FORENSE",cst:"1 Sintonia",exe:"Ação",alc:"Curto",dur:"Cena",p:"Escolha uma categoria — sangue e fluidos · toques recentes · coisas movidas · passagens dissimuladas — e ela brilha fraco.",t:"Duas categorias, brilho claro, com idade (mais recente = mais vivo).",c:"Todas, e o realce aponta a anomalia-mestra: a única coisa que não bate com o resto.",sob:"+1 Sintonia = alcance Médio. Não revela o magicamente oculto.",fal:"Brilho Errado: tudo acende igual — −1 em Percepção e Investigação na cena."},
+{el:"obs",g:3,n:"Ver de Verdade",tipo:"VISÃO VERDADEIRA",cst:"3 Sintonia + 2 Lucidez",exe:"Ação",alc:"Pessoal",dur:"Sustentada (1 Sintonia/turno)",p:"Vê através de disfarces mundanos e ilusões fracas; o invisível aparece como contorno trêmulo.",t:"O oculto inteiro: invisibilidade, disfarces sobrenaturais, Espelhos fora de registro, possessões.",c:"E a natureza: o elemento de cada coisa anômala presente, como assinatura visual.",sob:"+2 Sintonia = estende a um aliado em contato. Cada coisa revelada custa a Lucidez que custaria ao ser vista; o Olhar de Volta é automático.",fal:"Viu Demais: por 1 turno você vê tudo de tudo — 1d4 Lucidez e Atordoado."},
+{el:"obs",g:3,n:"Panóptico Menor",tipo:"REDE DE OLHOS",cst:"3 Sintonia + 2 Lucidez",exe:"Ação",alc:"Até 3 pontos em Médio",dur:"Sustentada (1 Sintonia/turno)",p:"Monitora um por vez (alterna como Ação Livre); os demais gravam.",t:"Monitora todos simultaneamente — aliados avisados não podem ser surpreendidos nessas zonas.",c:"E os olhos miram: ataques à distância contra alvos nos campos ganham +1 e ignoram cobertura parcial.",sob:"+1 Sintonia = +1 olho (máx 5). Olhos invisíveis (Percepção 10).",fal:"Realimentação: o loop volta para você — Atordoado 1 turno, e tudo colapsa."},
+{el:"obs",g:4,n:"O Arquivo",tipo:"CONSULTA AO REGISTRO",cst:"5 Sintonia + 3 Lucidez",exe:"Ritual (cena; espelhos em círculo; silêncio)",alc:"Pessoal",dur:"[Juízo] consultas",p:"Cada consulta retorna um registro visual relevante, sem índice: você pesca com palavras-chave.",t:"Registros completos e datados — “mostre a última vez que [X] foi visto” funciona, se algum olho da Observação esteve lá.",c:"Uma consulta pode ser sobre algo que nenhum humano jamais viu (1d4 Lucidez).",sob:"Nenhuma. Ao fim, 1d6 por consulta: qualquer 1 = os Olheiros abrem um registro sobre você.",fal:"Ficha Solicitada: o Arquivo nega — e consulta você. 1d4 Lucidez."},
+{el:"obs",g:4,n:"Visto por Todos",tipo:"A SENTENÇA",cst:"5 Sintonia + 4 Lucidez",exe:"Ação (apontar e sentenciar)",alc:"Visível",dur:"[Têmpera] horas",p:"Ele perde furtividade, disfarce e invisibilidade pela duração; anômalos em Longo sentem a posição dele.",t:"A transmissão é regional — tudo de anômalo na cidade recebe o registro: rosto, cheiro de medo, posição.",c:"A sentença gruda: mesmo depois, a primeira tentativa de ocultação dele por dia falha, por um arco.",sob:"Nenhuma. Em você mesmo: vira a isca absoluta — e ganha +2 em Coragem enquanto durar.",fal:"—"},
+{el:"ger",g:2,n:"Jardim Súbito",tipo:"ÁREA SEMEADA",cst:"2 Sintonia + 1 Lucidez",exe:"Ação",alc:"Área Curta em Médio",dur:"Até ser queimado ou tratado",p:"A área vira terreno difícil (espinho, cipó, chão mole) para quem você não nomear.",t:"E quem termina o turno lá dentro fica Semeado (1) (Resistência 8 nega, a cada turno).",c:"E o jardim cresce: +1 área Curta adjacente por rodada, até o dobro.",sob:"+1 de Vida = o Total aplica Semeado (2). Fogo limpa uma área por turno.",fal:"Canteiro Invasor: nasce centrado em você — e não te reconhece como jardineiro."},
+{el:"ger",g:2,n:"Praga Menor",tipo:"DEBUFF CONTAGIOSO",cst:"2 Sintonia + 1 Lucidez",exe:"Ação",alc:"Curto",dur:"Cena",p:"O alvo testa Resistência (8) ou fica −1 em tudo pela cena — febril, suando frio.",t:"E a praga contagia: o primeiro que tocá-lo testa também.",c:"−2 em vez de −1, e ele sabe que está doente de um jeito errado — Coragem (7) ou perde a próxima ação em pânico.",sob:"+1 de Vida = +1 alvo inicial.",fal:"Paciente Zero: a febre estreia em você — −1 por 2 turnos."},
+{el:"ger",g:2,n:"Sugar a Doença",tipo:"REMOÇÃO MAIOR",cst:"2 Sintonia + 1 Lucidez",exe:"Ação",alc:"Toque",dur:"Instantânea",p:"Remove uma doença, veneno ou infecção não-anômala do alvo — ela passa a você em forma branda (−1) até o fim da cena.",t:"Igual, sem o desconto: o Germe come na hora, satisfeito.",c:"E o alvo cura 1d4 — o corpo dele agradece a desocupação.",sob:"+1 de Vida = alcança uma aflição anômala de Grau ≤2 (o aluguel vira Semeado (1) em você por 2 turnos).",fal:"Hóspede Teimoso: não sai dele — e uma versão fraca pega em você."},
+{el:"ger",g:2,n:"Casca de Musgo",tipo:"DEFESA QUE PLANTA",cst:"2 Sintonia + 1 de Vida",exe:"Ação",alc:"Pessoal ou toque",dur:"Cena",p:"Absorção 1.",t:"Absorção 2, e quem te acertar corpo a corpo fica Semeado (1).",c:"Absorção 2 e imune a Sangrando enquanto durar.",sob:"+1 de Vida = também em um aliado tocado. Você range e cheira a mato: −1 em Furtividade e social fino.",fal:"Casca Verde Demais: Absorção 1, mas gruda — remover no fim da cena custa 1 de dano."},
+{el:"asc",g:3,n:"Arsenal da Carne",tipo:"TRANSMUTAÇÃO",cst:"3 Sintonia + 2 Lucidez",exe:"Ação",alc:"Pessoal",dur:"Cena",p:"Sai instável (−1 com ela).",t:"Plena.",c:"Plena e viciada em servir: +1 com ela, e o primeiro golpe da cena tem Vantagem.",sob:"+2 Sintonia = duas formas ao mesmo tempo. Escolha: Lâmina (dano +2, Sangrando em Total) · Disparador (Curto, dano +2, 1 de Vida por tiro) · Escudo (+2 Limiar).",fal:"Parto Seco: nasce pela metade — −1 em tudo até gastar uma Ação empurrando de volta."},
+{el:"asc",g:3,n:"Colheita de Força",tipo:"DRENAGEM",cst:"3 Sintonia + 2 Lucidez",exe:"Ação",alc:"Toque (alvo agarrado, caído ou incapacitado)",dur:"Até o fim da cena",p:"Rouba 1 ponto de atributo físico por uma cena (ele −1, você +1).",t:"Rouba 2 pontos, ou 1 físico + a perícia treinada que ele mais usa.",c:"Rouba 2, e a devolução é incompleta: ele fica −1 até descansar.",sob:"+2 Sintonia = rouba à distância Curta. A extração dói: 1 de dano no alvo.",fal:"Refluxo de Carne: ganha o bônus, mas com espasmos — 1–2 num d6 = a ação sai violenta demais ou errada."},
+{el:"asc",g:3,n:"Fusão",tipo:"UNIÃO",cst:"3 Sintonia + 2 Lucidez",exe:"Ação (tocando o veículo)",alc:"Toque",dur:"Cena, ou até sair",p:"Fusão rasa — opera com +1, mas colisões doem: metade do dano estrutural vira seu.",t:"Fusão plena — +2 para operar, manobras impossíveis viram possíveis, +2 Percepção ao redor do casco.",c:"O veículo desperta junto: +1 numa característica dele pela cena.",sob:"+2 Sintonia = a fusão dura até você dormir. Sair: Ação.",fal:"Engrenado: sair exige Têmpera (9), e cada falha custa 1 Lucidez. Ela gostou de ter mãos."},
+{el:"asc",g:4,n:"Despertar a Fábrica",tipo:"DOMÍNIO",cst:"5 Sintonia + 3 Lucidez",exe:"Ação",alc:"Médio",dur:"Cena · Sustentada (1 Sintonia/turno)",p:"O ambiente vira hostil aos inimigos — terreno difícil, e 1 ataque ambiental por turno (1d4).",t:"2 ataques/turno, e você sela ou abre qualquer passagem como Ação Livre.",c:"—",sob:"—",fal:"—"},
+{el:"pac",g:4,n:"Audiência",tipo:"COMUNHÃO",cst:"4 Sintonia + 2 Lucidez",exe:"Ritual (cena; círculo selado; oferta digna)",alc:"O círculo",dur:"[Têmpera] perguntas, ou 10 min",p:"Audiência curta, contraparte impaciente: meias-respostas, preços um degrau acima.",t:"Audiência plena; respostas verdadeiras (e literais); preço de tabela.",c:"Você impressionou — uma resposta gratuita, ou um desconto real num acordo fechado agora.",sob:"+2 Sintonia = convoca uma potência específica que você saiba nomear. Dentro do círculo ninguém mente — cada mentira: 1d4.",fal:"Protocolo Quebrado: nada respondido, oferta consumida, e sua próxima magia do Pacto custa +1 Lucidez."},
+{el:"eco",g:1,n:"Reviver",tipo:"AUTOMÁTICA DO MARCADO",cst:"—",exe:"—",alc:"—",dur:"—",p:"",t:"Magia automática de quem é Marcado pelo Eco — não conta no limite de conhecidas. (Texto completo no Grimório.)",c:"",sob:"",fal:"",auto:true},
+{el:"vaz",g:1,n:"Lança do Nada",tipo:"AUTOMÁTICA DO MARCADO",cst:"—",exe:"—",alc:"—",dur:"—",p:"",t:"Magia automática de quem é Marcado pelo Vazio — não conta no limite de conhecidas. (Texto completo no Grimório.)",c:"",sob:"",fal:"",auto:true},
+{el:"ger",g:1,n:"Broto Faminto",tipo:"AUTOMÁTICA DO MARCADO",cst:"—",exe:"—",alc:"—",dur:"—",p:"",t:"Magia automática de quem é Marcado pelo Germe — não conta no limite de conhecidas. (Texto completo no Grimório.)",c:"",sob:"",fal:"",auto:true}];
+
+/* ---- TALENTOS (Cap. 14) ---- */
+const TALENTOS=[
+[1,"Casca Grossa","+1 de Vida máximo a cada nível par (no nível 15, são +7 acumulados)."],
+[1,"Reflexos Treinados","+1 na iniciativa."],
+[1,"Pé Rápido","Em perseguição, você age primeiro na abertura e ganha +1 na primeira rodada."],
+[1,"Fuga Limpa","1×/cena, numa perseguição: ignore um obstáculo ou ganhe um sucesso extra na corrida."],
+[1,"Esconderijo Improvisado","1×/cena, com qualquer cobertura, você some de vista por um turno, mesmo perseguido."],
+[1,"Mão Trocada","Sacar ou trocar de arma ou ferramenta nunca gasta ação."],
+[1,"Gatuno","+1 em Mãos Hábeis; arrombar e furtar leva metade do tempo; num Parcial de arrombamento, a complicação nunca é barulho."],
+[1,"Faro de Saída","Ao entrar num lugar, o mestre te diz a saída mais próxima — inclusive as não-óbvias."],
+[1,"Faro de Investigador","1×/cena, ao Examinar uma cena, faça uma pergunta extra ao mestre sobre ela."],
+[1,"Memória Fotográfica","Grave uma cena, objeto ou rosto; depois reexamine a imagem mental sem teste, quantas vezes quiser."],
+[1,"Pulso Firme","1×/cena, ignore a primeira reação de medo que a cena exigiria — o teste de Coragem não acontece."],
+[1,"Estômago de Ferro","Imune a enjoo, comida estragada e embriaguez leve; +1 contra venenos ingeridos."],
+[1,"Improviso Útil","1×/sessão, declare ter um item simples e barato com você: isqueiro, barbante, canivete, giz."],
+[1,"Pechincha","1×/sessão, consiga um item ou serviço por muito menos — ou de graça, por um favor que o mestre anota."],
+[1,"Contato Fiel","+1 de Gente máximo, e um contato menor de confiança, fixo, na sua região."],
+[1,"Resoluto","+1 de Lucidez máximo."],
+[2,"Adrenalina","Abaixo de 1/3 da Vida: +1 em todos os testes físicos, e ferimentos não reduzem seu deslocamento."],
+[2,"Descarga de Adrenalina","1×/sessão, logo após um susto ou ferimento grave, tome uma ação extra agora, fora da ordem."],
+[2,"Saque Veloz","1×/cena, sacar não gasta ação, e o primeiro ataque após o saque ganha +1 se o alvo não esperava."],
+[2,"Tiro Certeiro","Gaste 1 de Fôlego para somar +2 a um ataque à distância (declare antes de rolar)."],
+[2,"Combatente Sujo","1×/cena, ao acertar, declare o golpe baixo: o alvo testa Carne (7) ou fica Atordoado."],
+[2,"Improvisador de Combate","1×/cena, transforme um objeto do cenário em arma (+1) ou em vantagem tática."],
+[2,"Carga de Guerra","Usa armas pesadas sem preparo e ignora 1 ponto do requisito de Força delas."],
+[2,"Duro de Matar","1×/sessão, ao cair a 0 de Vida, fique em 1. Não acumula com outra rede do tipo na mesma queda."],
+[2,"Segundo Fôlego","1×/cena, gaste sua Ação para recuperar [Têmpera + 1] de Fôlego e remover Lento ou Exausto."],
+[2,"Especialista","Escolha 1 perícia: nela, Parciais (6–9) contam como Totais. Recomprável (outras perícias)."],
+[2,"Dois Ofícios","Escolha 2 perícias e um nicho para cada; dentro do nicho, contam como treinadas."],
+[2,"Intuição Aguçada","1×/cena, faça ao mestre uma pergunta de sim ou não sobre a cena; a resposta é honesta.",["tem",1]],
+[2,"Leitura Fria","Ação (1 min de conversa): descubra um fato verdadeiro que a pessoa esconde."],
+[2,"Negociador de Crise","1×/cena, force uma pausa num impasse: quem atacar testa Têmpera (7) ou segura a mão por 1 rodada; na pausa, os testes sociais do grupo ganham +1."],
+[2,"Mente Blindada","+2 contra a primeira perda de Lucidez de cada cena.",["tem",1]],
+[2,"Plano de Fuga","1×/sessão, você e os aliados próximos escapam de um cerco; descreva a rota, o mestre define o que fica para trás."],
+[2,"Improviso Médico","Sucata vira kit: estabiliza e trata sem material próprio, com −1."],
+[2,"Mãos de Curandeiro","Você Estabiliza com Vantagem, e seus primeiros socorros também curam um pouco de Vida."],
+[2,"Rede de Contatos","+2 de Gente máximo, e Cultivar Gente no downtime rende mais."],
+[3,"Mente Inquebrável","Se uma única perda de Lucidez te levaria a 0, você para em 1. Acúmulos na mesma cena ainda derrubam.",["tem",2]],
+[3,"Marca de Sorte","1×/sessão, “arme” a sorte: o próximo par de dados iguais que você rolar é tratado como 6+6."],
+[3,"O Improvável","1×/sessão, declare uma ação impossível-mas-imaginável: ela acontece como Parcial garantido, e o mestre define o preço."],
+[3,"Premonição de Perigo","1×/sessão, anule completamente uma emboscada, traição ou armadilha contra o grupo."],
+[3,"Veterano de Mil Cenas","Defina um tipo de cena; nela, 1×/cena, role com Vantagem. Recomprável (outro tipo)."],
+[3,"Sortudo Teimoso","Seu teto de Brio sobe para 7, e você começa cada sessão com +1 de Brio."],
+[3,"Presença de Comando","1×/cena, gaste uma Ação e sua Lábia para dar Vantagem a um aliado, ou remover dele um Apavorado ou Confuso."],
+[3,"Faro Sobrenatural","O mestre te avisa quando há algo paranormal por perto. Em troca, você cruza os limiares de ⟑⋏⊙⌖◊ um ponto mais cedo."]];
+
+const FX_SUS_GER=["“Você aceita?”"]; /* reservado */
+const BANDS=[[0,0,"Silêncio"],[1,3,"Estática"],[4,7,"Interferência"],[8,12,"Distorção"],[13,16,"Invasão"],[17,20,"Colapso"]];
+function bandOf(r){for(let i=BANDS.length-1;i>=0;i--)if(r>=BANDS[i][0]&&r<=BANDS[i][1]||r>=BANDS[i][0]&&i===BANDS.length-1)if(r>=BANDS[i][0])return i;return 0;}
+
+/* ============ NÚCLEO ============ */
+const $=id=>document.getElementById(id);
+const esc=s=>(s==null?"":String(s)).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const rAF=window.requestAnimationFrame?window.requestAnimationFrame.bind(window):(f=>setTimeout(()=>f(performance.now()),40));
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),2400);}
+function rw(){return `<span class="rw" title="Ruído" aria-label="Ruído">${W_RUIDO}</span>`;}
+function hhmm(){const d=new Date();return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");}
+const STG=["Aprendiz","Veterano","Mestre","Ápice"];
+const ELM=id=>ELEMS.find(e=>e.id===id)||null;
+
+/* ---------- estado ---------- */
+const DEF=()=>({v:4,nome:"",jogador:"",conceito:"",raiz:"",fardo:"",fardosX:[],nivel:1,
+attrs:{car:0,ner:0,jui:0,tem:0,lab:0},
+cur:{vida:null,fol:null,sin:null,luc:null},gente:null,brio:1,defesa:8,
+ruido:0,elem:"",dinheiro:0,
+per:{},profis:"",esc:[],maest:[],tal:[],conh:[],
+custom:{hab:[],mag:[],mae:[]},cond:{},
+inv:{pieces:[],bag:[],seq:1},
+div:[],cred:[],notas:"",hist:"",vinc:"",pcExtra:0,
+sess:{notes:[],log:[]},
+ui:{tab:"inicial",mute:false,calm:false,sess:false}});
+var S=DEF();
+function fixS(){const d=DEF();
+ for(const k of["attrs","cur","custom","inv","sess","ui"])S[k]=Object.assign({},d[k],S[k]||{});
+ for(const k of["fardosX","esc","maest","tal","conh","div","cred"])if(!Array.isArray(S[k]))S[k]=[];
+ for(const k of["hab","mag","mae"])if(!Array.isArray(S.custom[k]))S.custom[k]=[];
+ if(!Array.isArray(S.sess.notes))S.sess.notes=[];if(!Array.isArray(S.sess.log))S.sess.log=[];
+ if(typeof S.per!=="object"||!S.per)S.per={};if(typeof S.cond!=="object"||!S.cond)S.cond={};
+ if(!S.inv.pieces)S.inv.pieces=[];if(!S.inv.bag)S.inv.bag=[];if(!S.inv.seq)S.inv.seq=1;}
+
+/* ---------- salvar ---------- */
+let _st=null;
+function save(){clearTimeout(_st);_st=setTimeout(()=>{try{localStorage.setItem("p4auto",JSON.stringify(S));}catch(e){}},300);}
+function loadAuto(){try{const j=localStorage.getItem("p4auto");if(j){S=Object.assign(DEF(),JSON.parse(j));fixS();}}catch(e){}}
+function slots(){try{return JSON.parse(localStorage.getItem("p4slots")||"[]");}catch(e){return[];}}
+function saveSlot(id,name){try{const L=slots().filter(s=>s.id!==id);L.unshift({id,name,ts:Date.now()});localStorage.setItem("p4slots",JSON.stringify(L.slice(0,24)));localStorage.setItem("p4slot_"+id,JSON.stringify(S));toast("Personagem salvo: "+name);}catch(e){toast("Não deu para salvar neste navegador.");}}
+function loadSlot(id){try{const j=localStorage.getItem("p4slot_"+id);if(!j)return toast("Slot vazio.");S=Object.assign(DEF(),JSON.parse(j));fixS();save();closeModal();render();toast("Personagem carregado.");}catch(e){toast("Falha ao carregar.");}}
+function delSlot(id){try{localStorage.setItem("p4slots",JSON.stringify(slots().filter(s=>s.id!==id)));localStorage.removeItem("p4slot_"+id);}catch(e){}charsModal();}
+function charsModal(){const L=slots();
+ modal(`<h3>Personagens</h3>
+ <div class="row"><div><label>salvar o atual como</label><input type="text" id="slotName" value="${esc(S.nome||"Sem nome")}"></div>
+ <div style="flex:0;align-self:flex-end"><button class="btn gold" onclick="saveSlot(Date.now().toString(36),$('slotName').value||'Sem nome')">Salvar</button></div></div>
+ ${L.length?L.map(s=>`<div class="hcard"><div class="ht"><b>${esc(s.name)}</b><span class="src">${new Date(s.ts).toLocaleDateString("pt-BR")}</span></div>
+ <div style="margin-top:6px;display:flex;gap:6px"><button class="btn mini" onclick="loadSlot('${s.id}')">carregar</button>
+ <button class="btn mini" onclick="if(confirm('Salvar por cima de ${esc(s.name)}?'))saveSlot('${s.id}',${JSON.stringify(s.name)})">salvar aqui</button>
+ <button class="btn mini del" onclick="if(confirm('Excluir ${esc(s.name)}?'))delSlot('${s.id}')">excluir</button></div></div>`).join(""):`<div class="hint">Nenhum personagem salvo ainda. Tudo também fica num auto-save deste navegador.</div>`}
+ <div class="hint">Os documentos da Biblioteca ficam à parte (neste navegador) e não entram nos slots nem no JSON.</div>
+ <div style="margin-top:10px;text-align:right"><button class="btn" onclick="closeModal()">fechar</button></div>`);}
+function exportJSON(){const d=JSON.parse(JSON.stringify(S));const blob=new Blob([JSON.stringify(d,null,1)],{type:"application/json"});
+ const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=(S.nome||"personagem").replace(/\s+/g,"_")+"_protocolo4.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),4000);toast("Exportado (a Biblioteca não vai no JSON).");}
+function importJSON(file){const r=new FileReader();r.onload=()=>{try{S=Object.assign(DEF(),JSON.parse(r.result));fixS();save();render();toast("Ficha importada.");}catch(e){toast("JSON inválido.");}};r.readAsText(file);}
+
+/* ---------- cálculos ---------- */
+const A=k=>{const v=parseInt(S.attrs[k],10);return isNaN(v)?0:v;};
+const FP=()=>FARDOS[S.fardo]||null;
+function owned(){const o=[];if(S.fardo&&FARDOS[S.fardo])o.push(S.fardo);for(const f of S.fardosX)if(FARDOS[f]&&!o.includes(f))o.push(f);return o;}
+function maxVida(){const f=FP();return 3+A("car")+(f?f.vida*S.nivel:0);}
+function maxFol(){const f=FP();return 3+A("ner")+((f&&f.comb==="fol")?f.cv*S.nivel:0);}
+function maxSin(){const f=FP();return 3+A("jui")+((f&&f.comb==="sin")?f.cv*S.nivel:0);}
+function maxLuc(){return 5+A("tem");}
+function maxGente(){return Math.max(0,1+A("lab"));}
+function curOf(k){const m={vida:maxVida,fol:maxFol,sin:maxSin,luc:maxLuc}[k];const v=S.cur[k];return(v==null||v==="")?m():parseInt(v,10)||0;}
+function ppTot(){const n=S.nivel;return 2+(n-1)+(n>=8?1:0)+(n>=15?1:0);}
+function pcTot(){const n=S.nivel;return 4+2*(n-1)+(n>=8?1:0)+(n>=12?1:0)+(n>=15?1:0);}
+function mtTot(){const n=S.nivel;return 1+(n>=4?1:0)+(n>=8?1:0)+(n>=12?1:0);}
+function ppGasto(){return 2*S.esc.length;}
+function pcGasto(){let t=0;for(const k of S.tal)t+=parseInt(k.split("|")[0],10)||0;return t+(parseInt(S.pcExtra,10)||0);}
+function mtUsado(){return S.maest.reduce((a,m)=>a+1+(m.st||0),0);}
+function hasHab(f,name){const d=FARDOS[f];if(!d)return false;if(d.base.some(h=>h[0]===name))return true;return S.esc.includes(f+"|"+name);}
+const fmtRS=v=>{v=parseFloat(v)||0;try{return v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});}catch(e){return "R$ "+v;}};
+
+/* ---------- rolagem ---------- */
+let _rt=null;
+function doRoll(label,mod){mod=parseInt(mod,10)||0;
+ const d1=1+Math.floor(Math.random()*6),d2=1+Math.floor(Math.random()*6),tot=d1+d2+mod;
+ let g,cls;if(d1===d2){g="CRÍTICO";cls="g-crit";}else if(tot>=10){g="TOTAL";cls="g-total";}else if(tot>=6){g="PARCIAL";cls="g-parcial";}else{g="FALHA";cls="g-falha";}
+ const c=$("rollcard");$("rc_l").textContent=label;
+ $("rc_t").innerHTML=`${tot} <small>(${d1} + ${d2} ${mod<0?"−":"+"} ${Math.abs(mod)})</small>`;
+ $("rc_g").textContent=g;$("rc_g").className="rg "+cls;
+ c.classList.add("on");clearTimeout(_rt);_rt=setTimeout(()=>c.classList.remove("on"),3400);
+ S.sess.log.unshift({t:hhmm(),x:`${label} → ${d1}+${d2}${mod?(mod>0?"+"+mod:mod):""} = ${tot} · ${g}`});
+ S.sess.log=S.sess.log.slice(0,40);save();
+ const sl=$("slog");if(sl)sl.innerHTML=logHTML();}
+function logHTML(){return S.sess.log.slice(0,12).map(l=>`<div><b style="color:var(--faint);font-family:ui-monospace">${l.t}</b> ${esc(l.x)}</div>`).join("")||`<div class="hint">nenhuma rolagem ainda</div>`;}
+
+/* ---------- tema / efeitos ---------- */
+function applyTheme(){const b=bandOf(S.ruido||0);
+ document.body.dataset.el=S.elem||"";document.body.dataset.band=b;
+ document.body.style.setProperty("--band",b);
+ document.body.classList.toggle("calm",!!S.ui.calm);
+ document.body.classList.toggle("sess",!!S.ui.sess);
+ const mv=maxVida(),vc=curOf("vida");
+ document.body.classList.toggle("lowvida",mv>0&&vc<=Math.ceil(mv/3));
+ document.body.classList.toggle("lowluc",curOf("luc")<=2);
+ const g=$("h1g");if(g)g.textContent=S.elem?(" "+ELM(S.elem).g):"";
+ syncFX();}
+function updDock(){const d=$("divDock");const n=S.div.filter(x=>x&&x.trim()).length;
+ if(n>0){d.classList.add("on");d.innerHTML=`⚖ o Pacto cobra — <b>${n}</b> dívida${n>1?"s":""} registrada${n>1?"s":""} <span style="color:var(--faint)">· aba Dívidas &amp; Notas</span>`;}
+ else d.classList.remove("on");}
+
+/* partículas */
+let FX={run:false,ps:[],last:0};
+function syncFX(){const b=bandOf(S.ruido||0);const want=!!S.elem&&b>0&&!S.ui.calm&&!document.hidden;
+ if(want&&!FX.run){FX.run=true;rAF(fxTick);}if(!want){FX.run=false;const cv=$("fx-canvas");if(cv){const x=cv.getContext&&cv.getContext("2d");if(x)x.clearRect(0,0,cv.width,cv.height);}}}
+function fxTick(t){if(!FX.run)return;const cv=$("fx-canvas");if(!cv)return;const ctx=cv.getContext&&cv.getContext("2d");if(!ctx){FX.run=false;return;}
+ if(cv.width!==innerWidth||cv.height!==innerHeight){cv.width=innerWidth;cv.height=innerHeight;}
+ const b=bandOf(S.ruido||0),el=S.elem,alvo=el==="vaz"?Math.min(b*2,8):b*3;
+ if(FX.ps.length<alvo&&Math.random()<.12)FX.ps.push(fxNew(el,cv));
+ ctx.clearRect(0,0,cv.width,cv.height);
+ FX.ps=FX.ps.filter(p=>{p.life+=1;p.x+=p.vx;p.y+=p.vy;const a=Math.sin(Math.PI*Math.min(1,p.life/p.max));
+  if(p.life>=p.max)return false;ctx.globalAlpha=a*p.op;fxDraw(ctx,el,p);ctx.globalAlpha=1;return true;});
+ if(FX.ps.length>alvo)FX.ps.length=alvo;
+ rAF(fxTick);}
+function fxNew(el,cv){const W=cv.width,H=cv.height,r=Math.random;
+ const base={x:r()*W,y:r()*H,vx:(r()-.5)*.2,vy:(r()-.5)*.2,life:0,max:240+r()*240,op:.16,s:4+r()*7};
+ if(el==="ger"){base.y=H+10;base.vy=-.14-r()*.2;base.vx=(r()-.5)*.12;base.op=.2;}
+ if(el==="asc"){base.vy=-.05;base.op=.15;}
+ if(el==="pac"){base.vx=.2+r()*.2;base.vy=0;base.op=.12;}
+ if(el==="eco"){base.vx=0;base.vy=0;base.max=160;base.op=.14;}
+ if(el==="vaz"){base.vx=0;base.vy=0;base.op=.5;base.max=300;}
+ return base;}
+function fxDraw(c,el,p){c.strokeStyle=c.fillStyle=getComputedStyle(document.body).getPropertyValue("--ec")||"#b8932f";
+ if(el==="obs"){c.beginPath();c.ellipse(p.x,p.y,p.s*1.6,p.s*.8,0,0,7);c.stroke();c.beginPath();c.arc(p.x,p.y,p.s*.32,0,7);c.fill();}
+ else if(el==="eco"){const k=(p.life/p.max);c.beginPath();c.arc(p.x,p.y,p.s*3*k+2,0,7);c.stroke();}
+ else if(el==="vaz"){c.fillStyle="#04050a";c.beginPath();c.arc(p.x,p.y,p.s*1.4,0,7);c.fill();}
+ else if(el==="asc"){c.save();c.translate(p.x,p.y);c.rotate(p.life*.01);c.strokeRect(-p.s/2,-p.s/2,p.s,p.s);c.restore();}
+ else if(el==="pac"){c.beginPath();c.moveTo(p.x,p.y);for(let i=1;i<5;i++)c.lineTo(p.x+i*7,p.y+Math.sin(p.life*.1+i)*2.4);c.stroke();}
+ else if(el==="ger"){c.beginPath();c.arc(p.x,p.y,p.s*.5,0,7);c.fill();c.globalAlpha*=.4;c.beginPath();c.arc(p.x,p.y,p.s,0,7);c.stroke();}}
+document.addEventListener("visibilitychange",()=>syncFX());
+
+/* sussurros */
+let _wt=null;
+function whisperLoop(){clearTimeout(_wt);const b=bandOf(S.ruido||0),e=ELM(S.elem);
+ if(!e||b<1||S.ui.mute||S.ui.calm)return;
+ const delay=[0,55,40,28,20,14][b]*1000*(0.7+Math.random()*.6);
+ _wt=setTimeout(()=>{const w=$("whisper");let tx=e.sus[Math.floor(Math.random()*e.sus.length)];
+  if(b>=4&&Math.random()<.5){const ws=tx.split(" ");const i=Math.floor(Math.random()*ws.length);ws[i]=alien(ws[i]);tx=ws.join(" ");}
+  w.textContent=tx;w.style.left=(8+Math.random()*70)+"%";w.style.top=(10+Math.random()*75)+"%";
+  w.classList.add("on");setTimeout(()=>w.classList.remove("on"),4200);whisperLoop();},delay);}
+
+/* ---------- abas / navegação ---------- */
+const TABS=[["inicial","Inicial"],["sint","Sintonizar"],["hab","Habilidades"],["mag","Magias"],["tal","Talentos"],["inv","Inventário"],["bib","Biblioteca"],["div","Dívidas & Notas"]];
+function go(t){S.ui.tab=t;save();render();window.scrollTo(0,0);}
+function render(){fixS();
+ $("tabsrow").innerHTML=TABS.map(([id,lb])=>{let l=esc(lb);
+  if(id==="sint"&&S.elem)l=`<span class="tglifo">${ELM(S.elem).g}</span> Sintonizar`;
+  return `<button class="${S.ui.tab===id?"active":""}" onclick="go('${id}')">${l}</button>`;}).join("");
+ const R={inicial:rInicial,sint:rSint,hab:rHab,mag:rMag,tal:rTal,inv:rInv,bib:rBib,div:rDiv};
+ (R[S.ui.tab]||rInicial)();
+ if(S.ui.sess)rSess();
+ updDock();applyTheme();whisperLoop();
+ $("foot").textContent=alien("O QUE OLHA DEMAIS E OLHADO DE VOLTA")+"  ·  protocolo 4ª edição · 2002";}
+function toggleSess(){S.ui.sess=!S.ui.sess;save();
+ $("btnSess").textContent=S.ui.sess?"◼ Encerrar sessão":"▶ Sessão";
+ if(S.ui.sess)rSess();applyTheme();window.scrollTo(0,0);}
+
+/* modal */
+function modal(html){$("modalbox").innerHTML=html;$("modal").classList.add("on");}
+function closeModal(){$("modal").classList.remove("on");}
+
+/* boot */
+function boot(){loadAuto();
+ $("modal").addEventListener("click",e=>{if(e.target.id==="modal")closeModal();});
+ $("btnChars").onclick=charsModal;
+ $("btnExp").onclick=exportJSON;
+ $("btnImp").onclick=()=>$("impFile").click();
+ $("impFile").addEventListener("change",e=>{if(e.target.files[0])importJSON(e.target.files[0]);e.target.value="";});
+ $("btnMute").onclick=()=>{S.ui.mute=!S.ui.mute;save();$("btnMute").classList.toggle("on",S.ui.mute);toast(S.ui.mute?"Sussurros silenciados.":"Os sussurros voltaram.");whisperLoop();};
+ $("btnCalm").onclick=()=>{S.ui.calm=!S.ui.calm;save();$("btnCalm").classList.toggle("on",S.ui.calm);applyTheme();toast(S.ui.calm?"Efeitos reduzidos.":"Efeitos completos.");};
+ $("btnSess").onclick=toggleSess;
+ $("btnMute").classList.toggle("on",S.ui.mute);$("btnCalm").classList.toggle("on",S.ui.calm);
+ $("btnSess").textContent=S.ui.sess?"◼ Encerrar sessão":"▶ Sessão";
+ render();}
+window.addEventListener("DOMContentLoaded",boot);
+
+/* ============ ABAS ============ */
+const EC={obs:"#c9a227",eco:"#7fb8a8",vaz:"#7c8fb5",asc:"#c15a45",pac:"#c13a52",ger:"#8dbb62"};
+const MTH=[1,3,5]; /* limiares da Marca */
+
+/* ---------- setters simples ---------- */
+function setF(k,v){S[k]=v;save();}
+function setNum(k,v){S[k]=parseInt(v,10)||0;save();}
+function setNivel(v){S.nivel=Math.max(1,Math.min(15,parseInt(v,10)||1));save();render();}
+function setAttr(k,v){S.attrs[k]=Math.max(-2,Math.min(4,parseInt(v,10)||0));save();render();}
+function setCur(k,v){S.cur[k]=(v===""?null:parseInt(v,10)||0);save();applyTheme();barSync();}
+function stepRec(k,d){const m={vida:maxVida,fol:maxFol,sin:maxSin,luc:maxLuc}[k]();const v=Math.max(0,Math.min(m,curOf(k)+d));S.cur[k]=v;save();
+ const i=$("cur_"+k);if(i)i.value=v;const j=$("scur_"+k);if(j)j.value=v;applyTheme();barSync();}
+function barSync(){for(const k of["vida","fol","sin","luc"]){const m={vida:maxVida,fol:maxFol,sin:maxSin,luc:maxLuc}[k]();
+ for(const id of["bar_"+k,"sbar_"+k]){const b=$(id);if(b)b.style.width=(m?Math.max(0,Math.min(100,Math.round(curOf(k)/m*100))):0)+"%";}}}
+function setRuido(n){S.ruido=Math.max(0,Math.min(20,n));save();render();}
+function clickSeg(i){setRuido(S.ruido===i+1?i:i+1);}
+function togglePer(n,ck){S.per[n]=!!ck;save();const row=$("sk_"+PERICIAS.findIndex(p=>p[0]===n));render();}
+function toggleCond(n){S.cond[n]=!S.cond[n];save();render();}
+function setGente(v){S.gente=(v===""?null:parseInt(v,10)||0);save();}
+function curGente(){return S.gente==null?maxGente():S.gente;}
+
+/* ---------- INICIAL ---------- */
+function rInicial(){const f=FP(),r=RAIZES.find(x=>x.n===S.raiz);
+ const marcos=`PC ${pcTot()} · PP ${ppTot()} · Escolhas de Maestria ${mtTot()} — atributo grátis nos níveis 3·6·9·12·15`;
+ $("mainview").innerHTML=`
+ <div class="grid2">
+ <div class="panel"><h2>Identidade</h2>
+  <div class="row"><div><label>Nome</label><input type="text" value="${esc(S.nome)}" oninput="setF('nome',this.value)"></div>
+  <div><label>Jogador</label><input type="text" value="${esc(S.jogador)}" oninput="setF('jogador',this.value)"></div></div>
+  <div class="row"><div><label>Conceito</label><input type="text" value="${esc(S.conceito)}" placeholder="quem é, antes do caso" oninput="setF('conceito',this.value)"></div></div>
+  <div class="row"><div><label>Raiz</label><select onchange="setF('raiz',this.value);render()">
+   <option value="">—</option>${RAIZES.map(x=>`<option ${S.raiz===x.n?"selected":""}>${x.n}</option>`).join("")}</select></div>
+  <div style="flex:0;align-self:flex-end"><button class="btn mini" onclick="applyRaiz()" ${r?"":"disabled"}>aplicar pacote</button></div></div>
+  ${r?`<div class="hint"><em style="color:var(--dim)">${esc(r.f)}</em> — perícias <b>${r.per.join(", ")}</b> · prof. ${esc(r.prof)} · ${fmtRS(r.rs)} · ${esc(r.item)} · <b>${r.c[0]}:</b> ${esc(r.c[1])}${r.ruido?` · começa com ${rw()} 1`:""}</div>`:""}
+  <div class="row" style="margin-top:8px"><div><label>Fardo principal</label><select onchange="setFardoPrincipal(this.value)">
+   <option value="">—</option>${Object.keys(FARDOS).map(k=>`<option ${S.fardo===k?"selected":""}>${k}</option>`).join("")}</select></div>
+  <div style="flex:0;align-self:flex-end"><button class="btn mini" onclick="applyFardoTre()" ${f?"":"disabled"}>treinadas do Fardo</button></div></div>
+  ${f?`<div class="hint"><em style="color:var(--dim)">“${esc(f.f)}”</em> — +${f.vida} Vida e +${f.cv} ${f.comb==="fol"?"Fôlego":"Sintonia"} por nível · treinadas: ${f.tre.join(", ")} · prof.: ${esc(f.profs)}</div>`:""}
+  <div class="row" style="margin-top:8px">
+   <div><label>Nível</label><input type="number" min="1" max="15" value="${S.nivel}" onchange="setNivel(this.value)"></div>
+   <div><label>Dinheiro (R$)</label><input type="number" step="50" value="${S.dinheiro}" onchange="setNum('dinheiro',this.value);$('rsl').textContent=fmtRS(S.dinheiro)"><div class="hint" id="rsl">${fmtRS(S.dinheiro)}</div></div>
+   <div><label>Defesa</label><input type="number" value="${S.defesa}" onchange="setNum('defesa',this.value)"><div class="hint">padrão 8, antes de armadura</div></div>
+  </div>
+  <div class="hint">${marcos}</div>
+ </div>
+ <div class="panel"><h2>Atributos <small>+2 · +1 · 0 · 0 · −1 (teto +4 na progressão)</small></h2>
+  <div class="attrs">${ATTRS.map(a=>`<div class="attr"><div class="an">${a[1]}</div>
+   <input type="number" min="-2" max="4" value="${A(a[0])}" onchange="setAttr('${a[0]}',this.value)"><div class="ad">${a[2]}</div></div>`).join("")}</div>
+  <div class="secband" style="margin-top:14px">Recursos</div>
+  <div class="recs">
+   ${recCard("vida","Vida",maxVida())}${recCard("fol","Fôlego",maxFol())}${recCard("sin","Sintonia",maxSin())}${recCard("luc","Lucidez",maxLuc())}
+   <div class="rec"><div class="rn">GENTE <b>máx ${maxGente()}</b></div><div class="rv">
+    <button class="stp" onclick="setGente(Math.max(0,curGente()-1));render()">−</button>
+    <input type="number" value="${curGente()}" onchange="setGente(this.value)"><span class="mx">/ ${maxGente()}</span>
+    <button class="stp" onclick="setGente(Math.min(maxGente(),curGente()+1));render()">+</button></div></div>
+   <div class="rec"><div class="rn">BRIO <b>teto 5</b></div><div class="rv">
+    <button class="stp" onclick="setNum('brio',Math.max(0,S.brio-1));render()">−</button>
+    <input type="number" value="${S.brio}" onchange="setNum('brio',this.value)"><span class="mx"></span>
+    <button class="stp" onclick="setNum('brio',S.brio+1);render()">+</button></div></div>
+  </div>
+ </div></div>
+ <div class="panel"><h2>${rw()} <small>Ruído — o quanto o desconhecido já entrou · máx. 20</small>
+  <span style="margin-left:auto;font-family:Georgia,serif;font-size:16px;color:var(--ec)">${S.ruido} <small style="color:var(--faint)">· ${BANDS[bandOf(S.ruido)][2]}</small></span></h2>
+  <div class="rtrack">${Array.from({length:20},(_,i)=>`<div class="rseg ${i<S.ruido?"on":""}" onclick="clickSeg(${i})">${i<S.ruido?"✕":""}</div>`).join("")}</div>
+  <div class="hint">A Marca do seu elemento avança em ${W_RUIDO} 1–2 · 3–4 · 5–6 — a trilha completa vive no altar de <a href="#" style="color:var(--ec)" onclick="go('sint');return false">Sintonizar</a>. A corrupção nunca é pegadinha: o preço se anuncia antes.</div>
+ </div>
+ <div class="panel"><h2>Condições</h2><div class="chips">${CONDICOES.map(c=>`<span class="chip ${S.cond[c[0]]?"on":""}" title="${esc(c[1])}" onclick="toggleCond('${c[0].replace(/'/g,"\\'")}')">${c[0]}</span>`).join("")}</div>
+  ${CONDICOES.filter(c=>S.cond[c[0]]).map(c=>`<div class="hint" style="color:#c88">▸ <b>${c[0]}</b> — ${esc(c[1])}</div>`).join("")}
+ </div>
+ <div class="panel"><h2>Perícias <small>clique no nome para rolar 2d6 + bônus · ✓ = treinada (+1)</small></h2>
+  <div class="skills">${skillsHTML(false)}</div></div>
+ <div class="panel"><h2>Proficiências <small>o que você sabe operar — sem elas, −2 ou impossível</small></h2>
+  <textarea oninput="setF('profis',this.value)" placeholder="armas de fogo leves, ferramentas médicas, idioma morto…">${esc(S.profis)}</textarea></div>`;
+ barSync();}
+function recCard(k,nm,mx){return `<div class="rec"><div class="rn">${nm} <b>máx ${mx}</b></div><div class="rv">
+ <button class="stp" onclick="stepRec('${k}',-1)">−</button>
+ <input type="number" id="cur_${k}" value="${curOf(k)}" onchange="setCur('${k}',this.value)"><span class="mx">/ ${mx}</span>
+ <button class="stp" onclick="stepRec('${k}',1)">+</button></div>
+ <div class="bar"><i id="bar_${k}"></i></div></div>`;}
+function skillsHTML(sessOnly){let out="",cur="";
+ const list=PERICIAS.map((p,i)=>({p,i})).filter(o=>!sessOnly||S.per[o.p[0]]||SESS_ALL);
+ for(const {p,i} of list){const an=ATTRS.find(a=>a[0]===p[1]);
+  if(!sessOnly&&an[1]!==cur){cur=an[1];out+=`<div class="sgroup">${cur}</div>`;}
+  const tr=!!S.per[p[0]],bn=A(p[1])+(tr?1:0);
+  out+=`<div class="skill ${tr?"tr":""}" onclick="doRoll('${p[0].replace(/'/g,"\\'")}',${bn})">
+  <input type="checkbox" ${tr?"checked":""} onclick="event.stopPropagation();togglePer('${p[0].replace(/'/g,"\\'")}',this.checked)">
+  <span class="nm">${p[0]}</span><span class="at">${an[1].slice(0,3)}</span><span class="bn">${bn>=0?"+":""}${bn}</span></div>`;}
+ return out||`<div class="hint">nenhuma perícia treinada — marque na aba Inicial ou ative “mostrar todas”.</div>`;}
+function applyRaiz(){const r=RAIZES.find(x=>x.n===S.raiz);if(!r)return;
+ r.per.forEach(p=>S.per[p]=true);
+ if(r.ruido&&S.ruido<r.ruido)S.ruido=r.ruido;
+ if(confirm(`Definir o dinheiro inicial em ${fmtRS(r.rs)}?`))S.dinheiro=r.rs;
+ save();render();toast(`Raiz aplicada — anote: ${r.item}. Proficiências: ${r.prof}.`);}
+function applyFardoTre(){const f=FP();if(!f)return;f.tre.forEach(p=>S.per[p]=true);save();render();
+ toast("Treinadas do Fardo marcadas. Onde repetir com a Raiz, escolha outra livre no lugar.");}
+function setFardoPrincipal(v){const old=S.fardo;S.fardo=v;S.fardosX=S.fardosX.filter(x=>x!==v);
+ if(old&&old!==v&&!owned().includes(old))purgeFardo(old);save();render();}
+function purgeFardo(f){const nE=S.esc.filter(k=>k.startsWith(f+"|")).length,nM=S.maest.filter(m=>m.f===f).length;
+ S.esc=S.esc.filter(k=>!k.startsWith(f+"|"));S.maest=S.maest.filter(m=>m.f!==f);
+ if(nE||nM)toast(`${f} removido — ${nE*2} PP e ${nM?"escolhas de maestria":""} devolvidos.`);}
+
+/* ---------- SINTONIZAR ---------- */
+function rSint(){const sel=S.elem;
+ $("mainview").innerHTML=`<div id="sintwrap">
+ <div class="fala">${alien("SINTONIZAR")} · o que você olha, olha de volta</div>
+ <div class="elring">${ELEMS.map(e=>`
+  <div class="elc ${sel===e.id?"sel":sel?"dim":""}" data-el="${e.id}" style="--c:${EC[e.id]}"
+   onmouseenter="previewEl('${e.id}')" onmouseleave="previewEl(null)" onclick="clickEl('${e.id}')">
+   <span class="eg">${e.g}</span><div class="en">${e.n}</div><div class="ev">— ${e.v} —</div>
+   <div class="ef">${esc(e.fr)}</div></div>`).join("")}</div>
+ ${sel?altarHTML(ELM(sel)):`<div class="hint" style="text-align:center;margin-top:30px">Nenhum elemento sintonizado. O Ruído sobe do mesmo jeito — mas sem nome, sem Marca, sem trilha.</div>`}
+ </div>`;}
+function altarHTML(e){const b=bandOf(S.ruido);
+ return `<div id="altar">
+ <h3><span style="font-size:26px;color:${EC[e.id]}">${e.g}</span> ${e.n} <small style="letter-spacing:2px;color:var(--faint)">— ${e.v} —</small>
+ <span style="margin-left:auto"><button class="btn mini" onclick="dessint()">dessintonizar</button></span></h3>
+ <div class="hint" style="font-style:italic">${esc(e.fr)}</div>
+ <div class="hcard regra" style="margin-top:10px"><div class="ht"><b>${e.lei[0]}</b><span class="tag warn">lei do elemento</span></div><div class="hx">${esc(e.lei[1])}</div></div>
+ <div class="secband">A Marca — quem foi tocado</div>
+ ${e.marca.map((m,i)=>{const on=S.ruido>=MTH[i];
+  return `<div class="mtier ${on?"on":"off"}"><div class="mt">${W_RUIDO} ${MTH[i]}–${MTH[i]+1}${on?"":" · selado"}</div>
+  <div class="mx">${on?esc(m):esc(alien(m).slice(0,72))+" …"}</div></div>`;}).join("")}
+ <div class="secband">Graus de conjuração <small style="letter-spacing:0;text-transform:none">— 2d6 + Juízo ou Têmpera + Ocultismo vs Limiar</small></div>
+ <div class="chips">${GRAUS.map(g=>`<span class="tag ${grauOK(g.g,S.ruido,S.nivel)?"ok":"dark"}" title="${esc(g.rq)}">G${g.g} · limiar ${g.lim}</span>`).join(" ")}</div>
+ <div class="hint" style="margin-top:8px">Trocar de elemento é livre — clique em outro círculo. ${owned().includes("Sintonizador")?"<b>Maestria Imposta:</b> a trilha do Sintonizador segue este elemento (aba Habilidades).":""}</div>
+ </div>`;}
+function previewEl(id){document.body.dataset.el=id||S.elem||"";}
+function clickEl(id){if(S.elem===id){const a=$("altar");if(a)a.scrollIntoView({behavior:"smooth"});return;}
+ const e=ELM(id);
+ modal(`<h3>${e.g} Sintonizar — ${e.n}</h3>
+ <div class="hint" style="font-size:13px;font-style:italic;margin-bottom:10px">${esc(e.fr)}</div>
+ <div class="hint">${esc(e.lei[1])}</div>
+ ${S.elem?`<div class="hint" style="color:#c88;margin-top:8px">Você deixa ${ELM(S.elem).n} para trás. A troca é livre — a Marca acompanha o elemento atual.</div>`:""}
+ <div style="margin-top:14px;display:flex;gap:8px;justify-content:flex-end">
+ <button class="btn" onclick="closeModal()">ainda não</button>
+ <button class="btn gold" onclick="doSint('${id}')">sintonizar</button></div>`);}
+function doSint(id){closeModal();const ov=$("transOv");ov.className="t-"+id+" go";
+ setTimeout(()=>{ov.className="";S.elem=id;save();render();
+  toast(ELM(id).n+" — "+ELM(id).lei[0]+".");},S.ui.calm?60:1650);
+ if(S.ui.calm){/* instantâneo no modo calmo */}}
+function dessint(){if(!confirm("Dessintonizar? A Marca fica em silêncio até você sintonizar de novo."))return;
+ S.elem="";save();render();}
+
+/* ---------- HABILIDADES ---------- */
+function badge(tx,ok){return `<span class="tag ${ok?"ok":"warn"}">${tx}</span>`;}
+function reqInfo(f,h){const r=h[3]||{};let html="",ok=true;
+ if(r.nv){const o=S.nivel>=r.nv;ok=ok&&o;html+=badge("nível "+r.nv,o);}
+ if(r.ruido){const o=S.ruido>=r.ruido;ok=ok&&o;html+=badge(W_RUIDO+" ≥"+r.ruido,o);}
+ if(r.req){const o=hasHab(f,r.req);ok=ok&&o;html+=badge("req. "+r.req,o);}
+ return {html,ok};}
+function hcardH(h,extraTags,body){return `<div class="hcard"><div class="ht"><b>${esc(h[0])}</b><span class="tag dark">${esc(h[1])}</span>${extraTags||""}</div><div class="hx">${esc(h[2])}</div>${body||""}</div>`;}
+function rHab(){const own=owned(),ppL=ppTot()-ppGasto(),mtL=mtTot()-mtUsado();
+ let html=`<div class="wallet"><span class="${ppL<0?"neg":""}">Pontos de Profissão <b>${ppL}</b> livres <small>(${ppTot()} totais − ${ppGasto()} gastos)</small></span>
+ <span class="${mtL<0?"neg":""}">Escolhas de Maestria <b>${mtL}</b> <small>(níveis 1 · 4 · 8 · 12)</small></span></div>
+ <div class="panel"><h2>Fardos <small>multiclasse livre — habilidades-base vêm de graça; só o principal soma Vida e combustível por nível</small></h2>
+ ${S.fardo?`<span class="fchip">★ ${S.fardo} <small>principal</small></span>`:`<span class="hint">defina o Fardo principal na aba Inicial</span>`}
+ ${S.fardosX.map(f=>`<span class="fchip">${f} <small>extra</small><span class="x" onclick="remFardo('${f}')">✕</span></span>`).join("")}
+ <button class="btn mini gold" onclick="addFardoModal()">+ adicionar Fardo</button></div>`;
+ if(!own.length){$("mainview").innerHTML=html+`<div class="hint">Sem Fardo, sem habilidades. O mundo mostra os dentes mesmo assim.</div>`;return;}
+ html+=`<div class="secband">No seu personagem</div>`;
+ for(const f of own){const d=FARDOS[f];
+  html+=`<div class="panel"><h2>${f} <small>“${esc(d.f)}” · +${d.vida} Vida e +${d.cv} ${d.comb==="fol"?"Fôlego":"Sintonia"}/nível${f===S.fardo?"":" (extra — não soma recursos)"} · treinadas: ${d.tre.join(", ")}</small></h2>
+  ${d.regra?`<div class="hcard regra"><div class="ht"><b>◆ ${d.regra[0]}</b><span class="tag warn">regra de fardo</span></div><div class="hx">${esc(d.regra[1])}</div></div>`:""}
+  ${d.base.map(h=>hcardH(h,`<span class="tag">automática</span>`)).join("")}
+  ${d.esc.map((h,i)=>S.esc.includes(f+"|"+h[0])?hcardH(h,`<span class="tag ok">2 PP</span><span class="src"><button class="btn mini del" onclick="refundEsc('${f}',${i})">devolver</button></span>`):"").join("")}
+  </div>`;}
+ html+=`<div class="secband">Disponíveis — <b>2 PP</b> cada</div>`;
+ for(const f of own){const d=FARDOS[f];const av=d.esc.map((h,i)=>({h,i})).filter(o=>!S.esc.includes(f+"|"+o.h[0]));
+  if(!av.length)continue;
+  html+=`<div class="panel"><h2>${f}</h2>${av.map(({h,i})=>{const q=reqInfo(f,h);
+   return hcardH(h,q.html+`<span class="src"><button class="btn mini gold" onclick="buyEsc('${f}',${i})">comprar · 2 PP</button></span>`);}).join("")}</div>`;}
+ /* customizadas */
+ html+=`<div class="panel"><h2>Anotadas à mão <small>habilidades fora do Dossiê — casa, mestre, sabe-se lá</small>
+  <span style="margin-left:auto"><button class="btn mini gold" onclick="habEditor()">+ criar habilidade</button></span></h2>
+  ${S.custom.hab.map((h,i)=>`<div class="hcard"><div class="ht"><b>${esc(h.n)}</b><span class="tag dark">${esc(h.tag||"—")}</span>
+   <span class="src"><button class="btn mini del" onclick="if(confirm('Apagar ${esc(h.n)}?')){S.custom.hab.splice(${i},1);save();render()}">apagar</button></span></div>
+   <div class="hx">${esc(h.tx)}</div></div>`).join("")||`<div class="hint">nada anotado ainda.</div>`}</div>`;
+ /* maestrias */
+ html+=`<div class="panel"><h2>Quadro de Maestrias <small>Aprendiz → Veterano → Mestre → Ápice (nível 12+) · cada passo gasta 1 Escolha</small>
+  <span style="margin-left:auto"><button class="btn mini gold" onclick="openMaeModal()">abrir maestria</button></span></h2>
+  ${maeImpostaAviso()}
+  ${S.maest.map((m,i)=>maeCard(m,i)).join("")||`<div class="hint">nenhuma maestria aberta — a primeira Escolha chega no nível 1.</div>`}</div>`;
+ $("mainview").innerHTML=html;}
+function addFardoModal(){const rest=Object.keys(FARDOS).filter(f=>!owned().includes(f));
+ modal(`<h3>Adicionar Fardo</h3>${rest.map(f=>{const d=FARDOS[f];
+  return `<div class="hcard" style="cursor:pointer" onclick="pickFardo('${f}')"><div class="ht"><b>${f}</b>
+  <span class="tag dark">${d.comb==="fol"?"Fôlego":"Sintonia"}</span></div><div class="hx">“${esc(d.f)}” — base: ${d.base.map(h=>h[0]).join(" · ")}</div></div>`;}).join("")||"<div class='hint'>você já carrega todos os oito. Deus te ajude.</div>"}
+ <div style="text-align:right;margin-top:8px"><button class="btn" onclick="closeModal()">fechar</button></div>`);}
+function pickFardo(f){S.fardosX.push(f);save();closeModal();render();toast(f+" adicionado — 3 habilidades-base ganhas de graça.");}
+function remFardo(f){if(!confirm(`Remover ${f}? Escolhíveis e maestrias dele voltam como reembolso.`))return;
+ S.fardosX=S.fardosX.filter(x=>x!==f);purgeFardo(f);save();render();}
+function buyEsc(f,i){const h=FARDOS[f].esc[i],q=reqInfo(f,h),ppL=ppTot()-ppGasto();
+ if(ppL<2&&!confirm("PP insuficiente — comprar mesmo assim (fica negativo)?"))return;
+ if(!q.ok&&!confirm("Requisito não atendido — a mesa manda. Comprar mesmo assim?"))return;
+ S.esc.push(f+"|"+h[0]);save();render();toast(h[0]+" adquirida.");}
+function refundEsc(f,i){const n=FARDOS[f].esc[i][0];S.esc=S.esc.filter(k=>k!==f+"|"+n);save();render();toast("2 PP devolvidos.");}
+function habEditor(){modal(`<h3>Criar habilidade</h3>
+ <div class="row"><div><label>Nome</label><input type="text" id="ch_n"></div><div><label>Etiqueta</label><input type="text" id="ch_t" placeholder="AÇÃO · 1 FÔLEGO · 1×/CENA"></div></div>
+ <label>Texto</label><textarea id="ch_x"></textarea>
+ <div style="text-align:right;margin-top:10px;display:flex;gap:8px;justify-content:flex-end">
+ <button class="btn" onclick="closeModal()">cancelar</button>
+ <button class="btn gold" onclick="addCustomHab()">salvar</button></div>`);}
+function addCustomHab(){const n=$("ch_n").value.trim();if(!n)return toast("Dê um nome.");
+ S.custom.hab.push({n,tag:$("ch_t").value.trim(),tx:$("ch_x").value.trim()});save();closeModal();render();}
+/* maestrias */
+function maeImpostaAviso(){if(!owned().includes("Sintonizador"))return "";
+ if(!S.elem)return `<div class="hint" style="color:#c88">◆ Maestria Imposta: o Sintonizador não escolhe — <a href="#" style="color:var(--ec)" onclick="go('sint');return false">sintonize um elemento</a> para revelar a trilha.</div>`;
+ const e=ELM(S.elem),nome=FARDOS["Sintonizador"].mae.find(m=>m.el===S.elem);
+ if(nome&&!S.maest.some(m=>m.f==="Sintonizador"))return `<div class="hint" style="color:var(--ec)">◆ Maestria Imposta revelada: <b>${nome.n}</b> — abra pelo botão acima (custa 1 Escolha, como manda a progressão).</div>`;
+ return "";}
+function openMaeModal(){const mtL=mtTot()-mtUsado();let body="";
+ for(const f of owned()){const d=FARDOS[f];let ops=d.mae.map((m,i)=>({m,i}));
+  if(f==="Sintonizador")ops=ops.filter(o=>o.m.el===S.elem);
+  ops=ops.filter(o=>!S.maest.some(x=>x.f===f&&x.n===o.m.n));
+  if(ops.length)body+=`<div class="secband">${f}${f==="Sintonizador"?" · imposta pelo elemento":""}</div>`+
+   ops.map(({m,i})=>`<div class="hcard" style="cursor:pointer" onclick="openMae('${f}',${i})"><div class="ht"><b>${esc(m.n)}</b>${m.el?`<span class="tag">${ELM(m.el).g} ${ELM(m.el).n}</span>`:""}</div><div class="hx">${esc(m.s||"")}${m.st.every(s=>!s.length)?" <em style='color:var(--faint)'>· estágios a completar do Dossiê</em>":""}</div></div>`).join("");
+  if(f==="Sintonizador"&&!S.elem)body+=`<div class="secband">Sintonizador</div><div class="hint">sintonize um elemento para revelar a trilha imposta.</div>`;}
+ modal(`<h3>Abrir maestria <small style="color:var(--faint)">· ${mtL} escolha${mtL===1?"":"s"} livre${mtL===1?"":"s"}</small></h3>
+ ${body||`<div class="hint">nenhum caminho embutido disponível nos seus Fardos.</div>`}
+ <div class="secband">Caminho customizado</div>
+ <div class="row"><div><label>Fardo</label><select id="cm_f">${owned().map(f=>`<option>${f}</option>`).join("")}</select></div>
+ <div><label>Nome do caminho</label><input type="text" id="cm_n" placeholder="ex: Batedor"></div>
+ <div style="flex:0;align-self:flex-end"><button class="btn gold mini" onclick="openMaeCustom()">abrir</button></div></div>
+ <div style="text-align:right;margin-top:10px"><button class="btn" onclick="closeModal()">fechar</button></div>`);}
+function chkEscolha(){if(mtTot()-mtUsado()<1){toast("Sem Escolha de Maestria livre — elas chegam nos níveis 1, 4, 8 e 12.");return false;}return true;}
+function openMae(f,i){if(!chkEscolha())return;const m=FARDOS[f].mae[i];
+ S.maest.push({f,n:m.n,st:0});save();closeModal();render();toast(m.n+" — Aprendiz.");}
+function openMaeCustom(){if(!chkEscolha())return;const f=$("cm_f").value,n=$("cm_n").value.trim();if(!n)return toast("Dê um nome ao caminho.");
+ S.maest.push({f,n,st:0,cu:true,tx:["","","",""]});save();closeModal();render();}
+function maeData(m){const d=FARDOS[m.f];return d?d.mae.find(x=>x.n===m.n):null;}
+function maeCard(m,i){const md=m.cu?null:maeData(m),imposta=(m.f==="Sintonizador");
+ let body="";
+ for(let s=0;s<=m.st;s++){const lb=`<div class="secband" style="border:none;padding:6px 0 2px">${STG[s]}</div>`;
+  if(m.cu){body+=lb+`<textarea oninput="S.maest[${i}].tx[${s}]=this.value;save()" placeholder="habilidades deste estágio…">${esc(m.tx[s]||"")}</textarea>`;}
+  else{const abs=(md&&md.st[s])||[];body+=lb+(abs.length?abs.map(h=>hcardH(h)).join(""):`<div class="hint">— a completar do Dossiê (use um caminho customizado ou me peça para embutir).</div>`);}}
+ return `<div class="mcard"><div class="ht" style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap">
+ <b style="font-family:Georgia,serif;font-size:15px">${esc(m.n)}</b><span class="tag dark">${m.f}</span>
+ ${imposta?`<span class="tag warn">imposta</span>`:""}${md&&md.s?`<span class="src">${esc(md.s)}</span>`:""}</div>
+ ${md&&md.regra?`<div class="hcard regra" style="margin-top:8px"><div class="ht"><b>◆ ${md.regra[0]}</b></div><div class="hx">${esc(md.regra[1])}</div></div>`:""}
+ <div class="mrail">${STG.map((n,s)=>`<div class="mst ${s<=m.st?"on":s===m.st+1?"next":""}">${n}</div>`).join("")}</div>
+ ${body}
+ <div style="display:flex;gap:6px;margin-top:8px">
+ ${m.st<3?`<button class="btn mini gold" onclick="subirMae(${i})">subir para ${STG[m.st+1]} · 1 escolha</button>`:`<span class="tag ok">ápice alcançado</span>`}
+ ${m.st>0?`<button class="btn mini" onclick="S.maest[${i}].st--;save();render();toast('Escolha devolvida.')">voltar estágio</button>`:""}
+ ${imposta&&owned().includes("Sintonizador")?"":`<button class="btn mini del" onclick="remMae(${i})">fechar caminho</button>`}
+ </div></div>`;}
+function subirMae(i){const m=S.maest[i];
+ if(m.st+1===3&&S.nivel<12)return toast("Ápice exige nível 12+.");
+ if(!chkEscolha())return;m.st++;save();render();toast(m.n+" — "+STG[m.st]+".");}
+function remMae(i){const m=S.maest[i];if(!confirm(`Fechar ${m.n}? As ${1+m.st} escolhas voltam.`))return;
+ S.maest.splice(i,1);save();render();}
+
+/* ---------- MAGIAS ---------- */
+function allMag(){return MAGIAS.concat(S.custom.mag.map(m=>Object.assign({custom:true},m)));}
+function conhKey(m){return m.el+"|"+m.n;}
+function conhOwnCount(){return S.conh.filter(k=>{const[el,n]=k.split("|");return el===S.elem&&!MAGIAS_AUTO.includes(n);}).length;}
+function toggleConh(key,ck){if(ck){if(!S.conh.includes(key))S.conh.push(key);}else S.conh=S.conh.filter(k=>k!==key);
+ save();const c=$("magCount");if(c)c.textContent=conhOwnCount();}
+function magCard(m,ci){const ok=grauOK(m.g,S.ruido,S.nivel),key=conhKey(m),kn=S.conh.includes(key);
+ const lines=[["Parcial",m.p],["Total",m.t],["Crítico",m.c],["Sobrecarga",m.sob],["Falha",m.fal]].filter(x=>x[1]&&x[1]!=="—");
+ return `<div class="hcard ${ok||m.auto?"":"locked"}"><div class="ht"><b>${esc(m.n)}</b>
+ <span class="tag ${ok?"ok":"warn"}" title="${esc(GRAUS[m.g-1].rq)}">G${m.g} · limiar ${GRAUS[m.g-1].lim}</span>
+ <span class="tag dark">${esc(m.tipo)}</span><span class="tag dark">${esc(m.cst)}</span>
+ ${m.auto?`<span class="tag">automática do Marcado</span>`:`<label style="margin-left:auto;display:flex;gap:5px;align-items:center;font-size:10px;letter-spacing:1px;color:var(--dim)"><input type="checkbox" ${kn?"checked":""} onchange="toggleConh('${key}',this.checked)"> conhecida</label>`}
+ ${m.custom?`<span class="src"><button class="btn mini del" onclick="S.custom.mag.splice(${ci},1);save();render()">apagar</button></span>`:""}
+ </div><div class="hx"><em>Execução</em> ${esc(m.exe)} · <em>Alcance</em> ${esc(m.alc)} · <em>Duração</em> ${esc(m.dur)}<br>
+ ${lines.map(l=>`<em>${l[0]}</em> ${esc(l[1])}`).join("<br>")}</div></div>`;}
+function rMag(){const N=2+A("jui"),X=conhOwnCount(),e=ELM(S.elem);
+ let html=`<div class="panel"><h2>Magias
+ <span style="margin-left:auto;font-family:Georgia,serif;font-size:16px;letter-spacing:1px;color:${X>N?"#c66":"var(--ec)"}">
+ conhecidas do próprio elemento: <b id="magCount">${X}</b> / ${N}</span></h2>
+ <div class="hint">${e?`elemento sintonizado: <a href="#" style="color:var(--ec)" onclick="go('sint');return false">${e.g} ${e.n}</a> · `:`<a href="#" style="color:var(--ec)" onclick="go('sint');return false">sintonize um elemento →</a> · `}
+ limite = 2 + Juízo · automáticas dos Marcados e fontes achadas em jogo não contam · novas magias entram em downtime de estudo</div>
+ <div class="chips" style="margin-top:8px">${GRAUS.map(g=>`<span class="tag ${grauOK(g.g,S.ruido,S.nivel)?"ok":"dark"}" title="${esc(g.rq)}">G${g.g} · ${g.lim}</span>`).join(" ")}
+ <span style="margin-left:auto"><button class="btn mini gold" onclick="magEditor()">+ criar magia</button></span></div></div>`;
+ if(e){const own=allMag().filter(m=>m.el===e.id).sort((a,b)=>a.g-b.g||a.n.localeCompare(b.n));
+  html+=`<div class="secband">${e.g} ${e.n} — ${e.v}</div>`;
+  html+=own.length?own.map(m=>magCard(m,m.custom?S.custom.mag.indexOf(S.custom.mag.find(x=>x.n===m.n&&x.el===m.el)):-1)).join(""):`<div class="hint">nenhuma magia deste elemento embutida ainda — crie pelas anotações ou me peça para puxar do Grimório.</div>`;}
+ const outros=ELEMS.filter(x=>!e||x.id!==e.id);
+ html+=`<details style="margin-top:16px"><summary style="cursor:pointer;color:var(--faint);font-size:11px;letter-spacing:3px;text-transform:uppercase">outros elementos — fontes achadas em jogo</summary>
+ ${outros.map(o=>{const ms=allMag().filter(m=>m.el===o.id).sort((a,b)=>a.g-b.g);
+  return ms.length?`<div class="secband">${o.g} ${o.n}</div>`+ms.map(m=>magCard(m,m.custom?S.custom.mag.findIndex(x=>x.n===m.n&&x.el===m.el):-1)).join(""):"";}).join("")||`<div class="hint">nada por aqui.</div>`}</details>`;
+ $("mainview").innerHTML=html;}
+function magEditor(){modal(`<h3>Criar magia</h3>
+ <div class="row"><div><label>Elemento</label><select id="cm_el">${ELEMS.map(e=>`<option value="${e.id}" ${S.elem===e.id?"selected":""}>${e.g} ${e.n}</option>`).join("")}</select></div>
+ <div><label>Grau</label><select id="cm_g"><option>1</option><option>2</option><option>3</option><option>4</option></select></div>
+ <div><label>Nome</label><input type="text" id="cm_nm"></div></div>
+ <div class="row"><div><label>Tipo</label><input type="text" id="cm_tp" placeholder="SENSOR, ÁREA…"></div>
+ <div><label>Custo</label><input type="text" id="cm_cs" placeholder="2 Sintonia + 1 Lucidez"></div></div>
+ <div class="row"><div><label>Execução</label><input type="text" id="cm_ex" value="Ação"></div>
+ <div><label>Alcance</label><input type="text" id="cm_al" value="Curto"></div>
+ <div><label>Duração</label><input type="text" id="cm_du" value="Cena"></div></div>
+ <label>Texto (Parcial / Total / Crítico…)</label><textarea id="cm_tx"></textarea>
+ <div style="text-align:right;margin-top:10px;display:flex;gap:8px;justify-content:flex-end">
+ <button class="btn" onclick="closeModal()">cancelar</button><button class="btn gold" onclick="addCustomMag()">salvar</button></div>`);}
+function addCustomMag(){const n=$("cm_nm").value.trim();if(!n)return toast("Dê um nome.");
+ S.custom.mag.push({el:$("cm_el").value,g:parseInt($("cm_g").value,10),n,tipo:$("cm_tp").value.trim()||"—",cst:$("cm_cs").value.trim()||"—",exe:$("cm_ex").value.trim(),alc:$("cm_al").value.trim(),dur:$("cm_du").value.trim(),p:$("cm_tx").value.trim(),t:"",c:"",sob:"",fal:""});
+ save();closeModal();render();}
+
+/* ---------- TALENTOS + ROLETA ---------- */
+let TF={q:"",c:0,e:"todos"},spinning=false;
+function rTal(){const pcL=pcTot()-pcGasto();
+ $("mainview").innerHTML=`<div class="wallet"><span class="${pcL<0?"neg":""}">Pontos de Compra <b>${pcL}</b> livres <small>(${pcTot()} totais − ${pcGasto()} gastos)</small></span>
+ <span>gasto fora da loja <input type="number" min="0" style="width:70px;display:inline-block;padding:3px 6px" value="${S.pcExtra}" onchange="S.pcExtra=parseInt(this.value,10)||0;save();rTal()"> <small>PC (proficiências 1 · atributos 3/4/6/8)</small></span></div>
+ <div class="tbar"><input type="text" placeholder="buscar talento…" value="${esc(TF.q)}" oninput="TF.q=this.value;talList()">
+ <select onchange="TF.c=parseInt(this.value,10);talList()"><option value="0">todos os custos</option><option value="1" ${TF.c===1?"selected":""}>1 PC</option><option value="2" ${TF.c===2?"selected":""}>2 PC</option><option value="3" ${TF.c===3?"selected":""}>3 PC</option></select>
+ <select onchange="TF.e=this.value;talList()"><option value="todos" ${TF.e==="todos"?"selected":""}>todos</option><option value="c" ${TF.e==="c"?"selected":""}>comprados</option><option value="d" ${TF.e==="d"?"selected":""}>disponíveis</option></select></div>
+ <div id="tallist"></div>
+ <div id="roleta"><h2 style="font-family:Georgia,serif;font-weight:400;letter-spacing:4px;text-transform:uppercase;color:var(--ec);margin:0 0 4px">⟳ Roleta Maluca</h2>
+ <div class="rq">“Cinco nomes na roda. A sorte não conhece nenhum.” — a roleta sorteia um <b>atributo</b>; o que fazer com ele, a mesa decide.</div>
+ <div class="slotbox" id="slotbox"><div id="slotreel"><div><span>?</span>— · —</div></div></div>
+ <div id="rolres" class="hint" style="min-height:18px"></div>
+ <button class="btn gold" id="btnGirar" onclick="spinRoleta()">G I R A R</button></div>`;
+ talList();}
+function talList(){const box=$("tallist");if(!box)return;const q=TF.q.toLowerCase();let html="",last=0;
+ TALENTOS.forEach((t,gi)=>{const[pc,n,tx,rq]=t,key=pc+"|"+n,own=S.tal.includes(key);
+  if(TF.c&&pc!==TF.c)return;if(TF.e==="c"&&!own)return;if(TF.e==="d"&&own)return;
+  if(q&&!(n+" "+tx).toLowerCase().includes(q))return;
+  if(pc!==last){last=pc;html+=`<div class="secband">Talentos de <b>${pc} PC</b></div>`;}
+  let rb="";if(rq){const an=ATTRS.find(a=>a[0]===rq[0]);const ok=A(rq[0])>=rq[1];rb=badge(an[1]+" +"+rq[1],ok);}
+  html+=`<div class="hcard"><div class="ht"><b>${esc(n)}</b><span class="tag dark">${pc} PC</span>${rb}
+  ${own?`<span class="tag ok">comprado</span><span class="src"><button class="btn mini del" onclick="refundTal(${gi})">devolver</button></span>`
+   :`<span class="src"><button class="btn mini gold" onclick="buyTal(${gi})">comprar</button></span>`}</div>
+  <div class="hx">${esc(tx).replace(/⟑⋏⊙⌖◊/g,rw())}</div></div>`;});
+ box.innerHTML=html||`<div class="hint">nada encontrado.</div>`;}
+function buyTal(gi){const[pc,n,,rq]=TALENTOS[gi],pcL=pcTot()-pcGasto();
+ if(pcL<pc&&!confirm("PC insuficiente — comprar mesmo assim (fica negativo)?"))return;
+ if(rq&&A(rq[0])<rq[1]&&!confirm("Requisito de atributo não atendido — comprar mesmo assim?"))return;
+ S.tal.push(pc+"|"+n);save();rTal();toast(n+" adquirido.");}
+function refundTal(gi){const[pc,n]=TALENTOS[gi];S.tal=S.tal.filter(k=>k!==pc+"|"+n);save();rTal();toast(pc+" PC devolvidos.");}
+function spinRoleta(){if(spinning)return;spinning=true;$("btnGirar").disabled=true;$("rolres").innerHTML="";
+ const pick=Math.floor(Math.random()*5),seq=[];
+ for(let r=0;r<4;r++)for(const a of ATTRS)seq.push(a);
+ for(let i=0;i<=pick;i++)seq.push(ATTRS[i]);
+ const reel=$("slotreel");reel.style.transform="translateY(0)";
+ reel.innerHTML=seq.map(a=>`<div><span>${alien(a[1][0])}</span>${a[1]}</div>`).join("");
+ const total=(seq.length-1)*56,t0=performance.now(),D=S.ui.calm?200:2500;
+ (function fr(t){const p=Math.min(1,(t-t0)/D),e2=1-Math.pow(1-p,3);
+  reel.style.transform=`translateY(${-total*e2}px)`;
+  if(p<1)rAF(fr);else{const a=ATTRS[pick];$("slotbox").classList.add("slotwin");setTimeout(()=>{const b=$("slotbox");if(b)b.classList.remove("slotwin");},900);
+   $("rolres").innerHTML=`a roleta cravou: <b style="color:var(--ec);letter-spacing:3px">${a[1].toUpperCase()}</b> — ${esc(a[2])}`;
+   S.sess.log.unshift({t:hhmm(),x:"Roleta Maluca → "+a[1]});S.sess.log=S.sess.log.slice(0,40);save();
+   toast("Roleta Maluca: "+a[1].toUpperCase());spinning=false;const g=$("btnGirar");if(g)g.disabled=false;}})(t0);}
+
+/* ---------- BIBLIOTECA (IndexedDB) ---------- */
+let _db=null,_urls={};
+function idb(){return new Promise((res,rej)=>{if(!window.indexedDB)return rej("no-idb");if(_db)return res(_db);
+ const rq=indexedDB.open("prot4db",1);
+ rq.onupgradeneeded=e=>{e.target.result.createObjectStore("docs",{keyPath:"id",autoIncrement:true});};
+ rq.onsuccess=e=>{_db=e.target.result;res(_db);};rq.onerror=()=>rej(rq.error);});}
+function dbAll(){return idb().then(db=>new Promise((res,rej)=>{const r=db.transaction("docs").objectStore("docs").getAll();r.onsuccess=()=>res(r.result||[]);r.onerror=()=>rej(r.error);}));}
+function dbAdd(rec){return idb().then(db=>new Promise((res,rej)=>{const r=db.transaction("docs","readwrite").objectStore("docs").add(rec);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);}));}
+function dbPut(rec){return idb().then(db=>new Promise((res,rej)=>{const r=db.transaction("docs","readwrite").objectStore("docs").put(rec);r.onsuccess=()=>res();r.onerror=()=>rej(r.error);}));}
+function dbDel(id){return idb().then(db=>new Promise((res,rej)=>{const r=db.transaction("docs","readwrite").objectStore("docs").delete(id);r.onsuccess=()=>res();r.onerror=()=>rej(r.error);}));}
+function rBib(){$("mainview").innerHTML=`<div class="panel"><h2>Biblioteca do Caso <small>PDFs e imagens — mapas, retratos, recortes de jornal</small></h2>
+ <div class="dropzone" id="dz" onclick="$('bibFile').click()">arraste PDFs ou imagens aqui · ou clique para escolher</div>
+ <div class="hint">os arquivos ficam salvos <b>neste navegador</b> (IndexedDB) — não entram no JSON de exportação nem nos slots.</div>
+ <div class="docgrid" id="docgrid" style="margin-top:14px"></div></div>`;
+ const dz=$("dz");
+ dz.addEventListener("dragover",e=>{e.preventDefault();dz.classList.add("over");});
+ dz.addEventListener("dragleave",()=>dz.classList.remove("over"));
+ dz.addEventListener("drop",e=>{e.preventDefault();dz.classList.remove("over");bibAdd(e.dataTransfer.files);});
+ bibRefresh();}
+function bibAdd(files){const fl=Array.from(files||[]).filter(f=>/pdf|image/.test(f.type));
+ if(!fl.length)return toast("Só PDFs e imagens.");
+ Promise.all(fl.map(f=>dbAdd({name:f.name.replace(/\.[^.]+$/,""),type:f.type,blob:f,note:"",ts:Date.now()})))
+ .then(()=>{toast(fl.length+" documento(s) arquivado(s).");bibRefresh();})
+ .catch(()=>toast("Este navegador recusou o arquivo (IndexedDB indisponível)."));}
+function bibURL(r){if(!_urls[r.id])try{_urls[r.id]=URL.createObjectURL(r.blob);}catch(e){_urls[r.id]="";}return _urls[r.id];}
+function bibRefresh(){const g=$("docgrid");if(!g)return;
+ dbAll().then(list=>{list.sort((a,b)=>b.ts-a.ts);
+  g.innerHTML=list.map(r=>`<div class="doc">
+  <div class="dth" onclick="bibView(${r.id})">${/image/.test(r.type)?`<img src="${bibURL(r)}" alt="">`:"⌸"}</div>
+  <input type="text" value="${esc(r.name)}" onchange="bibRen(${r.id},this.value)">
+  <input type="text" placeholder="nota…" value="${esc(r.note||"")}" onchange="bibNote(${r.id},this.value)">
+  <div class="dbtns"><button class="btn mini" onclick="bibView(${r.id})">abrir</button>
+  <button class="btn mini del" onclick="bibDel(${r.id})">excluir</button></div></div>`).join("")
+  ||`<div class="hint">o arquivo do caso está vazio. Por enquanto.</div>`;})
+ .catch(()=>{g.innerHTML=`<div class="hint">Biblioteca indisponível neste navegador (sem IndexedDB).</div>`;});}
+function bibFind(id,cb){dbAll().then(l=>{const r=l.find(x=>x.id===id);if(r)cb(r);});}
+function bibRen(id,v){bibFind(id,r=>{r.name=v;dbPut(r);});}
+function bibNote(id,v){bibFind(id,r=>{r.note=v;dbPut(r);});}
+function bibDel(id){if(!confirm("Excluir este documento do arquivo?"))return;dbDel(id).then(bibRefresh);}
+function bibView(id){bibFind(id,r=>{const u=bibURL(r);
+ modal(`<h3>${esc(r.name)}</h3>
+ ${/image/.test(r.type)?`<img src="${u}" style="max-width:100%;max-height:70vh;display:block;margin:0 auto;border:1px solid var(--line)">`
+  :`<iframe src="${u}" style="width:100%;height:70vh;border:1px solid var(--line);background:#222"></iframe>`}
+ <div style="margin-top:10px;display:flex;justify-content:space-between">
+ <a class="btn" href="${u}" download="${esc(r.name)}" style="text-decoration:none">baixar</a>
+ <button class="btn" onclick="closeModal()">fechar</button></div>`);});}
+
+/* ---------- DÍVIDAS & NOTAS ---------- */
+function rDiv(){$("mainview").innerHTML=`<div class="grid2">
+ <div class="panel"><h2>⚖ Dívidas <small>registro do mestre — cobrável em jogo. O Cobrador vive delas.</small></h2>
+  <div id="divlist">${S.div.map((d,i)=>`<div class="row" style="margin-bottom:6px"><div><input type="text" value="${esc(d)}" oninput="S.div[${i}]=this.value;save();updDock()"></div>
+  <div style="flex:0"><button class="btn mini del" onclick="S.div.splice(${i},1);save();render()">×</button></div></div>`).join("")}</div>
+  <button class="btn mini gold" onclick="S.div.push('');save();render()">+ registrar dívida</button></div>
+ <div class="panel"><h2>Créditos de Garantia <small>moeda da magia Garantia (Pacto) — penhore o intangível, gaste em bônus, cura e descontos</small></h2>
+  <div>${S.cred.map((d,i)=>`<div class="row" style="margin-bottom:6px"><div><input type="text" value="${esc(d)}" oninput="S.cred[${i}]=this.value;save()"></div>
+  <div style="flex:0"><button class="btn mini del" onclick="S.cred.splice(${i},1);save();render()">×</button></div></div>`).join("")}</div>
+  <button class="btn mini gold" onclick="S.cred.push('');save();render()">+ anotar crédito</button>
+  <div class="hint">Tudo se anota. Nada se esquece.</div></div>
+ </div>
+ <div class="grid2">
+ <div class="panel"><h2>Vínculos <small>quem te segura no mundo</small></h2><textarea style="min-height:110px" oninput="setF('vinc',this.value)">${esc(S.vinc)}</textarea></div>
+ <div class="panel"><h2>História</h2><textarea style="min-height:110px" oninput="setF('hist',this.value)">${esc(S.hist)}</textarea></div>
+ </div>
+ <div class="panel"><h2>Notas gerais</h2><textarea style="min-height:160px" oninput="setF('notas',this.value)">${esc(S.notas)}</textarea>
+ <div class="hint">as notas rápidas do Modo Sessão podem ser arquivadas aqui.</div></div>`;}
+
+/* ---------- MODO SESSÃO ---------- */
+let SESS_ALL=false;
+function rSess(){const e=ELM(S.elem);
+ $("sessview").innerHTML=`<div class="panel"><h2>Modo Sessão <small>${esc(S.nome||"sem nome")} · nível ${S.nivel}${S.fardo?" · "+S.fardo:""}${e?" · "+e.g+" "+e.n:""}</small>
+ <span style="margin-left:auto"><button class="btn" onclick="toggleSess()">◼ encerrar</button></span></h2>
+ <div class="bigrec">${["vida","fol","sin","luc"].map(k=>{const nm={vida:"Vida",fol:"Fôlego",sin:"Sintonia",luc:"Lucidez"}[k],mx={vida:maxVida,fol:maxFol,sin:maxSin,luc:maxLuc}[k]();
+  return `<div class="rec"><div class="rn">${nm} <b>/ ${mx}</b></div><div class="rv">
+  <button class="stp" onclick="stepRec('${k}',-1)">−</button>
+  <input type="number" id="scur_${k}" value="${curOf(k)}" onchange="setCur('${k}',this.value)">
+  <button class="stp" onclick="stepRec('${k}',1)">+</button></div><div class="bar"><i id="sbar_${k}"></i></div></div>`;}).join("")}
+ </div>
+ <div class="row" style="margin-top:12px;align-items:center">
+  <div style="flex:0;min-width:220px"><label>${W_RUIDO} · Ruído</label>
+   <div style="display:flex;gap:6px;align-items:center">
+   <button class="stp btn mini" onclick="setRuido(S.ruido-1)">−</button>
+   <span style="font-family:Georgia,serif;font-size:22px;color:var(--ec);min-width:34px;text-align:center">${S.ruido}</span>
+   <button class="stp btn mini" onclick="setRuido(S.ruido+1)">+</button>
+   <span class="hint" style="margin:0">${BANDS[bandOf(S.ruido)][2]}</span></div></div>
+  <div style="flex:0;min-width:130px"><label>Brio</label><div style="display:flex;gap:6px;align-items:center">
+   <button class="stp btn mini" onclick="setNum('brio',Math.max(0,S.brio-1));rSess()">−</button>
+   <span style="font-family:Georgia,serif;font-size:22px;min-width:26px;text-align:center">${S.brio}</span>
+   <button class="stp btn mini" onclick="setNum('brio',S.brio+1);rSess()">+</button></div></div>
+  <div style="flex:0;min-width:150px"><label>Gente</label><div style="display:flex;gap:6px;align-items:center">
+   <button class="stp btn mini" onclick="setGente(Math.max(0,curGente()-1));rSess()">−</button>
+   <span style="font-family:Georgia,serif;font-size:22px;min-width:26px;text-align:center">${curGente()}<small style="font-size:11px;color:var(--faint)">/${maxGente()}</small></span>
+   <button class="stp btn mini" onclick="setGente(Math.min(maxGente(),curGente()+1));rSess()">+</button></div></div>
+  <div><label>Condições</label><div class="chips">${CONDICOES.map(c=>`<span class="chip ${S.cond[c[0]]?"on":""}" title="${esc(c[1])}" onclick="toggleCond('${c[0].replace(/'/g,"\\'")}')">${c[0]}</span>`).join("")}</div></div>
+ </div></div>
+ <div class="sessgrid">
+ <div class="panel"><h2>Perícias <small><label style="display:inline;letter-spacing:0;text-transform:none;cursor:pointer"><input type="checkbox" ${SESS_ALL?"checked":""} onchange="SESS_ALL=this.checked;rSess()" style="accent-color:var(--ec)"> mostrar todas</label></small></h2>
+ <div class="skills">${skillsHTML(true)}</div></div>
+ <div>
+ <div class="panel"><h2>Notas rápidas</h2>
+  <div class="snote"><input type="text" id="snIn" placeholder="pista, nome, endereço…" onkeydown="if(event.key==='Enter')addSN()"><button class="btn mini gold" onclick="addSN()">+</button></div>
+  <div class="snlist">${S.sess.notes.map((n,i)=>`<div class="sn"><b>${esc(n.t)}</b>${esc(n.x)} <span style="float:right;color:var(--faint);cursor:pointer" onclick="S.sess.notes.splice(${i},1);save();rSess()">×</span></div>`).join("")||`<div class="hint">nada anotado nesta sessão.</div>`}</div>
+  <div style="display:flex;gap:6px;margin-top:8px">
+  <button class="btn mini" onclick="arqSN()">arquivar em Notas</button>
+  <button class="btn mini del" onclick="if(confirm('Limpar as notas da sessão?')){S.sess.notes=[];save();rSess()}">limpar</button></div></div>
+ <div class="panel"><h2>Rolagens</h2><div class="slog" id="slog">${logHTML()}</div></div>
+ </div></div>`;
+ barSync();}
+function addSN(){const i=$("snIn");if(!i.value.trim())return;S.sess.notes.unshift({t:hhmm(),x:i.value.trim()});i.value="";save();rSess();}
+function arqSN(){if(!S.sess.notes.length)return toast("Nada para arquivar.");
+ const d=new Date().toLocaleDateString("pt-BR");
+ S.notas=("— sessão "+d+" —\n"+S.sess.notes.slice().reverse().map(n=>n.t+" · "+n.x).join("\n")+"\n\n")+(S.notas||"");
+ S.sess.notes=[];save();rSess();toast("Notas arquivadas em Dívidas & Notas.");}
+
+/* ============ INVENTÁRIO (portado da ficha antiga) ============ */
+const GRID_COLS=6,GAP=2,CSZ=38;
+const PIECE_COLORS=["#c9a227","#8dbb62","#7fb8a8","#c15a45","#7c8fb5","#c13a52","#b8b0a0","#8a7a5a"];
+let editorColor=PIECE_COLORS[0],editorShape=[],selectedPiece=null,dragInfo=null,_invKey=false;
+function gridRows(){return Math.max(4,Math.min(10,6+A("car")));}
+function rInv(){
+ $("mainview").innerHTML=`<div class="panel"><h2>Mochila <small>arraste para posicionar · clique numa peça e tecle R para girar</small>
+ <span style="margin-left:auto;font-size:12px;color:var(--dim);letter-spacing:0;text-transform:none;font-family:system-ui">R$ <input type="number" step="50" style="width:110px;display:inline-block;padding:3px 7px" value="${S.dinheiro}" onchange="setNum('dinheiro',this.value);toast(fmtRS(S.dinheiro))"></span></h2>
+ <div class="inv-top">
+  <div class="inv-left">
+   <div class="hint" style="margin-bottom:8px">Capacidade pela Carne: grade <b id="gi">${GRID_COLS} × ${gridRows()}</b>.</div>
+   <div id="invGrid"></div>
+   <div style="margin-top:12px"><label>Bolsa de espera (não cabem / fora do grid)</label><div class="bag" id="bag"></div></div>
+  </div>
+  <div class="inv-right"><div class="panel" style="margin:0">
+   <h2>Criar item</h2>
+   <div class="row"><div><label>Nome</label><input type="text" id="pieceName" placeholder="ex: Espingarda"></div></div>
+   <label>Cor</label><div class="swatches" id="swatches"></div>
+   <label>Formato (clique nas células)</label><div class="shape-editor" id="shapeEd"></div>
+   <button class="btn mini" onclick="clearShape()">limpar formato</button>
+   <div style="margin-top:10px"><button class="btn gold" onclick="addPiece()">+ adicionar à bolsa</button></div>
+   <div class="hint">Formato livre: L, T, linha, quadrado… Cada célula ocupa 1 espaço da mochila. Depois arraste da bolsa para a grade.</div>
+  </div></div>
+ </div></div>`;
+ buildSwatches();buildShapeEditor();renderGrid();renderBag();
+ if(!_invKey){_invKey=true;document.addEventListener("keydown",e=>{
+  if((e.key==="r"||e.key==="R")&&selectedPiece&&S.ui.tab==="inv"&&!/input|textarea/i.test(document.activeElement.tagName)){
+   const p=selectedPiece,old=p.rot;p.rot=((p.rot||0)+1)%4;
+   if(p._loc==="grid"&&!canPlace(p,p.row,p.col,p.id)){p.rot=old;toast("Não cabe girado aqui.");}
+   save();renderGrid();renderBag();}});}}
+function buildSwatches(){const b=$("swatches");if(!b)return;
+ b.innerHTML=PIECE_COLORS.map(c=>`<div class="sw ${c===editorColor?"sel":""}" style="background:${c}" onclick="pickColor('${c}')"></div>`).join("");}
+function pickColor(c){editorColor=c;buildSwatches();}
+function buildShapeEditor(){if(!editorShape.length)editorShape=Array.from({length:5},()=>Array(5).fill(false));
+ const ed=$("shapeEd");if(!ed)return;ed.innerHTML="";
+ for(let r=0;r<5;r++)for(let c=0;c<5;c++){const d=document.createElement("div");
+  d.className="sc"+(editorShape[r][c]?" on":"");
+  d.onclick=()=>{editorShape[r][c]=!editorShape[r][c];buildShapeEditor();};ed.appendChild(d);}}
+function clearShape(){editorShape=Array.from({length:5},()=>Array(5).fill(false));buildShapeEditor();}
+function shapeCells(){const cells=[];
+ for(let r=0;r<5;r++)for(let c=0;c<5;c++)if(editorShape[r][c])cells.push([r,c]);
+ if(!cells.length)return null;
+ const mR=Math.min(...cells.map(x=>x[0])),mC=Math.min(...cells.map(x=>x[1]));
+ return cells.map(([r,c])=>[r-mR,c-mC]);}
+function addPiece(){const name=$("pieceName").value.trim()||"Item";const cells=shapeCells();
+ if(!cells){toast("Desenhe um formato primeiro.");return;}
+ S.inv.bag.push({id:S.inv.seq++,name,color:editorColor,shape:cells,rot:0});
+ $("pieceName").value="";clearShape();save();renderBag();toast("Item criado na bolsa.");}
+function rotateShape(cells){const mR=Math.max(...cells.map(x=>x[0]));
+ const rot=cells.map(([r,c])=>[c,mR-r]);
+ const nR=Math.min(...rot.map(x=>x[0])),nC=Math.min(...rot.map(x=>x[1]));
+ return rot.map(([r,c])=>[r-nR,c-nC]);}
+function shapeDims(cells){return[Math.max(...cells.map(x=>x[0]))+1,Math.max(...cells.map(x=>x[1]))+1];}
+function effShape(p){let s=p.shape;for(let i=0;i<(((p.rot||0)%4)+4)%4;i++)s=rotateShape(s);return s;}
+function renderGrid(){const rows=gridRows(),grid=$("invGrid");if(!grid)return;
+ const gi=$("gi");if(gi)gi.textContent=GRID_COLS+" × "+rows;
+ grid.style.gridTemplateColumns=`repeat(${GRID_COLS}, ${CSZ}px)`;grid.innerHTML="";
+ for(let i=0;i<rows*GRID_COLS;i++){const c=document.createElement("div");c.className="cell";grid.appendChild(c);}
+ const step=CSZ+GAP;
+ S.inv.pieces.forEach(p=>{const s=effShape(p),[h,w]=shapeDims(s);
+  const cont=document.createElement("div");cont.className="piece";
+  cont.style.left=(2+p.col*step)+"px";cont.style.top=(2+p.row*step)+"px";
+  cont.style.width=(w*CSZ+(w-1)*GAP)+"px";cont.style.height=(h*CSZ+(h-1)*GAP)+"px";
+  cont.title=p.name+" (clique e tecle R p/ girar)";cont.dataset.id=p.id;
+  s.forEach(([r,c])=>{const cd=document.createElement("div");
+   cd.style.cssText=`position:absolute;left:${c*step}px;top:${r*step}px;width:${CSZ}px;height:${CSZ}px;background:${p.color};border:1px solid rgba(0,0,0,.35);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);border-radius:2px`;
+   cont.appendChild(cd);});
+  const lbl=document.createElement("div");lbl.textContent=p.name;
+  lbl.style.cssText="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#0d0b0a;font-weight:700;font-size:9px;text-shadow:0 0 2px rgba(255,255,255,.4);pointer-events:none;padding:2px;text-align:center";
+  cont.appendChild(lbl);
+  makeDraggable(cont,p,"grid");cont.onclick=()=>{selectedPiece=p;};
+  grid.appendChild(cont);});}
+function makeDraggable(dom,p,loc){p._loc=loc;
+ dom.addEventListener("pointerdown",ev=>{ev.preventDefault();selectedPiece=p;
+  const grid=$("invGrid");if(!grid)return;const rect=grid.getBoundingClientRect();
+  const cell=grid.querySelector(".cell");const cs=cell?cell.getBoundingClientRect().width:CSZ;
+  dragInfo={p,dom,rect,step:cs+GAP};dom.classList.add("dragging");
+  document.addEventListener("pointermove",onDrag);document.addEventListener("pointerup",endDrag);});}
+function onDrag(ev){if(!dragInfo)return;const{dom}=dragInfo;
+ dom.style.position="fixed";dom.style.left=(ev.clientX-15)+"px";dom.style.top=(ev.clientY-15)+"px";dom.style.zIndex=999;}
+function endDrag(ev){document.removeEventListener("pointermove",onDrag);document.removeEventListener("pointerup",endDrag);
+ if(!dragInfo)return;const{p,rect,step}=dragInfo;
+ const col=Math.round((ev.clientX-rect.left-2)/step),row=Math.round((ev.clientY-rect.top-2)/step);
+ dragInfo.dom.classList.remove("dragging");dragInfo=null;
+ if(ev.clientX>=rect.left&&ev.clientX<=rect.right&&ev.clientY>=rect.top&&ev.clientY<=rect.bottom){
+  if(canPlace(p,row,col,p.id)){S.inv.bag=S.inv.bag.filter(x=>x.id!==p.id);
+   if(!S.inv.pieces.find(x=>x.id===p.id))S.inv.pieces.push(p);
+   p.row=row;p.col=col;}else toast("Não cabe aí.");}
+ else{S.inv.pieces=S.inv.pieces.filter(x=>x.id!==p.id);
+  if(!S.inv.bag.find(x=>x.id===p.id))S.inv.bag.push(p);}
+ save();renderGrid();renderBag();}
+function canPlace(p,row,col,ignoreId){const rows=gridRows(),s=effShape(p),occ={};
+ S.inv.pieces.forEach(o=>{if(o.id===ignoreId)return;effShape(o).forEach(([r,c])=>occ[(o.row+r)+","+(o.col+c)]=1);});
+ for(const[r,c]of s){const rr=row+r,cc=col+c;
+  if(rr<0||cc<0||rr>=rows||cc>=GRID_COLS)return false;
+  if(occ[rr+","+cc])return false;}
+ return true;}
+function renderBag(){const bag=$("bag");if(!bag)return;bag.innerHTML="";
+ S.inv.bag.forEach(p=>{const s=effShape(p),[h,w]=shapeDims(s);
+  const d=document.createElement("div");d.className="bagpiece";
+  d.style.width=Math.max(34,w*16)+"px";d.style.height=Math.max(20,h*16)+"px";
+  d.style.background=p.color;d.textContent=p.name;d.title=p.name;
+  makeDraggable(d,p,"bag");d.onclick=()=>{selectedPiece=p;};
+  const wrap=document.createElement("div");wrap.style.cssText="display:flex;flex-direction:column;align-items:center;gap:2px";
+  wrap.appendChild(d);
+  const del=document.createElement("button");del.className="btn mini del";del.textContent="×";
+  del.onclick=()=>{S.inv.bag=S.inv.bag.filter(x=>x.id!==p.id);save();renderBag();};
+  wrap.appendChild(del);bag.appendChild(wrap);});}
+
+</script>
+</body>
+</html>
