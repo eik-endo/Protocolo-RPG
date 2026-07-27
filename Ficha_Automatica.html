@@ -1569,9 +1569,123 @@ mae:[
     req:{nv:12}}
   ]
  ]},
-{n:"Marcado pelo Vazio",el:"vaz",s:"o que subtrai",st:[[],[],[],[]]},
-{n:"Marcado pela Ascensão",el:"asc",s:"o que acumula",st:[[],[],[],[]]},
-{n:"Marcado pelo Pacto",el:"pac",s:"o que troca",st:[[],[],[],[]]},
+{n:"Marcado pelo Vazio",el:"vaz",s:"o que subtrai",
+ regra:{n:"Erosão",ef:"O Vazio não gasta Sintonia nos efeitos maiores; gasta Erosão, um contador permanente que sobe e não volta com descanso. Cada ponto apaga algo de você (uma memória, um afeto, um sentido, um laço — definido na ficção). Marcos: a 3, perde acesso a uma perícia social ou gancho pessoal; a 6, emoções distantes (−1 em tudo que dependa de se importar, mas imune a Apavorado); a 10, você se completa — some da realidade como os que apagou (fim de arco). Os efeitos do Vazio não permitem resistência: você não resiste à ausência."},
+ medidor:{chave:"erosao",nome:"Erosão",min:0,tetos:[10,10,10,10],reset:"permanente"},
+ st:[
+  [
+   {n:"Silêncio",cst:"—",ac:"Ação · Curto",
+    sab:"Você não faz barulho. Você faz o barulho parar de ter existido.",
+    ef:"Crie uma zona de Silêncio (Curto) por 1 cena. Dentro dela nenhum som existe — nada de fala, conjuração verbal, alarme. Não há teste; som simplesmente não acontece. Você e todos ali ficam igualmente mudos."},
+   {n:"O que Falta",cst:"—",ac:"Passiva",
+    sab:"Você enxerga os buracos que o mundo finge não ter.",
+    ef:"Você percebe ausências — o que foi apagado, a passagem que não deveria estar tapada, a pessoa de quem ninguém lembra, a mentira dita por omissão. Custo: você começa com 1 de Erosão. Ver o Vazio já é ser um pouco dele."}
+  ],
+  [
+   {n:"Subtrair",cst:"—",ac:"Ação · Curto",
+    sab:"Você não bloqueia o poder dele. Você tira do contrato o direito de tê-lo.",
+    ef:"Escolha uma capacidade de um alvo à vista — um bônus ativo, uma resistência, um sentido, a habilidade de conjurar, a força de erguer algo. Por 1 turno, ela não existe para ele. Sem teste. Contra um poder verdadeiramente grande (Ápice inimigo, magia de Grau alto), custa 1 de Erosão."},
+   {n:"Zona Morta",cst:"1 de Erosão",ac:"Ação · Médio · concentração",
+    sab:"Aqui dentro, nada ajuda ninguém. Nem a esperança.",
+    ef:"Uma esfera (Médio) por [Juízo] turnos onde nenhum efeito funciona — magia não conjura, bônus não contam, cura não cura, condições não progridem, itens mágicos ficam inertes. Inclusive os seus."}
+  ],
+  [
+   {n:"Apagar",cst:"2 de Erosão",ac:"Ação · Curto",
+    sab:"Não é morte. Morte deixa corpo. Isto não deixa nada.",
+    ef:"Remova um alvo pequeno da existência por [Juízo] turnos — uma criatura, um objeto, uma porta, um trecho de parede. Não está lá em sentido nenhum: não pode ser tocado, visto, lembrado ou afetado, e não pode agir. Ao voltar, volta confuso e sem saber onde esteve. Contra alvos poderosos, dura só 1 turno."},
+   {n:"Entorpecimento",cst:"—",ac:"Passiva",
+    sab:"Você já não sente o frio. Nem o medo. Nem a falta que os outros fazem.",
+    ef:"A partir de Erosão 6, você é imune a medo, dor, e a qualquer efeito mental ou emocional — não há 'você' suficiente para atingir. 1×/cena, transfira essa vacância para um inimigo que te ataque psicologicamente: ele testa contra ficar Apavorado e Confuso."}
+  ],
+  [
+   {n:"O Vão Entre as Coisas",cst:"—",ac:"Passiva",
+    sab:"Você não caminha mais pelo mundo. Caminha pelos buracos dele.",
+    ef:"Você existe parcialmente na ausência. Pode passar por onde não há passagem, não é detectado por meios que dependam de você 'estar' em algum lugar, e o primeiro ataque contra você a cada cena simplesmente erra (você não estava lá). O custo é constante: a Erosão sobe 1 a cada sessão, use poder ou não.",
+    req:{nv:12}},
+   {n:"O Nada que Resta",cst:"5 de Erosão",ac:"Ação · 1×/campanha",
+    sab:"Você pensa no nome. E o mundo esquece que ele um dia significou algo.",
+    ef:"Apague algo grande e permanente da existência — uma cidade, uma linhagem, um evento histórico, uma entidade, um conceito. Não é destruído: nunca terá existido. O mundo se reorganiza em volta do buraco. Não há teste, defesa, ou desfazer. Os 5 de Erosão de uma vez quase certamente te levam a 10 — o ato te apaga junto.",
+    req:{nv:12}}
+  ]
+ ]},
+{n:"Marcado pela Ascensão",el:"asc",s:"o que acumula",
+ regra:{n:"Perfeição",ef:"Um medidor permanente (0–10, sobe para 15 no Ápice) que sobe e não desce com descanso. Sobe quando você se refina (ação, gastando Sintonia) ou supera um limite humano de forma extraordinária (um Crítico, um feito impossível). Cada ponto faz duas coisas para sempre: a cada 2 graus, +1 em TUDO (testes, dano, Defesa, deslocamento); e cada grau reduz sua Lucidez máxima em 1. Quanto mais perfeito, menos sanidade cabe em você. Ao chegar a 10 (Lucidez máxima perto de zero), você transcende — sai da escala do jogo (fim de arco)."},
+ medidor:{chave:"perfeicao",nome:"Perfeição",min:0,tetos:[10,10,10,15],reset:"permanente"},
+ st:[
+  [
+   {n:"Refinar-se",cst:"1 Sintonia",ac:"Ação",
+    sab:"Você olha o que é e apara o que sobra.",
+    ef:"Suba 1 grau de Perfeição. Você pode fazer isso a qualquer momento que tenha Sintonia — o poder está sempre disponível, a decisão é sempre sua."},
+   {n:"Corpo Depurado",cst:"—",ac:"Passiva",
+    sab:"As pequenas falhas da carne já não são suas.",
+    ef:"Você não sente fome, sede, cansaço comum nem dor menor; imune a doença mundana; recupera o dobro em descanso. O bônus de Perfeição (+1 a cada 2 graus) já corre por baixo."}
+  ],
+  [
+   {n:"Mente Expandida",cst:"—",ac:"Passiva",
+    sab:"Você pensa em direções que não têm nome.",
+    ef:"1×/cena, refaça qualquer teste mental ou de percepção e fique com o melhor; você resolve enigmas na hora (o mestre dá a resposta), e percebe padrões, mentiras e intenções antes que sejam ditos. Cada grau de Perfeição acima de 3 dá +1 nisso."},
+   {n:"Impor-se",cst:"1 Sintonia",ac:"Ação",
+    sab:"Você é evidentemente superior. Basta deixarem de fingir que não veem.",
+    ef:"Projete sua superioridade: todos os presentes 'inferiores' a você (Perfeição mais alta que a Vontade/Juízo deles) hesitam — inimigos comuns podem ficar Atordoados ou recuar; PNJs tendem a obedecer ou reverenciar. Contra os fortes, só um arrepio de estar diante de algo maior."}
+  ],
+  [
+   {n:"Forma Superior",cst:"2 Sintonia",ac:"Ação · 1×/cena",
+    sab:"Por um momento, você é o que está se tornando.",
+    ef:"Por [Juízo] turnos, aja como se sua Perfeição fosse +3 do que é, e ganhe uma capacidade sobre-humana à escolha pela duração — mover-se rápido demais para reagirem, sentidos que atravessam paredes, força que dobra metal, regeneração visível."},
+   {n:"Além da Dor",cst:"—",ac:"Passiva",
+    sab:"Ferir você é discutir com uma estátua sobre por que ela deveria rachar.",
+    ef:"A partir de Perfeição 6, você ignora a primeira condição que sofreria a cada turno e reduz todo dano recebido em [metade da sua Perfeição]. (O reverso: seu teto de Lucidez a esta altura é tão baixo que uma única cena ruim pode te despedaçar.)"}
+  ],
+  [
+   {n:"Quase Divino",cst:"—",ac:"Passiva",
+    sab:"Você já não melhora aos poucos. Você melhora em tudo, o tempo todo.",
+    ef:"O teto de Perfeição sobe para 15 (a Lucidez máxima continua caindo junto). O bônus passa a ser +1 a cada grau, não a cada 2. 1×/cena, declare que simplesmente é bom demais para falhar numa única coisa: um sucesso automático, de qualquer escala, sem rolar.",
+    req:{nv:12}},
+   {n:"A Última Evolução",cst:"leva a Perfeição a 15 (Lucidez máxima a ~0)",ac:"Ação · 1×/campanha",
+    sab:"O último degrau não tem volta. E você vai subir mesmo assim.",
+    ef:"Complete a ascensão: por uma cena, você é essencialmente um deus menor — reescreve o resultado de qualquer coisa ao seu redor, sua vontade acontece, nada humano te alcança. Ao fim, Perfeição em 15, Lucidez máxima em zero, e você transcende para sempre: sai da escala do jogo, vira força/entidade/lenda que a mesa narra mas não controla mais.",
+    req:{nv:12}}
+  ]
+ ]},
+{n:"Marcado pelo Pacto",el:"pac",s:"o que troca",
+ regra:{n:"Dívida",ef:"As habilidades do Pacto não gastam Sintonia — adicionam Dívida (começa cada sessão em 0). Com Dívida ≥5, o Outro Lado fica interessado e o mestre pode complicar seus momentos. Ao chegar ao teto, o credor coleta (Cobrança maior) e a Dívida volta a 5. Pagar é ativo: 1 Vida, 1 Lucidez ou uma Sina abatem 2 de Dívida. A espinha é OFERECER PACTO: você aluga, emprestado, um efeito de outra classe ou domínio; ganha Dívida = o Grau (1–5) do efeito; o Grau máximo sobe por nível (2→3→4→5), por Ruído, e com Dívida ≥5 (+1 de Grau grátis)."},
+ medidor:{chave:"divida",nome:"Dívida",min:0,tetos:[10,10,10,15],reset:"sessao"},
+ st:[
+  [
+   {n:"Primeiro Trato",cst:"—",ac:"Passiva",
+    sab:"Você assinou antes de ler. E descobriu que gostava da caneta.",
+    ef:"Oferecer Pacto está liberado (Grau máx. 2). Você sempre sabe sua Dívida exata e sente quando ela cruza 5. 1×/cena, um trato de Grau 1 não adiciona Dívida — a primeira dose é sempre cortesia da casa."},
+   {n:"Fiador",cst:"adiciona 2 de Dívida",ac:"Reação",
+    sab:"A letra miúda, dessa vez, trabalha pra você.",
+    ef:"Anule um dano ou condição que acabou de atingir você ou um aliado à vista — o Outro Lado cobre a ferida, a conta é sua. Com Dívida já ≥5, custa 3 em vez de 2."}
+  ],
+  [
+   {n:"Transferência",cst:"adiciona 2 de Dívida",ac:"Ação · Toque/Curto",
+    sab:"Nada se cura. Nada some. Só muda de dono.",
+    ef:"Mova um dano recente, uma condição, ou um efeito ativo de um alvo para outro ao alcance. Num trato maior (+2 Dívida), transfira também algo bom: roube um bônus, uma postura, ou a próxima ação preparada de um inimigo."},
+   {n:"Credor",cst:"—",ac:"Passiva",
+    sab:"Você parou de só dever. Agora empresta — e cobra juros.",
+    ef:"Quando você aplica um efeito negativo a um inimigo via Pacto, ele passa a carregar uma Dívida sua. 1×/cena por inimigo endividado, chame a conta: ele sofre uma Cobrança e você abate 2 da sua Dívida. Grau máx. de Oferecer Pacto sobe para 3."}
+  ],
+  [
+   {n:"Usurário",cst:"—",ac:"Passiva",
+    sab:"O mercado é seu. Você define as taxas.",
+    ef:"Grau máx. sobe para 4. Quando você quita Dívida pagando com Vida/Lucidez/Sina, abate 3 por ponto em vez de 2. 1×/cena, empurre até 4 pontos da sua Dívida para um inimigo que carregue sua Dívida (Credor): ele sofre 1 de dano verdadeiro por ponto e testa Resistência (Limiar = pontos) ou fica Apavorado."},
+   {n:"Contrato Aberto",cst:"adiciona 3 de Dívida",ac:"Ação · 1×/cena",
+    sab:"Por que alugar uma coisa quando a prateleira inteira está à venda?",
+    ef:"Mantenha até dois efeitos alugados de Oferecer Pacto ativos ao mesmo tempo por uma cena. Por essa cena, você é literalmente duas classes de uma vez. A conta dobrada é o preço da onipresença."}
+  ],
+  [
+   {n:"Sócio Majoritário",cst:"—",ac:"Passiva",
+    sab:"Vocês dois querem as mesmas coisas agora. É o que apavora.",
+    ef:"Grau máx. sobe para 5 — você aluga milagres. O teto de Dívida sobe para 15 e a coleta automática em 10 some: entre 10 e 15, você escolhe quando o credor age, e cada vez que permite ganha um benefício (um trato grátis, um sucesso garantido). Acima de 15, ele coleta tudo de uma vez — catastrófico.",
+    req:{nv:12}},
+   {n:"O Grande Contrato",cst:"adiciona 8 de Dívida (ou vai a 15, o que for maior)",ac:"Ação · 1×/campanha",
+    sab:"Você pede a coisa impossível. Ela vem. Que Deus te ajude na hora de cobrarem.",
+    ef:"Um único efeito de escala quase divina, dentro do tema — desfazer uma morte recente, forçar qualquer criatura a um acordo vinculante, alugar o poder pleno de qualquer classe por uma cena, reescrever um 'não' do mundo em 'sim'. O mestre concede, sem regatear. A Dívida resultante vai coletar ao fim da cena, sem apelação.",
+    req:{nv:12}}
+  ]
+ ]},
 {n:"Marcado pelo Germe",el:"ger",s:"o que infecta",
  regra:{n:"A Carne é Adubo",ef:"As habilidades do Germe custam Carne (Vida) em vez de Sintonia. Você sacrifica pontos de Vida para conjurar, de bom grado — a carne é matéria-prima. Tudo é úmido, grotesco, invasivo. O Germe é o elemento que mais ajuda os outros (cura, protege, salva), mas sempre de formas repugnantes que dão nojo em quem recebe. Como paga em Vida, vive perto da própria morte, contando com sua regeneração grotesca para não cair."},
  st:[
