@@ -116,6 +116,7 @@ body[data-el="ger"] .bar i{animation:breathe 4s ease-in-out infinite}
 .tag.ok{color:#8fae6a;border-color:#42552e}
 .hcard .hx{font-size:12.5px;color:var(--dim);margin-top:5px;line-height:1.55}
 .hcard .hx em{color:var(--ink);font-style:normal;font-weight:600}
+.hcard .hsab{font-style:italic;opacity:.8;font-size:12px;color:var(--dim);margin-top:5px;line-height:1.5}
 .hcard .src{margin-left:auto;font-size:9px;letter-spacing:1px;color:var(--faint);text-transform:uppercase}
 .hcard.locked{opacity:.55}
 .hcard.regra{border-left-color:var(--red)}
@@ -374,34 +375,41 @@ const RAIZES=[
 {n:"Investigador do Oculto",f:"Lê fóruns estranhos de madrugada.",per:["Ocultismo","Mídia"],prof:"idioma morto, etiqueta de cultos",rs:2500,item:"anotações + amuleto duvidoso",ruido:1,c:["Já Vi Isso Antes","1×/sessão, reconhece um padrão sobrenatural."]}];
 
 /* ---- FARDOS (Dossiê de Fardos, 4ª ed.) ---- */
-/* h = habilidade: [nome, etiqueta, texto, req?{nv,ruido,req}] */
+/* h = habilidade: {n:nome, cst:custo, ac:ação+frequência, sab:sabor, ef:efeito, req?{nv,ruido,req}} */
 const FARDOS={
 "Casca-Grossa":{f:"Quando o mundo mostra os dentes, alguém mostra os punhos.",vida:3,comb:"fol",cv:2,tre:["Briga","Atletismo","Força Bruta"],profs:"armas brancas, fogo leves, proteções",
-base:[["Treinamento de Combate","PASSIVA","Nunca sofre penalidade de improviso ou de não-proficiência com armas. Com um olhar (Ação Livre, 1×/cena por alvo), avalia o armamento de alguém: o mestre diz o bônus de dano da arma dele e se ele é treinado."],
-["Investida","AÇÃO","Mova-se até o deslocamento total e ataque no fim. Se avançou 3m+ em linha reta: +1 de dano, e num Total o alvo testa Força Bruta (7) ou é empurrado 1m e fica −1 na próxima ação. Num Parcial, você termina exposto: o alvo ganha +1 contra você até seu próximo turno."],
-["Encaixar o Golpe","REAÇÃO · 1×/CENA","Ao ser atingido, reduza aquele dano pela metade (arredonda para baixo). No nível 8, passa a 2×/cena."]],
-esc:[["Postura Defensiva","AÇÃO","+2 no seu Limiar de Defesa até seu próximo turno; gaste 1 Fôlego (Reação) para estender o +2 a um aliado adjacente contra um ataque."],
-["Contra-Ataque","REAÇÃO · REQ. ENCAIXAR O GOLPE","Quando um ataque corpo a corpo erra você, ataque de graça; num Total, desarma ou empurra 1m.",{req:"Encaixar o Golpe"}],
-["Empurrão de Guerra","AÇÃO","Ataque com dano pela metade; Parcial: alvo empurrado 3m ou Caído; Total: você escolhe, +1 se ele bater em obstáculo."],
-["Grito de Guerra","LIVRE · 1 FÔLEGO · 1×/CENA · NV 4","Aliados próximos saem de Apavorado, ganham +1 no próximo teste e resistem ao medo com Vantagem na cena.",{nv:4}],
-["Quebra-Guarda","AÇÃO · 1 FÔLEGO · NV 6","Seu ataque ignora a Absorção do alvo; num Total, a Absorção dele cai 1 até ser reparada.",{nv:6}],
-["Furacão","GATILHO · 1×/TURNO · NV 8","Ao reduzir um inimigo a 0, mova metade do deslocamento e ataque outro inimigo ao alcance.",{nv:8}],
-["Pele de Couro","PASSIVA","A carne de quem apanha muito: você tem Absorção 1 mesmo sem armadura."],
-["Placagem","AÇÃO","Investida que derruba: num Total, você e o alvo vão ao chão, ele Caído; você levanta de graça."],
-["Desarme Brutal","AÇÃO · 1 FÔLEGO","Força Bruta oposta; no sucesso, a arma dele voa para longe."],
-["Cabeçada","REAÇÃO · AGARRANDO/AGARRADO","Dano leve e o alvo testa Carne (7) ou fica Atordoado."],
-["Segundo Ataque","PASSIVA · NV 6","1×/rodada, se seu primeiro ataque foi Total, faça um segundo ataque com −2.",{nv:6}],
-["Guarda de Ferro","REAÇÃO · 1 FÔLEGO","Some a sua Carne ao Limiar de Defesa contra um único ataque."],
-["Rugir","LIVRE · 1×/CENA","Um inimigo à sua escolha testa Coragem (7) ou fica Apavorado de você."],
-["Fôlego de Boi","PASSIVA","+2 de Fôlego máximo, e o Respiro recupera Fôlego em dobro."],
-["Golpe Giratório","AÇÃO · 1 FÔLEGO","Ataque dois inimigos adjacentes com o mesmo golpe, dano cheio em ambos."],
-["Não Sai do Chão","PASSIVA","Não pode ser empurrado nem derrubado contra a vontade; escapar de Agarrado é Ação Livre."],
-["Investida Blindada","PASSIVA · REQ. INVESTIDA","Durante a Investida, ataques contra você têm −1; você entra protegendo a cabeça."],
-["Castigo","GATILHO","Quando um inimigo adjacente ataca um aliado seu, faça um ataque de oportunidade nele."],
-["Fúria Contida","AÇÃO · 1 FÔLEGO","Seu próximo ataque neste turno causa +2 de dano, mas você fica Vulnerável até o próximo turno."],
-["Osso Duro","PASSIVA","A primeira condição física que você sofreria em cada cena é ignorada."],
-["Marcar Presença","PASSIVA","Inimigos adjacentes a você sofrem −1 para atacar seus aliados: você é ameaça demais para ignorar."],
-["Levantar na Marra","REAÇÃO · 1 FÔLEGO","Quando é derrubado, levante-se na hora sem gastar Movimento."]],
+base:[
+{n:"Não Passa",cst:"—",ac:"Passiva",
+ sab:"Você não é um obstáculo que se contorna. É a parede que decide o fim do corredor.",
+ ef:"Nunca sofre penalidade de improviso ou de não-proficiência com armas. Inimigos não te ultrapassam sem dar a volta (gasta o Movimento deles). Inimigo adjacente que ataca um aliado seu em vez de você faz isso com −1. Você não pode ser empurrado nem derrubado contra a vontade."},
+{n:"Investida",cst:"—",ac:"Ação",
+ sab:"Você não corre até o inimigo. Você chega nele.",
+ ef:"Mova-se até o deslocamento total e ataque no fim. Se avançou 3m+ em linha reta, +1 de dano. Parcial: você termina exposto (o alvo ganha +1 contra você até seu próximo turno). Total: escolha — o alvo fica Caído ou Atordoado; se bateu num obstáculo, agrava (dano +1). Crítico: ambos, Caído e Atordoado."},
+{n:"Encaixar o Golpe",cst:"—",ac:"Reação · 1×/cena (2×/cena no nível 8)",
+ sab:"O golpe que era do seu amigo agora é seu. Você aguenta.",
+ ef:"Quando você ou um aliado adjacente é atingido, receba o golpe no lugar dele e reduza aquele dano pela metade (arredonda p/ baixo)."}
+],
+esc:[
+{n:"Muralha",cst:"1 Fôlego (só na parte de Reação)",ac:"Ação (+ Reação opcional)",
+ sab:"Enquanto você estiver de pé, ninguém atrás de você cai.",
+ ef:"+2 no seu Limiar de Defesa até seu próximo turno. Como Reação (1 Fôlego), intercepte um ataque contra um aliado adjacente, somando sua Carne ao Limiar de Defesa dele contra aquele golpe."},
+{n:"Empurrão de Guerra",cst:"—",ac:"Ação",
+ sab:"Às vezes o melhor lugar pra bater é a parede atrás dele.",
+ ef:"Ataque com dano pela metade. Parcial: alvo empurrado 3m ou Caído (você escolhe). Total: você escolhe empurrão ou queda, +1 de dano se ele bater em obstáculo."},
+{n:"Desarme Brutal",cst:"1 Fôlego",ac:"Ação",
+ sab:"A arma dele não serve pra nada no chão do outro lado da sala.",
+ ef:"Força Bruta oposta contra o alvo. No sucesso, a arma dele voa para longe."},
+{n:"Rugir",cst:"—",ac:"Ação Livre · 1×/cena",
+ sab:"Alguns não precisam apanhar pra decidir que não vale a pena.",
+ ef:"Um inimigo à sua escolha testa Coragem (7) ou fica Apavorado de você."},
+{n:"Castigo",cst:"—",ac:"Gatilho",
+ sab:"Bater no seu amigo na sua frente foi o último erro dele.",
+ ef:"Quando um inimigo adjacente ataca um aliado seu, faça um ataque de oportunidade nele."},
+{n:"Quebra-Guarda",cst:"1 Fôlego",ac:"Ação · NV 6",
+ sab:"Não existe blindagem que você não amasse com tempo suficiente.",
+ ef:"Seu ataque ignora a Absorção do alvo. Total: a Absorção dele cai 1 até ser reparada.",
+ req:{nv:6}}
+],
 mae:[{n:"Berserker",s:"a dor como combustível",regra:["Risco da Fúria","A cada turno em Fúria, teste Coragem (7) ou ataque a criatura mais próxima — amiga ou inimiga."],st:[
 [["Sangue Fervendo","PASSIVA","Ao sofrer dano, recupere 1 de Fôlego (máx. 1×/turno)."],["Entrar em Fúria","AÇÃO","Entre em Fúria: +1 de dano corpo a corpo, −1 na Defesa, imune a Apavorado. Dura a cena ou até você acalmar."]],
 [["Fúria Crescente","PASSIVA","O bônus de dano da Fúria sobe conforme a sua Vida cai."],["Ignorar a Ferida","1×/CENA","Em Fúria, ignore os efeitos de uma condição por 1 turno."]],
@@ -416,38 +424,80 @@ mae:[{n:"Berserker",s:"a dor como combustível",regra:["Risco da Fúria","A cada
 [["Foco no Alvo","AÇÃO LIVRE","Marque um inimigo: +1 para acertá-lo, −1 contra os outros enquanto o foco durar."]],[],[],[]]}]},
 
 "Investigador":{f:"Todo mundo vê. Quase ninguém olha.",vida:2,comb:"sin",cv:2,tre:["Investigação","Percepção","Intuição"],profs:"arrombamento, fotografia e escuta, etiqueta do submundo",
-base:[["Linha de Raciocínio","AÇÃO LIVRE · 1×/CENA","Declare uma conexão entre duas pistas encontradas. Plausível? O mestre confirma e dá um rumo concreto (um lugar, um nome, um próximo passo). Se for um salto, role Investigação (7): sucesso confirma; falha diz que a conexão é real, mas falta uma peça — o mestre diz de que tipo."],
-["Olhar Treinado","AÇÃO LIVRE · 1×/CENA","+2 numa Investigação ou Percepção feita com calma. Além disso, pode perguntar ao mestre: “o que aqui está fora do lugar?” — resposta honesta, mesmo num Parcial."],
-["Nunca Esquece o Caso","PASSIVA","Memória perfeita de toda pista da campanha; 1×/sessão pede ao mestre que recite uma palavra por palavra. +1 contra tentativas de alterar ou confundir suas memórias — inclusive sobrenaturais. O Eco odeia você."]],
-esc:[["Reconstituição","AÇÃO · 1 SINTONIA","Investigação (7) numa cena. Parcial: um quadro congelado — o essencial do que houve. Total: uma sequência curta — o quê e em que ordem. Crítico: + um detalhe que ninguém deveria saber. É dedução, não magia: não vê o que não deixou rastro."],
-["Pressão Psicológica","REQ. LINHA DE RACIOCÍNIO","+2 em interrogatórios; num Parcial, o alvo ainda revela uma verdade. Num Total, você também descobre o que ele teme perder.",{req:"Linha de Raciocínio"}],
-["Perfil","AÇÃO (UMA CENA DE ESTUDO) · NV 4","Estude um suspeito: monte o Perfil. Contra ele: +1 para antecipar/opor, e 1×/cena pode perguntar ao mestre “qual o próximo passo dele?” — resposta honesta em uma frase.",{nv:4}],
-["Não Escapa","PASSIVA · REQ. PERFIL · NV 6","Contra alvos perfilados: você sempre acha um rastro (o mestre fornece), e disfarces deles não o enganam (Percepção 6 revela num olhar).",{nv:6,req:"Perfil"}],
-["Conexões Improváveis","1×/SESSÃO · NV 6","Declare uma ligação entre dois elementos da campanha. Plausível? Vira verdade. Se o mestre julgar falsa, você ganha em vez disso uma pista real sobre por que NÃO se conectam — errar também alimenta.",{nv:6}],
-["Faro de Mentira","PASSIVA · NV 6","Quando mentem diretamente para você, você sente (a mentira, não a verdade). Enganadores sobrenaturais forçam teste oposto: sua Intuição vs a Enganação deles.",{nv:6}],
-["Vasculhar","AÇÃO ESTENDIDA","Reviste um ambiente a fundo: Percepção (7). Parcial: acha o óbvio escondido. Total: + um item ou pista guardada com cuidado. Crítico: + algo que o próprio dono esqueceu que tinha."]],mae:[]},
+base:[
+ {n:"Linha de Raciocínio",cst:"—",ac:"Ação Livre · 1×/cena",
+  sab:"Duas peças soltas. Você vê a linha entre elas.",
+  ef:"Declare uma conexão entre duas pistas encontradas. Plausível? O mestre confirma e dá um rumo concreto (lugar, nome, próximo passo). Se for um salto, role Investigação (7): sucesso confirma; falha diz que a conexão é real, mas falta uma peça — o mestre diz de que tipo."},
+ {n:"Olhar Treinado",cst:"—",ac:"Ação Livre · 1×/cena",
+  sab:"Todo mundo vê a sala. Você vê o que está errado nela.",
+  ef:"+2 numa Investigação ou Percepção feita com calma. Pode perguntar ao mestre: o que aqui está fora do lugar? — resposta honesta, mesmo num Parcial."},
+ {n:"Nunca Esquece o Caso",cst:"—",ac:"Passiva",
+  sab:"A campanha inteira está guardada, palavra por palavra.",
+  ef:"Memória perfeita de toda pista da campanha; 1×/sessão pede ao mestre que recite uma palavra por palavra. +1 contra tentativas de alterar ou confundir suas memórias — inclusive sobrenaturais."}
+],
+esc:[
+ {n:"Reconstituição",cst:"1 Sintonia",ac:"Ação",
+  sab:"A cena ainda guarda o que aconteceu. Você só precisa ler.",
+  ef:"Investigação (7) numa cena. Parcial: um quadro congelado — o essencial. Total: uma sequência curta — o quê e em que ordem. Crítico: + um detalhe que ninguém deveria saber. É dedução, não magia: não vê o que não deixou rastro."},
+ {n:"Conexões Improváveis",cst:"—",ac:"1×/sessão · NV 6",
+  sab:"Você aponta a ligação. E o mundo descobre que ela sempre existiu.",
+  ef:"Declare uma ligação entre dois elementos da campanha. Plausível? Vira verdade. Se o mestre julgar falsa, você ganha em vez disso uma pista real sobre por que NÃO se conectam.",
+  req:{nv:6}},
+ {n:"Perfil",cst:"—",ac:"Ação (uma cena de estudo) · NV 4",
+  sab:"Você não adivinha o próximo passo dele. Você já sabe.",
+  ef:"Estude um suspeito e monte o Perfil. Contra ele: +1 para antecipar/opor, e 1×/cena pergunte ao mestre qual o próximo passo dele? — resposta honesta em uma frase.",
+  req:{nv:4}},
+ {n:"Faro de Mentira",cst:"—",ac:"Passiva · NV 6",
+  sab:"A mentira tem um cheiro. Você aprendeu a senti-lo.",
+  ef:"Quando mentem diretamente para você, você sente (a mentira, não a verdade). Enganadores sobrenaturais forçam teste oposto: sua Intuição vs a Enganação deles.",
+  req:{nv:6}},
+ {n:"Pressão Psicológica",cst:"—",ac:"Ação (interrogatório) · Req. Linha de Raciocínio",
+  sab:"Todo mundo entrega alguma coisa. Basta apertar o lugar certo.",
+  ef:"+2 em interrogatórios. Parcial: o alvo revela uma verdade. Total: você também descobre o que ele teme perder.",
+  req:{req:"Linha de Raciocínio"}},
+ {n:"Vasculhar",cst:"—",ac:"Ação estendida",
+  sab:"O que foi escondido com cuidado foi escondido de gente comum.",
+  ef:"Percepção (7). Parcial: acha o óbvio escondido. Total: + um item ou pista guardada com cuidado. Crítico: + algo que o próprio dono esqueceu que tinha."}
+],mae:[]},
 
 "Médico":{f:"Você decide quem vira cadáver.",vida:2,comb:"sin",cv:2,tre:["Medicina","Ciências","Intuição"],profs:"ferramentas médicas, veículos comuns, acesso hospitalar",
-regra:["Cura-Base","Ação · 1 Sintonia · Toque. Em condições calmas, cura automática de 1d2 + Juízo. Sob pressão, exige Medicina (7): Falha cura metade e você se expõe · Parcial cura normal · Total cura +1 · Crítico cura o máximo e remove uma condição leve."],
-base:[["Estabilizar","AÇÃO · TOQUE","Alguém a 0 de Vida: teste Medicina (7). Parcial: estável, mas inconsciente (acorda com 1 de Vida após a cena). Total: volta a 1 de Vida, consciente. Crítico: volta a 1 e pode agir imediatamente — adrenalina pura. Sem kit: Desvantagem."],
-["Triagem","AÇÃO LIVRE · 1×/CENA","Olhe um ferido: o mestre diz exatamente o que ele tem — Vida, condições, venenos, e o que mata mais rápido. Em vários feridos: você sabe a ordem certa; quem seguir sua triagem ganha +1 em testes de socorro."],
-["Mãos Firmes","PASSIVA","Você trata sob estresse como se estivesse calmo: a Cura-Base não exige teste em combate, e Medicina ignora penalidades de ambiente (escuro, chuva, veículo em movimento)."]],
-esc:[["Tratamento Intensivo","AÇÃO · 2 SINTONIA · 1×/CENA POR ALVO","O alvo recupera 1d4 + Juízo de Vida e remove Sangrando ou uma condição física leve."],
-["Farmacologia","AÇÃO (1 CENA DE PREPARO) · REQ. TRIAGEM","Prepara 2 doses por cena de trabalho (duram a sessão): Estimulante — ignora Exausto e +1 físico por uma cena; depois, Exausto. Sedativo — alvo testa Resistência (8) ou fica Lento; dose dupla apaga. Analgésico forte — ignora penalidades de ferimento por uma cena.",{req:"Triagem"}],
-["Calmante","AÇÃO · ADJACENTE (TOQUE OU VOZ)","Remove Apavorado, Confuso ou Em Pânico de um aliado; ele ainda ganha +1 no próximo teste de Coragem da cena."],
-["Cirurgia de Campo","AÇÃO ESTENDIDA (10+ MIN) · 2 SINTONIA · NV 6","Teste Medicina (8). Parcial: remove uma condição grave, mas o paciente sofre 1 de dano e fica Exausto. Total: remove limpo. Crítico: remove e o paciente cura 1d4. Falha: 1d2 de dano e a condição fica.",{nv:6}],
-["Estoque de Emergência","1×/SESSÃO · NV 4","Declara ter o suprimento certo à mão: antídoto comum, soro, dose, kit completo. Raros e anômalos ficam de fora.",{nv:4}],
-["Anatomia Aplicada","PASSIVA · NV 6","Você sabe consertar corpos; logo, sabe onde quebram. +1 em ataques precisos.",{nv:6}],
-["Contenção de Sangramento","REAÇÃO","Quando um aliado adjacente sofre Sangrando, remova a condição na hora, sem gastar sua ação."],
-["Overdose Controlada","AÇÃO · 1 SINTONIA + 1 LUCIDEZ","Force o corpo de alguém além do limite por 1 turno: ele age mesmo Inconsciente ou Atordoado — e depois cai de vez."],
-["Palavra que Acalma","AÇÃO LIVRE","Um paciente consciente para de entrar em pânico ou piorar por medo; coopera com o tratamento mesmo assustado."],
-["Leitura de Sintomas","AÇÃO","Diagnostique uma doença ou veneno que nunca viu, só pelos sintomas: Medicina (8) revela a natureza geral do problema."],
-["Cuidado Preventivo","DOWNTIME","Trate alguém entre casos para impedir o agravamento de uma condição crônica ou lesão mal curada."],
-["Mãos que Salvam Muitos","AÇÃO · 1 SINTONIA","Trate dois feridos adjacentes a você numa única ação; cada um recupera metade do valor normal da Cura-Base."],
-["Instinto Clínico","PASSIVA","Você percebe, à vista, se alguém próximo está doente ou ferido, mesmo que esconda bem."],
-["Remédio na Manga","1×/SESSÃO","Declare ter consigo o medicamento comum certo para a situação — não anômalo, mas exatamente o que falta."],
-["Sangue Frio","PASSIVA","Você não perde Lucidez ao lidar com ferimentos, mortes ou horrores médicos que já esperava encontrar no ofício."],
-["Última Tentativa","AÇÃO · 2 SINTONIA + 1 LUCIDEZ","Force uma reanimação onde não devia ser possível: Medicina (9). Total: funciona, com um custo definido pelo mestre. Falha: não funciona — e você sente o peso de ter tentado."]],
+regra:{n:"Cura-Base",cst:"1 Sintonia",ac:"Ação · Toque",
+ sab:"Você não faz milagre. Você compra tempo — e cobra do próprio poço.",
+ ef:"Em condições calmas, cura automática de 1d2 + Juízo. Sob pressão (combate, perigo), exige Medicina (7). Falha: cura metade e você se expõe. Parcial: cura normal. Total: cura +1. Crítico: cura o máximo e remove uma condição leve."},
+base:[
+ {n:"Estabilizar",cst:"—",ac:"Ação · Toque",
+  sab:"A linha entre vai ficar e já era cabe nos seus dez segundos.",
+  ef:"Alguém a 0 de Vida: Medicina (7). Parcial: estável, mas inconsciente (acorda com 1 de Vida após a cena). Total: volta a 1 de Vida, consciente. Crítico: volta a 1 e pode agir imediatamente. Sem kit: Desvantagem."},
+ {n:"Triagem",cst:"—",ac:"Ação Livre · 1×/cena",
+  sab:"Você olha e já sabe quem tem tempo e quem não tem.",
+  ef:"Olhe um ferido: o mestre diz exatamente o que ele tem — Vida, condições, venenos, e o que mata mais rápido. Em vários feridos, você sabe a ordem certa; quem seguir sua triagem ganha +1 em testes de socorro."},
+ {n:"Mãos Firmes",cst:"—",ac:"Passiva",
+  sab:"O mundo desaba. Suas mãos não tremem.",
+  ef:"Você trata sob estresse como se estivesse calmo: a Cura-Base não exige teste em combate, e Medicina ignora penalidades de ambiente (escuro, chuva, veículo em movimento)."}
+],
+esc:[
+ {n:"Tratamento Intensivo",cst:"2 Sintonia",ac:"Ação · 1×/cena por alvo",
+  sab:"Não é remendo. É reparo de verdade, aqui e agora.",
+  ef:"O alvo recupera 1d4 + Juízo de Vida e remove Sangrando ou uma condição física leve."},
+ {n:"Calmante",cst:"—",ac:"Ação · Adjacente (toque ou voz)",
+  sab:"Uma voz, uma mão no ombro. O horror recua um passo.",
+  ef:"Remove Apavorado, Confuso ou Em Pânico de um aliado; ele ainda ganha +1 no próximo teste de Coragem da cena."},
+ {n:"Farmacologia",cst:"—",ac:"Ação (1 cena de preparo) · Req. Triagem",
+  sab:"A química certa transforma um corpo acabado numa arma por mais cinco minutos.",
+  ef:"Prepara 2 doses por cena de trabalho (duram a sessão): Estimulante — ignora Exausto e +1 físico por uma cena; depois, Exausto. Sedativo — alvo testa Resistência (8) ou fica Lento; dose dupla apaga. Analgésico forte — ignora penalidades de ferimento por uma cena.",
+  req:{req:"Triagem"}},
+ {n:"Cirurgia de Campo",cst:"2 Sintonia",ac:"Ação estendida (10+ min) · NV 6",
+  sab:"Sem sala, sem luz, sem tempo. Só você e o que precisa sair.",
+  ef:"Medicina (8). Parcial: remove uma condição grave, mas o paciente sofre 1 de dano e fica Exausto. Total: remove limpo. Crítico: remove e o paciente cura 1d4. Falha: 1d2 de dano e a condição fica.",
+  req:{nv:6}},
+ {n:"Estoque de Emergência",cst:"—",ac:"1×/sessão · NV 4",
+  sab:"Eu tinha guardado isso pra uma hora dessas.",
+  ef:"Declara ter o suprimento certo à mão: antídoto comum, soro, dose, kit completo. Raros e anômalos ficam de fora.",
+  req:{nv:4}},
+ {n:"Última Tentativa",cst:"2 Sintonia + 1 Lucidez",ac:"Ação",
+  sab:"Você sabe que não devia dar certo. Tenta assim mesmo.",
+  ef:"Force uma reanimação onde não devia ser possível: Medicina (9). Total: funciona, com um custo definido pelo mestre. Falha: não funciona — e você sente o peso de ter tentado."}
+],
 mae:[{n:"Cirurgião",s:"cura pesada e reparo",st:[
 [["Mãos Precisas","PASSIVA","Cura-Base sobe para 1d4 + Juízo. Em qualquer Crítico de cura sua, o alvo também remove uma condição leve."],["Estancar","REAÇÃO · 1×/CENA","Aliado adjacente sofre Sangrando ou cai a 1/4 da Vida: você age fora do turno — remove Sangrando e cura 1d2."]],
 [["Operação","AÇÃO · 2 SINTONIA","Cura 2d4 + Juízo e remove uma condição grave. Sob fogo exige Medicina (8): Parcial cura metade."],["Reparo Profundo","AÇÃO ESTENDIDA (HORAS)","Restaura a função de um membro ou sentido danificado (condições duradouras; Sequelas só no Ápice)."]],
@@ -455,56 +505,107 @@ mae:[{n:"Cirurgião",s:"cura pesada e reparo",st:[
 [["Bisturi Milagroso","DOWNTIME","Remove Sequelas físicas permanentes (uma por downtime, Medicina 9)."],["Sutura Perfeita","PASSIVA","Toda cura sua de 8+ de Vida remove também uma condição à escolha do paciente."]]]}]},
 
 "Faz-Tudo":{f:"Tudo que liga, desliga. Tudo que tranca, abre.",vida:1,comb:"sin",cv:3,tre:["Tecnologia","Ciências","Engenharia"],profs:"ferramentas técnicas, veículos comuns, inglês técnico",
-base:[["Mãos de Oficina","PASSIVA","Consertos e trabalhos técnicos levam metade do tempo, e você improvisa a ferramenta certa com sucata quando não a tem."],
-["Olho de Engenheiro","LIVRE · 1×/CENA","Encare um mecanismo, veículo ou dispositivo: o mestre diz como funciona e onde é o ponto fraco."],
-["Gambiarra de Combate","AÇÃO · 1 SINTONIA · 1×/CENA","Monte na hora um truque técnico do cenário — fumaça, um choque, um estrondo que distrai; num Total, o alvo fica Atordoado ou Cego por 1 turno."]],
-esc:[["Invadir Sistema","AÇÃO · 1 SINTONIA","Tecnologia para burlar uma fechadura eletrônica, câmera ou sistema de segurança."],
-["Armadilha Técnica","AÇÃO · PREPARA","Monte uma armadilha (choque, alarme, rede) num ponto; dispara quando alguém cruza."],
-["Sobrecarga","AÇÃO · 1 SINTONIA","Force um aparelho elétrico a estourar ou queimar: luzes, painel, motor."],
-["Torre Improvisada","AÇÃO · 2 SINTONIA · NV 6","Monte uma arma fixa improvisada que ataca sozinha por alguns turnos.",{nv:6}],
-["Pulso Eletromagnético","AÇÃO · 2 SINTONIA · NV 8","Um pulso apaga toda eletrônica na área por uma cena.",{nv:8}],
-["Suporte Vital","AÇÃO","Improvise um aparelho que mantém um ferido estável, substituindo Estabilizar."],
-["Chave-Mestra","PASSIVA","Abre qualquer fechadura mecânica comum sem teste, dado tempo."],
-["Grampo","AÇÃO · 1 SINTONIA","Plante uma escuta; ouça o que se diz naquele ambiente à distância."],
-["Rádio-Amador","PASSIVA","Monte comunicação improvisada; fale com quem devia estar fora de alcance."],
-["Blindagem de Campo","AÇÃO · 1 SINTONIA","Reforce uma cobertura: +1 de Absorção a quem se abriga nela."],
-["Desarmar Dispositivo","AÇÃO","Engenharia para neutralizar uma armadilha, carga ou aparelho perigoso."],
-["Motor Turbinado","PASSIVA","Veículos que você prepara ou dirige ganham +1 em perseguição."],
-["Ferramenta Certa","PASSIVA · 1×/CENA","Declare ter em mãos a ferramenta específica que a situação técnica pede."],
-["Remendo Rápido","AÇÃO · 1 SINTONIA","Conserte na hora um equipamento quebrado o bastante para uma última função."],
-["Interferência","AÇÃO · 1 SINTONIA","Embaralhe rádios, câmeras e sinais numa área por uma cena."],
-["Detonação Controlada","AÇÃO · 2 SINTONIA · REQ. EXPLOSIVOS","Abra uma parede ou porta com precisão, sem soterrar ninguém."]],mae:[]},
+base:[
+ {n:"Olho de Engenheiro",cst:"—",ac:"Ação Livre · 1×/cena",
+  sab:"Toda máquina tem um segredo. Você lê na cara dela.",
+  ef:"Encare um mecanismo, veículo ou dispositivo: o mestre diz como funciona e onde é o ponto fraco."},
+ {n:"Mãos de Oficina",cst:"—",ac:"Passiva",
+  sab:"Se tranca, abre. Se falta ferramenta, você inventa uma.",
+  ef:"Consertos e trabalhos técnicos levam metade do tempo; você improvisa a ferramenta certa com sucata quando não a tem; fechaduras mecânicas comuns cedem com tempo, sem teste."},
+ {n:"Gambiarra de Combate",cst:"1 Sintonia",ac:"Ação · 1×/cena",
+  sab:"Um fio, uma faísca, um estrondo na hora certa.",
+  ef:"Monte na hora um truque técnico do cenário — fumaça, choque, estrondo. Total: o alvo fica Atordoado ou Cego por 1 turno."}
+],
+esc:[
+ {n:"Invadir Sistema",cst:"1 Sintonia",ac:"Ação",
+  sab:"Fechadura, câmera, sinal — tudo obedece a quem sabe pedir.",
+  ef:"Tecnologia para burlar uma fechadura eletrônica, câmera ou sistema de segurança — ou embaralhar rádios, câmeras e sinais numa área por uma cena."},
+ {n:"Sobrecarga",cst:"1 Sintonia",ac:"Ação",
+  sab:"Todo aparelho tem um limite. Você o ultrapassa por ele.",
+  ef:"Force um aparelho elétrico a estourar ou queimar: luzes, painel, motor."},
+ {n:"Armadilha Técnica",cst:"—",ac:"Ação (prepara)",
+  sab:"A sala inteira vira sua, e ninguém percebeu.",
+  ef:"Monte uma armadilha (choque, alarme, rede) num ponto; dispara quando alguém cruza."},
+ {n:"Desarmar Dispositivo",cst:"—",ac:"Ação",
+  sab:"O fio certo, no segundo certo.",
+  ef:"Engenharia para neutralizar uma armadilha, carga ou aparelho perigoso."},
+ {n:"Suporte Vital",cst:"—",ac:"Ação",
+  sab:"Você não é médico. Mas máquina que mantém gente viva, isso você monta.",
+  ef:"Improvise um aparelho que mantém um ferido estável, substituindo Estabilizar."},
+ {n:"Pulso Eletromagnético",cst:"2 Sintonia",ac:"Ação · NV 8",
+  sab:"Por um instante, nada eletrônico nesta sala funciona. Nada.",
+  ef:"Um pulso apaga toda eletrônica na área por uma cena.",
+  req:{nv:8}}
+],mae:[]},
 
 "Atirador":{f:"Você termina frases.",vida:2,comb:"fol",cv:2,tre:["Pontaria","Percepção","Furtividade"],profs:"armas de fogo leves, armas Restritas, manutenção de armas",
-regra:["Posição Exposta","Ao atacar sem cobertura, escolha antes de rolar — Exposição Calculada: +2 de dano; inimigos têm +1 contra você até seu próximo turno. Na Mira de Todos (declare; fica imóvel): +3 de dano e o tiro ignora cobertura leve do alvo; inimigos têm +2 contra você. Atrás de cobertura, atira normal — seguro, sem bônus."],
-base:[["Mira Calma","AÇÃO · DURA ATÉ O DISPARO","Gaste a ação mirando um alvo visível: o próximo disparo contra ele ganha +2. Se sofrer dano antes de atirar, teste Coragem (7) ou a mira se perde."],
-["Olho de Águia","PASSIVA","+1 Percepção à distância; lê detalhes a distâncias absurdas. 1×/cena, aponta o ponto fraco de um alvo distante: você ou um aliado ganha +1 no próximo ataque contra ele."],
-["Recarga Instintiva","PASSIVA","Recarregar é Ação Livre fora de ataque direto. Sob fogo, recarrega como parte do Movimento."]],
-esc:[["Tiro Duplo","AÇÃO","Dois disparos na mesma ação (mesmo alvo ou alvos adjacentes entre si), ambos com −1, resolvidos separadamente. Consome munição em dobro."],
-["Tiro Supressor","AÇÃO · 1 FÔLEGO","Varre uma área Curta: até seu próximo turno, agir ali custa +2 de Limiar. Capangas testam Coragem (7) ou colam na cobertura — perdem a ação. Consome 1 carga extra."],
-["Tiro Perfurante","GATILHO · 1 FÔLEGO · 1×/CENA","Seu ataque ignora a Absorção. Num Crítico, a bala atravessa: quem estiver na linha atrás do alvo sofre dano = margem."],
-["Disparo Preciso","AÇÃO · REQ. MIRA CALMA · NV 6","Apenas no turno seguinte a Mira Calma. Parcial: dano +3. Total: dano +3 e escolha — derruba, desarma ou Sangrando. Crítico: contra alvo que nunca o viu, declare incapacitação (fora de combate, vivo) ou cause o dano máximo do acerto.",{nv:6,req:"Mira Calma"}],
-["Reposicionar","AÇÃO LIVRE · 1×/CENA","Após disparar, mova-se até Curto terminando em cobertura. Quem falhar em Percepção (7) perde sua posição."],
-["Tiro de Aviso","AÇÃO · 1×/CENA","Dispare de propósito para não acertar: capangas testam Coragem (7) ou recuam/congelam; nomeados ficam com −1 na próxima ação."],
-["Munição Contada","PASSIVA","Você sempre sabe quantas balas restam — nas suas armas e, ouvindo, nas dos outros. 1×/cena, declare: “ele está seco” (o mestre confirma se plausível)."]],mae:[]},
+regra:{n:"Posição Exposta",ac:"Regra de Fardo",
+ sab:"Sem cobertura, você troca a própria pele por precisão.",
+ ef:"Ao atacar sem cobertura, escolha antes de rolar — Exposição Calculada: +2 de dano; inimigos têm +1 contra você até seu próximo turno. Na Mira de Todos (declare; fica imóvel): +3 de dano e o tiro ignora cobertura leve do alvo; inimigos têm +2 contra você. Atrás de cobertura, atira normal — seguro, sem bônus."},
+base:[
+ {n:"Mira Calma",cst:"—",ac:"Ação (dura até o disparo)",
+  sab:"Você desacelera o mundo até sobrar só o alvo e a respiração.",
+  ef:"Gaste a Ação mirando um alvo visível; o próximo disparo contra ele ganha +2. Se sofrer dano antes de atirar, teste Coragem (7) ou a mira se perde."},
+ {n:"Sob Mira",cst:"—",ac:"Ação (segura o tiro até disparar ou o começo do seu próximo turno)",
+  sab:"Você não atira. Ainda. Mas todo mundo sabe onde a sua luneta está apontada.",
+  ef:"Escolha um alvo à vista e segure seu disparo sobre ele. Se ele fizer qualquer coisa ameaçadora antes do seu próximo turno — atacar, correr, sair da cobertura, conjurar — você atira primeiro, como Reação, e o teste dele sai com −2. Enquanto estiver Sob Mira, capangas evitam agir na sua linha; nomeados agem por conta e risco."},
+ {n:"Recarga Instintiva",cst:"—",ac:"Passiva",
+  sab:"A arma volta a estar pronta antes de você perceber que atirou.",
+  ef:"Recarregar é Ação Livre fora de um ataque direto; sob fogo, recarrega como parte do Movimento. Você sempre sabe quantas balas restam — nas suas armas e, ouvindo, nas dos outros."}
+],
+esc:[
+ {n:"Disparo Preciso",cst:"—",ac:"Ação · Req. Mira Calma · NV 6",
+  sab:"Você não atira torcendo. Você atira sabendo.",
+  ef:"Apenas no turno seguinte a Mira Calma. Parcial: dano +3. Total: dano +3 e escolha — derruba, desarma ou Sangrando. Crítico: contra alvo que nunca o viu, declare incapacitação (fora de combate, vivo) ou cause o dano máximo do acerto.",
+  req:{nv:6,req:"Mira Calma"}},
+ {n:"Tiro Perfurante",cst:"1 Fôlego",ac:"Gatilho · 1×/cena",
+  sab:"Blindagem é uma sugestão. A bala discorda.",
+  ef:"Seu ataque ignora a Absorção. Num Crítico, a bala atravessa: quem estiver na linha atrás do alvo sofre dano = margem."},
+ {n:"Reposicionar",cst:"—",ac:"Ação Livre · 1×/cena",
+  sab:"O tiro saiu; você já não está mais onde ele veio.",
+  ef:"Após disparar, mova-se até Curto terminando em cobertura. Quem falhar em Percepção (7) perde sua posição."},
+ {n:"Tiro de Aviso",cst:"—",ac:"Ação · 1×/cena",
+  sab:"A próxima é na cabeça. Todo mundo entendeu.",
+  ef:"Dispare de propósito para não acertar: capangas testam Coragem (7) ou recuam/congelam; nomeados ficam com −1 na próxima ação."},
+ {n:"Domínio de Área",cst:"1 Fôlego",ac:"Ação",
+  sab:"Aquele pedaço do mapa agora pertence à sua mira.",
+  ef:"Varre uma zona Curta: até seu próximo turno, agir ali custa +2 de Limiar. Capangas testam Coragem (7) ou colam na cobertura e perdem a ação. Consome 1 carga extra."}
+],mae:[]},
 
 "Sobrevivente":{f:"O mato só mata quem não escuta.",vida:2,comb:"fol",cv:2,tre:["Sobrevivência","Atletismo","Percepção"],profs:"armas Restritas (caça), navegação, veículos comuns",
-base:[["Instinto de Presa","REAÇÃO · 1×/CENA","Um instante antes do perigo se manifestar, o mestre avisa que algo vem e de onde. Você (e quem você alertar com um gesto) não pode ser surpreendido nesse momento, e você age primeiro na primeira rodada."],
-["Vida na Estrada","AÇÃO (TEMPO DE BUSCA)","Sobrevivência (6 ambiente generoso / 8 hostil). Parcial: o básico para um — água, abrigo precário, rota. Total: para o grupo, com conforto mínimo. Crítico: + algo valioso (atalho, esconderijo, recurso raro). Funciona até em ruína urbana."],
-["Couro Curtido","PASSIVA","+1 contra clima, fome, sede, exaustão e ambientes hostis; remove Exausto com metade do descanso; venenos naturais fracos não o afetam."]],
-esc:[["Rastrear","AÇÃO CONTÍNUA","Sobrevivência (6 trilha fresca / 8 fria / 10 apagada). Parcial: direção e quantos. Total: + idade da trilha, estado deles e um detalhe. Crítico: + algo que eles não queriam deixar para trás. Rastros anômalos: Limiar +1, e entender o que os fez pode custar Lucidez."],
-["Armadilheiro","AÇÃO (MONTAGEM: 1 CENA; RÁPIDA: AÇÃO + 1 FÔLEGO)","Com material do ambiente: laço (prende; Atletismo 8 solta) · fojo (1d4 + Caído) · alarme natural · espinhos (1 dano + Sangrando ao atravessar). Detectar: Percepção (8)."],
-["Faro do Anômalo","PASSIVA · NV 4 · RUÍDO ≥1","Sente quando lugar, criatura ou objeto é não-natural — arrepio direcional, cheiro errado. Alcance Curto; concentrando (Ação): Médio. Não diz o quê. Diz que e onde.",{nv:4,ruido:1}],
-["Resistência Sobrenatural","REAÇÃO · 1×/SESSÃO · NV 6","Ignora completamente um efeito ambiental, tóxico ou de exaustão que o incapacitaria — inclusive anômalo. Você sente o efeito… e ele escorre.",{nv:6}],
-["Segundo Pulmão","PASSIVA · NV 8","Ignora permanentemente um nível de Exausto; aguenta o dobro em privação; 1×/cena cruza sem teste um terreno que exigiria.",{nv:8}],
-["Orientação Certa","PASSIVA","Com céu, vento ou referência qualquer, você nunca se perde; sempre sabe o norte e o caminho de volta ao último acampamento."],
-["Leitura do Céu","AÇÃO LIVRE","Prevê o tempo das próximas horas sem teste — e sente quando o clima muda de um jeito que a natureza não explicaria."],
-["Nó Certo","PASSIVA","Cordas, laços e amarras suas não falham; escapar delas exige teste (9). Escalar com corda sua dá +1 a todos."],
-["Passo Firme","PASSIVA","Terreno difícil natural (mato fechado, lama, pedra solta) não reduz seu deslocamento."],
-["Pesca e Caça","DOWNTIME","Em ambiente natural, alimenta o grupo indefinidamente sem teste; sobra couro, banha e osso — material de troca e conserto."],
-["Carga de Mula","PASSIVA","+1 categoria de carga; marchas longas não o deixam Exausto."],
-["Instinto Territorial","PASSIVA","Ao entrar numa área nova, o mestre diz se algo grande ou perigoso “mora” ali — o mato conta quem manda nele."],
-["Água Limpa","PASSIVA","Identifica à vista água ou comida estragada, envenenada ou errada; com tempo, purifica o purificável sem teste."]],
+base:[
+ {n:"Instinto de Presa",cst:"—",ac:"Reação · 1×/cena",
+  sab:"Você sentiu o silêncio errado antes de entender o porquê.",
+  ef:"Um instante antes do perigo se manifestar, o mestre avisa que algo vem e de onde. Você (e quem alertar com um gesto) não pode ser surpreendido nesse momento, e você age primeiro na primeira rodada."},
+ {n:"Dono do Lugar",cst:"—",ac:"Passiva",
+  sab:"O mato não te obedece. Mas te respeita — e te conta quem manda.",
+  ef:"Terreno natural difícil (mato, lama, pedra solta) não reduz seu deslocamento; +1 contra clima, fome, sede e exaustão; remove Exausto com metade do descanso. Ao entrar numa área nova, o mestre diz se algo grande ou perigoso mora ali."},
+ {n:"Vida na Estrada",cst:"—",ac:"Ação (tempo de busca)",
+  sab:"Onde os outros veem fim do caminho, você vê o que ainda dá pra usar.",
+  ef:"Sobrevivência (6 ambiente generoso / 8 hostil). Parcial: o básico para um — água, abrigo precário, rota. Total: para o grupo, com conforto mínimo. Crítico: + algo valioso (atalho, esconderijo, recurso raro). Funciona até em ruína urbana."}
+],
+esc:[
+ {n:"Rastrear",cst:"—",ac:"Ação contínua",
+  sab:"O chão é um jornal. Quase ninguém sabe ler.",
+  ef:"Sobrevivência (6 fresca / 8 fria / 10 apagada). Parcial: direção e quantos. Total: + idade da trilha, estado deles e um detalhe. Crítico: + algo que não queriam deixar para trás. Rastros anômalos: Limiar +1, e entendê-los pode custar Lucidez."},
+ {n:"Armadilheiro",cst:"1 Fôlego (só na montagem rápida em combate)",ac:"Ação (montagem: 1 cena; rápida em combate: Ação + 1 Fôlego)",
+  sab:"O ambiente já tem tudo que você precisa pra machucar alguém.",
+  ef:"Com material do ambiente, monte: laço (prende; Atletismo 8 solta) · fojo (1d4 + Caído) · alarme natural · espinhos (1 dano + Sangrando ao atravessar). Detectar uma armadilha sua: Percepção (8)."},
+ {n:"Faro do Anômalo",cst:"—",ac:"Passiva · NV 4 · Ruído ≥1",
+  sab:"Cheiro errado. Arrepio na direção certa. Você sente antes de ver.",
+  ef:"Sente quando lugar, criatura ou objeto é não-natural — direcional, alcance Curto; concentrando (Ação): Médio. Não diz o quê. Diz que e onde.",
+  req:{nv:4,ruido:1}},
+ {n:"Resistência Sobrenatural",cst:"—",ac:"Reação · 1×/sessão · NV 6",
+  sab:"O impossível tentou te derrubar. Escorreu.",
+  ef:"Ignore completamente um efeito ambiental, tóxico ou de exaustão que o incapacitaria — inclusive anômalo (miasma, frio impossível, esporos).",
+  req:{nv:6}},
+ {n:"Água Limpa",cst:"—",ac:"Passiva",
+  sab:"O que mata devagar também deixa rastro. Você aprendeu a ver.",
+  ef:"Identifica à vista água ou comida estragada, envenenada ou errada; com tempo, purifica o purificável sem teste."},
+ {n:"Nó Certo",cst:"—",ac:"Passiva",
+  sab:"O que você amarra, fica amarrado.",
+  ef:"Cordas, laços e amarras suas não falham; escapar delas exige teste (9). Escalar com corda sua dá +1 a todos."}
+],
 mae:[{n:"Caçador",s:"trilha, sustento e abate",st:[
 [["Olho de Caçador","PASSIVA","+1 em Rastrear; identifica criaturas por sinais. 1×/cena pergunta ao mestre “o que ela vai fazer?” sobre uma criatura rastreada — resposta honesta."],["Terreno Conhecido","PASSIVA","Nunca se perde; +1 em terreno difícil; 1×/sessão declara um atalho ou passagem que mapas não mostram."]],
 [["Bote","PASSIVA","+2 de dano no primeiro ataque contra presa que você rastreava; se ela não sabia de você, o ataque sobe um grau (Parcial→Total)."],["Autossuficiente","PASSIVA","Sustenta o grupo em qualquer lugar; 1×/dia monta acampamento seguro: o descanso ali nunca é interrompido por perigo mundano."]],
@@ -516,22 +617,40 @@ mae:[{n:"Caçador",s:"trilha, sustento e abate",st:[
 [],[]]}]},
 
 "Operador":{f:"Você não existe. É exatamente isso que te torna útil.",vida:2,comb:"fol",cv:2,tre:["Furtividade","Pilotagem","Enganação"],profs:"armas de fogo leves, veículos especiais, sistemas de segurança",
-base:[["Disfarce","AÇÃO (PREPARO: MINUTOS A HORAS)","Com preparo, assume identidade crível; só rola Enganação quando alguém tem motivo para duvidar. Parcial: passa, mas fica um fio solto. Total: passa limpo. Crítico: o disfarce rende — alguém o confunde com exatamente quem você queria ser. Sem disfarce ativo: +1 para não ser reconhecido."],
-["Olho Periférico","AÇÃO LIVRE · 1×/CENA","Ao entrar num lugar, o mestre lista: saídas, câmeras, guardas e a ameaça mais imediata. Se o quadro mudar depois, você nota primeiro."],
-["Treinamento de Operação","PASSIVA","+1 em Furtividade e invasão de locais controlados; +1 contra surpresa; algemas, cordas e fechaduras simples não o seguram — escapa com tempo, sem teste."]],
-esc:[["Eliminação Silenciosa","AÇÃO · ALVO DESPREVENIDO ADJACENTE","Briga ou Mãos Hábeis vs defesa. Parcial: incapacita, mas há ruído ou rastro. Total: silêncio — escolha apagado ou morto. Crítico: silêncio total e você arruma a cena."],
-["Identidade Falsa","REQ. DISFARCE · CRIADA EM DOWNTIME","Mantém até 2 identidades documentadas que passam em verificações comuns. Verificação profunda exige teste do verificador contra 9. Queimou uma? Downtime para recriar.",{req:"Disfarce"}],
-["Treinamento Cruzado","PASSIVA · NV 4","A agência ensinava de tudo: ganha uma perícia treinada extra à escolha.",{nv:4}],
-["Protocolo de Fuga","1×/SESSÃO · NV 6","Num cerco: declare a rota que já estava preparada. O grupo escapa da cena imediata; o mestre define o custo — o que fica para trás, quem viu.",{nv:6}],
-["Mãos Limpas","1×/SESSÃO · NV 8","Após uma cena, apaga sua presença: testemunhas lembram vagamente, registros somem, câmeras “falharam”. Não apaga as consequências. Apaga você delas.",{nv:8}],
-["Contra-Vigilância","PASSIVA","Sente quando é seguido ou observado (Intuição 6 confirma e localiza); +1 para despistar uma cauda."],
-["Bolso Profundo","PASSIVA","Esconde um item Leve no corpo: revistas comuns não acham; busca minuciosa exige teste contra 9."],
-["Sinais de Mão","PASSIVA","Código silencioso da equipe: passa instruções táticas ao grupo sem som; quem observa de fora não decifra."],
-["Queima de Arquivo","AÇÃO (DOWNTIME CURTO)","Apaga ou corrompe um registro específico sobre alguém: papel, foto, ficha, fita."],
-["Extração","AÇÃO · 1 FÔLEGO","Agarra um aliado adjacente e move o deslocamento total com ele, sem provocar reações."],
-["Kit de Campo","PASSIVA","Carrega sempre arrombamento, escuta e primeiros socorros compactos; em revista casual, nada parece suspeito."],
-["Vida de Fachada","REQ. IDENTIDADE FALSA","Uma das suas identidades tem vida real: emprego, vizinhos, histórico que testemunhas confirmam sem saber que mentem.",{req:"Identidade Falsa"}],
-["Instinto de Operação","PASSIVA","Quando um plano começa a azedar, você sente antes: o mestre avisa uma rodada antes de a complicação estourar."]],
+base:[
+ {n:"Disfarce",cst:"—",ac:"Ação (preparo: minutos a horas)",
+  sab:"Você não engana ninguém. Você simplesmente é outra pessoa.",
+  ef:"Com preparo, assume identidade crível; só rola Enganação quando alguém tem motivo para duvidar. Parcial: passa, mas fica um fio solto. Total: passa limpo. Crítico: alguém o confunde com exatamente quem você queria ser. Sem disfarce ativo: +1 para não ser reconhecido."},
+ {n:"Olho Periférico",cst:"—",ac:"Ação Livre · 1×/cena",
+  sab:"Antes de sentar, você já contou as saídas.",
+  ef:"Ao entrar num lugar, o mestre lista: saídas, câmeras, guardas e a ameaça mais imediata. Se o quadro mudar depois, você nota primeiro."},
+ {n:"Fantasma Operacional",cst:"—",ac:"Passiva",
+  sab:"Ninguém te prende, ninguém te segue sem você saber, e você sente a hora que o plano vira.",
+  ef:"+1 em Furtividade e invasão de locais controlados; +1 contra surpresa; algemas, cordas e fechaduras simples não o seguram (escapa com tempo, sem teste); sente quando é seguido ou observado (Intuição 6 confirma e localiza); e o mestre te avisa uma rodada antes de uma complicação estourar."}
+],
+esc:[
+ {n:"Eliminação Silenciosa",cst:"—",ac:"Ação · alvo desprevenido adjacente",
+  sab:"Um som só. E nem esse, se você fizer certo.",
+  ef:"Briga ou Mãos Hábeis vs defesa. Parcial: incapacita, mas há ruído ou rastro. Total: silêncio — escolha apagado ou morto. Crítico: silêncio total e você arruma a cena (ganha tempo antes da descoberta)."},
+ {n:"Identidade Falsa",cst:"—",ac:"Downtime · Req. Disfarce",
+  sab:"Ela tem nome, documento e passado. Só não tem alma.",
+  ef:"Mantém até 2 identidades documentadas que passam em verificações comuns. Verificação profunda exige teste do verificador contra 9. Queimou uma? Downtime para recriar.",
+  req:{req:"Disfarce"}},
+ {n:"Mãos Limpas",cst:"—",ac:"1×/sessão · NV 8",
+  sab:"Você esteve lá. Só que ninguém consegue provar — nem lembrar direito.",
+  ef:"Após uma cena, apaga sua presença: testemunhas lembram vagamente, registros somem, câmeras falharam. Não apaga as consequências. Apaga você delas.",
+  req:{nv:8}},
+ {n:"Protocolo de Fuga",cst:"—",ac:"1×/sessão · NV 6",
+  sab:"A rota já estava pronta antes de a coisa dar errado.",
+  ef:"Num cerco, declare a rota que já estava preparada. O grupo escapa da cena imediata; o mestre define o custo — o que fica para trás, quem viu.",
+  req:{nv:6}},
+ {n:"Extração",cst:"1 Fôlego",ac:"Ação",
+  sab:"Tirar gente da linha de fogo é ofício.",
+  ef:"Agarra um aliado adjacente e move o deslocamento total com ele, sem provocar reações."},
+ {n:"Queima de Arquivo",cst:"—",ac:"Ação (downtime curto)",
+  sab:"O papel some. A foto some. Você faz a memória do sistema falhar.",
+  ef:"Apaga ou corrompe um registro específico sobre alguém: papel, foto, ficha, fita."}
+],
 mae:[{n:"Fantasma",s:"infiltração total",st:[
 [["Cobertura","PASSIVA","Mantém disfarces por dias ou semanas sem testes diários; só rola em risco real. +1 Enganação social."],["Camaleão","PASSIVA","Minutos observando um grupo: adota maneirismo, gíria, postura. +1 para pertencer; as pessoas assumem que você “é dali”."]],
 [["Dupla Face","PASSIVA","Infiltrado numa organização: extrai 1 segredo por sessão de infiltração sem teste. Desconfiar de você exige um incidente — não um palpite."],["Voz e Trejeito","AÇÃO (UMA CENA DE ESTUDO)","Imita voz e maneirismos de alguém: por telefone/rádio engana até íntimos (testam contra 9); ao vivo, só à meia-luz."]],
@@ -543,17 +662,38 @@ mae:[{n:"Fantasma",s:"infiltração total",st:[
 [],[]]}]},
 
 "Sintonizador":{f:"Todo mundo paga para saber. Você é o que sobra depois do pagamento.",vida:1,comb:"sin",cv:3,tre:["Ocultismo","Intuição","Fé"],profs:"idioma morto, etiqueta de cultos, ferramentas rituais",
-regra:["Maestria Imposta","O Sintonizador não escolhe sua maestria. No primeiro ponto de Ruído, a fonte da exposição define o elemento que o marcou — para sempre. São seis maestrias, uma por elemento — e só uma delas será sua. (Na ficha: o elemento da aba Sintonizar define a trilha.)"],
-base:[["Conhecimento Proibido","PASSIVA","+1 em Ocultismo; reconhece símbolos, ritos e nomes que não deveria conhecer. 1×/sessão, pergunte ao mestre “o que a tradição diz sobre isto?” — a resposta vem inteira. E pode estar errada: tradição não é prova."],
-["Sentir o Véu","AÇÃO LIVRE · 1×/CENA","Sente presença, resíduo ou ponto fraco anômalo em Curto: direção e intensidade. Concentrando (Ação · 1 Sintonia): também o elemento envolvido."],
-["Mente Resignada","PASSIVA","+1 contra a primeira perda de Lucidez de cada cena; diante do seu próprio elemento, toda perda cai em 1 (mín. 0). Você já viu. Já pagou."]],
-esc:[["Ritual Menor","AÇÃO (RITUAL: MINUTOS) · 1 SINTONIA","Com tempo, giz, vela e voz baixa: um efeito utilitário menor do seu elemento (Grau 1, fora de combate). Ocultismo (6)."],
-["Foco Ritual","PASSIVA","Um objeto pessoal consagrado: 1×/cena, uma conjuração sua custa −1 de Sintonia. Se o foco for destruído, você sente — perde 1 Lucidez."],
-["Linguagem Morta","PASSIVA · NV 4","Lê idiomas que não deveriam ser legíveis: mortos, cifrados, impossíveis. Textos que custariam Lucidez lidos “de raspão” custam metade (mín. 1).",{nv:4}],
-["Contramágica","REAÇÃO · 2 SINTONIA · NV 6","Contra uma conjuração que você percebe: teste oposto (ou contra Grau +2). Total: interrompe — e o Refluxo é dele. Crítico: também ganha +2 na próxima ação contra a fonte.",{nv:6}],
-["Pacto Sussurrado","1×/SESSÃO · NV 6 · RUÍDO ≥2","Sussurre ao Outro Lado: +3 num teste ou uma informação. O preço vem junto — escolha na hora: 1 Lucidez, 1 Sina para o mestre, ou uma Dívida registrada.",{nv:6,ruido:2}],
-["Magia Maior","PASSIVA · NV 8 · RUÍDO ≥4","Destrava as magias de Grau 3 do seu elemento. (Grau 4: nível 12 e Ruído ≥6.)",{nv:8,ruido:4}],
-["Benzedura","AÇÃO · 1 SINTONIA","Reza e gesto de ofício, coisa de avó que funcionava: remove uma condição leve de alguém tocado, ou dá +1 no próximo teste dele contra o anômalo."]],
+regra:{n:"Maestria Imposta",
+ ef:"O Sintonizador não escolhe sua maestria. No primeiro ponto de Ruído, a fonte da exposição define o elemento que o marcou — para sempre. São seis maestrias, uma por elemento — e só uma delas será sua. (Na ficha: o elemento da aba Sintonizar define a trilha.)"},
+base:[
+ {n:"Conhecimento Proibido",cst:"—",ac:"Passiva",
+  sab:"Você sabe nomes que deviam ter morrido com quem os inventou.",
+  ef:"+1 em Ocultismo; reconhece símbolos, ritos e nomes que não deveria conhecer. 1×/sessão, pergunte ao mestre o que a tradição diz sobre isto? — a resposta vem inteira. E pode estar errada: tradição não é prova."},
+ {n:"Sentir o Véu",cst:"—",ac:"Ação Livre · 1×/cena",
+  sab:"Onde o mundo está fino, você sente a corrente de ar.",
+  ef:"Sente presença, resíduo ou ponto fraco anômalo em Curto: direção e intensidade. Concentrando (Ação · 1 Sintonia): também o elemento envolvido."},
+ {n:"Mente Resignada",cst:"—",ac:"Passiva",
+  sab:"Você já viu. Já pagou. A próxima vez dói menos.",
+  ef:"+1 contra a primeira perda de Lucidez de cada cena; diante do seu próprio elemento, toda perda cai em 1 (mín. 0)."}
+],
+esc:[
+ {n:"Contramágica",cst:"2 Sintonia",ac:"Reação · NV 6",
+  sab:"Você conhece a forma da magia dele. E sabe onde ela racha.",
+  ef:"Contra uma conjuração que você percebe, teste oposto (ou contra Grau +2). Total: interrompe — e o Refluxo é dele. Crítico: interrompe e ganha +2 na próxima ação contra a fonte.",
+  req:{nv:6}},
+ {n:"Selo de Proteção",cst:"1 Sintonia",ac:"Ação (ritual: 1 minuto)",
+  sab:"Giz, sal, uma palavra que não devia ser dita. E o lado de dentro fica seu.",
+  ef:"Desenhe um círculo em Curto. Pela cena, quem está dentro tem +2 contra efeitos anômalos, e nada de Grau 1–2 atravessa a borda sem vencer sua Sintonia num teste oposto. Sair quebra o selo."},
+ {n:"Oferenda",cst:"1 Lucidez ou 2 Vida",ac:"Ação Livre (declare antes de rolar) · 1×/cena",
+  sab:"O Outro Lado não faz crédito. Mas aceita adiantamento.",
+  ef:"Pague o custo e sua próxima conjuração desta cena não pode dar Refluxo — no pior caso, apenas falha sem consequência. Alternativamente, transforme um Parcial dela em Total."},
+ {n:"Pacto Sussurrado",cst:"1 Lucidez, 1 Sina, ou uma Dívida (escolha ao usar)",ac:"1×/sessão · NV 6 · Ruído ≥2",
+  sab:"Você sussurra. E, dessa vez, algo sussurra de volta com a resposta.",
+  ef:"+3 num teste, ou uma informação verdadeira do Outro Lado. O preço é escolhido na hora, entre os três acima.",
+  req:{nv:6,ruido:2}},
+ {n:"Foco Ritual",cst:"—",ac:"Passiva · 1×/cena",
+  sab:"Um objeto que você consagrou com algo que não se recupera.",
+  ef:"Uma conjuração sua custa −1 de Sintonia, 1×/cena. Se o foco for destruído, você sente: perde 1 Lucidez."}
+],
 mae:[{n:"Marcado pela Observação",el:"obs",s:"o que registra",st:[[],[],[],[]]},
 {n:"Marcado pelo Eco",el:"eco",s:"o que repete",st:[[],[],[],[]]},
 {n:"Marcado pelo Vazio",el:"vaz",s:"o que subtrai",st:[[],[],[],[]]},
@@ -738,7 +878,7 @@ function mtTot(){const n=S.nivel;return 1+(n>=4?1:0)+(n>=8?1:0)+(n>=12?1:0);}
 function ppGasto(){return 2*S.esc.length;}
 function pcGasto(){let t=0;for(const k of S.tal)t+=parseInt(k.split("|")[0],10)||0;return t+(parseInt(S.pcExtra,10)||0);}
 function mtUsado(){return S.maest.reduce((a,m)=>a+1+(m.st||0),0);}
-function hasHab(f,name){const d=FARDOS[f];if(!d)return false;if(d.base.some(h=>h[0]===name))return true;return S.esc.includes(f+"|"+name);}
+function hasHab(f,name){const d=FARDOS[f];if(!d)return false;if(d.base.some(h=>h.n===name))return true;return S.esc.includes(f+"|"+name);}
 const fmtRS=v=>{v=parseFloat(v)||0;try{return v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});}catch(e){return "R$ "+v;}};
 
 /* ---------- rolagem ---------- */
@@ -990,12 +1130,12 @@ function dessint(){if(!confirm("Dessintonizar? A Marca fica em silêncio até vo
 
 /* ---------- HABILIDADES ---------- */
 function badge(tx,ok){return `<span class="tag ${ok?"ok":"warn"}">${tx}</span>`;}
-function reqInfo(f,h){const r=h[3]||{};let html="",ok=true;
+function reqInfo(f,h){const r=h.req||{};let html="",ok=true;
  if(r.nv){const o=S.nivel>=r.nv;ok=ok&&o;html+=badge("nível "+r.nv,o);}
  if(r.ruido){const o=S.ruido>=r.ruido;ok=ok&&o;html+=badge(W_RUIDO+" ≥"+r.ruido,o);}
  if(r.req){const o=hasHab(f,r.req);ok=ok&&o;html+=badge("req. "+r.req,o);}
  return {html,ok};}
-function hcardH(h,extraTags,body){return `<div class="hcard"><div class="ht"><b>${esc(h[0])}</b><span class="tag dark">${esc(h[1])}</span>${extraTags||""}</div><div class="hx">${esc(h[2])}</div>${body||""}</div>`;}
+function hcardH(h,extraTags,body){return `<div class="hcard"><div class="ht"><b>${esc(h.n)}</b><span class="tag dark">${esc(h.cst)}</span><span class="tag dark">${esc(h.ac)}</span>${extraTags||""}</div>${h.sab?`<div class="hsab">${esc(h.sab)}</div>`:""}<div class="hx">${esc(h.ef)}</div>${body||""}</div>`;}
 function rHab(){const own=owned(),ppL=ppTot()-ppGasto(),mtL=mtTot()-mtUsado();
  let html=`<div class="wallet"><span class="${ppL<0?"neg":""}">Pontos de Profissão <b>${ppL}</b> livres <small>(${ppTot()} totais − ${ppGasto()} gastos)</small></span>
  <span class="${mtL<0?"neg":""}">Escolhas de Maestria <b>${mtL}</b> <small>(níveis 1 · 4 · 8 · 12)</small></span></div>
@@ -1007,12 +1147,12 @@ function rHab(){const own=owned(),ppL=ppTot()-ppGasto(),mtL=mtTot()-mtUsado();
  html+=`<div class="secband">No seu personagem</div>`;
  for(const f of own){const d=FARDOS[f];
   html+=`<div class="panel"><h2>${f} <small>“${esc(d.f)}” · +${d.vida} Vida e +${d.cv} ${d.comb==="fol"?"Fôlego":"Sintonia"}/nível${f===S.fardo?"":" (extra — não soma recursos)"} · treinadas: ${d.tre.join(", ")}</small></h2>
-  ${d.regra?`<div class="hcard regra"><div class="ht"><b>◆ ${d.regra[0]}</b><span class="tag warn">regra de fardo</span></div><div class="hx">${esc(d.regra[1])}</div></div>`:""}
+  ${d.regra?`<div class="hcard regra"><div class="ht"><b>◆ ${esc(d.regra.n)}</b>${d.regra.cst?`<span class="tag dark">${esc(d.regra.cst)}</span>`:""}${d.regra.ac?`<span class="tag dark">${esc(d.regra.ac)}</span>`:""}<span class="tag warn">regra de fardo</span></div>${d.regra.sab?`<div class="hsab">${esc(d.regra.sab)}</div>`:""}<div class="hx">${esc(d.regra.ef)}</div></div>`:""}
   ${d.base.map(h=>hcardH(h,`<span class="tag">automática</span>`)).join("")}
-  ${d.esc.map((h,i)=>S.esc.includes(f+"|"+h[0])?hcardH(h,`<span class="tag ok">2 PP</span><span class="src"><button class="btn mini del" onclick="refundEsc('${f}',${i})">devolver</button></span>`):"").join("")}
+  ${d.esc.map((h,i)=>S.esc.includes(f+"|"+h.n)?hcardH(h,`<span class="tag ok">2 PP</span><span class="src"><button class="btn mini del" onclick="refundEsc('${f}',${i})">devolver</button></span>`):"").join("")}
   </div>`;}
  html+=`<div class="secband">Disponíveis — <b>2 PP</b> cada</div>`;
- for(const f of own){const d=FARDOS[f];const av=d.esc.map((h,i)=>({h,i})).filter(o=>!S.esc.includes(f+"|"+o.h[0]));
+ for(const f of own){const d=FARDOS[f];const av=d.esc.map((h,i)=>({h,i})).filter(o=>!S.esc.includes(f+"|"+o.h.n));
   if(!av.length)continue;
   html+=`<div class="panel"><h2>${f}</h2>${av.map(({h,i})=>{const q=reqInfo(f,h);
    return hcardH(h,q.html+`<span class="src"><button class="btn mini gold" onclick="buyEsc('${f}',${i})">comprar · 2 PP</button></span>`);}).join("")}</div>`;}
@@ -1031,7 +1171,7 @@ function rHab(){const own=owned(),ppL=ppTot()-ppGasto(),mtL=mtTot()-mtUsado();
 function addFardoModal(){const rest=Object.keys(FARDOS).filter(f=>!owned().includes(f));
  modal(`<h3>Adicionar Fardo</h3>${rest.map(f=>{const d=FARDOS[f];
   return `<div class="hcard" style="cursor:pointer" onclick="pickFardo('${f}')"><div class="ht"><b>${f}</b>
-  <span class="tag dark">${d.comb==="fol"?"Fôlego":"Sintonia"}</span></div><div class="hx">“${esc(d.f)}” — base: ${d.base.map(h=>h[0]).join(" · ")}</div></div>`;}).join("")||"<div class='hint'>você já carrega todos os oito. Deus te ajude.</div>"}
+  <span class="tag dark">${d.comb==="fol"?"Fôlego":"Sintonia"}</span></div><div class="hx">“${esc(d.f)}” — base: ${d.base.map(h=>h.n).join(" · ")}</div></div>`;}).join("")||"<div class='hint'>você já carrega todos os oito. Deus te ajude.</div>"}
  <div style="text-align:right;margin-top:8px"><button class="btn" onclick="closeModal()">fechar</button></div>`);}
 function pickFardo(f){S.fardosX.push(f);save();closeModal();render();toast(f+" adicionado — 3 habilidades-base ganhas de graça.");}
 function remFardo(f){if(!confirm(`Remover ${f}? Escolhíveis e maestrias dele voltam como reembolso.`))return;
@@ -1039,8 +1179,8 @@ function remFardo(f){if(!confirm(`Remover ${f}? Escolhíveis e maestrias dele vo
 function buyEsc(f,i){const h=FARDOS[f].esc[i],q=reqInfo(f,h),ppL=ppTot()-ppGasto();
  if(ppL<2&&!confirm("PP insuficiente — comprar mesmo assim (fica negativo)?"))return;
  if(!q.ok&&!confirm("Requisito não atendido — a mesa manda. Comprar mesmo assim?"))return;
- S.esc.push(f+"|"+h[0]);save();render();toast(h[0]+" adquirida.");}
-function refundEsc(f,i){const n=FARDOS[f].esc[i][0];S.esc=S.esc.filter(k=>k!==f+"|"+n);save();render();toast("2 PP devolvidos.");}
+ S.esc.push(f+"|"+h.n);save();render();toast(h.n+" adquirida.");}
+function refundEsc(f,i){const n=FARDOS[f].esc[i].n;S.esc=S.esc.filter(k=>k!==f+"|"+n);save();render();toast("2 PP devolvidos.");}
 function habEditor(){modal(`<h3>Criar habilidade</h3>
  <div class="row"><div><label>Nome</label><input type="text" id="ch_n"></div><div><label>Etiqueta</label><input type="text" id="ch_t" placeholder="AÇÃO · 1 FÔLEGO · 1×/CENA"></div></div>
  <label>Texto</label><textarea id="ch_x"></textarea>
