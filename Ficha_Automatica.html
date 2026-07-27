@@ -1182,15 +1182,125 @@ esc:[
   sab:"O que você amarra, fica amarrado.",
   ef:"Cordas, laços e amarras suas não falham; escapar delas exige teste (9). Escalar com corda sua dá +1 a todos."}
 ],
-mae:[{n:"Caçador",s:"trilha, sustento e abate",st:[
-[["Olho de Caçador","PASSIVA","+1 em Rastrear; identifica criaturas por sinais. 1×/cena pergunta ao mestre “o que ela vai fazer?” sobre uma criatura rastreada — resposta honesta."],["Terreno Conhecido","PASSIVA","Nunca se perde; +1 em terreno difícil; 1×/sessão declara um atalho ou passagem que mapas não mostram."]],
-[["Bote","PASSIVA","+2 de dano no primeiro ataque contra presa que você rastreava; se ela não sabia de você, o ataque sobe um grau (Parcial→Total)."],["Autossuficiente","PASSIVA","Sustenta o grupo em qualquer lugar; 1×/dia monta acampamento seguro: o descanso ali nunca é interrompido por perigo mundano."]],
-[["Caçada Implacável","PASSIVA","Na trilha de um alvo, você sempre o reencontra: a trilha nunca esfria. Contra ele: +1 em Percepção e Intuição."],["Lar em Qualquer Lugar","AÇÃO (1 CENA) · 1×/SESSÃO","Refúgio improvisado: o descanso do grupo conta como Descanso Longo mesmo em território hostil."]],
-[["Predador Ápice","AÇÃO LIVRE · 1×/CENA","Marca uma presa: +1 em ataque, dano e defesa contra ela até cair. Se fugir, a Caçada Implacável já está contando."],["Aclimatação Total","PASSIVA","Você e o grupo (em Curto) ignoram penalidades de qualquer ambiente extremo."]]]},
-{n:"Predador",s:"emboscada e dano selvagem",st:[
-[["Tocaia","PASSIVA","Escondido e imóvel por 1+ turno: o primeiro ataque pega o alvo desprevenido e causa +2. Se o abater nesse golpe, ninguém sabe de onde veio — você continua oculto."],["Movimento Silencioso","PASSIVA","Furtividade não reduz seu deslocamento; seguir seus rastros exige Sobrevivência (9)."]],
-[["Golpe Brutal","GATILHO · 1×/CENA","Um acerto seu aplica Sangrando; num Total, o alvo também testa Coragem (7) ou fica Apavorado."],["Instinto Assassino","PASSIVA","Contra alvos com metade da Vida ou menos: +1 de dano, e você sente quais estão feridos sem teste."]],
-[],[]]}]},
+mae:[
+{n:"Guardião do Ermo",s:"o terreno como aliado",
+ regra:{n:"Preparar o Campo",ef:"Se você teve qualquer tempo num local antes do confronto (minutos bastam), você o prepara: acumula fichas de Terreno (1 por ação de preparo — armar, estudar, posicionar, esconder). Durante o confronto, gasta Terreno para acionar o que o lugar oferece: armadilhas, cobertura, rotas, perigos naturais. Longe do campo preparado, você é um Sobrevivente comum, sem Terreno para gastar."},
+ medidor:{chave:"terreno",nome:"Terreno",min:0,tetos:[5,5,5,8],reset:"cena"},
+ st:[
+  [
+   {n:"Leitura do Campo",cst:"—",ac:"Ação (ao chegar num local)",
+    sab:"Num relance, você vê tudo que o lugar pode fazer por você — e contra eles.",
+    ef:"Ao ter tempo num local, ganhe 2 de Terreno e o mestre aponta: rotas, pontos de emboscada, perigos naturais e a melhor posição defensiva. Você nunca é surpreendido num lugar que teve tempo de ler."},
+   {n:"Armadilhas",cst:"gasta 1 Terreno por armadilha",ac:"Ação (preparo) / Gatilho (dispara)",
+    sab:"O lugar já tinha os dentes. Você só os posicionou.",
+    ef:"Monte armadilhas com o ambiente (laço, fojo, pedras, espinhos, alarme). Quando um inimigo aciona: dano + uma condição do tipo (Caído, Preso, Lento, Sangrando). Detectá-las: Percepção (8)."}
+  ],
+  [
+   {n:"O Lugar é Meu",cst:"gasta 1 Terreno",ac:"Reação",
+    sab:"Você conhece cada pedra. Elas trabalham no seu horário.",
+    ef:"Use o campo a seu favor: aparecer de uma cobertura que o inimigo não sabia existir (ataque com Vantagem), sumir numa rota que só você conhece (fica oculto), ou empurrar um inimigo para um perigo natural que você mapeou."},
+   {n:"Emboscada",cst:"gasta 3 Terreno",ac:"Ação · 1×/confronto (abre a luta)",
+    sab:"O primeiro instante da luta já foi vencido antes de ela começar.",
+    ef:"Se você preparou o campo e o inimigo entrou sem saber: todos os seus aliados agem primeiro, com Vantagem, e toda armadilha montada dispara de uma vez. A primeira rodada inteira é sua."}
+  ],
+  [
+   {n:"Fortaleza Natural",cst:"—",ac:"Passiva",
+    sab:"Onde você fica de pé, vira posição fortificada, mesmo que seja só mato e pedra.",
+    ef:"Teto de Terreno sobe para 8. Qualquer lugar onde passe uma cena preparando vira Fortaleza: aliados dentro ganham +2 na Defesa e não podem ser surpreendidos, você regenera Terreno a cada turno lá dentro, e inimigos tratam o espaço como terreno difícil e hostil."},
+   {n:"O Ermo Obedece",cst:"gasta 5 Terreno",ac:"Ação · 1×/cena",
+    sab:"Você pede, e a terra faz.",
+    ef:"Comande o ambiente num gesto de escala: um desmoronamento numa passagem, uma enchente que arrasta inimigos, um incêndio que fecha metade do campo, o teto de uma ruína cedendo sobre quem você escolher."}
+  ],
+  [
+   {n:"Senhor do Lugar",cst:"—",ac:"Passiva",
+    sab:"Não existe mais 'campo alheio'. Onde você está, o lugar é seu.",
+    ef:"Você prepara o campo instantaneamente — chegar já conta como tê-lo preparado (ganha Terreno máximo ao entrar em qualquer lugar). Suas armadilhas e comandos funcionam mesmo em ambientes urbanos ou artificiais.",
+    req:{nv:12}},
+   {n:"Terra Arrasada",cst:"gasta todo o Terreno (mínimo 6)",ac:"Ação · 1×/campanha",
+    sab:"Se você não pode vencer aqui, ninguém vence. O lugar inteiro vai embora junto.",
+    ef:"Queime todo o Terreno para transformar uma região numa armadilha apocalíptica que você detona de uma vez: o local desmorona, inunda, queima, engole. Tudo que não for seu aliado sofre dano massivo e é preso, soterrado ou arrastado; a geografia muda para sempre.",
+    req:{nv:12}}
+  ]
+ ]},
+{n:"Catador",s:"nada se perde",
+ regra:{n:"Ferro-Velho",ef:"O mundo inteiro é uma despensa de peças. Você mantém um estoque de Sucata — fichas abstratas de material recolhido (vasculhar um corpo, uma ruína, destroços, uma carcaça rende 1–3 cada). Gasta Sucata para improvisar na hora o que precisar. Todo item improvisado é instável: o mestre pode pedir um teste ao usá-lo; numa falha, quebra no pior momento, sai mais fraco, ou tem um efeito colateral grotesco."},
+ medidor:{chave:"sucata",nome:"Sucata",min:0,tetos:[10,10,15,99],reset:"sessao"},
+ st:[
+  [
+   {n:"Vasculhar",cst:"—",ac:"Ação",
+    sab:"Onde os outros veem um cadáver, você vê um kit de primeiros socorros, três balas e um pé de cabra.",
+    ef:"Revistar qualquer fonte de material (corpo, ruína, destroço, lixo, carcaça) rende 1–3 de Sucata e, às vezes, um item concreto útil. Você sempre acha mais do que deveria haver ali."},
+   {n:"Improviso",cst:"gasta Sucata (1–3 conforme a complexidade)",ac:"Ação",
+    sab:"Dá um tempo. Eu faço um.",
+    ef:"Monte na hora um item improvisado: 1 = simples (tocha, corda, curativo, gazua); 2 = útil (arma branca, ferramenta específica, remédio caseiro, bomba de fumaça); 3 = complexo (explosivo, antídoto, dispositivo). Some depois de usado ou ao fim da cena."}
+  ],
+  [
+   {n:"Remendo de Guerra",cst:"gasta 2 Sucata",ac:"Ação (ou Reação)",
+    sab:"Nada está quebrado demais pra durar mais cinco minutos.",
+    ef:"Conserte na hora algo quebrado (arma, veículo, porta, equipamento) ou remende um aliado ferido (cura improvisada: 1d4 + remove Sangrando, mas deixa uma 'gambiarra' no corpo que dói). Temporário e feio, mas aguenta."},
+   {n:"Arsenal de Lata",cst:"gasta Sucata",ac:"Ação",
+    sab:"Você abre a mochila e ela tem, de algum jeito, exatamente o que faltava.",
+    ef:"Declare que já tinha improvisado de antemão um item específico (dentro do plausível) e gaste a Sucata correspondente. 1×/cena, esse item vem estável (sem o risco da instabilidade)."}
+  ],
+  [
+   {n:"Engenhoca",cst:"gasta 4 Sucata",ac:"Ação (preparo curto)",
+    sab:"Você não faz uma ferramenta. Faz uma máquina.",
+    ef:"Teto de Sucata sobe para 15. Construa dispositivos de verdade: uma torreta de sucata que atira sozinha por [Juízo] turnos, um drone de reconhecimento, uma armadilha automática, um gerador, um veículo remendado. A engenhoca age por conta própria depois de montada."},
+   {n:"Tudo é Arma",cst:"—",ac:"Passiva",
+    sab:"Na sua mão, um garfo é uma faca, um cano é um rifle, e um relógio é uma bomba.",
+    ef:"Você nunca está desarmado nem sem ferramenta: qualquer objeto vira o que você precisar, sem gastar Sucata para o básico. Improvisos simples (1 de Sucata) deixam de ser instáveis."}
+  ],
+  [
+   {n:"Alquimista do Lixo",cst:"—",ac:"Passiva",
+    sab:"A diferença entre entulho e milagre é só quem está montando.",
+    ef:"Teto de Sucata praticamente ilimitado (recolhe de tudo, o tempo todo). Improvisos complexos deixam de ser instáveis por padrão, e você pode improvisar coisas quase-mágicas — um remédio para o incurável, uma arma contra o anômalo — pagando Sucata alta.",
+    req:{nv:12}},
+   {n:"A Máquina do Fim do Mundo",cst:"gasta toda a Sucata (mínimo 10)",ac:"Ação · 1×/campanha (preparo de uma cena)",
+    sab:"Você junta tudo que já catou na vida numa única coisa. E ela resolve o problema. Todo ele.",
+    ef:"Queime todo o estoque para construir um dispositivo definitivo do tamanho do problema: uma bomba que arrasa uma fortaleza, um veículo que atravessa o impossível, um aparelho que neutraliza uma ameaça anômala inteira. Funciona uma vez, gloriosamente — depois vira sucata de novo.",
+    req:{nv:12}}
+  ]
+ ]},
+{n:"Andarilho",s:"a mobilidade impossível",
+ regra:{n:"O Caminho + Impulso",ef:"Você nunca é atrasado por terreno (nenhum tipo), e sempre que se move de verdade num turno (mais que um passo) ganha Impulso: +1 acumulativo (até o teto) em Defesa e testes físicos, que dura enquanto continuar em movimento. Parar zera o Impulso. Manter Impulso alto significa nunca se entrincheirar nem descansar na ação; travessias extremas custam Fôlego, e falhar numa pode custar Vida."},
+ medidor:{chave:"impulso",nome:"Impulso",min:0,tetos:[3,3,5,5],reset:"cena"},
+ st:[
+  [
+   {n:"Passo que Não Para",cst:"—",ac:"Passiva",
+    sab:"Lama, gelo, escombro, ladeira. Para os seus pés, é tudo chão plano.",
+    ef:"Nenhum terreno reduz seu deslocamento; você escala, nada, salta e se equilibra sem teste no que barraria outros. Ganha Impulso ao se mover. É sempre o primeiro a chegar e o último a ser alcançado."},
+   {n:"Atalho Impossível",cst:"1 Fôlego",ac:"Ação",
+    sab:"Existe um caminho. Sempre existe. Você só precisa querer passar por ele.",
+    ef:"Atravesse um obstáculo que deveria ser intransponível numa única ação — uma parede a escalar, um vão a saltar, uma correnteza, uma fenda. Você e quem estiver colado em você passam. O mestre pode pedir teste em travessias extremas."}
+  ],
+  [
+   {n:"Vento",cst:"—",ac:"Ação",
+    sab:"Você não corre pelo campo. Você aparece do outro lado dele.",
+    ef:"Mova-se o dobro do seu deslocamento e, se terminar adjacente a um inimigo, seu primeiro ataque tem Vantagem. Com Impulso 3, esse movimento não provoca reações de ninguém."},
+   {n:"Ninguém me Prende",cst:"—",ac:"Reação",
+    sab:"Corda, cela, agarrão, atolamento. Você já saiu antes de perceberem que te pegaram.",
+    ef:"Ignore ou escape automaticamente de qualquer coisa que tente restringir seu movimento — Agarrado, Preso, amarras, terreno que prende, uma cela improvisada. 1×/cena, tira um aliado adjacente junto."}
+  ],
+  [
+   {n:"Levar o Grupo",cst:"—",ac:"Passiva",
+    sab:"Você não escapa sozinho. Você abre o caminho e puxa todo mundo por ele.",
+    ef:"Aliados que te seguem ignoram terreno e restrições como você, e 1×/cena você conduz o grupo inteiro por um Atalho Impossível de uma vez (uma fuga por onde ninguém os seguiria, uma travessia coletiva do intransponível)."},
+   {n:"Incansável",cst:"—",ac:"Passiva",
+    sab:"O corpo devia ter desistido há muito tempo. Ele não recebeu o aviso.",
+    ef:"Teto de Impulso sobe para 5. Você é imune a Exausto e a efeitos que dependam de te deter (Lento, raízes, redução de deslocamento), e com Impulso 3+, reduz todo dano recebido em [Impulso]."}
+  ],
+  [
+   {n:"Onipresente",cst:"—",ac:"Passiva",
+    sab:"Perguntar 'onde ele está' não faz mais sentido. Ele está indo.",
+    ef:"Com Impulso máximo, você se move rápido o bastante para agir, reagir e se reposicionar múltiplas vezes por rodada, atravessar o campo inteiro entre ações, e nenhum ataque de área ou cerco te alcança (você nunca está parado onde ele cai).",
+    req:{nv:12}},
+   {n:"A Jornada Impossível",cst:"—",ac:"Ação · 1×/campanha",
+    sab:"Existe um lugar aonde ninguém pode chegar. Você chega. E leva quem precisar.",
+    ef:"Empreenda uma travessia impossível de qualquer escala: alcançar um lugar inacessível (o fundo de um abismo, o coração de uma fortaleza selada, o outro lado de uma barreira anômala), levando o grupo junto e chegando a tempo, não importa a distância ou o obstáculo. O mestre não pode dizer 'vocês não conseguem chegar lá'.",
+    req:{nv:12}}
+  ]
+ ]}
+]},
 
 "Operador":{f:"Você não existe. É exatamente isso que te torna útil.",vida:2,comb:"fol",cv:2,tre:["Furtividade","Pilotagem","Enganação"],profs:"armas de fogo leves, veículos especiais, sistemas de segurança",
 base:[
