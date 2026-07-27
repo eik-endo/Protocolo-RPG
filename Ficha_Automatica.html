@@ -16,13 +16,16 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;bac
 #fx-vign{position:fixed;inset:0;pointer-events:none;z-index:7;box-shadow:inset 0 0 calc(40px + var(--band)*34px) calc(var(--band)*7px) rgba(0,0,0,calc(.12 + var(--band)*.09));transition:box-shadow 1.2s}
 #fx-blood{position:fixed;inset:0;pointer-events:none;z-index:7;opacity:0;box-shadow:inset 0 0 120px 30px rgba(142,32,32,.55);transition:opacity .6s}
 /* obs — escopofobia (piloto): olho na periferia, túnel de desfoque, flash de texto */
+/* névoa periférica só com gradiente: nada de backdrop-filter — reprocessar o fundo a cada
+   frame (as partículas ficam embaixo) era o que travava a ficha nas bandas altas */
 #fx-tunnel{position:fixed;inset:0;pointer-events:none;z-index:6;opacity:0;visibility:hidden;transition:opacity 1.6s,visibility 1.6s;
- backdrop-filter:blur(calc(var(--band)*.45px));-webkit-backdrop-filter:blur(calc(var(--band)*.45px));
- background:rgba(0,0,0,calc(.02 + var(--band)*.028));
- -webkit-mask-image:radial-gradient(ellipse at 50% 45%,transparent 45%,#000 92%);mask-image:radial-gradient(ellipse at 50% 45%,transparent 45%,#000 92%)}
-#fx-eye{position:fixed;inset:0;pointer-events:none;z-index:7;opacity:0;visibility:hidden;transition:opacity 2.2s,visibility 2.2s;--eyeb:30px}
-#fx-eye i{position:absolute;left:0;top:0;width:46vmin;height:27vmin;margin:-13.5vmin 0 0 -23vmin;border-radius:50%;will-change:transform;transform:translate3d(-140vw,0,0);
- background:radial-gradient(closest-side at 50% 50%,#000 0 15%,var(--ecd) 16% 30%,var(--ec) 31% 41%,rgba(0,0,0,.6) 43% 55%,transparent 74%);filter:blur(var(--eyeb))}
+ background:radial-gradient(ellipse at 50% 45%,transparent 44%,rgba(0,0,0,calc(.03 + var(--band)*.045)) 82%,rgba(0,0,0,calc(.07 + var(--band)*.065)) 100%),
+  radial-gradient(ellipse at 50% 45%,transparent 62%,var(--eglow) 100%)}
+#fx-eye{position:fixed;inset:0;pointer-events:none;z-index:7;opacity:0;visibility:hidden;transition:opacity 2.2s,visibility 2.2s;--eyeb:20px}
+/* a difusão vem das paradas largas do gradiente; o blur fica pequeno e a caixa ganha camada
+   própria, então ele é rasterizado uma vez e o resto do tempo só se translada na GPU */
+#fx-eye i{position:absolute;left:0;top:0;width:46vmin;height:27vmin;margin:-13.5vmin 0 0 -23vmin;border-radius:50%;will-change:transform,opacity;transform:translate3d(-140vw,0,0);
+ background:radial-gradient(closest-side at 50% 50%,#000 0 9%,var(--ecd) 22% 28%,var(--ec) 36% 42%,rgba(0,0,0,.55) 52% 58%,transparent 78%);filter:blur(var(--eyeb))}
 .fx-flash{position:fixed;pointer-events:none;z-index:9;overflow:hidden;white-space:nowrap;display:flex;align-items:center}
 body.lowvida #fx-blood{opacity:1;animation:bloodpulse 2.2s ease-in-out infinite}
 @keyframes bloodpulse{50%{box-shadow:inset 0 0 160px 46px rgba(142,32,32,.7)}}
@@ -284,11 +287,11 @@ body[data-el=eco] h1,body[data-el=eco] .panel h2{text-shadow:calc(var(--band)*1.
 body[data-el=obs][data-band="2"] .panel h2::after,body[data-el=obs][data-band="3"] .panel h2::after,body[data-el=obs][data-band="4"] .panel h2::after,body[data-el=obs][data-band="5"] .panel h2::after{content:"⊙";font-size:10px;color:var(--ec);animation:blinkeye 6s infinite}
 /* obs: escopofobia — a nuca (banda 2+) e o olho na periferia (banda 3+) */
 body[data-el=obs][data-band="2"] #fx-tunnel,body[data-el=obs][data-band="3"] #fx-tunnel,body[data-el=obs][data-band="4"] #fx-tunnel,body[data-el=obs][data-band="5"] #fx-tunnel{opacity:1;visibility:visible}
-body[data-el=obs][data-band="5"] #fx-tunnel{animation:scopobreath 11s ease-in-out infinite}
+body[data-el=obs][data-band="5"] #fx-tunnel{animation:scopobreath 11s ease-in-out infinite;will-change:opacity}
 @keyframes scopobreath{0%,100%{opacity:.7}50%{opacity:1}}
-body[data-el=obs][data-band="3"] #fx-eye{opacity:.035;visibility:visible;--eyeb:32px}
-body[data-el=obs][data-band="4"] #fx-eye{opacity:.075;visibility:visible;--eyeb:21px}
-body[data-el=obs][data-band="5"] #fx-eye{opacity:.12;visibility:visible;--eyeb:14px}
+body[data-el=obs][data-band="3"] #fx-eye{opacity:.035;visibility:visible;--eyeb:22px}
+body[data-el=obs][data-band="4"] #fx-eye{opacity:.075;visibility:visible;--eyeb:15px}
+body[data-el=obs][data-band="5"] #fx-eye{opacity:.12;visibility:visible;--eyeb:10px}
 /* asc: listras de ferrugem e tremor */
 body[data-el=asc] .panel{border-image:repeating-linear-gradient(45deg,var(--ecd) 0 8px,var(--line) 8px 16px) 1}
 body[data-el=asc][data-band="4"] .wrap,body[data-el=asc][data-band="5"] .wrap{animation:servo 3.5s steps(2) infinite}
@@ -1950,6 +1953,8 @@ function doRoll(label,mod){mod=parseInt(mod,10)||0;
 function logHTML(){return S.sess.log.slice(0,12).map(l=>`<div><b style="color:var(--faint);font-family:ui-monospace">${l.t}</b> ${esc(l.x)}</div>`).join("")||`<div class="hint">nenhuma rolagem ainda</div>`;}
 
 /* ---------- tema / efeitos ---------- */
+/* cor do elemento em cache: as partículas leem isto por frame, e getComputedStyle força reflow */
+let _ecCache="#b8932f";
 function applyTheme(){const b=bandOf(S.ruido||0);
  document.body.dataset.el=S.elem||"";document.body.dataset.band=b;
  document.body.style.setProperty("--band",b);
@@ -1959,17 +1964,20 @@ function applyTheme(){const b=bandOf(S.ruido||0);
  document.body.classList.toggle("lowvida",mv>0&&vc<=Math.ceil(mv/3));
  document.body.classList.toggle("lowluc",curOf("luc")<=2);
  const g=$("h1g");if(g)g.textContent=S.elem?(" "+ELM(S.elem).g):"";
+ _ecCache=(getComputedStyle(document.body).getPropertyValue("--ec")||"").trim()||"#b8932f";
  syncFX();}
 function updDock(){const d=$("divDock");const n=S.div.filter(x=>x&&x.trim()).length;
  if(n>0){d.classList.add("on");d.innerHTML=`⚖ o Pacto cobra — <b>${n}</b> dívida${n>1?"s":""} registrada${n>1?"s":""} <span style="color:var(--faint)">· aba Dívidas &amp; Notas</span>`;}
  else d.classList.remove("on");}
 
 /* partículas */
-let FX={run:false,ps:[],last:0};
+let FX={run:false,q:false,ps:[],last:0};
 function syncFX(){const b=bandOf(S.ruido||0);const want=!!S.elem&&b>0&&!S.ui.calm&&!document.hidden;
- if(want&&!FX.run){FX.run=true;rAF(fxTick);}if(!want){FX.run=false;const cv=$("fx-canvas");if(cv){const x=cv.getContext&&cv.getContext("2d");if(x)x.clearRect(0,0,cv.width,cv.height);}}
+ if(want&&!FX.run){FX.run=true;fxKick();}if(!want){FX.run=false;const cv=$("fx-canvas");if(cv){const x=cv.getContext&&cv.getContext("2d");if(x)x.clearRect(0,0,cv.width,cv.height);}}
  scopoSync();}
-function fxTick(t){if(!FX.run)return;const cv=$("fx-canvas");if(!cv)return;const ctx=cv.getContext&&cv.getContext("2d");if(!ctx){FX.run=false;return;}
+/* FX.q garante um único rAF pendente: desligar e religar no mesmo frame não duplica o loop */
+function fxKick(){if(FX.q)return;FX.q=true;rAF(fxTick);}
+function fxTick(t){FX.q=false;if(!FX.run)return;const cv=$("fx-canvas");if(!cv)return;const ctx=cv.getContext&&cv.getContext("2d");if(!ctx){FX.run=false;return;}
  if(cv.width!==innerWidth||cv.height!==innerHeight){cv.width=innerWidth;cv.height=innerHeight;}
  const b=bandOf(S.ruido||0),el=S.elem,alvo=el==="vaz"?Math.min(b*2,8):b*3;
  if(FX.ps.length<alvo&&Math.random()<.12)FX.ps.push(fxNew(el,cv));
@@ -1978,7 +1986,7 @@ function fxTick(t){if(!FX.run)return;const cv=$("fx-canvas");if(!cv)return;const
   if(p.life>=p.max)return false;ctx.globalAlpha=a*p.op;fxDraw(ctx,el,p);ctx.globalAlpha=1;return true;});
  if(FX.ps.length>alvo)FX.ps.length=alvo;
  eyeStep(t);
- rAF(fxTick);}
+ fxKick();}
 function fxNew(el,cv){const W=cv.width,H=cv.height,r=Math.random;
  const base={x:r()*W,y:r()*H,vx:(r()-.5)*.2,vy:(r()-.5)*.2,life:0,max:240+r()*240,op:.16,s:4+r()*7};
  if(el==="ger"){base.y=H+10;base.vy=-.14-r()*.2;base.vx=(r()-.5)*.12;base.op=.2;}
@@ -1987,7 +1995,7 @@ function fxNew(el,cv){const W=cv.width,H=cv.height,r=Math.random;
  if(el==="eco"){base.vx=0;base.vy=0;base.max=160;base.op=.14;}
  if(el==="vaz"){base.vx=0;base.vy=0;base.op=.5;base.max=300;}
  return base;}
-function fxDraw(c,el,p){c.strokeStyle=c.fillStyle=getComputedStyle(document.body).getPropertyValue("--ec")||"#b8932f";
+function fxDraw(c,el,p){c.strokeStyle=c.fillStyle=_ecCache;
  if(el==="obs"){c.beginPath();c.ellipse(p.x,p.y,p.s*1.6,p.s*.8,0,0,7);c.stroke();c.beginPath();c.arc(p.x,p.y,p.s*.32,0,7);c.fill();}
  else if(el==="eco"){const k=(p.life/p.max);c.beginPath();c.arc(p.x,p.y,p.s*3*k+2,0,7);c.stroke();}
  else if(el==="vaz"){c.fillStyle="#04050a";c.beginPath();c.arc(p.x,p.y,p.s*1.4,0,7);c.fill();}
@@ -1997,14 +2005,17 @@ function fxDraw(c,el,p){c.strokeStyle=c.fillStyle=getComputedStyle(document.body
 document.addEventListener("visibilitychange",()=>syncFX());
 
 /* sussurros */
-let _wt=null;
+let _wt=null,_wsig="";
 /* quem tem susB (só o obs, por ora) sussurra conforme a banda; os outros mantêm o sus simples */
 function susOf(e,b){const B=e.susB;if(!B)return e.sus;return b<=2?B.lo:(b<=4?B.mid:B.hi);}
-function whisperLoop(){clearTimeout(_wt);const b=bandOf(S.ruido||0),e=ELM(S.elem);
+function whisperLoop(){const b=bandOf(S.ruido||0),e=ELM(S.elem);
+ const sig=(S.elem||"")+"|"+b+"|"+(S.ui.mute?1:0)+"|"+(S.ui.calm?1:0);
+ if(sig===_wsig&&_wt)return; /* render() roda a cada clique: sem mudança relevante, o ciclo em curso segue */
+ _wsig=sig;clearTimeout(_wt);_wt=null;
  if(!e||b<1||S.ui.mute||S.ui.calm)return;
  let delay=[0,55,40,28,20,14][b]*1000*(0.7+Math.random()*.6);
  if(e.id==="obs"&&b>=4)delay*=.6; /* no ápice do Observação eles se acumulam */
- _wt=setTimeout(()=>{const w=$("whisper"),lst=susOf(e,b);let tx=lst[Math.floor(Math.random()*lst.length)];
+ _wt=setTimeout(()=>{_wt=null;const w=$("whisper"),lst=susOf(e,b);let tx=lst[Math.floor(Math.random()*lst.length)];
   if(b>=4&&Math.random()<.5){const ws=tx.split(" ");const i=Math.floor(Math.random()*ws.length);ws[i]=alien(ws[i]);tx=ws.join(" ");}
   w.textContent=tx;w.style.left=(8+Math.random()*70)+"%";w.style.top=(10+Math.random()*75)+"%";
   w.classList.add("on");setTimeout(()=>w.classList.remove("on"),4200);whisperLoop();},delay);}
@@ -2012,7 +2023,9 @@ function whisperLoop(){clearTimeout(_wt);const b=bandOf(S.ruido||0),e=ELM(S.elem
 /* ============ ESCOPOFOBIA — piloto do elemento Observação ============
    tudo aqui morre com body.calm, com prefers-reduced-motion e com a aba oculta.
    nada toca o DOM da ficha nem o estado S: só overlays pointer-events:none. */
-const RM=()=>!!(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches);
+/* a MediaQueryList é criada uma vez: scopoOn() é consultado a cada frame pelo olho */
+const _mqRM=window.matchMedia?matchMedia("(prefers-reduced-motion:reduce)"):null;
+const RM=()=>!!(_mqRM&&_mqRM.matches);
 const scopoOn=()=>S.elem==="obs"&&!S.ui.calm&&!RM();
 
 /* --- o olho na periferia: segue o cursor sem nunca alcançá-lo --- */
@@ -2121,7 +2134,7 @@ function boot(){loadAuto();
  $("btnImp").onclick=()=>$("impFile").click();
  $("impFile").addEventListener("change",e=>{if(e.target.files[0])importJSON(e.target.files[0]);e.target.value="";});
  $("btnMute").onclick=()=>{S.ui.mute=!S.ui.mute;save();$("btnMute").classList.toggle("on",S.ui.mute);toast(S.ui.mute?"Sussurros silenciados.":"Os sussurros voltaram.");whisperLoop();scopoSync();};
- $("btnCalm").onclick=()=>{S.ui.calm=!S.ui.calm;save();$("btnCalm").classList.toggle("on",S.ui.calm);applyTheme();toast(S.ui.calm?"Efeitos reduzidos.":"Efeitos completos.");};
+ $("btnCalm").onclick=()=>{S.ui.calm=!S.ui.calm;save();$("btnCalm").classList.toggle("on",S.ui.calm);applyTheme();whisperLoop();toast(S.ui.calm?"Efeitos reduzidos.":"Efeitos completos.");};
  $("btnSess").onclick=toggleSess;
  $("btnMute").classList.toggle("on",S.ui.mute);$("btnCalm").classList.toggle("on",S.ui.calm);
  $("btnSess").textContent=S.ui.sess?"◼ Encerrar sessão":"▶ Sessão";
