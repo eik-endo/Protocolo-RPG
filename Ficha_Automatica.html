@@ -79,6 +79,8 @@ body[data-band="3"] .rw,body[data-band="4"] .rw,body[data-band="5"] .rw{animatio
 .rec .rv{display:flex;align-items:center;gap:6px;margin-top:5px}
 .rec .rv input{width:56px;text-align:center;font-size:17px;font-family:Georgia,serif;padding:3px}
 .rec .rv .mx{color:var(--faint);font-size:13px}
+.rec .rv .mx input{width:46px;text-align:center;font-size:13px;font-family:Georgia,serif;padding:2px 3px;color:var(--dim)}
+.rec .rv .mx input::placeholder{color:var(--faint);opacity:1}
 .rec .stp{background:none;border:1px solid var(--line2);color:var(--dim);width:24px;height:24px;border-radius:3px;line-height:1}
 .rec .stp:hover{border-color:var(--ec);color:var(--ec)}
 .bar{height:4px;background:#0c0a08;border-radius:2px;margin-top:7px;overflow:hidden}
@@ -236,6 +238,7 @@ body.sess #sessview{display:block}
 @media(max-width:900px){.sessgrid{grid-template-columns:1fr}}
 .bigrec{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
 .bigrec .rec .rv input{font-size:24px;width:70px}
+.bigrec .rec .rv .mx input{font-size:15px;width:54px}
 .bigrec .rec .stp{width:34px;height:34px;font-size:16px}
 .slog{max-height:220px;overflow:auto;font-size:12px;color:var(--dim)}
 .slog div{border-bottom:1px solid var(--line);padding:4px 0}
@@ -1844,7 +1847,7 @@ const ELM=id=>ELEMS.find(e=>e.id===id)||null;
 /* ---------- estado ---------- */
 const DEF=()=>({v:4,nome:"",jogador:"",conceito:"",raiz:"",fardo:"",fardosX:[],nivel:1,
 attrs:{car:0,ner:0,jui:0,tem:0,lab:0},
-cur:{vida:null,fol:null,sin:null,luc:null},gente:null,brio:1,defesa:8,
+cur:{vida:null,fol:null,sin:null,luc:null},curMax:{vida:null,fol:null,sin:null,luc:null},gente:null,brio:1,defesa:8,
 ruido:0,elem:"",dinheiro:0,
 per:{},profis:"",esc:[],maest:[],tal:[],conh:[],
 custom:{hab:[],mag:[],mae:[]},cond:{},
@@ -1854,13 +1857,13 @@ sess:{notes:[],log:[]},
 ui:{tab:"inicial",mute:false,calm:false,sess:false}});
 var S=DEF();
 function fixS(){const d=DEF();
- for(const k of["attrs","cur","custom","inv","sess","ui"])S[k]=Object.assign({},d[k],S[k]||{});
+ for(const k of["attrs","cur","curMax","custom","inv","sess","ui"])S[k]=Object.assign({},d[k],S[k]||{});
  for(const k of["fardosX","esc","maest","tal","conh","div","cred"])if(!Array.isArray(S[k]))S[k]=[];
  for(const k of["hab","mag","mae"])if(!Array.isArray(S.custom[k]))S.custom[k]=[];
  if(!Array.isArray(S.sess.notes))S.sess.notes=[];if(!Array.isArray(S.sess.log))S.sess.log=[];
  if(typeof S.per!=="object"||!S.per)S.per={};if(typeof S.cond!=="object"||!S.cond)S.cond={};
  if(!S.inv.pieces)S.inv.pieces=[];if(!S.inv.bag)S.inv.bag=[];if(!S.inv.seq)S.inv.seq=1;
- for(const m of S.maest)if(typeof m.rec!=="number")m.rec=0;}
+ for(const m of S.maest){if(typeof m.rec!=="number")m.rec=0;if(typeof m.recMax!=="number")m.recMax=null;}}
 
 /* ---------- salvar ---------- */
 let _st=null;
@@ -1888,10 +1891,17 @@ function importJSON(file){const r=new FileReader();r.onload=()=>{try{S=Object.as
 const A=k=>{const v=parseInt(S.attrs[k],10);return isNaN(v)?0:v;};
 const FP=()=>FARDOS[S.fardo]||null;
 function owned(){const o=[];if(S.fardo&&FARDOS[S.fardo])o.push(S.fardo);for(const f of S.fardosX)if(FARDOS[f]&&!o.includes(f))o.push(f);return o;}
-function maxVida(){const f=FP();return 3+A("car")+(f?f.vida*S.nivel:0);}
-function maxFol(){const f=FP();return 3+A("ner")+((f&&f.comb==="fol")?f.cv*S.nivel:0);}
-function maxSin(){const f=FP();return 3+A("jui")+((f&&f.comb==="sin")?f.cv*S.nivel:0);}
-function maxLuc(){return 5+A("tem");}
+/* máximos: a fórmula é o padrão; S.curMax[k] preenchido sobrescreve na mão */
+function baseMaxVida(){const f=FP();return 3+A("car")+(f?f.vida*S.nivel:0);}
+function baseMaxFol(){const f=FP();return 3+A("ner")+((f&&f.comb==="fol")?f.cv*S.nivel:0);}
+function baseMaxSin(){const f=FP();return 3+A("jui")+((f&&f.comb==="sin")?f.cv*S.nivel:0);}
+function baseMaxLuc(){return 5+A("tem");}
+function baseMaxOf(k){return {vida:baseMaxVida,fol:baseMaxFol,sin:baseMaxSin,luc:baseMaxLuc}[k]();}
+function ovMax(k){const o=S.curMax&&S.curMax[k];return(o==null||o==="")?baseMaxOf(k):Math.max(0,parseInt(o,10)||0);}
+function maxVida(){return ovMax("vida");}
+function maxFol(){return ovMax("fol");}
+function maxSin(){return ovMax("sin");}
+function maxLuc(){return ovMax("luc");}
 function maxGente(){return Math.max(0,1+A("lab"));}
 function curOf(k){const m={vida:maxVida,fol:maxFol,sin:maxSin,luc:maxLuc}[k];const v=S.cur[k];return(v==null||v==="")?m():parseInt(v,10)||0;}
 function ppTot(){const n=S.nivel;return 2+(n-1)+(n>=8?1:0)+(n>=15?1:0);}
@@ -2017,6 +2027,8 @@ function setNum(k,v){S[k]=parseInt(v,10)||0;save();}
 function setNivel(v){S.nivel=Math.max(1,Math.min(15,parseInt(v,10)||1));save();render();}
 function setAttr(k,v){S.attrs[k]=Math.max(-2,Math.min(4,parseInt(v,10)||0));save();render();}
 function setCur(k,v){S.cur[k]=(v===""?null:parseInt(v,10)||0);save();applyTheme();barSync();}
+function setMax(k,v){if(!S.curMax)S.curMax={vida:null,fol:null,sin:null,luc:null};
+ S.curMax[k]=(v===""?null:Math.max(0,parseInt(v,10)||0));save();applyTheme();barSync();render();}
 function stepRec(k,d){const m={vida:maxVida,fol:maxFol,sin:maxSin,luc:maxLuc}[k]();const v=Math.max(0,Math.min(m,curOf(k)+d));S.cur[k]=v;save();
  const i=$("cur_"+k);if(i)i.value=v;const j=$("scur_"+k);if(j)j.value=v;applyTheme();barSync();}
 function barSync(){for(const k of["vida","fol","sin","luc"]){const m={vida:maxVida,fol:maxFol,sin:maxSin,luc:maxLuc}[k]();
@@ -2083,27 +2095,34 @@ function rInicial(){const f=FP(),r=RAIZES.find(x=>x.n===S.raiz);
  barSync();}
 function recCard(k,nm,mx){return `<div class="rec"><div class="rn">${nm} <b>máx ${mx}</b></div><div class="rv">
  <button class="stp" onclick="stepRec('${k}',-1)">−</button>
- <input type="number" id="cur_${k}" value="${curOf(k)}" onchange="setCur('${k}',this.value)"><span class="mx">/ ${mx}</span>
+ <input type="number" id="cur_${k}" value="${curOf(k)}" onchange="setCur('${k}',this.value)"><span class="mx">/ ${maxIn("max_"+k,k)}</span>
  <button class="stp" onclick="stepRec('${k}',1)">+</button></div>
  <div class="bar"><i id="bar_${k}"></i></div></div>`;}
+/* campo do máximo: vazio = fórmula (mostrada como placeholder), número = teto na mão */
+function maxIn(id,k){const o=S.curMax?S.curMax[k]:null;
+ return `<input type="number" min="0" id="${id}" value="${o==null||o===""?"":o}" placeholder="${baseMaxOf(k)}" title="máximo — deixe vazio para usar o cálculo automático" onchange="setMax('${k}',this.value)">`;}
 /* medidores de maestria — recurso próprio de uma trilha (Fúria, etc.) */
-const RESET_LB={cena:"nova cena",sessao:"nova sessão",permanente:"permanente"};
+const RESET_LB={cena:"zerar (nova cena)",sessao:"zerar (nova sessão)",permanente:"zerar"};
 function meterOf(m){const md=m&&!m.cu?maeData(m):null;return(md&&md.medidor)||null;}
-function meterCap(m){const d=meterOf(m);return d?{min:d.min,max:d.tetos[m.st]}:null;}
+function meterCap(m){const d=meterOf(m);if(!d)return null;
+ return {min:d.min,max:(typeof m.recMax==="number"?m.recMax:d.tetos[m.st])};}
 function meterVal(m){const c=meterCap(m);return c?Math.max(c.min,Math.min(c.max,m.rec||0)):0;}
 function meterCard(m,i){const d=meterOf(m);if(!d)return "";
- const tp=d.tetos[m.st],v=meterVal(m),pc=tp>d.min?Math.round((v-d.min)/(tp-d.min)*100):0;
+ const tp=meterCap(m).max,v=meterVal(m),pc=tp>d.min?Math.round((v-d.min)/(tp-d.min)*100):0;
+ const ov=(typeof m.recMax==="number"?m.recMax:"");
  return `<div class="rec" id="mtr_${i}" style="margin-top:8px"><div class="rn">${esc(d.nome)} <b>teto ${tp} · ${STG[m.st]}</b></div><div class="rv">
  <button class="stp" onclick="stepMeter(${i},-1)">−</button>
- <input type="number" id="mcur_${i}" min="${d.min}" max="${tp}" value="${v}" onchange="setMeter(${i},this.value)"><span class="mx">/ ${tp}</span>
+ <input type="number" id="mcur_${i}" min="${d.min}" max="${tp}" value="${v}" onchange="setMeter(${i},this.value)"><span class="mx">/ <input type="number" min="${d.min}" id="mmax_${i}" value="${ov}" placeholder="${d.tetos[m.st]}" title="teto — deixe vazio para usar o teto do estágio" onchange="setMeterMax(${i},this.value)"></span>
  <button class="stp" onclick="stepMeter(${i},1)">+</button>
- ${d.reset?`<button class="btn mini" style="margin-left:auto" onclick="resetMeter(${i})">zerar (${RESET_LB[d.reset]||esc(d.reset)})</button>`:""}</div>
+ ${d.reset?`<button class="btn mini" style="margin-left:auto" onclick="resetMeter(${i})">${RESET_LB[d.reset]||"zerar ("+esc(d.reset)+")"}</button>`:""}</div>
  <div class="bar"><i id="mbar_${i}" style="width:${pc}%"></i></div></div>`;}
 function meterSync(i){const el=$("mtr_"+i);if(el)el.outerHTML=meterCard(S.maest[i],i);}
 function meterPut(i,v){const m=S.maest[i];if(!m)return;const c=meterCap(m);if(!c)return;
  m.rec=Math.max(c.min,Math.min(c.max,isNaN(v)?c.min:v));save();meterSync(i);}
 function stepMeter(i,d){const m=S.maest[i];if(m)meterPut(i,meterVal(m)+d);}
 function setMeter(i,v){meterPut(i,parseInt(v,10));}
+function setMeterMax(i,v){const m=S.maest[i];if(!m)return;
+ m.recMax=(v===""?null:Math.max(0,parseInt(v,10)||0));save();meterSync(i);}
 function resetMeter(i){const m=S.maest[i];if(!m)return;const c=meterCap(m);if(c)meterPut(i,c.min);}
 function skillsHTML(sessOnly){let out="",cur="";
  const list=PERICIAS.map((p,i)=>({p,i})).filter(o=>!sessOnly||S.per[o.p[0]]||SESS_ALL);
@@ -2443,9 +2462,9 @@ function rSess(){const e=ELM(S.elem);
  $("sessview").innerHTML=`<div class="panel"><h2>Modo Sessão <small>${esc(S.nome||"sem nome")} · nível ${S.nivel}${S.fardo?" · "+S.fardo:""}${e?" · "+e.g+" "+e.n:""}</small>
  <span style="margin-left:auto"><button class="btn" onclick="toggleSess()">◼ encerrar</button></span></h2>
  <div class="bigrec">${["vida","fol","sin","luc"].map(k=>{const nm={vida:"Vida",fol:"Fôlego",sin:"Sintonia",luc:"Lucidez"}[k],mx={vida:maxVida,fol:maxFol,sin:maxSin,luc:maxLuc}[k]();
-  return `<div class="rec"><div class="rn">${nm} <b>/ ${mx}</b></div><div class="rv">
+  return `<div class="rec"><div class="rn">${nm} <b>máx ${mx}</b></div><div class="rv">
   <button class="stp" onclick="stepRec('${k}',-1)">−</button>
-  <input type="number" id="scur_${k}" value="${curOf(k)}" onchange="setCur('${k}',this.value)">
+  <input type="number" id="scur_${k}" value="${curOf(k)}" onchange="setCur('${k}',this.value)"><span class="mx">/ ${maxIn("smax_"+k,k)}</span>
   <button class="stp" onclick="stepRec('${k}',1)">+</button></div><div class="bar"><i id="sbar_${k}"></i></div></div>`;}).join("")}
  </div>
  <div class="row" style="margin-top:12px;align-items:center">
