@@ -563,7 +563,126 @@ esc:[
  {n:"Vasculhar",cst:"—",ac:"Ação estendida",
   sab:"O que foi escondido com cuidado foi escondido de gente comum.",
   ef:"Percepção (7). Parcial: acha o óbvio escondido. Total: + um item ou pista guardada com cuidado. Crítico: + algo que o próprio dono esqueceu que tinha."}
-],mae:[]},
+],
+mae:[
+{n:"Detetive",s:"a mente que resolve",
+ regra:{n:"Dedução",ef:"Você acumula Deduções coletando e conectando informação — cada pista notada, contradição ou detalhe fora do lugar rende 1. Gasta Deduções para declarar conclusões que viram verdade, antecipar comportamentos e expor fraquezas. A Dedução persiste enquanto o caso estiver aberto; resolver ou abandonar o mistério a zera. Sem informação para coletar, você fica sem munição."},
+ medidor:{chave:"deducao",nome:"Dedução",min:0,tetos:[5,8,8,99],reset:"sessao"},
+ st:[
+  [
+   {n:"Raciocínio",cst:"—",ac:"Ação Livre · 1×/turno",
+    sab:"Você olha a mesma coisa que todos e vê o que ninguém viu.",
+    ef:"Observe uma cena, pessoa ou objeto e ganhe 1 Dedução; o mestre responde honestamente uma pergunta dedutiva ('o que está errado aqui?', 'o que ele esconde?', 'o que aconteceu antes?')."},
+   {n:"Elementar",cst:"gasta 1 Dedução",ac:"Ação Livre",
+    sab:"É óbvio, quando se sabe olhar.",
+    ef:"Declare uma conclusão plausível sobre o caso — o mestre confirma ou aponta a peça que falta. Contra um alvo estudado, use para prever o próximo passo dele (age depois de você saber) ou expor uma fraqueza (+2 na próxima ação contra ele)."}
+  ],
+  [
+   {n:"O Palácio Mental",cst:"—",ac:"Passiva",
+    sab:"Nada que você percebeu se perde. Está tudo guardado, catalogado, esperando.",
+    ef:"Teto de Dedução sobe para 8, e você retém tudo com perfeição — 1×/sessão, peça ao mestre que recite uma informação da campanha palavra por palavra. Pode gastar Deduções fora de combate para resolver um enigma na hora."},
+   {n:"A Única Explicação",cst:"gasta 3 Deduções",ac:"Ação · 1×/cena",
+    sab:"Eliminado o impossível, o que resta, por mais improvável, é a verdade.",
+    ef:"Force uma revelação sobre o mistério atual: o mestre deve te entregar uma verdade central e concreta (a identidade do culpado, a localização do escondido, o método, o elo que faltava)."}
+  ],
+  [
+   {n:"Sempre um Passo à Frente",cst:"gasta Deduções",ac:"Reação",
+    sab:"Você já tinha previsto isto. Na verdade, contava com isso.",
+    ef:"Revele que você antecipou o que acabou de acontecer: declare retroativamente uma preparação sua que se encaixa (já sabia da armadilha, já tinha o antídoto, já postou alguém ali). Quanto mais Deduções gasta, maior a preparação que você 'sempre teve'."},
+   {n:"Leitura Fria",cst:"—",ac:"Ação Livre",
+    sab:"Cinco segundos olhando e você sabe mais sobre a situação do que quem vive nela.",
+    ef:"Ao entrar em qualquer cena ou encontrar qualquer pessoa, o mestre te entrega de graça um punhado de deduções imediatas — quem manda, quem mente, a tensão oculta, onde está o perigo, o que está fora do lugar."}
+  ],
+  [
+   {n:"A Mente Absoluta",cst:"—",ac:"Passiva",
+    sab:"Você não resolve mais casos. Você vê a solução no instante em que vê o problema.",
+    ef:"Você gera Deduções continuamente, e suas conclusões deixam de precisar de confirmação — quando declara uma dedução plausível, ela é verdade, e a realidade do caso se conforma a ela (no que o mestre não estabeleceu explicitamente em contrário).",
+    req:{nv:12}},
+   {n:"Caso Encerrado",cst:"gasta 8 Deduções",ac:"Ação · 1×/campanha",
+    sab:"Você reúne todos numa sala. E revela a coisa inteira, do começo ao fim, sem uma peça fora do lugar.",
+    ef:"Resolva, de uma vez e por completo, um mistério de qualquer escala. O mestre entrega a verdade total e todas as implicações; você declara como usar essa verdade, e a revelação vira uma arma (expõe o vilão, desfaz seu plano, dá ao grupo o que precisa para vencer).",
+    req:{nv:12}}
+  ]
+ ]},
+{n:"Forense",s:"a cena fala",
+ regra:{n:"Vestígios",ef:"Você reconstrói o passado a partir do que ficou. Coleta Vestígios examinando cenas, corpos, objetos e locais — cada exame minucioso rende fragmentos do que se passou ali. Gasta Vestígios para montar reconstruções cada vez mais completas. Reviver eventos violentos ou anômalos custa Lucidez: você não lê o massacre, você o revive."},
+ medidor:{chave:"vestigios",nome:"Vestígios",min:0,tetos:[5,8,8,99],reset:"sessao"},
+ st:[
+  [
+   {n:"Exame",cst:"—",ac:"Ação",
+    sab:"Você toca o que ficou e ele começa a contar.",
+    ef:"Examine uma cena, corpo ou objeto e ganhe 1 Vestígio; o mestre entrega um fato concreto sobre o que aconteceu ali (como, com o quê, há quanto tempo, por quem). Identifica automaticamente causas de morte, tipos de dano, resíduos, o que foi movido."},
+   {n:"Reconstituição",cst:"gasta Vestígios (1–3)",ac:"Ação",
+    sab:"Você fecha os olhos e a cena se remonta, quadro a quadro.",
+    ef:"Reconstrua o evento passado de uma cena. 1: um quadro congelado. 2: a sequência (o quê, em que ordem). 3: a cena inteira em movimento. Reviver eventos violentos ou anômalos custa 1 Lucidez. Não vê o que não deixou rastro material."}
+  ],
+  [
+   {n:"O Corpo Não Mente",cst:"—",ac:"Passiva",
+    sab:"As pessoas mentem. A carne, os objetos e a poeira, nunca.",
+    ef:"Teto de Vestígios sobe para 8. Extrai de restos físicos verdades que testemunhas jamais dariam. Contra tentativas de forjar ou limpar uma cena, você percebe a fraude (a cena 'arrumada' grita mais alto que uma bagunçada)."},
+   {n:"Prova Irrefutável",cst:"gasta 3 Vestígios",ac:"Ação",
+    sab:"Você não afirma. Você demonstra, e não há como negar.",
+    ef:"Transforme sua reconstrução em fato inegável: o que você reconstruiu é aceito como verdade por qualquer um confrontado com a prova (PNJs cedem, aliados ganham certeza acionável, mentiras sobre o evento se desfazem)."}
+  ],
+  [
+   {n:"Autópsia do Impossível",cst:"gasta Vestígios (+ Lucidez)",ac:"Ação estendida",
+    sab:"O monstro também deixa restos. E restos você sabe interrogar.",
+    ef:"Aplique o método forense ao anômalo: de uma carcaça sobrenatural, do rastro de um ritual, dos destroços de uma manifestação, reconstrua o que era, o que fez, de onde veio e — o mais valioso — como foi ferido ou como pode ser. Cada reconstrução anômala custa Lucidez."},
+   {n:"A Cena Completa",cst:"gasta 5 Vestígios",ac:"Ação · 1×/cena",
+    sab:"Não um quadro. Não uma sequência. Tudo. Como se você tivesse estado lá o tempo todo.",
+    ef:"Reviva um evento passado de forma total e imersiva — você 'assiste' à cena inteira desenrolar em tempo real, de todos os ângulos, podendo pausar e focar detalhes. Nada relevante escapa."}
+  ],
+  [
+   {n:"Memória da Matéria",cst:"—",ac:"Passiva",
+    sab:"Tudo que existe se lembra do que tocou. Você aprendeu a linguagem.",
+    ef:"Você gera Vestígios continuamente e lê o passado de qualquer coisa física ao toque, instantaneamente, sem precisar de uma 'cena' preparada. O tempo deixa de apagar rastros: reconstrua eventos de séculos atrás tão bem quanto os de ontem.",
+    req:{nv:12}},
+   {n:"Reconstituição Absoluta",cst:"gasta 8 Vestígios (+ Lucidez pesada)",ac:"Ação estendida · 1×/campanha",
+    sab:"Você reúne cada resto, cada fragmento. E o que foi destruído volta a acontecer diante de você, inteiro.",
+    ef:"Reconstrua por completo um evento de qualquer escala, por mais antigo, oculto ou apagado que seja. A cena se remonta em totalidade absoluta, sem lacunas, sem possibilidade de mentira. Custa Lucidez pesada, mas entrega a verdade histórica inteira.",
+    req:{nv:12}}
+  ]
+ ]},
+{n:"Caçador do Oculto",s:"o que persegue o impossível",
+ regra:{n:"O Caso",ef:"Você monta dossiês sobre ameaças anômalas. Sobre uma criatura, culto ou entidade específica, acumula Conhecimento pesquisando, observando, entrevistando sobreviventes, examinando vítimas. Quanto mais Conhecimento sobre um alvo, mais consegue combatê-lo. O Conhecimento é específico e não se transfere para outra ameaça. Estudar o oculto de perto custa Lucidez."},
+ medidor:{chave:"conhecimento",nome:"Conhecimento",min:0,tetos:[5,8,8,99],reset:"sessao"},
+ st:[
+  [
+   {n:"Montar o Dossiê",cst:"—",ac:"Ação (pesquisa/observação)",
+    sab:"Você começa uma pasta. No fim, ela terá tudo que aquela coisa não queria que soubessem.",
+    ef:"Abra um dossiê sobre uma ameaça anômala e ganhe 1 Conhecimento ao pesquisá-la. Cada Conhecimento revela um fato utilizável: um comportamento, uma origem, uma pista de fraqueza. Estudo direto e próximo pode custar 1 Lucidez."},
+   {n:"Ponto Fraco",cst:"gasta 1 Conhecimento",ac:"Ação Livre",
+    sab:"Toda coisa que não deveria existir tem uma rachadura por onde a realidade a agarra.",
+    ef:"Revele e explore uma fraqueza de um alvo anômalo: por uma cena, você e seus aliados ignoram uma de suas defesas/imunidades, ou ganham +2 contra ele, ou sabem como neutralizar um de seus poderes."}
+  ],
+  [
+   {n:"Protocolo de Contenção",cst:"gasta Conhecimento",ac:"Ação",
+    sab:"Você sabe o que ele odeia, o que o prende, e o que o faz recuar. E trouxe tudo.",
+    ef:"Aplique uma contramedida específica que você preparou contra a ameaça estudada: uma barreira que ela não cruza, uma substância que a fere de verdade, um símbolo que a detém, uma condição que a expõe."},
+   {n:"Eu Já Vi Isso Antes",cst:"—",ac:"Passiva",
+    sab:"Nomes, sintomas, padrões. Você reconhece o horror pela silhueta.",
+    ef:"Teto de Conhecimento sobe para 8. Ao encontrar uma ameaça anômala, mesmo sobre algo que não estudou, o mestre te dá uma pista inicial se ela se parecer com algo dos seus arquivos. Você começa cada caça já com um palpite fundamentado."}
+  ],
+  [
+   {n:"Caçador Experiente",cst:"—",ac:"Passiva",
+    sab:"Você não teme mais o escuro. Você o catalogou.",
+    ef:"Montar dossiês fica muito mais rápido. Contra ameaças com dossiê, você é imune ao medo que elas causam, resiste melhor aos seus efeitos anômalos, e a Lucidez que elas custam a você cai."},
+   {n:"A Fraqueza Fatal",cst:"gasta 5 Conhecimento",ac:"Ação · 1×/cena",
+    sab:"Toda lenda diz como o monstro morre. Você descobriu qual lenda era verdade.",
+    ef:"Revele a fraqueza fatal de um alvo anômalo — a condição específica sob a qual ele é vulnerável de verdade. Enquanto ela for explorada, a criatura perde suas proteções sobrenaturais e pode ser derrotada como algo mortal."}
+  ],
+  [
+   {n:"Enciclopédia do Abismo",cst:"—",ac:"Passiva",
+    sab:"Não há mais monstro novo. Só variações de coisas que você já arquivou.",
+    ef:"Você gera Conhecimento continuamente e mantém dossiês ilimitados; contra quase qualquer ameaça anômala, já tem informação utilizável de imediato. Imune ao medo sobrenatural em geral, e reconhece natureza, origem e fraqueza provável de um horror quase instantaneamente.",
+    req:{nv:12}},
+   {n:"O Nome Verdadeiro",cst:"gasta 8 Conhecimento",ac:"Ação · 1×/campanha",
+    sab:"Você descobriu o que ele é de verdade. E dizer isso em voz alta é a arma mais afiada que existe.",
+    ef:"Exponha a natureza verdadeira e completa de uma ameaça anômala de grande escala — o que é, de onde veio, como existe, e o que pode desfazê-lo. Munido dessa verdade, aplique a única coisa capaz de derrotá-lo: banir, selar, destruir ou quebrar o impossível.",
+    req:{nv:12}}
+  ]
+ ]}
+]},
 
 "Médico":{f:"Você decide quem vira cadáver.",vida:2,comb:"sin",cv:2,tre:["Medicina","Ciências","Intuição"],profs:"ferramentas médicas, veículos comuns, acesso hospitalar",
 regra:{n:"Cura-Base",cst:"1 Sintonia",ac:"Ação · Toque",
@@ -603,11 +722,125 @@ esc:[
   sab:"Você sabe que não devia dar certo. Tenta assim mesmo.",
   ef:"Force uma reanimação onde não devia ser possível: Medicina (9). Total: funciona, com um custo definido pelo mestre. Falha: não funciona — e você sente o peso de ter tentado."}
 ],
-mae:[{n:"Cirurgião",s:"cura pesada e reparo",st:[
-[["Mãos Precisas","PASSIVA","Cura-Base sobe para 1d4 + Juízo. Em qualquer Crítico de cura sua, o alvo também remove uma condição leve."],["Estancar","REAÇÃO · 1×/CENA","Aliado adjacente sofre Sangrando ou cai a 1/4 da Vida: você age fora do turno — remove Sangrando e cura 1d2."]],
-[["Operação","AÇÃO · 2 SINTONIA","Cura 2d4 + Juízo e remove uma condição grave. Sob fogo exige Medicina (8): Parcial cura metade."],["Reparo Profundo","AÇÃO ESTENDIDA (HORAS)","Restaura a função de um membro ou sentido danificado (condições duradouras; Sequelas só no Ápice)."]],
-[["Cirurgia Estável","1×/CENA","Declare antes: essa cura não falha, não complica e cura o valor máximo sem rolar."],["De Volta da Beira","AÇÃO · 3 SINTONIA · 1×/SESSÃO","Morto há até 2 turnos: Medicina (9). Total: volta com 1d4 de Vida e uma Sequela — ninguém volta inteiro. Parcial: volta com 1, Sequela + Exausto pela sessão. Falha: foi-se. Não pode ser Forçada."]],
-[["Bisturi Milagroso","DOWNTIME","Remove Sequelas físicas permanentes (uma por downtime, Medicina 9)."],["Sutura Perfeita","PASSIVA","Toda cura sua de 8+ de Vida remove também uma condição à escolha do paciente."]]]}]},
+mae:[
+{n:"Cirurgião",s:"o reparo definitivo",
+ regra:{n:"Procedimento",ef:"O Cirurgião não joga Vida de volta no caos — ele opera. Cada cura sua acumula Procedimento sobre um paciente, somando enquanto você continua cuidando dele sem interrupção. Quanto mais Procedimento, mais fundo você conserta. Interromper (mudar de paciente, entrar em combate direto) esfria o Procedimento. Acumular exige ficar parado, focado, de mãos ocupadas — você não luta nem se protege bem enquanto opera."},
+ medidor:{chave:"procedimento",nome:"Procedimento",min:0,tetos:[5,5,5,8],reset:"cena"},
+ st:[
+  [
+   {n:"Mãos Precisas",cst:"—",ac:"Passiva",
+    sab:"Você não trata. Você resolve.",
+    ef:"Sua Cura-Base sobe para 1d4 + Juízo, e cada ação de cura contínua sobre o mesmo paciente rende 1 de Procedimento. Em qualquer Crítico de cura, o paciente remove também uma condição leve."},
+   {n:"Estancar",cst:"—",ac:"Reação · 1×/cena",
+    sab:"A hemorragia não espera o seu turno. Você também não.",
+    ef:"Quando um aliado à vista sofre Sangrando ou cai a 1/4 da Vida, aja fora do seu turno: remova Sangrando e cure 1d4."}
+  ],
+  [
+   {n:"Operação",cst:"2 Sintonia",ac:"Ação (escala com Procedimento)",
+    sab:"Você abre, corrige e fecha. O corpo agradece depois.",
+    ef:"Cura 2d4 + Juízo e remove uma condição. Escala: Proc. 2+ remove uma condição grave; Proc. 4+ cura o dobro e remove duas condições. Sob fogo, exige Medicina (8) e o Parcial cura metade."},
+   {n:"Reparo Profundo",cst:"gasta Procedimento (3+)",ac:"Ação estendida",
+    sab:"O que estava perdido volta a funcionar. Leva tempo, mas volta.",
+    ef:"Com Procedimento 3+ sobre o paciente, restaure a função de algo danificado — um membro inutilizado, um sentido perdido, uma condição física duradoura. Sequelas permanentes só cedem no Ápice, mas ferimentos 'definitivos' comuns você desfaz."}
+  ],
+  [
+   {n:"Cirurgia Estável",cst:"—",ac:"1×/cena (declare antes)",
+    sab:"Não há tremor na sua mão. Não há acaso na sua agulha.",
+    ef:"Declare antes de uma cura ou procedimento seu: ele não falha, não complica, e entrega o valor máximo sem rolar."},
+   {n:"De Volta da Beira",cst:"3 Sintonia · 1×/sessão",ac:"Ação",
+    sab:"A morte é uma condição. Recente o bastante, você a trata.",
+    ef:"Sobre alguém morto há até 2 turnos: Medicina (9). Total: volta com 1d4 de Vida e uma Sequela. Parcial: volta com 1, Sequela + Exausto pela sessão. Falha: foi-se de vez. Não pode ser forçada nem repetida no mesmo corpo."}
+  ],
+  [
+   {n:"Mão que Não Erra",cst:"—",ac:"Passiva",
+    sab:"Não existe mais dano que você não saiba desfazer. Só o tempo que ele exige.",
+    ef:"Teto de Procedimento sobe para 8, e você acumula Procedimento mais rápido (2 por ação de cuidado). Toda cura sua de 8+ remove uma condição à escolha; no downtime você remove Sequelas físicas permanentes (Medicina 9, uma por downtime).",
+    req:{nv:12}},
+   {n:"Ressurreição",cst:"gasta 8 de Procedimento + 4 Sintonia",ac:"Ação estendida · 1×/campanha",
+    sab:"Você teve tempo suficiente. E tempo suficiente, nas suas mãos, vence qualquer coisa — até isso.",
+    ef:"Com Procedimento 8 sobre um corpo (vivo ou morto há horas, mesmo destruído), traga alguém de volta inteiro, sem Sequela — ou repare, num único paciente, qualquer condição de qualquer escala, por pior e mais definitiva que seja.",
+    req:{nv:12}}
+  ]
+ ]},
+{n:"Praga",s:"a medicina virada arma",
+ regra:{n:"Doses",ef:"Você cultiva e carrega Doses — venenos, toxinas e patógenos preparados (estoque recarregado com preparo/downtime), aplicados por lâmina, contato, ingestão ou ar. O dano não é bruto — é o corpo do inimigo se voltando contra ele, no tempo dele. As Doses levam tempo para agir; um inimigo que percebe pode reagir, curar-se, ou te matar antes de a dose amadurecer."},
+ medidor:{chave:"doses",nome:"Doses",min:0,tetos:[4,4,8,99],reset:"sessao"},
+ st:[
+  [
+   {n:"Farmacologia Sombria",cst:"—",ac:"Passiva (+ preparo para reabastecer)",
+    sab:"O mesmo armário que cura tem uma prateleira de baixo.",
+    ef:"Você mantém um estoque de Doses preparadas (recarrega no downtime), identifica automaticamente venenos e doenças alheias, é imune aos seus próprios agentes, e sabe a dose exata de qualquer coisa — para curar ou para o contrário."},
+   {n:"Aplicar Dose",cst:"gasta 1 Dose",ac:"Ação (aplicar) · efeito com atraso",
+    sab:"Ele nem vai lembrar de quando começou a sentir.",
+    ef:"Aplique uma Dose (lâmina envenenada, contato, ingestão). Escolha o efeito: Febre (−1 cumulativo/turno), Torpor (Lento, depois Paralisia parcial), Hemorragia (Sangrando que agrava), ou Náusea (não pode agir ofensivamente sem testar). Começa fraco e piora a cada turno."}
+  ],
+  [
+   {n:"Contágio",cst:"gasta 1 Dose",ac:"Passiva (dispara ao aplicar)",
+    sab:"Uma dose. Muitos corpos.",
+    ef:"Uma Dose que você aplica passa a ser contagiosa — o primeiro que tocar, socorrer ou ficar adjacente ao alvo por um turno testa Resistência (8) ou também a recebe (versão mais fraca)."},
+   {n:"Coquetel",cst:"gasta 2 Doses",ac:"Ação",
+    sab:"Você não aplica um veneno. Aplica uma conversa entre vários.",
+    ef:"Combine duas Doses num só golpe: os efeitos se somam e interagem (Febre + Torpor = o corpo desliga; Hemorragia + Náusea = ele não consegue nem fugir)."}
+  ],
+  [
+   {n:"Mitridatismo",cst:"—",ac:"Passiva",
+    sab:"Você provou um pouco de tudo que pode matar. Nada mais te surpreende.",
+    ef:"Teto de Doses sobe muito, e você é imune a todo veneno, doença e toxina (mundanos e a maioria dos anômalos). Pode colher: de qualquer criatura envenenada, doente ou peçonhenta que examine, extraia uma Dose nova baseada na aflição dela — inclusive de horrores anômalos."},
+   {n:"Necrose",cst:"gasta 3 Doses",ac:"Ação",
+    sab:"Você aponta a parte dele que vai morrer primeiro. E ela obedece.",
+    ef:"Condene um sistema do corpo do alvo: um membro apodrece e fica inútil, os pulmões falham (não corre nem conjura com voz), a visão vai embora, ou a coordenação colapsa. Só um tratamento sério reverte."}
+  ],
+  [
+   {n:"Peste Encarnada",cst:"—",ac:"Passiva",
+    sab:"Você não carrega mais as doenças. Você é a fonte delas.",
+    ef:"Você gera Doses continuamente, suas aflições agem mais rápido (o atraso encolhe), e pode aplicá-las à distância (Curto) por um gesto, um sopro, um olhar. Sua presença prolongada num lugar começa a adoecer os inimigos ali.",
+    req:{nv:12}},
+   {n:"A Praga que Não Tem Cura",cst:"gasta todas as Doses (mínimo 6)",ac:"Ação · 1×/campanha",
+    sab:"Você libera aquilo para o qual não preparou antídoto.",
+    ef:"Queime todo o estoque para desencadear uma praga catastrófica sobre uma área enorme, um exército, uma organização, uma linhagem: todos os afetados adoecem de algo implacável e progressivo que a medicina comum não reverte.",
+    req:{nv:12}}
+  ]
+ ]},
+{n:"Paramédico",s:"o triador de campo de batalha",
+ regra:{n:"Triagem",ef:"Você gerencia a viabilidade do grupo inteiro em tempo real. No início de cada rodada de combate, faça a Triagem: recebe fichas de Atenção (= Juízo) para gastar naquela rodada em ações rápidas de socorro espalhadas pelo grupo. Cura pouco por vez, mas mantém muitos de pé. A Atenção some no fim da rodada — você nunca tem fichas para todos, e escolhe quem deixa sofrer."},
+ medidor:{chave:"atencao",nome:"Atenção",min:0,tetos:[4,4,6,99],reset:"cena"},
+ st:[
+  [
+   {n:"Protocolo de Triagem",cst:"—",ac:"Passiva (+ Ação Livre por ficha)",
+    sab:"Cada rodada, a mesma pergunta: quem primeiro?",
+    ef:"No início de cada rodada de combate, ganhe Atenção = Juízo. Gaste 1 Atenção (Ação Livre, alcance Curto ou instrução gritada) para: estabilizar quem caiu a 0, curar 1d2, ou remover uma condição leve. Atenção não usada some no fim da rodada."},
+   {n:"Olho Clínico",cst:"—",ac:"Passiva",
+    sab:"Você sabe quem vai cair antes de a pessoa saber.",
+    ef:"Você sempre vê a Vida, condições e estado real de todos os aliados à vista, e o mestre te avisa quando um deles está a um golpe de cair."}
+  ],
+  [
+   {n:"Intervenção",cst:"gasta 2 Atenção",ac:"Reação",
+    sab:"Você chega no segundo exato entre o golpe e o chão.",
+    ef:"Quando um aliado à vista sofreria dano que o derrubaria ou uma condição grave, intervenha à distância: reduza o dano à metade e anule a condição."},
+   {n:"Remanejar",cst:"gasta 2 Atenção",ac:"Ação Livre",
+    sab:"Um está inteiro e o outro está caindo. Você equilibra a conta.",
+    ef:"Redistribua ferimentos e fôlego entre aliados dispostos — mova Vida de quem tem sobra para quem precisa, transfira uma condição de quem não pode carregá-la para quem aguenta, ou passe Fôlego de um para outro."}
+  ],
+  [
+   {n:"Maestro do Caos",cst:"—",ac:"Passiva",
+    sab:"No meio do inferno, você é a única pessoa calma.",
+    ef:"Sua Atenção por rodada sobe (Juízo + 2), e gastar Atenção deixa de exigir linha de visão direta. 1×/cena, conceda a todos os aliados uma 'ordem de triagem': cada um ganha +1 e ignora a próxima condição."},
+   {n:"Ninguém Morre Hoje",cst:"gasta 4 Atenção",ac:"Reação · 1×/cena",
+    sab:"Não sob a sua vigília.",
+    ef:"Quando um ou mais aliados cairiam a 0 na mesma rodada, segure todos eles em 1 de Vida, conscientes e de pé, até o fim da rodada seguinte."}
+  ],
+  [
+   {n:"Coração do Grupo",cst:"—",ac:"Passiva",
+    sab:"Enquanto você respira, o grupo não quebra.",
+    ef:"O teto de Atenção deixa de limitar na prática (você gera o suficiente para responder a tudo), e enquanto estiver consciente, nenhum aliado à vista pode ser reduzido a 0 por um único golpe (o excesso vira 1 de Vida).",
+    req:{nv:12}},
+   {n:"Hora Dourada",cst:"gasta toda a Atenção da rodada",ac:"Ação · 1×/campanha",
+    sab:"Existe uma janela em que a morte ainda é reversível para todos. Você a segura aberta com as duas mãos.",
+    ef:"Declare uma Hora Dourada sobre o grupo: por uma cena inteira, nenhum aliado à vista pode morrer — quedas viram inconsciência estável, ferimentos mortais esperam, a morte fica em suspenso para todos ao seu redor enquanto você estiver de pé. Ao fim, você desaba, esvaziado.",
+    req:{nv:12}}
+  ]
+ ]}
+]},
 
 "Faz-Tudo":{f:"Tudo que liga, desliga. Tudo que tranca, abre.",vida:1,comb:"sin",cv:3,tre:["Tecnologia","Ciências","Engenharia"],profs:"ferramentas técnicas, veículos comuns, inglês técnico",
 base:[
@@ -641,7 +874,126 @@ esc:[
   sab:"Por um instante, nada eletrônico nesta sala funciona. Nada.",
   ef:"Um pulso apaga toda eletrônica na área por uma cena.",
   req:{nv:8}}
-],mae:[]},
+],
+mae:[
+{n:"Engenheiro",s:"fazer surgir o que não existe",
+ regra:{n:"Construções",ef:"Você mantém um estoque de Componentes e gasta Componentes para montar Construções — máquinas autônomas que agem por conta própria no campo, seguindo uma ordem simples, todo turno, até serem destruídas. Você mantém até [Juízo] Construções ativas ao mesmo tempo. Construções são frágeis: pouca Vida, podem ser destruídas, hackeadas ou desligadas."},
+ medidor:{chave:"componentes",nome:"Componentes",min:0,tetos:[6,6,12,99],reset:"sessao"},
+ st:[
+  [
+   {n:"Oficina de Campo",cst:"—",ac:"Passiva (+ preparo para reabastecer)",
+    sab:"Você carrega uma oficina inteira em peças soltas e na cabeça.",
+    ef:"Conserta qualquer Construção sua gastando 1 Componente, e improvisa Componentes de sucata quando o estoque acaba (com tempo). Reabastece no downtime."},
+   {n:"Montar Construção",cst:"1–3 Componentes conforme o porte",ac:"Ação",
+    sab:"Um minuto de trabalho e ela já está de pé, esperando ordens.",
+    ef:"Monte uma Construção que age na sua iniciativa seguindo uma ordem simples. Modelos base (1 Componente cada): Drone (voa/rola, observa e ataca à distância), Torre (fixa, atira em quem entra no alcance), Autômato (anda e bate corpo a corpo), Utilitário (carrega, ilumina, abre passagem)."}
+  ],
+  [
+   {n:"Enxame",cst:"gasta Componentes",ac:"Ação",
+    sab:"Por que um drone, quando cabem seis na mochila?",
+    ef:"Monte várias Construções pequenas de uma vez (um enxame de mini-drones, uma matilha de autômatos-aranha). Elas agem em conjunto como uma única unidade coordenada — mais frágeis individualmente, mas cobrem área, distraem e sobrecarregam alvos por número."},
+   {n:"Módulos",cst:"1 Componente",ac:"Ação Livre",
+    sab:"A mesma carcaça, funções diferentes. Você troca a alma da máquina no meio da luta.",
+    ef:"Adicione um módulo a uma Construção sua, mudando ou somando função na hora: arma pesada, blindagem extra, sensor (dá visão/alerta a você), autodestruição, campo de reparo, alto-falante."}
+  ],
+  [
+   {n:"Linha de Montagem",cst:"—",ac:"Passiva",
+    sab:"Você para de montar uma de cada vez. A oficina agora trabalha sozinha.",
+    ef:"Teto de Componentes sobe para 12, você mantém o dobro de Construções ativas, e montar uma Construção pequena passa a ser Ação Livre 1×/turno. Construções destruídas podem ser reconstruídas de graça no início do seu turno se houver Componentes e destroços por perto."},
+   {n:"Rede de Comando",cst:"—",ac:"Passiva",
+    sab:"Você não comanda cada uma. Você pensa, e todas obedecem.",
+    ef:"Todas as suas Construções agem com inteligência coordenada, sem você gastar ações para dirigi-las. Você vê pelos sensores de todas simultaneamente, e elas se protegem, flanqueiam e focam alvos como uma unidade tática única."}
+  ],
+  [
+   {n:"A Fábrica Andante",cst:"—",ac:"Passiva",
+    sab:"Você não é mais um engenheiro com máquinas. Você é o núcleo de um exército que se constrói sozinho.",
+    ef:"Componentes praticamente ilimitados. Monte Construções de porte grande e complexo — um autômato de guerra, um veículo autônomo blindado, um drone-mãe que fabrica outros drones. Suas Construções ganham Vida e potência muito maiores.",
+    req:{nv:12}},
+   {n:"Grande Obra",cst:"gasta todos os Componentes (mínimo 8)",ac:"Ação estendida · 1×/campanha",
+    sab:"Você constrói a única máquina que o problema não sobrevive.",
+    ef:"Queime todo o estoque e monte, numa cena de trabalho, uma Construção definitiva à altura do problema — poderosa o bastante para ser um personagem por si só — que age ao seu lado por toda a cena ou missão.",
+    req:{nv:12}}
+  ]
+ ]},
+{n:"Sabotador",s:"virar os sistemas contra o dono",
+ regra:{n:"Controle",ef:"Você invade e assume a infraestrutura de um lugar, acumulando Controle sobre uma instalação/sistema/rede conforme invade seus subsistemas. Quanto mais Controle, mais o lugar obedece a você em vez do dono. Sem sistemas para subverter (mato aberto, lugar 'burro'), você vira um Faz-Tudo comum."},
+ medidor:{chave:"controle",nome:"Controle",min:0,tetos:[5,5,8,12],reset:"sessao"},
+ st:[
+  [
+   {n:"Intrusão",cst:"—",ac:"Ação",
+    sab:"Toda porta trancada é um convite mal formulado.",
+    ef:"Invada um sistema à vista ou ao alcance (câmera, fechadura, terminal, máquina, rede) e ganhe 1 de Controle sobre a instalação a que ele pertence. O mestre diz o que aquele subsistema permite controlar."},
+   {n:"Comando",cst:"1 Controle",ac:"Ação Livre",
+    sab:"Você não força o sistema. Você só é o novo administrador dele.",
+    ef:"Comande um subsistema já invadido: trancar/destrancar portas, cegar câmeras, luzes, redirecionar energia, disparar/silenciar alarmes, mexer em máquinas."}
+  ],
+  [
+   {n:"Virar a Arma",cst:"2 Controle",ac:"Ação",
+    sab:"A defesa deles tinha um detalhe: agora é minha.",
+    ef:"Assuma uma defesa ou máquina hostil do local — torre automática, drone inimigo, sistema de segurança letal, armadilha — e vire-a contra os donos por [Juízo] turnos."},
+   {n:"Fantasma no Sistema",cst:"—",ac:"Passiva",
+    sab:"Eles sabem que há alguém lá dentro. Não sabem quem, nem onde, nem como tirar.",
+    ef:"Suas intrusões ficam ocultas; expulsá-lo exige um esforço ativo e bem-sucedido. Você mantém Controle sobre uma instalação mesmo à distância e depois de sair fisicamente dela."}
+  ],
+  [
+   {n:"Domínio",cst:"gasta Controle (5+)",ac:"Ação · 1×/cena",
+    sab:"A partir de agora, a casa é minha.",
+    ef:"Teto de Controle sobe para 8. Com Controle 5+ sobre uma instalação, assuma o domínio total: todos os sistemas obedecem sem gasto adicional, o lugar trabalha contra seus inimigos, e o dono original perde acesso ao próprio forte."},
+   {n:"Porta dos Fundos",cst:"—",ac:"Passiva",
+    sab:"Todo sistema por que você passou lembra de você com carinho.",
+    ef:"Você deixa portas dos fundos permanentes em sistemas já invadidos — pode reassumir Controle sobre qualquer instalação onde já esteve, instantaneamente e à distância, a qualquer momento da campanha."}
+  ],
+  [
+   {n:"Onipresença Digital",cst:"—",ac:"Passiva",
+    sab:"Não há mais 'sistema deles'. Há sistemas, e você está em todos.",
+    ef:"Invade sistemas quase instantaneamente e sem teste na maioria dos casos, mantém Controle sobre múltiplas instalações ao mesmo tempo, e sua intrusão alcança até tecnologia anômala.",
+    req:{nv:12}},
+   {n:"Colapso",cst:"gasta todo o Controle (mínimo 6)",ac:"Ação · 1×/campanha",
+    sab:"Você deu uma ordem. E tudo que eles construíram obedeceu, uma última vez, contra eles.",
+    ef:"Queime todo o Controle para orquestrar o colapso total da infraestrutura de um inimigo de grande escala: defesas se voltam para dentro, sistemas se autodestroem, comunicações mentem, cofres se abrem.",
+    req:{nv:12}}
+  ]
+ ]},
+{n:"Artilheiro",s:"força bruta aplicada",
+ regra:{n:"Cargas",ef:"Você monta e carrega Cargas — explosivos, sobrecargas, demolições — mantendo um estoque e posicionando-as com antecedência ou improvisando na hora. As Cargas atingem tudo na área, inclusive aliados mal posicionados, e fazem estrondo que denuncia sua posição."},
+ medidor:{chave:"cargas",nome:"Cargas",min:0,tetos:[5,5,10,99],reset:"sessao"},
+ st:[
+  [
+   {n:"Arsenal Explosivo",cst:"—",ac:"Passiva (+ preparo para reabastecer)",
+    sab:"Você olha uma parede e já sabe quantos gramas ela pede.",
+    ef:"Você nunca erra o cálculo básico de uma demolição sua, e improvisa explosivos de material comum com tempo. Reabastece no downtime."},
+   {n:"Detonação Controlada",cst:"1 Carga",ac:"Ação",
+    sab:"Precisão é só potência com boas maneiras.",
+    ef:"Posicione e detone uma Carga com controle: abra uma parede/porta/obstáculo com precisão (sem soterrar quem você não quer), ou cause dano numa área pequena com efeito à escolha (empurrão, Caído, Atordoado pelo estrondo)."}
+  ],
+  [
+   {n:"Sobrecarga",cst:"1 Carga",ac:"Ação",
+    sab:"Toda máquina tem um limite. Você o apresenta a ela, violentamente.",
+    ef:"Force qualquer coisa energizada ou mecânica a explodir — painel, motor, gerador, veículo, arma inimiga, dispositivo — causando dano em área ao redor do alvo."},
+   {n:"Campo Minado",cst:"gasta Cargas",ac:"Ação (preparo)",
+    sab:"Você decide, de antemão, quais pedaços do chão são fatais.",
+    ef:"Posicione Cargas ocultas numa área; detonam quando você quiser (remotamente) ou quando um inimigo pisar/cruzar. Detectá-las: Percepção (9)."}
+  ],
+  [
+   {n:"Demolição",cst:"gasta 3 Cargas",ac:"Ação · 1×/cena",
+    sab:"Estruturas são só sugestões de permanência.",
+    ef:"Teto de Cargas sobe para 10. Derrube uma estrutura inteira de forma controlada — parte de um prédio, ponte, teto, torre — sobre os inimigos ou para bloquear/abrir passagem."},
+   {n:"Mestre Artificeiro",cst:"—",ac:"Passiva",
+    sab:"Você tem, de fato, sempre a carga certa. Sempre.",
+    ef:"Nunca fica sem Cargas no momento crítico, e suas detonações passam a ser cirúrgicas o bastante para poupar aliados mesmo em área."}
+  ],
+  [
+   {n:"Força da Natureza",cst:"—",ac:"Passiva",
+    sab:"Não é mais engenharia. É meteorologia.",
+    ef:"Cargas praticamente ilimitadas. Explosões atingem escala devastadora — destruição comparável a artilharia pesada, derruba estruturas grandes num gesto — e você adiciona ou remove terreno, cobertura e obstáculos à vontade.",
+    req:{nv:12}},
+   {n:"Terra Arrasada",cst:"gasta todas as Cargas (mínimo 8)",ac:"Ação · 1×/campanha",
+    sab:"Você aperta o botão. E onde havia um problema, passa a haver uma cratera.",
+    ef:"Queime todo o arsenal para uma detonação de escala apocalíptica sobre uma área enorme: estruturas colapsam, o terreno é reformulado, e a oposição na área é destruída ou soterrada.",
+    req:{nv:12}}
+  ]
+ ]}
+]},
 
 "Atirador":{f:"Você termina frases.",vida:2,comb:"fol",cv:2,tre:["Pontaria","Percepção","Furtividade"],profs:"armas de fogo leves, armas Restritas, manutenção de armas",
 regra:{n:"Posição Exposta",ac:"Regra de Fardo",
