@@ -1337,15 +1337,125 @@ esc:[
   sab:"O papel some. A foto some. Você faz a memória do sistema falhar.",
   ef:"Apaga ou corrompe um registro específico sobre alguém: papel, foto, ficha, fita."}
 ],
-mae:[{n:"Fantasma",s:"infiltração total",st:[
-[["Cobertura","PASSIVA","Mantém disfarces por dias ou semanas sem testes diários; só rola em risco real. +1 Enganação social."],["Camaleão","PASSIVA","Minutos observando um grupo: adota maneirismo, gíria, postura. +1 para pertencer; as pessoas assumem que você “é dali”."]],
-[["Dupla Face","PASSIVA","Infiltrado numa organização: extrai 1 segredo por sessão de infiltração sem teste. Desconfiar de você exige um incidente — não um palpite."],["Voz e Trejeito","AÇÃO (UMA CENA DE ESTUDO)","Imita voz e maneirismos de alguém: por telefone/rádio engana até íntimos (testam contra 9); ao vivo, só à meia-luz."]],
-[["Agente Duplo","1×/ARCO","Revela que esteve infiltrado o tempo todo: retroativamente, você plantou, copiou ou sabotou algo durante a infiltração."],["Sou Quem Eu Quiser","1×/ARCO · PREPARO (CENA)","Assume a identidade de uma pessoa específica por uma cena: rosto, voz, assinatura. Íntimos testam Intuição (9)."]],
-[["Homem de Mil Faces","AÇÃO","Troca de “personagem” no meio da cena: casaco vira outro, postura muda, você É outro. Reconectar você ao de antes exige Percepção (10)."],["Ninguém Real","PASSIVA","Não existe prova estável de quem você é: fotos saem “não parecidas”, registros se contradizem, biometria falha. Até o sobrenatural tem Desvantagem para ler sua identidade."]]]},
-{n:"Assassino",s:"abate cirúrgico",st:[
-[["Golpe Furtivo","PASSIVA","+2 de dano contra alvos desprevenidos ou incapazes de reagir."],["Passo de Gato","PASSIVA","Furtividade sem reduzir deslocamento; vigilância casual não rola contra você — só atenção ativa."]],
-[["Lâmina Envenenada","AÇÃO (APLICAR; 2 DOSES POR PREPARO)","No acerto, o alvo testa Resistência (8) ou recebe à sua escolha: Sangrando, Lento ou −1 cumulativo."],["Eliminação Aprimorada","PASSIVA","Sua Eliminação Silenciosa funciona contra alvos alertas (Limiar +2). Contra desprevenidos, o Parcial dela conta como Total."]],
-[],[]]}]},
+mae:[
+{n:"Fantasma",s:"a identidade como recurso",
+ regra:{n:"Fachadas",ef:"Você não improvisa quem é; você tem um guarda-roupa de pessoas. Mantém um conjunto de Fachadas — identidades construídas, cada uma com um nível de Solidez (1 a 5). Solidez sobe com preparação e cai quando é testada e quase pega. Vestir uma Fachada é Ação Livre; enquanto a veste, você é aquela pessoa para todos os efeitos sociais. Queimar uma Fachada de Solidez 3+ testa contra perder 1 de Lucidez — viver como tanta gente diferente corrói a noção de quem você era."},
+ medidor:{chave:"fachadas",nome:"Fachadas",min:0,tetos:[3,4,5,99],reset:"permanente"},
+ st:[
+  [
+   {n:"Guarda-Roupa",cst:"—",ac:"Passiva (+ Downtime para construir)",
+    sab:"Cada pessoa que você inventa é real o bastante para outra pessoa acreditar.",
+    ef:"Construa Fachadas no downtime — cada uma com nome, história, documentos e Solidez inicial 2 (ou 3 com preparo caprichado). Vesti-las é Ação Livre. Numa Fachada, você não rola Enganação a menos que alguém tenha motivo concreto para duvidar."},
+   {n:"Ler a Sala",cst:"—",ac:"Ação Livre · 1×/cena",
+    sab:"Antes de decidir quem ser, você descobre quem eles precisam que você seja.",
+    ef:"Ao observar um grupo ou pessoa, o mestre diz que tipo de pessoa aquele ambiente confia por instinto. Se você tiver uma Fachada que encaixe, ela ganha +1 de Solidez temporária naquela cena."}
+  ],
+  [
+   {n:"Vestir Mais Fundo",cst:"—",ac:"Ação (uma cena de imersão)",
+    sab:"Você não finge o sotaque. Você passa a sonhar nele.",
+    ef:"Eleve a Solidez de uma Fachada em +1 (até 5). Numa Fachada de Solidez 4+, até íntimos do impersonado testam contra 9 para notar algo errado, e você extrai um segredo por cena de uma organização infiltrada sem suspeita."},
+   {n:"Troca Rápida",cst:"—",ac:"Ação",
+    sab:"Um casaco vira outro. A postura muda. Quem estava aqui já não está.",
+    ef:"Troque de Fachada no meio de uma cena, na frente das pessoas, sem que percebam a transição. Reconectar essas figuras entre si exige Percepção (10) de quem tentar."}
+  ],
+  [
+   {n:"Agente Duplo",cst:"—",ac:"1×/arco",
+    sab:"Você não se infiltrou agora. Você já estava dentro. Sempre esteve.",
+    ef:"Revele retroativamente que uma de suas Fachadas esteve infiltrada num lugar/grupo o tempo todo — e que você já plantou, copiou ou sabotou algo relevante durante esse período (dentro do plausível, definido com o mestre)."},
+   {n:"Sou Quem Eu Quiser",cst:"—",ac:"Ação (preparo: uma cena)",
+    sab:"Não uma pessoa como você. A pessoa. Exata.",
+    ef:"Assuma a identidade de um indivíduo específico e real por uma cena — rosto, voz, assinatura, trejeitos (Fachada temporária de Solidez 5). Apenas os mais íntimos testam Intuição (9), uma vez, para sentir que 'há algo estranho hoje'."}
+  ],
+  [
+   {n:"Ninguém Real",cst:"—",ac:"Passiva",
+    sab:"Pergunte a dez pessoas quem você é. Terá dez respostas. Nenhuma verdadeira.",
+    ef:"Não existe mais prova estável da sua identidade real: fotos saem 'não parecidas', registros se contradizem, biometria falha. Até meios sobrenaturais têm Desvantagem. Fachadas ilimitadas, e queimar uma não custa mais Lucidez — você já aceitou que não há um 'você' original a proteger.",
+    req:{nv:12}},
+   {n:"O Homem de Mil Faces",cst:"—",ac:"Ação · 1×/campanha",
+    sab:"Por um dia, você pode ser todos ao mesmo tempo.",
+    ef:"Orquestre uma operação em que você é várias pessoas simultaneamente aos olhos do mundo — em salas diferentes, para grupos diferentes, no mesmo período, cada Fachada com álibi e ações próprias. O mestre trata como se houvesse múltiplos de você operando em paralelo por uma cena estendida ou um dia inteiro.",
+    req:{nv:12}}
+  ]
+ ]},
+{n:"Lâmina",s:"o abate cirúrgico",
+ regra:{n:"Preparação",ef:"O assassino não vence na hora. Vence antes. Você acumula fichas de Preparação montando o abate antes do golpe: estudar o alvo, isolá-lo, aplicar veneno, posicionar-se. Cada ação de setup rende 1 Preparação sobre um alvo específico. O golpe gasta a Preparação toda de uma vez. A Preparação é frágil: só existe enquanto o alvo não sabe que é alvo — se ele te detecta, é alertado, ou vira combate aberto antes do golpe, toda a Preparação sobre ele evapora."},
+ medidor:{chave:"preparacao",nome:"Preparação",min:0,tetos:[5,5,5,8],reset:"cena"},
+ st:[
+  [
+   {n:"Estudar a Presa",cst:"—",ac:"Ação (setup)",
+    sab:"Rotina, ponto cego, o momento em que ele baixa a guarda. Você anota tudo.",
+    ef:"Observe um alvo e ganhe 1 Preparação sobre ele; o mestre revela uma vulnerabilidade explorável. Ações furtivas contra esse alvo (envenenar, sabotar, aproximar-se) rendem Preparação adicional."},
+   {n:"Golpe Furtivo",cst:"—",ac:"Passiva",
+    sab:"Contra quem não te espera, você não erra o lugar.",
+    ef:"+2 de dano contra alvos desprevenidos ou incapazes de reagir, e cada ponto de Preparação sobre o alvo adiciona +1 de dano contra ele. Furtividade não reduz seu deslocamento; vigilância casual não rola contra você, só atenção ativa."}
+  ],
+  [
+   {n:"Toxinas",cst:"—",ac:"Ação (aplicar; 3 doses por preparo)",
+    sab:"A morte já está no corpo dele. Só falta você dizer quando.",
+    ef:"Aplique um veneno preparado. No acerto ou ingestão, o alvo testa Resistência (8) ou sofre, à escolha: Sangrando persistente, Lento, Paralisia parcial, ou −1 cumulativo por turno. Aplicar veneno rende +1 Preparação. Venenos podem ser montados para agir depois."},
+   {n:"Eliminação Cirúrgica",cst:"gasta Preparação",ac:"Ação",
+    sab:"Todo o trabalho, num só movimento.",
+    ef:"Desfira o golpe gastando a Preparação. 1–2: dano massivo, ignora Absorção. 3–4: o acima + Resistência (Limiar = Preparação) ou incapacita. 5: abate automático contra comuns e a maioria dos nomeados; contra chefes, dano catastrófico + Atordoado + Sangrando."}
+  ],
+  [
+   {n:"Janela",cst:"—",ac:"Passiva",
+    sab:"Existe um segundo em que ele está sozinho, distraído e ao seu alcance. Você sempre o encontra.",
+    ef:"1×/cena, o mestre é obrigado a te apontar uma 'janela' — um momento em que um alvo fica isolado e vulnerável. Se você agir nela, o golpe conta com +2 de Preparação de graça."},
+   {n:"Sem Rastro",cst:"—",ac:"Reação (após um abate)",
+    sab:"O corpo, o som, a testemunha, a pista. Tudo resolvido antes de alguém pensar em procurar.",
+    ef:"Ao concluir um abate, apague-o: sem ruído, sem rastro imediato, e você já não está mais ali. A descoberta acontece muito depois, e a investigação começa fria. Contra o sobrenatural que 'sente' mortes, você abafa até isso por uma cena."}
+  ],
+  [
+   {n:"Morte Anunciada",cst:"—",ac:"Passiva",
+    sab:"A partir do momento em que você decide que alguém vai morrer, é só questão de quando.",
+    ef:"Teto de Preparação sobe para 8, e você mantém Preparação sobre vários alvos ao mesmo tempo. A Preparação não evapora mais só porque ele te detectou uma vez — agora só some se ele escapar completamente do seu alcance por uma cena inteira.",
+    req:{nv:12}},
+   {n:"Sentença",cst:"gasta 8 de Preparação",ac:"Ação · 1×/campanha",
+    sab:"Você pronuncia o nome. E o mundo executa a sentença que você preparou a vida inteira.",
+    ef:"Contra um único alvo sobre o qual montou Preparação 8, execute o abate definitivo: não há teste, defesa, ou escape, não importa o poder ou proteção do alvo — se você o alcança, ele morre, agora, do jeito que você planejou.",
+    req:{nv:12}}
+  ]
+ ]},
+{n:"Titereiro",s:"a manipulação de pessoas",
+ regra:{n:"Ganchos",ef:"Você não move as pessoas. Você planta as razões para elas se moverem sozinhas. Cada Gancho é uma alavanca instalada numa pessoa ou organização: um favor devido, um medo semeado, uma crença falsa, um segredo, um agente seu. Plantar leva tempo e interação; depois você puxa o Gancho para fazê-los agir como quer, sem aparecer. Puxar forte demais faz a pessoa perceber que foi usada, virando um inimigo que sabe do seu jogo."},
+ medidor:{chave:"ganchos",nome:"Ganchos",min:0,tetos:[5,5,10,99],reset:"permanente"},
+ st:[
+  [
+   {n:"Plantar Gancho",cst:"—",ac:"Ação (interação social / downtime)",
+    sab:"Uma frase na hora certa. Um favor pequeno. Uma mentira que ninguém checa. Sementes.",
+    ef:"Instale um Gancho numa pessoa ou grupo com quem interagiu — favor devido, medo plantado, crença falsa, ou segredo em mãos. O mestre diz que tipo de ação aquele Gancho consegue motivar. Ficam guardados até você puxá-los."},
+   {n:"Boa Impressão",cst:"—",ac:"Passiva",
+    sab:"Ninguém desconfia de quem parece inofensivo, útil e por perto.",
+    ef:"As pessoas subestimam suas intenções por padrão. +1 para plantar Ganchos sem levantar suspeita, e ninguém associa eventos convenientes a você sem prova concreta."}
+  ],
+  [
+   {n:"Puxar o Gancho",cst:"gasta 1 Gancho",ac:"Ação Livre (mesmo à distância / fora de cena)",
+    sab:"Você não pede. Você aciona o que já estava lá.",
+    ef:"Ative um Gancho: a pessoa/grupo age como o Gancho permite — te avisa, abre uma porta, atrasa um inimigo, entrega informação, cria distração, obedece uma ordem plausível. Acontece mesmo que você não esteja presente. Um Gancho pequeno pode não se gastar."},
+   {n:"Boato",cst:"—",ac:"Ação (uma cena para se espalhar)",
+    sab:"Você diz uma coisa para uma pessoa. Em dois dias, uma cidade acredita.",
+    ef:"Solte uma informação (verdadeira ou falsa) na rede certa e ela se propaga sozinha, ganhando credibilidade. Pode virar um Gancho coletivo sobre um grupo inteiro. Rastrear a origem até você exige esforço investigativo sério."}
+  ],
+  [
+   {n:"Rede",cst:"—",ac:"Passiva",
+    sab:"Você não tem contatos. Você tem um organismo, e cada célula deve algo a você.",
+    ef:"Teto de Ganchos sobe muito, e Ganchos podem ser plantados através de outros Ganchos — um agente seu planta por você, à distância, em pessoas que você nunca conheceu. 1×/sessão, declare que 'alguém que te deve' está exatamente onde você precisa."},
+   {n:"Guerra Psicológica",cst:"gasta 2 Ganchos",ac:"Ação (campanha de pressão)",
+    sab:"Você não ataca a pessoa. Ataca a confiança dela em tudo ao redor.",
+    ef:"Contra um alvo importante, desestabilize-o por dentro: aliados dele duvidam, decisões saem erradas por informação envenenada, a paranoia se instala. O alvo sofre penalidades crescentes em seus planos e pode ser levado a erros graves — sem saber que foi você."}
+  ],
+  [
+   {n:"Eminência Parda",cst:"—",ac:"Passiva",
+    sab:"Reis acham que reinam. Você os deixa pensar assim.",
+    ef:"Seus Ganchos alcançam qualquer nível de poder. Puxar Ganchos raramente os gasta agora (sua influência é estrutural), e você pode ter Ganchos plantados em alguém através de camadas de intermediários, tornando quase impossível traçar a manipulação de volta.",
+    req:{nv:12}},
+   {n:"O Mundo é Meu Títere",cst:"gasta todos os Ganchos (mínimo 5)",ac:"Ação · 1×/campanha",
+    sab:"Um gesto. E tudo que você plantou, por anos, acontece de uma vez, na ordem exata.",
+    ef:"Queime toda a teia (5+) para orquestrar um acontecimento de escala histórica — uma revolução, a queda de uma organização, a coroação ou destruição de uma figura. Cada pessoa que te devia, cada boato, cada crença dispara na sequência perfeita, e o mundo muda de forma. Ninguém sabe que foi você.",
+    req:{nv:12}}
+  ]
+ ]}
+]},
 
 "Sintonizador":{f:"Todo mundo paga para saber. Você é o que sobra depois do pagamento.",vida:1,comb:"sin",cv:3,tre:["Ocultismo","Intuição","Fé"],profs:"idioma morto, etiqueta de cultos, ferramentas rituais",
 regra:{n:"Maestria Imposta",
