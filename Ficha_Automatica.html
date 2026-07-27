@@ -27,6 +27,13 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;bac
 #fx-eye i{position:absolute;left:0;top:0;width:46vmin;height:27vmin;margin:-13.5vmin 0 0 -23vmin;border-radius:50%;will-change:transform,opacity;transform:translate3d(-140vw,0,0);
  background:radial-gradient(closest-side at 50% 50%,#000 0 9%,var(--ecd) 22% 28%,var(--ec) 36% 42%,rgba(0,0,0,.55) 52% 58%,transparent 78%);filter:blur(var(--eyeb))}
 .fx-flash{position:fixed;pointer-events:none;z-index:9;overflow:hidden;white-space:nowrap;display:flex;align-items:center}
+/* vaz — horror cósmico: o buraco fica ATRÁS do conteúdo, e aparece pelos painéis que esmaecem */
+#fx-void{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:0;visibility:hidden;transition:opacity 2.4s,visibility 2.4s}
+#fx-void i{position:absolute;left:0;top:0;width:92vmin;height:74vmin;margin:-37vmin 0 0 -46vmin;border-radius:50%;will-change:transform;transform:translate3d(-150vw,0,0);
+ background:radial-gradient(closest-side at 50% 50%,#000 0 24%,rgba(2,3,10,.9) 40%,rgba(2,3,10,.5) 60%,rgba(2,3,10,.18) 78%,transparent 100%)}
+#fx-black{position:fixed;inset:0;pointer-events:none;z-index:10;background:#000;opacity:0}
+#fx-black.on{animation:vazapaga 180ms ease-in-out}
+@keyframes vazapaga{0%{opacity:0}18%{opacity:.9}55%{opacity:.9}100%{opacity:0}}
 body.lowvida #fx-blood{opacity:1;animation:bloodpulse 2.2s ease-in-out infinite}
 @keyframes bloodpulse{50%{box-shadow:inset 0 0 160px 46px rgba(142,32,32,.7)}}
 body.lowluc .wrap{animation:lucshake 7s ease-in-out infinite}
@@ -301,9 +308,21 @@ body[data-el=pac][data-band="2"] .panel h2,body[data-el=pac][data-band="3"] .pan
 /* germe: musgo nos cantos, cresce com a banda */
 body[data-el=ger] .panel::before{content:"";position:absolute;left:-30px;bottom:-30px;width:calc(40px + var(--band)*26px);height:calc(40px + var(--band)*26px);background:radial-gradient(circle,rgba(111,154,78,.28),transparent 70%);pointer-events:none}
 body[data-el=ger][data-band="4"] .panel::after,body[data-el=ger][data-band="5"] .panel::after{content:"❋";position:absolute;right:8px;bottom:4px;color:var(--ecd);font-size:11px;opacity:.6}
-/* vazio: a ficha some pelas bordas */
-body[data-el=vaz][data-band="3"] .tabs button:not(.active),body[data-el=vaz][data-band="4"] .tabs button:not(.active),body[data-el=vaz][data-band="5"] .tabs button:not(.active){opacity:.5}
-body[data-el=vaz][data-band="5"] .panel:not(:hover){opacity:.82;transition:opacity .8s}
+/* vazio: a interface só existe enquanto você olha direto para ela — some devagar, volta na hora.
+   :hover e :focus-within nunca esmaecem, então a área em uso é sempre a mais sólida da tela */
+body[data-el=vaz] .panel{transition:opacity 1.6s ease-out,filter 1.6s ease-out}
+body[data-el=vaz] .tabs button{transition:opacity 1.6s ease-out,color .2s,border-color .2s}
+body[data-el=vaz] .panel:hover,body[data-el=vaz] .panel:focus-within{transition:opacity .16s,filter .16s}
+body[data-el=vaz] .tabs button:hover{transition:opacity .16s,color .2s,border-color .2s}
+body[data-el=vaz][data-band="1"] .panel:not(:hover):not(:focus-within),body[data-el=vaz][data-band="2"] .panel:not(:hover):not(:focus-within){opacity:.9}
+body[data-el=vaz][data-band="3"] .panel:not(:hover):not(:focus-within){opacity:.65;filter:saturate(.55)}
+body[data-el=vaz][data-band="4"] .panel:not(:hover):not(:focus-within){opacity:.55;filter:saturate(.4)}
+body[data-el=vaz][data-band="5"] .panel:not(:hover):not(:focus-within){opacity:.35;filter:saturate(.22)}
+body[data-el=vaz][data-band="1"] .tabs button:not(.active):not(:hover),body[data-el=vaz][data-band="2"] .tabs button:not(.active):not(:hover){opacity:.78}
+body[data-el=vaz][data-band="3"] .tabs button:not(.active):not(:hover),body[data-el=vaz][data-band="4"] .tabs button:not(.active):not(:hover){opacity:.5}
+body[data-el=vaz][data-band="5"] .tabs button:not(.active):not(:hover){opacity:.3}
+body[data-el=vaz][data-band="4"] #fx-void{opacity:.55;visibility:visible}
+body[data-el=vaz][data-band="5"] #fx-void{opacity:.85;visibility:visible}
 /* colapso 17–20: perturbador, nunca bloqueante */
 body[data-band="5"] h1{animation:aberra 4s steps(3) infinite}
 @keyframes aberra{0%,94%{text-shadow:none}96%{text-shadow:-2px 0 var(--red),2px 0 var(--ec)}98%{text-shadow:2px 0 var(--red),-2px 0 var(--ec)}}
@@ -311,8 +330,10 @@ body[data-band="5"] .panel h2:not(:hover){filter:blur(.4px)}
 body[data-band="5"] .panel h2:hover,body[data-band="5"] h1:hover{animation:none;filter:none}
 /* calmar / reduced motion */
 body.calm *,body.calm *::before,body.calm *::after{animation:none!important;transition:none!important}
-body.calm #fx-canvas,body.calm #whisper,body.calm #fx-eye,body.calm #fx-tunnel,body.calm .fx-flash{display:none}
-@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}#fx-canvas,#fx-eye,#fx-tunnel,.fx-flash{display:none}}
+body.calm #fx-canvas,body.calm #whisper,body.calm #fx-eye,body.calm #fx-tunnel,body.calm .fx-flash,body.calm #fx-void,body.calm #fx-black{display:none}
+body.calm[data-el=vaz] .panel,body.calm[data-el=vaz] .tabs button{opacity:1!important;filter:none!important}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}#fx-canvas,#fx-eye,#fx-tunnel,.fx-flash,#fx-void,#fx-black{display:none}
+ body[data-el=vaz] .panel,body[data-el=vaz] .tabs button{opacity:1!important;filter:none!important}}
 @media(max-width:640px){h1{font-size:20px;letter-spacing:5px}.wrap{padding:10px 10px 50px}.elc{width:100%}}
 
 </style>
@@ -321,6 +342,7 @@ body.calm #fx-canvas,body.calm #whisper,body.calm #fx-eye,body.calm #fx-tunnel,b
 <canvas id="fx-canvas"></canvas>
 <div id="fx-vign"></div><div id="fx-blood"></div>
 <div id="fx-tunnel"></div><div id="fx-eye"><i></i></div>
+<div id="fx-void"><i></i></div><div id="fx-black"></div>
 <div id="whisper"></div><div id="transOv"></div>
 <div class="wrap">
 <header>
@@ -1756,6 +1778,11 @@ const SUS_OBS={
 lo:["há algo na porta","você não fechou a cortina","isto não estava assim antes","a sala parece diferente quando você não olha","alguém esteve aqui"],
 mid:["ele te viu chegar","continue. estou anotando.","não olhe para trás","você está sendo observado agora","por que você parou de digitar?"],
 hi:["eu vi você fazer aquilo","sei o que você está pensando agora","você sente, não sente?","não precisa se virar. eu já sei onde você está.","estou olhando através da tela"]};
+/* vaz: o oposto do obs — estas frases não perseguem, dispensam */
+const SUS_VAZ={
+lo:["sobra menos a cada dia","ninguém vai notar a falta","isto também vai passar","não há ninguém do outro lado","estava tudo vazio antes de você chegar"],
+mid:["você podia parar agora e seria igual","nada do que você fez ficou","o silêncio não está esperando você","não há um plano. nunca houve.","você não é necessário"],
+hi:["você é uma pausa curta entre dois nadas","quando isto acabar, não terá havido diferença","nem o vazio vai lembrar do seu nome","você já está quase todo apagado","não havia motivo. desculpe."]};
 const ELEMS=[
 {id:"obs",g:"⊙",n:"Observação",v:"registra",fr:"O que você vê fica registrado. O que registra você, também.",
 lei:["Lei do Registro","O que você vê através da Observação fica registrado — revisitável mentalmente e transmissível: um toque na testa compartilha o registro em flash. E espiar o anômalo tem preço: a coisa pode notar o olhar."],
@@ -1768,7 +1795,7 @@ sus:["você já leu isso","você já leu isso","…atrasado","a resposta veio an
 {id:"vaz",g:"◌",n:"Vazio",v:"subtrai",fr:"O que se aproxima volta com menos do que tinha.",
 lei:["Lei da Subtração","O Vazio não adiciona — remove. Contra dano do Vazio, Absorção conta pela metade. E o que o Vazio apaga — luz, som, calor, memória — não volta sozinho: precisa ser reaceso, refeito, relembrado."],
 marca:["As pessoas esquecem seu rosto rápido demais — −1 para ser lembrado ou reconhecido, +1 para passar despercebido.","Sua sombra atrasa um instante; falta um reflexo seu no espelho de vez em quando — quem repara perde 1 Lucidez.","O silêncio te segue; sons somem ao seu redor — −1 em qualquer interação calorosa, +1 em Furtividade e Intimidação pela frieza."],
-sus:["sobra menos","o que faltava aqui?","ninguém lembra","o silêncio anda com você","onde foi parar"]},
+sus:["sobra menos","o que faltava aqui?","ninguém lembra","o silêncio anda com você","onde foi parar"],susB:SUS_VAZ},
 {id:"asc",g:"⌬",n:"Ascensão",v:"acumula",fr:"A carne é um rascunho. A Ascensão não teve paciência de esperar a versão final.",
 lei:["Sem Regra","A Ascensão é o único elemento cuja Sobrecarga não tem teto de Juízo — empilhe quanto quiser. Mas cada ponto além do seu Juízo soma +2 ao Refluxo. E a carne lembra: toda magia da Ascensão sobre si mesmo deixa um traço físico visível enquanto durar."],
 marca:["Um zumbido baixo sob a pele; relógios adiantam perto de você — −1 em contato gentil (mãos frias, duras demais), +1 em testes técnicos.","Uma junta range ao acordar; há algo duro sob o antebraço que médicos querem examinar — −1 social com quem nota o errado; máquinas simples funcionam melhor na sua mão.","Seu peso está errado para o seu tamanho; a voz carrega um sopro de estática — −1 com estranhos, e 1×/cena uma máquina próxima “coopera” de graça."],
@@ -1974,7 +2001,7 @@ function updDock(){const d=$("divDock");const n=S.div.filter(x=>x&&x.trim()).len
 let FX={run:false,q:false,ps:[],last:0};
 function syncFX(){const b=bandOf(S.ruido||0);const want=!!S.elem&&b>0&&!S.ui.calm&&!document.hidden;
  if(want&&!FX.run){FX.run=true;fxKick();}if(!want){FX.run=false;const cv=$("fx-canvas");if(cv){const x=cv.getContext&&cv.getContext("2d");if(x)x.clearRect(0,0,cv.width,cv.height);}}
- scopoSync();}
+ scopoSync();vazioSync();}
 /* FX.q garante um único rAF pendente: desligar e religar no mesmo frame não duplica o loop */
 function fxKick(){if(FX.q)return;FX.q=true;rAF(fxTick);}
 function fxTick(t){FX.q=false;if(!FX.run)return;const cv=$("fx-canvas");if(!cv)return;const ctx=cv.getContext&&cv.getContext("2d");if(!ctx){FX.run=false;return;}
@@ -1985,7 +2012,7 @@ function fxTick(t){FX.q=false;if(!FX.run)return;const cv=$("fx-canvas");if(!cv)r
  FX.ps=FX.ps.filter(p=>{p.life+=1;p.x+=p.vx;p.y+=p.vy;const a=Math.sin(Math.PI*Math.min(1,p.life/p.max));
   if(p.life>=p.max)return false;ctx.globalAlpha=a*p.op;fxDraw(ctx,el,p);ctx.globalAlpha=1;return true;});
  if(FX.ps.length>alvo)FX.ps.length=alvo;
- eyeStep(t);
+ eyeStep(t);voidStep(t);
  fxKick();}
 function fxNew(el,cv){const W=cv.width,H=cv.height,r=Math.random;
  const base={x:r()*W,y:r()*H,vx:(r()-.5)*.2,vy:(r()-.5)*.2,life:0,max:240+r()*240,op:.16,s:4+r()*7};
@@ -2015,6 +2042,7 @@ function whisperLoop(){const b=bandOf(S.ruido||0),e=ELM(S.elem);
  if(!e||b<1||S.ui.mute||S.ui.calm)return;
  let delay=[0,55,40,28,20,14][b]*1000*(0.7+Math.random()*.6);
  if(e.id==="obs"&&b>=4)delay*=.6; /* no ápice do Observação eles se acumulam */
+ if(e.id==="vaz")delay*=1.45; /* o Vazio é vagaroso: mais espaçado, nunca frenético */
  _wt=setTimeout(()=>{_wt=null;const w=$("whisper"),lst=susOf(e,b);let tx=lst[Math.floor(Math.random()*lst.length)];
   if(b>=4&&Math.random()<.5){const ws=tx.split(" ");const i=Math.floor(Math.random()*ws.length);ws[i]=alien(ws[i]);tx=ws.join(" ");}
   w.textContent=tx;w.style.left=(8+Math.random()*70)+"%";w.style.top=(10+Math.random()*75)+"%";
@@ -2070,9 +2098,10 @@ function flashNow(){flashClear();
  setTimeout(flashClear,150);}
 function flashSched(){clearTimeout(_ft);_ft=setTimeout(()=>{flashNow();flashSched();},20000+Math.random()*20000);}
 
-/* --- a presença: Web Audio, só depois de um gesto do usuário e com o mute desligado --- */
-let AUD={ctx:null,gain:null,ogain:null,gest:false,on:false,timer:null};
-function audGesture(){if(AUD.gest)return;AUD.gest=true;scopoSync();}
+/* --- a presença: Web Audio, só depois de um gesto do usuário e com o mute desligado ---
+   o contexto é compartilhado; cada elemento tem suas próprias vozes, todas em ganho 0 */
+let AUD={ctx:null,gain:null,ogain:null,vgain:null,gest:false,on:false,von:false,timer:null,vtimer:null};
+function audGesture(){if(AUD.gest)return;AUD.gest=true;scopoSync();vazioSync();}
 ["pointerdown","keydown","touchstart"].forEach(ev=>addEventListener(ev,audGesture,{once:true,passive:true}));
 function audBuild(){if(AUD.ctx)return true;
  const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return false;
@@ -2084,7 +2113,9 @@ function audBuild(){if(AUD.ctx)return true;
   src.connect(f);f.connect(g);g.connect(c.destination);src.start();
   const o=c.createOscillator();o.type="sine";o.frequency.value=52;
   const og=c.createGain();og.gain.value=0;o.connect(og);og.connect(c.destination);o.start();
-  AUD.ctx=c;AUD.gain=g;AUD.ogain=og;return true;}catch(e){return false;}}
+  const vg=c.createGain();vg.gain.value=0;vg.connect(c.destination); /* drone do Vazio */
+  for(const hz of [44,44.6]){const v=c.createOscillator();v.type="sine";v.frequency.value=hz;v.connect(vg);v.start();}
+  AUD.ctx=c;AUD.gain=g;AUD.ogain=og;AUD.vgain=vg;return true;}catch(e){return false;}}
 function audOff(){clearTimeout(AUD.timer);AUD.timer=null;AUD.on=false;
  if(!AUD.ctx)return;try{const t=AUD.ctx.currentTime;
   for(const g of [AUD.gain.gain,AUD.ogain.gain]){g.cancelScheduledValues(t);g.setTargetAtTime(0,t,.4);}}catch(e){}}
@@ -2105,6 +2136,56 @@ function scopoSync(){const b=bandOf(S.ruido||0),on=scopoOn()&&!document.hidden;
  if(on&&b>=4){if(!_ft)flashSched();}
  else{clearTimeout(_ft);_ft=null;flashClear();}
  audSync(on&&b>=4&&!S.ui.mute,b);}
+
+/* ============ HORROR CÓSMICO — elemento Vazio ============
+   onde a escopofobia acrescenta, o Vazio subtrai: a interface, a cor e o som vão embora.
+   o esvaecimento é CSS puro (grátis); aqui ficam só o buraco, o apagão e o vácuo auditivo. */
+const vazioOn=min=>S.elem==="vaz"&&bandOf(S.ruido||0)>=(min||1)&&!S.ui.calm&&!RM()&&!document.hidden;
+
+/* --- o buraco que vagueia: duas senoides lentas de períodos diferentes, sem estado a manter --- */
+function voidStep(t){if(!vazioOn(4))return;
+ const w=$("fx-void"),i=w&&w.firstElementChild;if(!i)return;
+ const x=innerWidth*(.5+.42*Math.sin(t*3.1e-5)+.07*Math.sin(t*1.07e-4));
+ const y=innerHeight*(.5+.38*Math.cos(t*2.4e-5)+.08*Math.cos(t*8.9e-5));
+ i.style.transform=`translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0)`;}
+
+/* --- o apagão: vislumbre do nada, banda 5 e raro --- */
+let _bt=null,_bto=null;
+function blackClear(){clearTimeout(_bto);_bto=null;const b=$("fx-black");if(b)b.classList.remove("on");}
+function blackNow(){const el=$("fx-black");if(!el||!vazioOn(5))return;
+ if($("modal").classList.contains("on"))return;
+ const a=document.activeElement,tg=a&&a.tagName;
+ if(tg==="INPUT"||tg==="TEXTAREA"||tg==="SELECT"||(a&&a.isContentEditable))return; /* nunca durante edição */
+ el.classList.remove("on");void el.offsetWidth; /* reinicia a animação */
+ el.classList.add("on");
+ _bto=setTimeout(()=>{el.classList.remove("on");_bto=null;},280);}
+function blackSched(){clearTimeout(_bt);_bt=setTimeout(()=>{blackNow();blackSched();},25000+Math.random()*25000);}
+
+/* --- o vácuo auditivo: um drone que você não nota, cortado a seco para você sentir o silêncio --- */
+const vazLvl=b=>b>=5?.014:.009;
+function vazAudOff(){clearTimeout(AUD.vtimer);AUD.vtimer=null;AUD.von=false;
+ if(!AUD.ctx)return;try{const t=AUD.ctx.currentTime;
+  AUD.vgain.gain.cancelScheduledValues(t);AUD.vgain.gain.setTargetAtTime(0,t,.5);}catch(e){}}
+function vazCut(){if(!AUD.von||!AUD.ctx)return;
+ const b=bandOf(S.ruido||0),t=AUD.ctx.currentTime,g=AUD.vgain.gain;
+ const dur=b>=5?3+Math.random()*2:2+Math.random()*2; /* o silêncio dura mais no ápice */
+ try{g.cancelScheduledValues(t);g.setValueAtTime(0,t); /* corte seco: o vácuo */
+  g.setValueAtTime(0,t+dur);g.linearRampToValueAtTime(vazLvl(b),t+dur+1.8);}catch(e){}
+ AUD.vtimer=setTimeout(vazCut,(dur+(b>=5?14+Math.random()*12:20+Math.random()*20))*1000);}
+function vazAudSync(want,b){
+ if(!want||!AUD.gest)return vazAudOff();
+ if(!audBuild())return;
+ if(AUD.ctx.state==="suspended")AUD.ctx.resume().catch(()=>{});
+ if(!AUD.von){AUD.von=true;
+  try{const t=AUD.ctx.currentTime;AUD.vgain.gain.cancelScheduledValues(t);
+   AUD.vgain.gain.setTargetAtTime(vazLvl(b),t,1.4);}catch(e){}
+  AUD.vtimer=setTimeout(vazCut,(10+Math.random()*10)*1000);}}
+
+/* espelho do scopoSync: sair do Vazio (ou calmar) apaga timers, overlay e som */
+function vazioSync(){const b=bandOf(S.ruido||0),on=vazioOn(1);
+ if(on&&b>=5){if(!_bt)blackSched();}
+ else{clearTimeout(_bt);_bt=null;blackClear();}
+ vazAudSync(on&&b>=4&&!S.ui.mute,b);}
 
 /* ---------- abas / navegação ---------- */
 const TABS=[["inicial","Inicial"],["sint","Sintonizar"],["hab","Habilidades"],["mag","Magias"],["tal","Talentos"],["inv","Inventário"],["bib","Biblioteca"],["div","Dívidas & Notas"]];
@@ -2133,7 +2214,7 @@ function boot(){loadAuto();
  $("btnExp").onclick=exportJSON;
  $("btnImp").onclick=()=>$("impFile").click();
  $("impFile").addEventListener("change",e=>{if(e.target.files[0])importJSON(e.target.files[0]);e.target.value="";});
- $("btnMute").onclick=()=>{S.ui.mute=!S.ui.mute;save();$("btnMute").classList.toggle("on",S.ui.mute);toast(S.ui.mute?"Sussurros silenciados.":"Os sussurros voltaram.");whisperLoop();scopoSync();};
+ $("btnMute").onclick=()=>{S.ui.mute=!S.ui.mute;save();$("btnMute").classList.toggle("on",S.ui.mute);toast(S.ui.mute?"Sussurros silenciados.":"Os sussurros voltaram.");whisperLoop();scopoSync();vazioSync();};
  $("btnCalm").onclick=()=>{S.ui.calm=!S.ui.calm;save();$("btnCalm").classList.toggle("on",S.ui.calm);applyTheme();whisperLoop();toast(S.ui.calm?"Efeitos reduzidos.":"Efeitos completos.");};
  $("btnSess").onclick=toggleSess;
  $("btnMute").classList.toggle("on",S.ui.mute);$("btnCalm").classList.toggle("on",S.ui.calm);
