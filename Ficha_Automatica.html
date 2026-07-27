@@ -1490,16 +1490,127 @@ esc:[
   sab:"Um objeto que você consagrou com algo que não se recupera.",
   ef:"Uma conjuração sua custa −1 de Sintonia, 1×/cena. Se o foco for destruído, você sente: perde 1 Lucidez."}
 ],
-mae:[{n:"Marcado pela Observação",el:"obs",s:"o que registra",st:[[],[],[],[]]},
-{n:"Marcado pelo Eco",el:"eco",s:"o que repete",st:[[],[],[],[]]},
+mae:[
+{n:"Marcado pela Observação",el:"obs",s:"o que registra",
+ regra:{n:"Registro",ef:"Atenção total é posse, e ser o alvo dela é enlouquecedor. Você acumula Marcas de Registro. Ganha 1 ao Observar e 1 ao passar um turno sem agir ofensivamente. Enquanto mantém Marcas sobre um alvo, ele sofre Vigiado (paranoia crescente): 1–2 Marcas −1 em concentração/furtividade; 3–4 −1 em tudo e não surpreende ninguém; 5 age por último e não mente na sua presença. A faca: fechar uma cena com 4+ Marcas acumuladas custa 1 de Lucidez que descanso comum não recupera."},
+ medidor:{chave:"marcas",nome:"Marcas",min:0,tetos:[5,5,5,9],reset:"cena"},
+ st:[
+  [
+   {n:"Olho que Registra",cst:"—",ac:"Passiva + Ação Livre (1×/turno)",
+    sab:"Sua atenção não tem ponto cego. Sua memória não tem apagador. E sua presença não tem alívio.",
+    ef:"Passiva: imune a surpresa e emboscada; percebe o oculto, o disfarçado, o deslocado; memória perfeita e permanente do que já observou. Ação Livre (1×/turno): Observe um alvo/cena/objeto — ganhe 1 Marca e o mestre responde uma pergunta sobre ele. Marcas sobre uma criatura impõem Vigiado."},
+   {n:"Compartilhar o Olhar",cst:"1 Marca",ac:"Ação Livre",
+    sab:"O que você vê, seus aliados passam a ver pelos seus olhos.",
+    ef:"Dê a um aliado à vista, até o fim da cena: +2 em qualquer teste contra um alvo que você Observou, e imunidade a surpresa enquanto puder te ver."}
+  ],
+  [
+   {n:"Reconstruir",cst:"2 Marcas (3 para o porquê)",ac:"Ação (cena de análise)",
+    sab:"Você olha os fragmentos e o antes se remonta diante de você.",
+    ef:"Reconstrua com precisão o que aconteceu num local, corpo, objeto ou cena — a sequência, quem esteve presente, o que foi dito ou levado. Por 3 Marcas, o mestre também revela o porquê. É dedução sobre-humana, não magia."},
+   {n:"Sob Vigia",cst:"1 a 3 Marcas",ac:"Ação Livre (declare no início do turno)",
+    sab:"Você fixa o olhar. E ele começa a rachar sob o peso dele.",
+    ef:"Concentre o olhar num alvo e aposte Marcas (1–3). Até o fim do seu próximo turno, ele trata seu nível de Vigiado como +[Marcas apostadas] mais alto (podendo ir à certeza sufocante de 5 na hora), e você reage a qualquer coisa que ele faça antes dele."}
+  ],
+  [
+   {n:"Ponto Exato",cst:"2 Marcas",ac:"Ação · contra alvo Observado",
+    sab:"Você não acerta em algum lugar. Acerta no único lugar que importa.",
+    ef:"Contra um alvo Observado nesta cena: acerto automático, ignora Absorção, dano máximo, e aplica uma condição à escolha (Sangrando, Cego, Lento, Atordoado)."},
+   {n:"Leitura Completa",cst:"3 Marcas",ac:"Ação · 1×/cena",
+    sab:"Você o observou o bastante. Agora você já leu o final dele.",
+    ef:"Sobre um alvo Observado: pelo resto da cena (chefes: [Juízo] turnos) você sabe cada ação dele antes que aconteça — ele não te acerta com ataques normais, não te engana, e suas ações contra ele são acerto automático. O alvo fica automaticamente em Vigiado 5."}
+  ],
+  [
+   {n:"Olho que Tudo Vê",cst:"—",ac:"Passiva",
+    sab:"Você não está mais num ponto do espaço. Está em todos os que importam. E todos sentem.",
+    ef:"Teto de Marcas sobe para 9; ganha 1 Marca no início de cada turno. Percebe tudo simultaneamente numa área ampla, através de paredes e no escuro. Todo inimigo na área sente-se observado o tempo todo (Vigiado mínimo 1, sem gastar Marcas).",
+    req:{nv:12}},
+   {n:"A Memória do Mundo",cst:"8 Marcas",ac:"Ação · 1×/campanha",
+    sab:"Você acumulou observação suficiente para consultar o registro da própria realidade.",
+    ef:"Reviva qualquer evento já ocorrido em qualquer lugar; ou observe o presente em qualquer ponto que já pisou; ou preveja o desenrolar total de uma situação (o mestre narra o fim, você age para mudá-lo). O que essa consulta tira de você é permanente, definido com o mestre.",
+    req:{nv:12}}
+  ]
+ ]},
+{n:"Marcado pelo Eco",el:"eco",s:"o que repete",
+ regra:{n:"Ecos Gravados",ef:"Nada é único; tudo pode acontecer de novo. Você mantém até 3 Ecos gravados por vez (permanecem até serem usados ou substituídos). Como Reação, grava um evento NOTÁVEL que acabou de ocorrer — um Crítico, um sucesso de grande margem, um efeito, uma condição aplicada, um instante-chave (não ataques/testes comuns). Depois, gasta o Eco para reproduzi-lo. A faca — Dissonância: cada Eco reproduzido numa cena dá 1 de Dissonância; ao fim da cena, teste contra ela — se falhar, na próxima cena o mestre pode 1× fazer você reagir a um Eco antigo como se fosse o presente."},
+ medidor:{chave:"ecos",nome:"Ecos",min:0,tetos:[3,3,5,5],reset:"cena"},
+ st:[
+  [
+   {n:"Gravar",cst:"—",ac:"Reação",
+    sab:"Você prende o instante extraordinário antes que ele passe. Ele não passa mais.",
+    ef:"Grave como Eco um evento notável que acabou de ocorrer à sua vista — um Crítico, um sucesso de grande margem, um efeito, uma condição, um instante-chave (até 3 guardados). Ataques e testes comuns não valem gravação."},
+   {n:"Reproduzir",cst:"gasta 1 Eco",ac:"Ação (ou Reação, conforme o Eco)",
+    sab:"Já aconteceu uma vez, de verdade. Vai acontecer de novo, por sua mão.",
+    ef:"Solte um Eco gravado e faça-o acontecer de novo, por você: repita aquele Crítico como acerto garantido de mesmo efeito, reproduza aquele sucesso num teste equivalente, reaplique aquele efeito ou condição."}
+  ],
+  [
+   {n:"Reverberação",cst:"gasta 1 Eco",ac:"Gatilho (ao você acertar um ataque)",
+    sab:"O golpe bate num. E a onda dele encontra os outros.",
+    ef:"Ao acertar um ataque, o impacto se propaga: o mesmo dano ecoa imediatamente para até [Juízo] inimigos próximos do alvo, como uma onda que se repete pelo espaço. Não é o mesmo golpe repetido no tempo; é um golpe que acontece em vários lugares ao mesmo tempo."},
+   {n:"Devolver",cst:"gasta 1 Eco (gravado de um ataque notável do inimigo)",ac:"Reação",
+    sab:"O que ele fez de pior, você guardou. E devolve com o nome dele ainda gravado.",
+    ef:"Se você gravou um ataque notável de um inimigo (um Crítico dele, um golpe especial), reproduza-o contra ele: sofre o próprio ataque, com o próprio dano e efeito, muitas vezes sem a defesa que teria contra si mesmo."}
+  ],
+  [
+   {n:"Laço",cst:"gasta 2 Ecos",ac:"Ação · 1×/cena",
+    sab:"Você prende alguém num instante que não termina.",
+    ef:"Prenda um alvo num laço temporal por [Juízo] turnos: a cada turno dele, ele é forçado a repetir exatamente a última ação que fez antes do laço (agora previsível para todos). Alvos poderosos podem gastar a ação inteira para quebrar o laço em vez de repetir."},
+   {n:"Eco Persistente",cst:"—",ac:"Passiva",
+    sab:"Suas melhores jogadas não morrem. Ficam ressoando.",
+    ef:"O teto de Ecos gravados sobe para 5, e um Eco reproduzido tem chance de não se gastar — ao reproduzir, role: num resultado alto, ele permanece gravado. Ecos que ressoam sozinhos contam normal para Dissonância."}
+  ],
+  [
+   {n:"Momento Congelado",cst:"gasta 3 Ecos",ac:"Ação · 1×/cena",
+    sab:"Você grava o agora inteiro. E o solta quando quiser que ele volte.",
+    ef:"Grave o estado completo de uma cena num instante (posições, Vida, condições de todos). A qualquer momento até o fim da cena, reproduza aquele instante: tudo volta ao estado gravado, exceto o conhecimento de todos (você e aliados lembram o que aprenderam; inimigos não). A Dissonância disso conta como 3 reproduções.",
+    req:{nv:12}},
+   {n:"A Primeira Vez Nunca Existiu",cst:"todos os Ecos (mínimo 5)",ac:"Ação · 1×/campanha",
+    sab:"Você deixou de saber qual era o original. Talvez nunca tenha havido um.",
+    ef:"Gaste todos os Ecos (5+) para reescrever um evento por repetição: pegue algo que aconteceu — uma morte, uma derrota, uma catástrofe — e faça a realidade repeti-lo diferente, como se a versão que você reproduz sempre tivesse sido a verdadeira. Ninguém além de você lembra que houve outra. O preço é a certeza de qual é o real, para sempre.",
+    req:{nv:12}}
+  ]
+ ]},
 {n:"Marcado pelo Vazio",el:"vaz",s:"o que subtrai",st:[[],[],[],[]]},
 {n:"Marcado pela Ascensão",el:"asc",s:"o que acumula",st:[[],[],[],[]]},
 {n:"Marcado pelo Pacto",el:"pac",s:"o que troca",st:[[],[],[],[]]},
-{n:"Marcado pelo Germe",el:"ger",s:"o que infecta · hálito de terra molhada e algo doce demais",st:[
-[["Primeira Semente","PASSIVA","Você conhece a magia Broto Faminto automaticamente (não conta no limite) e a conjura com +1. Efeitos seus do Germe que compõem sozinhos continuam crescendo mesmo se você cair."],["Faro de Podridão","PASSIVA","Sente doença, infecção e carne morta em Curto — sabe o que está doente antes do dono saber. Carniça não o enjoa. Nunca mais enjoou."]],
-[["Enxerto","AÇÃO · 2 SINTONIA + 1 DE VIDA · TOQUE","Planta uma semente num alvo: 1 de dano por turno até ser tratada (Medicina 8 remove). Em aliado disposto, a semente come a doença dele — remove veneno ou infecção comum — e morre satisfeita."],["Casca de Fungo","AÇÃO · 1 SINTONIA + 1 DE VIDA · CENA","Uma couraça úmida cresce sobre você: Absorção 2. Quando absorve, range e fede — −1 em social e Furtividade enquanto durar."]],
-[["Jardim de Carniça","AÇÃO · 3 SINTONIA + 2 DE VIDA","Infesta uma área Curta por [Juízo] turnos: terreno difícil para inimigos, e quem começar o turno ali sofre 1 de dano (Resistência 8 nega). O chão respira. Devagar."],["Colher o Vivo","AÇÃO · 2 SINTONIA","Arranca vigor do que você infectou: recupera Vida igual ao dano que suas sementes e jardins causaram neste turno."]],
-[["Hospedeiro","PASSIVA","O Germe cuida do que é dele: imune a doença e veneno mundanos; 1×/cena, ao cair abaixo da metade da Vida, regenera 1d4. Cura de terceiros rende metade em você — seu corpo já tem dono."],["Floração","RITUAL (CENA) · 5 SINTONIA + 3 DE VIDA · 1×/ARCO","Um lugar inteiro vira viveiro por uma cena: portas brotam fechadas, paredes cedem, o ar pesa. Inimigos: −1 em tudo, e Coragem (8) ao entrar ou Apavorado. Quando acaba, o lugar nunca mais é o mesmo. Nem você."]]]}]}
+{n:"Marcado pelo Germe",el:"ger",s:"o que infecta",
+ regra:{n:"A Carne é Adubo",ef:"As habilidades do Germe custam Carne (Vida) em vez de Sintonia. Você sacrifica pontos de Vida para conjurar, de bom grado — a carne é matéria-prima. Tudo é úmido, grotesco, invasivo. O Germe é o elemento que mais ajuda os outros (cura, protege, salva), mas sempre de formas repugnantes que dão nojo em quem recebe. Como paga em Vida, vive perto da própria morte, contando com sua regeneração grotesca para não cair."},
+ st:[
+  [
+   {n:"Primeira Semente",cst:"—",ac:"Passiva",
+    sab:"Algo cresce em você. Você aprendeu a gostar.",
+    ef:"Você conhece a magia Broto Faminto automaticamente (não conta no limite) e a conjura com +1. Seus efeitos do Germe que crescem sozinhos continuam crescendo mesmo se você cair inconsciente ou morrer. Sente doença, infecção e carne morta em Curto; carniça não o enjoa."},
+   {n:"Enxerto",cst:"1 de Vida",ac:"Ação · Toque",
+    sab:"Você abre a própria mão, arranca o que cresce lá dentro e planta no outro. Funciona. É horrível, mas funciona.",
+    ef:"Enfie uma semente sua em alguém. Em inimigo: 2 de dano por turno até ser extraída (Medicina 8) e −1 enquanto durar. Em aliado disposto: remove veneno, infecção ou condição física e cura 1d4. Você mantém até [Juízo] sementes ativas ao mesmo tempo."}
+  ],
+  [
+   {n:"Casca de Fungo",cst:"2 de Vida",ac:"Ação · dura a cena",
+    sab:"Uma couraça úmida e viva cresce sobre a sua pele, respirando por você.",
+    ef:"Absorção 4 enquanto durar. Quando absorve um golpe corpo a corpo, os esporos reagem: o atacante sofre 1 de dano e testa contra ficar coberto de fungo (−1 até se limpar). Estender a um aliado adjacente não custa Vida extra — a casca cresce nos dois."},
+   {n:"Colheita de Carne",cst:"—",ac:"Ação",
+    sab:"Tudo que suas sementes comeram, volta para você. Vivo.",
+    ef:"Recupere Vida igual a todo o dano que suas sementes, enxertos e jardins causaram desde seu último turno, sem teto. O transbordo (Vida além do seu máximo) pode ser distribuído entre vários aliados à vista como enxerto de cura."}
+  ],
+  [
+   {n:"Jardim de Carniça",cst:"3 de Vida",ac:"Ação · área Média",
+    sab:"O chão respira. Devagar. E tem dentes.",
+    ef:"Infeste uma área Média por [Juízo] turnos: terreno difícil e vivo para inimigos, e quem começar o turno ali sofre 3 de dano (sem teste) e fica coberto de esporos. Aliados no jardim regeneram 1d4 de Vida por turno e têm +1 na Defesa."},
+   {n:"Hospedeiro",cst:"—",ac:"Passiva",
+    sab:"O Germe cuida do que é dele. E você é dele agora.",
+    ef:"Imune a doença e veneno. Enquanto abaixo da metade da Vida, regenera 1d4+[Juízo] no início de todo turno. Ao cair a 0, 1×/cena você não morre: brota de volta a 1d4 de Vida no próximo turno, se houver carne/jardim seu por perto. Cura de terceiros rende metade em você."}
+  ],
+  [
+   {n:"Mãe da Carne",cst:"—",ac:"Passiva",
+    sab:"Você parou de ser uma pessoa que planta. Você é o solo agora.",
+    ef:"O custo em Vida de todas as suas habilidades do Germe cai pela metade (mín. 1), e a Colheita de Carne passa a curar você e todos os aliados à vista pelo valor colhido. Seus efeitos ativos agem sozinhos no início de cada turno. Você pode ter dois jardins ativos ao mesmo tempo.",
+    req:{nv:12}},
+   {n:"Floração",cst:"5 de Vida (pode descer até 1 de Vida para pagar; não pode morrer para pagar)",ac:"Ação · 1×/cena",
+    sab:"Você se abre inteiro. Não sobra quase nada de humano — mas o que floresce salva ou condena tudo ao redor.",
+    ef:"Rasgue-se e transforme uma área ampla num organismo vivo por [Juízo] turnos. Inimigos na área: −2 em tudo, 2 de dano por turno, e Coragem (8) ao entrar ou ficam Apavorados. Aliados: regeneram 1d4 de Vida por turno, imunes a medo e a novas condições físicas. Você: sua regeneração do Hospedeiro dispara todo turno. Ao fim, você fica Exausto pela cena.",
+    req:{nv:12}}
+  ]
+ ]}
+]}
 };
 
 /* ---- ELEMENTOS (Grimório dos Seis) ---- */
