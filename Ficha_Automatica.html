@@ -34,6 +34,13 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;bac
 #fx-black{position:fixed;inset:0;pointer-events:none;z-index:10;background:#000;opacity:0}
 #fx-black.on{animation:vazapaga 180ms ease-in-out}
 @keyframes vazapaga{0%{opacity:0}18%{opacity:.9}55%{opacity:.9}100%{opacity:0}}
+/* eco — déjà vu: o soluço do texto, o fantasma do que foi apagado e o micro-loop travado */
+.fx-stut{opacity:0;animation:ecosoluco 220ms steps(2)}
+@keyframes ecosoluco{0%{transform:translateX(0);opacity:0}25%{transform:translateX(3px);opacity:.8}50%{transform:translateX(-2px);opacity:.45}75%{transform:translateX(4px);opacity:.7}100%{transform:translateX(0);opacity:0}}
+.fx-ghost{position:fixed;pointer-events:none;z-index:9;color:var(--ec);font-size:13px;font-family:ui-monospace,Consolas,monospace;letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0;text-shadow:0 0 8px var(--eglow);animation:ecolembra 1.8s ease-in-out}
+@keyframes ecolembra{0%{opacity:0}22%{opacity:.5}70%{opacity:.42}100%{opacity:0}}
+.fx-loop{animation:ecoloop .42s steps(4) 3}
+@keyframes ecoloop{0%{transform:translateX(0)}30%{transform:translateX(2px)}60%{transform:translateX(-1px);opacity:.7}100%{transform:translateX(0)}}
 body.lowvida #fx-blood{opacity:1;animation:bloodpulse 2.2s ease-in-out infinite}
 @keyframes bloodpulse{50%{box-shadow:inset 0 0 160px 46px rgba(142,32,32,.7)}}
 body.lowluc .wrap{animation:lucshake 7s ease-in-out infinite}
@@ -290,6 +297,12 @@ body[data-el=pac]{--ec:#c13a52;--ecd:#77202f;--eglow:rgba(163,38,56,.15)}
 body[data-el=ger]{--ec:#8dbb62;--ecd:#4f6d34;--eglow:rgba(111,154,78,.14)}
 /* eco: ghosting nos títulos, crescente com a banda */
 body[data-el=eco] h1,body[data-el=eco] .panel h2{text-shadow:calc(var(--band)*1.2px) calc(var(--band)*1.2px) 0 rgba(127,184,168,.35)}
+/* eco: o rastro vira temporal — segunda camada mais atrasada, e a cada re-render ele "custa a chegar" */
+body[data-el=eco][data-band="3"] h1,body[data-el=eco][data-band="3"] .panel h2,body[data-el=eco][data-band="4"] h1,body[data-el=eco][data-band="4"] .panel h2,body[data-el=eco][data-band="5"] h1,body[data-el=eco][data-band="5"] .panel h2{
+ text-shadow:calc(var(--band)*1.2px) calc(var(--band)*1.2px) 0 rgba(127,184,168,.35),calc(var(--band)*2.7px) calc(var(--band)*2.2px) 0 rgba(127,184,168,.15);
+ transition:text-shadow 1.1s ease-out;animation:ecoghost 1.1s ease-out}
+@keyframes ecoghost{from{text-shadow:calc(var(--band)*3.6px) calc(var(--band)*3px) 0 rgba(127,184,168,.42),calc(var(--band)*7px) calc(var(--band)*5.5px) 0 rgba(127,184,168,.22)}}
+body[data-el=eco][data-band="5"] .hx,body[data-el=eco][data-band="5"] .hint,body[data-el=eco][data-band="5"] label{text-shadow:1.5px 1.4px 0 rgba(127,184,168,.14);transition:text-shadow 1.3s ease-out}
 /* obs: olho que pisca nos títulos */
 body[data-el=obs][data-band="2"] .panel h2::after,body[data-el=obs][data-band="3"] .panel h2::after,body[data-el=obs][data-band="4"] .panel h2::after,body[data-el=obs][data-band="5"] .panel h2::after{content:"⊙";font-size:10px;color:var(--ec);animation:blinkeye 6s infinite}
 /* obs: escopofobia — a nuca (banda 2+) e o olho na periferia (banda 3+) */
@@ -330,10 +343,14 @@ body[data-band="5"] .panel h2:not(:hover){filter:blur(.4px)}
 body[data-band="5"] .panel h2:hover,body[data-band="5"] h1:hover{animation:none;filter:none}
 /* calmar / reduced motion */
 body.calm *,body.calm *::before,body.calm *::after{animation:none!important;transition:none!important}
-body.calm #fx-canvas,body.calm #whisper,body.calm #fx-eye,body.calm #fx-tunnel,body.calm .fx-flash,body.calm #fx-void,body.calm #fx-black{display:none}
+body.calm #fx-canvas,body.calm #whisper,body.calm #fx-eye,body.calm #fx-tunnel,body.calm .fx-flash,body.calm #fx-void,body.calm #fx-black,body.calm .fx-ghost{display:none}
 body.calm[data-el=vaz] .panel,body.calm[data-el=vaz] .tabs button{opacity:1!important;filter:none!important}
-@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}#fx-canvas,#fx-eye,#fx-tunnel,.fx-flash,#fx-void,#fx-black{display:none}
- body[data-el=vaz] .panel,body[data-el=vaz] .tabs button{opacity:1!important;filter:none!important}}
+body.calm[data-el=eco] h1,body.calm[data-el=eco] .panel h2{text-shadow:calc(var(--band)*1.2px) calc(var(--band)*1.2px) 0 rgba(127,184,168,.35)!important}
+body.calm[data-el=eco] .hx,body.calm[data-el=eco] .hint,body.calm[data-el=eco] label{text-shadow:none!important}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}#fx-canvas,#fx-eye,#fx-tunnel,.fx-flash,#fx-void,#fx-black,.fx-ghost{display:none}
+ body[data-el=vaz] .panel,body[data-el=vaz] .tabs button{opacity:1!important;filter:none!important}
+ body[data-el=eco] h1,body[data-el=eco] .panel h2{text-shadow:calc(var(--band)*1.2px) calc(var(--band)*1.2px) 0 rgba(127,184,168,.35)!important}
+ body[data-el=eco] .hx,body[data-el=eco] .hint,body[data-el=eco] label{text-shadow:none!important}}
 @media(max-width:640px){h1{font-size:20px;letter-spacing:5px}.wrap{padding:10px 10px 50px}.elc{width:100%}}
 
 </style>
@@ -1783,6 +1800,11 @@ const SUS_VAZ={
 lo:["sobra menos a cada dia","ninguém vai notar a falta","isto também vai passar","não há ninguém do outro lado","estava tudo vazio antes de você chegar"],
 mid:["você podia parar agora e seria igual","nada do que você fez ficou","o silêncio não está esperando você","não há um plano. nunca houve.","você não é necessário"],
 hi:["você é uma pausa curta entre dois nadas","quando isto acabar, não terá havido diferença","nem o vazio vai lembrar do seu nome","você já está quase todo apagado","não havia motivo. desculpe."]};
+/* eco: o familiar que azeda — e que às vezes se repete literalmente */
+const SUS_ECO={
+lo:["você já leu isso","isto já aconteceu","de novo","você reconhece este momento","já estava assim"],
+mid:["você já esteve exatamente aqui","a resposta veio antes da pergunta","quantas vezes já?","você não saiu daqui","outra vez. outra vez. outra vez."],
+hi:["você lembra. eu sei que lembra.","aconteceu de novo, como sempre acontece","você já viveu isto e vai viver outra vez","não foi a primeira vez. não vai ser a última.","volte ao começo. você sabe o caminho."]};
 const ELEMS=[
 {id:"obs",g:"⊙",n:"Observação",v:"registra",fr:"O que você vê fica registrado. O que registra você, também.",
 lei:["Lei do Registro","O que você vê através da Observação fica registrado — revisitável mentalmente e transmissível: um toque na testa compartilha o registro em flash. E espiar o anômalo tem preço: a coisa pode notar o olhar."],
@@ -1791,7 +1813,7 @@ sus:["estão te observando","isso ficou registrado","não pisque","alguém consu
 {id:"eco",g:"☊",n:"Eco",v:"repete",fr:"O Eco não cria. Devolve — meio segundo atrasado.",
 lei:["Lei do Retorno","O Eco não cria — devolve. Toda magia do Eco exige uma fonte: algo que aconteceu, foi dito, foi feito. Sem fonte, não conjura. E o Sulco: repetir a mesma magia na mesma cena dá +1 cumulativo (máx +2)."],
 marca:["Você repete baixinho a última palavra dos outros, meio segundo depois — −1 em primeiras impressões, +1 para recordar diálogos com exatidão.","Seus passos ecoam duas vezes; relógios atrasam no seu pulso. Quem anda com você no silêncio, na primeira vez, testa Coragem (7).","Você responde perguntas um instante antes de serem feitas — −1 em interações calorosas, +1 para agir primeiro em qualquer confronto."],
-sus:["você já leu isso","você já leu isso","…atrasado","a resposta veio antes da pergunta","isso já aconteceu"]},
+sus:SUS_ECO.lo,susB:SUS_ECO},
 {id:"vaz",g:"◌",n:"Vazio",v:"subtrai",fr:"O que se aproxima volta com menos do que tinha.",
 lei:["Lei da Subtração","O Vazio não adiciona — remove. Contra dano do Vazio, Absorção conta pela metade. E o que o Vazio apaga — luz, som, calor, memória — não volta sozinho: precisa ser reaceso, refeito, relembrado."],
 marca:["As pessoas esquecem seu rosto rápido demais — −1 para ser lembrado ou reconhecido, +1 para passar despercebido.","Sua sombra atrasa um instante; falta um reflexo seu no espelho de vez em quando — quem repara perde 1 Lucidez.","O silêncio te segue; sons somem ao seu redor — −1 em qualquer interação calorosa, +1 em Furtividade e Intimidação pela frieza."],
@@ -2001,7 +2023,7 @@ function updDock(){const d=$("divDock");const n=S.div.filter(x=>x&&x.trim()).len
 let FX={run:false,q:false,ps:[],last:0};
 function syncFX(){const b=bandOf(S.ruido||0);const want=!!S.elem&&b>0&&!S.ui.calm&&!document.hidden;
  if(want&&!FX.run){FX.run=true;fxKick();}if(!want){FX.run=false;const cv=$("fx-canvas");if(cv){const x=cv.getContext&&cv.getContext("2d");if(x)x.clearRect(0,0,cv.width,cv.height);}}
- scopoSync();vazioSync();}
+ scopoSync();vazioSync();ecoSync();}
 /* FX.q garante um único rAF pendente: desligar e religar no mesmo frame não duplica o loop */
 function fxKick(){if(FX.q)return;FX.q=true;rAF(fxTick);}
 function fxTick(t){FX.q=false;if(!FX.run)return;const cv=$("fx-canvas");if(!cv)return;const ctx=cv.getContext&&cv.getContext("2d");if(!ctx){FX.run=false;return;}
@@ -2032,21 +2054,30 @@ function fxDraw(c,el,p){c.strokeStyle=c.fillStyle=_ecCache;
 document.addEventListener("visibilitychange",()=>syncFX());
 
 /* sussurros */
-let _wt=null,_wsig="";
-/* quem tem susB (só o obs, por ora) sussurra conforme a banda; os outros mantêm o sus simples */
+let _wt=null,_wsig="",_wh=null,_wEt=null;
+/* quem tem susB (obs, vaz, eco) sussurra conforme a banda; os outros mantêm o sus simples */
 function susOf(e,b){const B=e.susB;if(!B)return e.sus;return b<=2?B.lo:(b<=4?B.mid:B.hi);}
+function showWhisper(tx,l,tp){const w=$("whisper");if(!w)return;
+ w.textContent=tx;w.style.left=l;w.style.top=tp;
+ w.classList.remove("on");void w.offsetWidth;w.classList.add("on");
+ clearTimeout(_wh);_wh=setTimeout(()=>w.classList.remove("on"),4200);}
 function whisperLoop(){const b=bandOf(S.ruido||0),e=ELM(S.elem);
  const sig=(S.elem||"")+"|"+b+"|"+(S.ui.mute?1:0)+"|"+(S.ui.calm?1:0);
  if(sig===_wsig&&_wt)return; /* render() roda a cada clique: sem mudança relevante, o ciclo em curso segue */
- _wsig=sig;clearTimeout(_wt);_wt=null;
+ _wsig=sig;clearTimeout(_wt);_wt=null;clearTimeout(_wEt);_wEt=null;
  if(!e||b<1||S.ui.mute||S.ui.calm)return;
  let delay=[0,55,40,28,20,14][b]*1000*(0.7+Math.random()*.6);
  if(e.id==="obs"&&b>=4)delay*=.6; /* no ápice do Observação eles se acumulam */
  if(e.id==="vaz")delay*=1.45; /* o Vazio é vagaroso: mais espaçado, nunca frenético */
- _wt=setTimeout(()=>{_wt=null;const w=$("whisper"),lst=susOf(e,b);let tx=lst[Math.floor(Math.random()*lst.length)];
+ _wt=setTimeout(()=>{_wt=null;const lst=susOf(e,b);let tx=lst[Math.floor(Math.random()*lst.length)];
   if(b>=4&&Math.random()<.5){const ws=tx.split(" ");const i=Math.floor(Math.random()*ws.length);ws[i]=alien(ws[i]);tx=ws.join(" ");}
-  w.textContent=tx;w.style.left=(8+Math.random()*70)+"%";w.style.top=(10+Math.random()*75)+"%";
-  w.classList.add("on");setTimeout(()=>w.classList.remove("on"),4200);whisperLoop();},delay);}
+  const l=(8+Math.random()*70)+"%",tp=(10+Math.random()*75)+"%";
+  showWhisper(tx,l,tp);
+  whisperLoop(); /* reagenda o ciclo primeiro: ele limpa ecos pendentes */
+  /* eco: o déjà vu do próprio sussurro — a mesma frase, no mesmo lugar, segundos depois */
+  if(e.id==="eco"&&Math.random()<(b>=4?.5:.35))
+   _wEt=setTimeout(()=>{_wEt=null;if(S.elem==="eco"&&!S.ui.mute&&!S.ui.calm)showWhisper(tx,l,tp);},4600+Math.random()*4200);
+  },delay);}
 
 /* ============ ESCOPOFOBIA — piloto do elemento Observação ============
    tudo aqui morre com body.calm, com prefers-reduced-motion e com a aba oculta.
@@ -2100,8 +2131,8 @@ function flashSched(){clearTimeout(_ft);_ft=setTimeout(()=>{flashNow();flashSche
 
 /* --- a presença: Web Audio, só depois de um gesto do usuário e com o mute desligado ---
    o contexto é compartilhado; cada elemento tem suas próprias vozes, todas em ganho 0 */
-let AUD={ctx:null,gain:null,ogain:null,vgain:null,gest:false,on:false,von:false,timer:null,vtimer:null};
-function audGesture(){if(AUD.gest)return;AUD.gest=true;scopoSync();vazioSync();}
+let AUD={ctx:null,gain:null,ogain:null,vgain:null,eg:null,gest:false,on:false,von:false,eon:false,timer:null,vtimer:null,etimer:null};
+function audGesture(){if(AUD.gest)return;AUD.gest=true;scopoSync();vazioSync();ecoSync();}
 ["pointerdown","keydown","touchstart"].forEach(ev=>addEventListener(ev,audGesture,{once:true,passive:true}));
 function audBuild(){if(AUD.ctx)return true;
  const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return false;
@@ -2187,6 +2218,109 @@ function vazioSync(){const b=bandOf(S.ruido||0),on=vazioOn(1);
  else{clearTimeout(_bt);_bt=null;blackClear();}
  vazAudSync(on&&b>=4&&!S.ui.mute,b);}
 
+/* ============ DÉJÀ VU — elemento Eco ============
+   o Eco repete: o sussurro volta, o texto gagueja, o que você apagou reaparece.
+   tudo é sobreposição efêmera — nada aqui escreve em campo, dispara oninput ou toca em S. */
+const ecoOn=min=>S.elem==="eco"&&bandOf(S.ruido||0)>=(min||1)&&!S.ui.calm&&!RM()&&!document.hidden;
+
+/* --- o soluço: um clone do texto que salta por 220ms e some --- */
+let _stT=null,_stEl=null;
+function ecoStClear(){if(_stEl&&_stEl.parentNode)_stEl.parentNode.removeChild(_stEl);_stEl=null;}
+function ecoStutter(){ecoStClear();
+ if(!ecoOn(3)||$("modal").classList.contains("on"))return;
+ const p=flashPick();if(!p)return; /* mesmo seletor do obs: já exclui hover, foco e campos */
+ const el=p[0],r=p[1],cs=getComputedStyle(el),d=document.createElement("div");
+ d.className="fx-flash fx-stut";
+ d.style.cssText=`left:${r.left}px;top:${r.top}px;width:${Math.ceil(r.width)}px;height:${Math.ceil(r.height)}px;`+
+  `color:${cs.color};font-family:${cs.fontFamily};font-size:${cs.fontSize};font-weight:${cs.fontWeight};`+
+  `letter-spacing:${cs.letterSpacing};text-transform:${cs.textTransform}`;
+ d.textContent=el.textContent.trim().slice(0,90);
+ document.body.appendChild(d);_stEl=d;
+ setTimeout(ecoStClear,240);}
+function stutSched(){clearTimeout(_stT);_stT=setTimeout(()=>{ecoStutter();stutSched();},15000+Math.random()*20000);}
+
+/* --- o fantasma do que foi digitado e apagado ---
+   ECOBUF é volátil: vive só em memória, nunca entra em S, nunca é salvo, nunca reescreve campo */
+let ECOBUF=[],_ghT=null,_ghEl=null;
+const _lastVal=new WeakMap();
+const TXIN=el=>el&&(el.tagName==="TEXTAREA"||(el.tagName==="INPUT"&&(!el.type||el.type==="text"||el.type==="search")));
+function _apagado(prev,now){let a=0;const m=Math.min(prev.length,now.length);
+ while(a<m&&prev[a]===now[a])a++;
+ let b=0;while(b<m-a&&prev[prev.length-1-b]===now[now.length-1-b])b++;
+ return prev.slice(a,prev.length-b).trim();}
+document.addEventListener("input",e=>{const t=e.target;if(!TXIN(t))return;
+ const prev=_lastVal.has(t)?_lastVal.get(t):(t.defaultValue||""),now=t.value||"";
+ _lastVal.set(t,now);
+ if(S.elem!=="eco"||now.length>=prev.length-2)return;
+ const gone=_apagado(prev,now);
+ if(gone.length<4)return;
+ ECOBUF.push(gone.slice(0,60));if(ECOBUF.length>10)ECOBUF.shift();},{passive:true});
+function ecoGhClear(){if(_ghEl&&_ghEl.parentNode)_ghEl.parentNode.removeChild(_ghEl);_ghEl=null;}
+/* um campo de texto vazio, visível, sem foco nem cursor em cima — senão, um ponto solto da tela */
+function ghostSpot(){const out=[];
+ document.querySelectorAll("input[type=text],textarea").forEach(el=>{
+  if(el.value||el===document.activeElement||el.matches(":hover"))return;
+  const r=el.getBoundingClientRect();
+  if(r.width<90||r.height<14||r.top<12||r.bottom>innerHeight-12)return;
+  out.push({x:r.left+9,y:r.top+Math.min(9,(r.height-15)/2),w:r.width-18});});
+ if(out.length)return out[Math.floor(Math.random()*out.length)];
+ return {x:innerWidth*(.1+Math.random()*.45),y:innerHeight*(.2+Math.random()*.55),w:260};}
+function ecoGhost(){ecoGhClear();
+ if(!ecoOn(4)||!ECOBUF.length||$("modal").classList.contains("on"))return;
+ const tx=ECOBUF[Math.floor(Math.random()*ECOBUF.length)],a=ghostSpot();
+ const d=document.createElement("div");d.className="fx-ghost";
+ d.style.cssText=`left:${Math.round(a.x)}px;top:${Math.round(a.y)}px;max-width:${Math.round(a.w)}px`;
+ d.textContent=tx;
+ document.body.appendChild(d);_ghEl=d;
+ setTimeout(ecoGhClear,1900);}
+function ghostSched(){clearTimeout(_ghT);_ghT=setTimeout(()=>{ecoGhost();ghostSched();},30000+Math.random()*30000);}
+
+/* --- o micro-loop: um elemento repete o mesmo movimento 3× e destrava --- */
+let _lpT=null,_lpEl=null;
+function ecoLoopClear(){if(_lpEl){_lpEl.classList.remove("fx-loop");_lpEl=null;}}
+function ecoLoopNow(){ecoLoopClear();
+ if(!ecoOn(5)||$("modal").classList.contains("on"))return;
+ const out=[];document.querySelectorAll(".panel h2,.tabs button,label").forEach(el=>{
+  if(el.matches(":hover"))return;
+  if(document.activeElement&&el.contains(document.activeElement))return;
+  const r=el.getBoundingClientRect();
+  if(r.width<30||r.height<8||r.top<6||r.bottom>innerHeight-6)return;out.push(el);});
+ if(!out.length)return;
+ _lpEl=out[Math.floor(Math.random()*out.length)];_lpEl.classList.add("fx-loop");
+ setTimeout(ecoLoopClear,1500);}
+function loopSched(){clearTimeout(_lpT);_lpT=setTimeout(()=>{ecoLoopNow();loopSched();},28000+Math.random()*32000);}
+
+/* --- o eco sonoro: um tom melancólico que volta 3–4 vezes, cada vez mais longe --- */
+function ecoPing(){if(!AUD.ctx||S.ui.mute||!ecoOn(4))return;
+ const c=AUD.ctx,t0=c.currentTime,b=bandOf(S.ruido||0),n=b>=5?4:3;
+ try{const g=c.createGain();g.gain.value=0;g.connect(c.destination);
+  const o=c.createOscillator();o.type="sine";o.frequency.value=196;o.connect(g);o.start(t0);
+  let d=0,lvl=b>=5?.05:.036;
+  for(let i=0;i<=n;i++){const t=t0+d;
+   g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(lvl,t+.02);
+   g.gain.exponentialRampToValueAtTime(.0001,t+.5);
+   d+=(b>=5?.6:.42)+i*.06;lvl*=.55;} /* atraso crescente, volume decaindo: a lembrança se afastando */
+  o.stop(t0+d+.6);AUD.eg=g;}catch(e){}}
+function ecoAudOff(){clearTimeout(AUD.etimer);AUD.etimer=null;AUD.eon=false;
+ if(!AUD.ctx||!AUD.eg)return;try{const t=AUD.ctx.currentTime;
+  AUD.eg.gain.cancelScheduledValues(t);AUD.eg.gain.setTargetAtTime(0,t,.05);}catch(e){}}
+function ecoAudTick(){if(!AUD.eon)return;const b=bandOf(S.ruido||0);
+ ecoPing();
+ AUD.etimer=setTimeout(ecoAudTick,(b>=5?12+Math.random()*12:18+Math.random()*17)*1000);}
+function ecoAudSync(want){
+ if(!want||!AUD.gest)return ecoAudOff();
+ if(!audBuild())return;
+ if(AUD.ctx.state==="suspended")AUD.ctx.resume().catch(()=>{});
+ if(!AUD.eon){AUD.eon=true;AUD.etimer=setTimeout(ecoAudTick,(6+Math.random()*8)*1000);}}
+
+/* sair do Eco apaga timers, overlays, som — e o buffer volátil não vaza para outro personagem */
+function ecoSync(){const b=bandOf(S.ruido||0),on=ecoOn(1);
+ if(S.elem!=="eco"){ECOBUF.length=0;clearTimeout(_wEt);_wEt=null;}
+ if(on&&b>=3){if(!_stT)stutSched();}else{clearTimeout(_stT);_stT=null;ecoStClear();}
+ if(on&&b>=4){if(!_ghT)ghostSched();}else{clearTimeout(_ghT);_ghT=null;ecoGhClear();}
+ if(on&&b>=5){if(!_lpT)loopSched();}else{clearTimeout(_lpT);_lpT=null;ecoLoopClear();}
+ ecoAudSync(on&&b>=4&&!S.ui.mute);}
+
 /* ---------- abas / navegação ---------- */
 const TABS=[["inicial","Inicial"],["sint","Sintonizar"],["hab","Habilidades"],["mag","Magias"],["tal","Talentos"],["inv","Inventário"],["bib","Biblioteca"],["div","Dívidas & Notas"]];
 function go(t){S.ui.tab=t;save();render();window.scrollTo(0,0);}
@@ -2214,7 +2348,7 @@ function boot(){loadAuto();
  $("btnExp").onclick=exportJSON;
  $("btnImp").onclick=()=>$("impFile").click();
  $("impFile").addEventListener("change",e=>{if(e.target.files[0])importJSON(e.target.files[0]);e.target.value="";});
- $("btnMute").onclick=()=>{S.ui.mute=!S.ui.mute;save();$("btnMute").classList.toggle("on",S.ui.mute);toast(S.ui.mute?"Sussurros silenciados.":"Os sussurros voltaram.");whisperLoop();scopoSync();vazioSync();};
+ $("btnMute").onclick=()=>{S.ui.mute=!S.ui.mute;save();$("btnMute").classList.toggle("on",S.ui.mute);toast(S.ui.mute?"Sussurros silenciados.":"Os sussurros voltaram.");whisperLoop();scopoSync();vazioSync();ecoSync();};
  $("btnCalm").onclick=()=>{S.ui.calm=!S.ui.calm;save();$("btnCalm").classList.toggle("on",S.ui.calm);applyTheme();whisperLoop();toast(S.ui.calm?"Efeitos reduzidos.":"Efeitos completos.");};
  $("btnSess").onclick=toggleSess;
  $("btnMute").classList.toggle("on",S.ui.mute);$("btnCalm").classList.toggle("on",S.ui.calm);
