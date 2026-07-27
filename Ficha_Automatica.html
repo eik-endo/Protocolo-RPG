@@ -410,18 +410,123 @@ esc:[
  ef:"Seu ataque ignora a Absorção do alvo. Total: a Absorção dele cai 1 até ser reparada.",
  req:{nv:6}}
 ],
-mae:[{n:"Berserker",s:"a dor como combustível",regra:["Risco da Fúria","A cada turno em Fúria, teste Coragem (7) ou ataque a criatura mais próxima — amiga ou inimiga."],st:[
-[["Sangue Fervendo","PASSIVA","Ao sofrer dano, recupere 1 de Fôlego (máx. 1×/turno)."],["Entrar em Fúria","AÇÃO","Entre em Fúria: +1 de dano corpo a corpo, −1 na Defesa, imune a Apavorado. Dura a cena ou até você acalmar."]],
-[["Fúria Crescente","PASSIVA","O bônus de dano da Fúria sobe conforme a sua Vida cai."],["Ignorar a Ferida","1×/CENA","Em Fúria, ignore os efeitos de uma condição por 1 turno."]],
-[["Não Vou Cair","PASSIVA","Em Fúria, ao chegar a 0 de Vida você segue de pé até o fim do seu próximo turno."],["Frenesi","GATILHO","Ao derrubar um inimigo, ataque outro imediatamente."]],
-[["Sede de Sangue","PASSIVA","Recupere Vida ao reduzir um inimigo a 0."],["Avatar da Carnificina","1×/SESSÃO","Um turno de Fúria absoluta: ataques sem custo e sem limite de alvos adjacentes; o mestre narra a saída."]]]},
-{n:"Lutador",s:"corpo a corpo puro",st:[
-[["Mãos de Pedra","PASSIVA","Desarmado, você causa dano como uma arma leve e nunca conta como improviso."],["Sequência","PASSIVA","Ao acertar corpo a corpo, +1 no próximo ataque contra o mesmo alvo (acumula na rodada)."]],
-[["Agarrão","AÇÃO","Teste de Briga: o alvo fica Agarrado."],["Nocaute","GATILHO","Contra alvo Atordoado ou Desprevenido, um Total o deixa Inconsciente."]],
-[["Fluxo de Combate","1×/RODADA","Um segundo golpe desarmado como Ação Livre."],["Quebra-Ossos","PASSIVA","Seu dano corpo a corpo aplica Lento num Total."]],
-[["Cem Mãos","AÇÃO","Ataque todos os inimigos adjacentes de uma vez."],["Imparável","PASSIVA","Imune a Agarrado, Caído e empurrão."]]]},
-{n:"Duelista",s:"um inimigo de cada vez",st:[
-[["Foco no Alvo","AÇÃO LIVRE","Marque um inimigo: +1 para acertá-lo, −1 contra os outros enquanto o foco durar."]],[],[],[]]}]},
+mae:[{n:"Berserker",s:"a dor como combustível",
+ regra:{n:"Risco da Fúria",ef:"Você tem um medidor de Fúria (0–6 baseado no estágio), começa cada cena em 0. Sobe +1 sempre que você sofre dano ou reduz um inimigo a 0. Não desce sozinho — só cai ao fim da cena ou quando gasta Fúria numa manobra. Cada ponto de Fúria: +1 de dano corpo a corpo a cada 2 pontos; −1 na Defesa a cada 2 pontos. No início do turno, se Fúria ≥4, teste Coragem (Limiar = a própria Fúria) — falhou, ataca a criatura mais próxima, amiga ou inimiga, antes de qualquer outra ação."},
+ medidor:{chave:"furia",nome:"Fúria",min:0,tetos:[6,6,6,9],reset:"cena"},
+ st:[
+  [
+   {n:"Entrar em Fúria",cst:"—",ac:"Ação Livre · 1×/cena",
+    sab:"Você para de segurar.",
+    ef:"Ligue a Fúria. Enquanto ativa, você é imune a Apavorado e Em Pânico, e o medidor começa a operar (subir e pesar). Desligar é Ação Livre, mas zera o medidor — recomeçar custa uma cena."},
+   {n:"Primeiro Sangue",cst:"—",ac:"Passiva",
+    sab:"A primeira ferida é a que abre a torneira.",
+    ef:"Quando você entra em Fúria, ganhe imediatamente 1 ponto de Fúria. Se você começou o turno tendo sofrido dano desde seu último turno, o próximo ataque contra o agressor ganha +1 além do bônus da maré."}
+  ],
+  [
+   {n:"Golpe de Maré",cst:"gasta 2 de Fúria",ac:"Gatilho (ao acertar um ataque corpo a corpo)",
+    sab:"Você sangra a própria maré pra que o golpe leve tudo junto.",
+    ef:"Queime 2 pontos do medidor pra transformar o acerto: o alvo é jogado ao chão (Caído) e o dano vira dano máximo em vez de rolado. Você escolhe usar isto depois de saber que acertou, mas antes de rolar o dano."},
+   {n:"Ignorar a Ferida",cst:"—",ac:"Reação · 1×/cena",
+    sab:"Dor é informação. Você desligou o aviso.",
+    ef:"Ao sofrer uma condição (Atordoado, Lento, Sangrando, etc.), ignore completamente o efeito dela por 1 turno — mas ganhe 1 de Fúria (a dor foi engolida, não some)."}
+  ],
+  [
+   {n:"Não Vou Cair",cst:"—",ac:"Passiva",
+    sab:"O corpo já morreu. A maré não percebeu ainda.",
+    ef:"Em Fúria, ao chegar a 0 de Vida, você não cai — segue de pé e agindo até o fim do seu próximo turno. Se você reduzir um inimigo a 0 nesse intervalo, ganhe 2 de Fúria e a contagem reinicia. Só cai quando terminar um turno em 0 sem ter matado ninguém nele."},
+   {n:"Frenesi",cst:"—",ac:"Gatilho",
+    sab:"Um caiu. O mundo tem mais.",
+    ef:"Ao reduzir um inimigo a 0, mova-se até um novo alvo ao alcance e ataque de graça."}
+  ],
+  [
+   {n:"Maré Vermelha",cst:"—",ac:"Passiva",
+    sab:"Não há mais fundo. Só o vermelho.",
+    ef:"O teto da Fúria sobe para 9. Nos pontos 7–9, o bônus de dano continua escalando (+4 em F8), mas o Risco passa a ser testado todo turno em Fúria, não só quando falha — e um teste falho ali significa que você ataca todos os adjacentes, aliados inclusive.",
+    req:{nv:12}},
+   {n:"Avatar da Carnificina",cst:"gasta toda a Fúria (mínimo 6)",ac:"Ação · 1×/sessão",
+    sab:"Você entrega o último fio de gente que ainda restava.",
+    ef:"Queime o medidor inteiro (precisa estar em 6+) para um turno de violência absoluta: ataques sem custo, sem limite de alvos adjacentes, ignora Absorção, e nenhuma condição te afeta. Ao fim do turno, a Fúria volta a 0 e você fica Exausto pela cena.",
+    req:{nv:12}}
+  ]
+ ]},
+{n:"Sentinela",s:"a muralha que protege",
+ regra:{n:"Guarda + Vigília",ef:"No seu turno, gastar a Ação para assumir a Guarda projeta uma zona de alcance Curto ao seu redor até seu próximo turno. Enquanto ativa: você começa com 1 ficha de Vigília e ganha +1 sempre que um inimigo dispara um gatilho seu dentro da zona (ele se move dentro dela, ataca um aliado seu, ou tenta atravessá-la — cada gatilho também dá uma Reação). Vigília não usada some quando a Guarda cai. Sem Guarda ativa, você é um Casca-Grossa comum."},
+ medidor:{chave:"vigilia",nome:"Vigília",min:0,tetos:[5,5,5,99],reset:"cena"},
+ st:[
+  [
+   {n:"Assumir a Guarda",cst:"—",ac:"Ação",
+    sab:"Os pés se plantam. Daqui você não sai — e ninguém passa.",
+    ef:"Ative a Guarda (zona Curto, até seu próximo turno) e ganhe 1 Vigília. Enquanto ativa, você não pode ser empurrado nem forçado a sair dela, e sua Defesa ganha +1."},
+   {n:"Interpor",cst:"1 Vigília",ac:"Reação (gatilho: inimigo ataca um aliado na zona)",
+    sab:"O golpe encontra você no caminho.",
+    ef:"Redirecione para você um ataque contra um aliado na sua Guarda, ou some sua Carne ao Limiar de Defesa dele contra aquele golpe. Você escolhe qual, depois de saber o ataque."}
+  ],
+  [
+   {n:"Castigo de Guarda",cst:"1 Vigília",ac:"Reação (gatilho: inimigo se move na zona ou atravessa)",
+    sab:"Cada passo aqui dentro é pago.",
+    ef:"Ataque de oportunidade contra quem disparou o gatilho. Se acertar, o deslocamento dele acaba na hora (para onde está) e ele fica Lento até o fim do turno dele."},
+   {n:"Prender",cst:"2 Vigília",ac:"Reação",
+    sab:"Você fecha a mão. Ele não vai a lugar nenhum.",
+    ef:"Um inimigo na zona fica Preso (não pode sair da zona nem se aproximar de outro alvo; só pode agir contra você ou tentar se soltar com Força Bruta oposta)."}
+  ],
+  [
+   {n:"Muralha Viva",cst:"—",ac:"Passiva",
+    sab:"A zona não é um lugar. É você.",
+    ef:"O alcance da Guarda sobe para Médio e ela passa a te acompanhar quando você se move (não precisa reassumir). Aliados inteiramente dentro da sua Guarda ganham +1 na Defesa."},
+   {n:"Revide em Cadeia",cst:"3 Vigília",ac:"Reação · 1×/rodada",
+    sab:"Um errou. Todos entenderam.",
+    ef:"Quando você acerta uma Reação de Castigo, gaste 3 Vigília para que todos os inimigos na zona testem Coragem (7) ou fiquem Lentos e percam a chance de se mover no próximo turno deles."}
+  ],
+  [
+   {n:"Zona de Execução",cst:"—",ac:"Passiva",
+    sab:"Aqui dentro, o tempo é seu.",
+    ef:"Não há mais limite de Reações por rodada dentro da Guarda — cada gatilho que um inimigo dispara, você pode responder, desde que tenha Vigília. O teto de Vigília deixa de existir: acumule quanto o inimigo te der.",
+    req:{nv:12}},
+   {n:"A Última Linha",cst:"toda a Vigília (mínimo 4)",ac:"Reação · 1×/sessão (gatilho: um aliado na zona chegaria a 0)",
+    sab:"Enquanto você respira, ele não cai.",
+    ef:"Queime toda a Vigília (4+) para anular completamente o golpe que derrubaria um aliado na sua Guarda — dano zero — e contra-atacar o agressor com dano máximo automático.",
+    req:{nv:12}}
+  ]
+ ]},
+{n:"Duelista",s:"um inimigo de cada vez",
+ regra:{n:"Foco + Ímpeto",ef:"Como Ação Livre, marque um inimigo como seu Foco (só um por vez; remarcar é Ação Livre). Contra o Foco: +1 para acertar, e ignora a penalidade de estar em desvantagem numérica contra ele; toda vez que acerta o Foco, ganha 1 de Ímpeto (máx. conforme estágio). Fora isso, enquanto houver 2+ inimigos adjacentes a você, sua Defesa é −1."},
+ medidor:{chave:"impeto",nome:"Ímpeto",min:0,tetos:[3,3,5,8],reset:"cena"},
+ st:[
+  [
+   {n:"En Garde",cst:"—",ac:"Passiva",
+    sab:"O peso certo no pé certo. Você já leu o duelo antes de ele começar.",
+    ef:"Com uma arma leve, seu deslocamento não provoca reações do seu Foco, e você pode se reposicionar (passo de 1m) de graça uma vez por turno."},
+   {n:"Finta",cst:"1 Ímpeto",ac:"Ação (declare antes de atacar o Foco) · Manobra",
+    sab:"Você mostra um golpe que nunca vem.",
+    ef:"O Foco não pode usar Reação contra este ataque e testa Coragem (7); se falhar, você tem +2 e o acerto abre a guarda dele (o próximo ataque de qualquer aliado contra ele, nesta rodada, ganha +2)."}
+  ],
+  [
+   {n:"Riposte",cst:"1 Ímpeto",ac:"Reação (gatilho: o Foco erra um ataque contra você) · Manobra",
+    sab:"O erro dele é o seu convite.",
+    ef:"Responda com um ataque imediato. Se acertar, além do dano, recupere o Ímpeto gasto."},
+   {n:"Ponto Fraco",cst:"2 Ímpeto",ac:"Ação (declare antes de atacar o Foco) · Manobra",
+    sab:"Você viu onde a armadura não cobre. Ou a alma.",
+    ef:"Este ataque ignora a Absorção do Foco e, num Total, aplica uma condição à escolha entre Sangrando, Lento ou Cego."}
+  ],
+  [
+   {n:"Tempo Perfeito",cst:"—",ac:"Passiva",
+    sab:"Não é mais rápido. É na hora exata.",
+    ef:"Sempre que seu Foco fica sem nenhum outro inimigo por perto (um duelo 1×1), você ganha 1 de Ímpeto no início de cada um dos seus turnos."},
+   {n:"Desarme Magistral",cst:"2 Ímpeto",ac:"Ação (declare antes de atacar o Foco) · Manobra",
+    sab:"A arma dele agora é sua, ou é do chão. Ele que escolha.",
+    ef:"Num acerto, o Foco é desarmado (a arma voa a Curto) e fica com −2 para agir até recuperá-la ou sacar outra. Contra inimigos sem arma, ele perde a próxima Reação."}
+  ],
+  [
+   {n:"Mestre-de-Armas",cst:"—",ac:"Passiva",
+    sab:"Você não trava mais. Cada troca de lâminas te ensina a próxima.",
+    ef:"Você pode declarar duas Manobras diferentes no mesmo turno (pagando as duas), e acertar o Foco recupera 2 de Ímpeto em vez de 1.",
+    req:{nv:12}},
+   {n:"Golpe de Mestre",cst:"5 Ímpeto",ac:"Ação · 1×/sessão (declare contra o Foco) · Manobra",
+    sab:"Toda a conversa levava a esta frase.",
+    ef:"Acerto automático, dano máximo, ignora Absorção, e o Foco testa Resistência (Limiar = seu dano) ou é imediatamente incapacitado (inconsciente ou morto, sua escolha). Contra alvos que sobrevivem, ficam Atordoados e Sangrando.",
+    req:{nv:12}}
+  ]
+ ]}]},
 
 "Investigador":{f:"Todo mundo vê. Quase ninguém olha.",vida:2,comb:"sin",cv:2,tre:["Investigação","Percepção","Intuição"],profs:"arrombamento, fotografia e escuta, etiqueta do submundo",
 base:[
@@ -570,7 +675,126 @@ esc:[
  {n:"Domínio de Área",cst:"1 Fôlego",ac:"Ação",
   sab:"Aquele pedaço do mapa agora pertence à sua mira.",
   ef:"Varre uma zona Curta: até seu próximo turno, agir ali custa +2 de Limiar. Capangas testam Coragem (7) ou colam na cobertura e perdem a ação. Consome 1 carga extra."}
-],mae:[]},
+],
+mae:[
+{n:"Caçador",s:"o tiro único e perfeito",
+ regra:{n:"Foco",ef:"Você acumula Foco (0–5, teto sobe para 8 no Ápice). Ganha 1 ao passar um turno sem atirar (respirar, observar, calcular) e 1 ao mirar um alvo com Ação. O Foco não some entre turnos — só quando você dispara, gastando todo o Foco acumulado de uma vez naquele tiro. Enquanto acumula Foco, sua Defesa cai −1 por ponto."},
+ medidor:{chave:"foco",nome:"Foco",min:0,tetos:[5,5,5,8],reset:"cena"},
+ st:[
+  [
+   {n:"Respirar",cst:"—",ac:"Ação (ou Ação Livre 1×/turno se imóvel)",
+    sab:"Entre uma batida do coração e a outra, o mundo para.",
+    ef:"Ganhe 1 de Foco e trave um alvo à vista. Cada ponto de Foco que você gastar no próximo disparo contra ele adiciona +2 de dano e +1 para acertar."},
+   {n:"Leitura de Distância",cst:"—",ac:"Passiva",
+    sab:"Vento, queda, distância. Números que os outros nem veem, você já corrigiu.",
+    ef:"Você ignora todas as penalidades de distância, cobertura parcial e condições de tiro. Contra um alvo que não sabe que você está lá, seu primeiro disparo da cena gasta o Foco acumulado com efeito dobrado."}
+  ],
+  [
+   {n:"Tiro Cirúrgico",cst:"gasta o Foco acumulado",ac:"Ação",
+    sab:"Você não atira nele. Atira no que faz ele funcionar.",
+    ef:"Ao disparar com Foco 3+, escolha o efeito além do dano: desarmar, aleijar (deslocamento a 0 e Sangrando), silenciar ([Foco] turnos) ou cegar. Ignora Absorção."},
+   {n:"Ninho",cst:"—",ac:"Ação (estabelece posição)",
+    sab:"Você escolheu este lugar por um motivo. Todos eles.",
+    ef:"Estabeleça uma posição de tiro (dura enquanto você ficar). Nela: ganha Foco +1 extra por turno de espera, não pode ser detectado por quem não vencer Percepção (9) contra sua Furtividade, e tem cobertura total contra a primeira ameaça que o encontrar."}
+  ],
+  [
+   {n:"Um Tiro, Uma Morte",cst:"gasta Foco 5",ac:"Ação · 1×/cena",
+    sab:"A frase inteira em uma bala.",
+    ef:"Ao disparar com Foco máximo (5), acerto automático, ignora Absorção e cobertura, dano máximo triplicado. Contra chefes, além do dano, aplica Atordoado e Sangrando."},
+   {n:"Olho de Deus",cst:"—",ac:"Passiva",
+    sab:"De onde você está, tudo é alcance.",
+    ef:"Não há mais 'longe demais' — acerta qualquer alvo que consiga enxergar, a qualquer distância, e enxerga através de fumaça, folhagem e escuro. Tiros com Foco 3+ atravessam obstáculos leves."}
+  ],
+  [
+   {n:"A Bala Já Saiu",cst:"—",ac:"Passiva",
+    sab:"No instante em que você decide atirar, a coisa já está feita.",
+    ef:"Teto de Foco sobe para 8. Uma vez por rodada, declare um disparo como inevitável: o tiro vai acertar no início do seu próximo turno não importa o que o alvo faça.",
+    req:{nv:12}},
+   {n:"Tiro Impossível",cst:"gasta 8 de Foco",ac:"Ação · 1×/campanha",
+    sab:"Você faz o disparo que não deveria ser possível.",
+    ef:"Gaste 8 de Foco para um tiro que desafia a realidade: um alvo que nunca viu mas sabe existir, um ricochete por [Juízo] alvos, ou uma bala que atinge um conceito tão bem quanto um corpo.",
+    req:{nv:12}}
+  ]
+ ]},
+{n:"Fuzileiro",s:"o volume de fogo e o controle de área",
+ regra:{n:"Supressão",ef:"Você marca Zonas de Fogo — áreas Curto que mantém sob supressão enquanto tiver munição e linha de tiro; sustenta até [Juízo] Zonas ao mesmo tempo. Manter Zonas te prende ao volume de fogo: enquanto suprime, não pode se mover mais que um passo nem fazer tiros precisos."},
+ medidor:{chave:"municao",nome:"Munição",min:0,tetos:[6,8,10,16],reset:"cena"},
+ st:[
+  [
+   {n:"Abrir Fogo",cst:"2 Munição (+1 por turno mantida)",ac:"Ação",
+    sab:"Não precisa acertar. Precisa que eles não consigam levantar a cabeça.",
+    ef:"Estabeleça uma Zona de Fogo (Curto). Inimigos que entrem ou ajam nela sofrem 1 de dano e ficam com −2 em tudo; capangas testam Coragem (7) ou ficam presos na cobertura."},
+   {n:"Pente Estendido",cst:"—",ac:"Passiva",
+    sab:"Você carrega mais, atira mais, e para menos.",
+    ef:"Sua capacidade de munição é muito maior (já refletida no teto); recarregar é Ação Livre 1×/turno mesmo em rajada."}
+  ],
+  [
+   {n:"Fogo Cruzado",cst:"2 Munição",ac:"Ação · requer 2+ Zonas",
+    sab:"Entre duas linhas de tiro não existe lugar seguro.",
+    ef:"Um inimigo pego entre duas de suas Zonas fica Preso (não pode sair sem sofrer um tiro automático de dano cheio) e perde bônus de cobertura."},
+   {n:"Rajada de Contenção",cst:"3 Munição",ac:"Reação",
+    sab:"Alguém tentou avançar. Você respondeu com uma parede.",
+    ef:"Quando um inimigo tenta atravessar ou sair de uma Zona sua, esvazie um pente para detê-lo: o movimento acaba na hora, sofre dano de rajada e testa contra ficar Caído."}
+  ],
+  [
+   {n:"Terra de Ninguém",cst:"4 Munição (+2 por turno mantida)",ac:"Ação · 1×/cena",
+    sab:"Deste ponto até aquele, o chão pertence às suas balas.",
+    ef:"Transforme uma área Médio em Terra de Ninguém por [Juízo] turnos: nada se move ali sem sofrer dano por metro avançado, conjurações lentas são interrompidas, e todo inimigo dentro age por último."},
+   {n:"Metralhar",cst:"3 Munição",ac:"Ação",
+    sab:"Você para de escolher alvos. Escolhe direções.",
+    ef:"Despeje fogo num arco: inimigos numa linha ou cone (Curto) sofrem dano e ficam Suprimidos (−2 e não podem reagir) até o próximo turno."}
+  ],
+  [
+   {n:"Senhor do Campo",cst:"—",ac:"Passiva",
+    sab:"A batalha inteira acontece dentro das regras que você escreveu com chumbo.",
+    ef:"Sustenta Zonas ilimitadas e pode mantê-las mesmo se mover. Suas Zonas derrubam projéteis (flechas, mísseis, magias) que cruzem sua linha.",
+    req:{nv:12}},
+   {n:"Barragem",cst:"toda a Munição que tiver (mínimo 10)",ac:"Ação · 1×/campanha",
+    sab:"Você chama todo o fogo que existe para um único lugar.",
+    ef:"Queime toda a munição para uma barragem sobre uma área enorme: por uma cena inteira, dano massivo por turno, estruturas cedem, ninguém entra e sobrevive.",
+    req:{nv:12}}
+  ]
+ ]},
+{n:"Pistoleiro",s:"a velocidade e o gunplay próximo",
+ regra:{n:"Momentum",ef:"Você acumula Momentum (0–5, teto sobe para 8 no Ápice) dentro de uma cena de ação. Ganha 1 a cada disparo certeiro, ao derrubar um inimigo, ou ao se mover e atirar no mesmo turno. Se passar um turno inteiro sem atirar nem se mover, o Momentum zera. A partir de Momentum 3, −1 na Defesa."},
+ medidor:{chave:"momentum",nome:"Momentum",min:0,tetos:[5,5,5,8],reset:"cena"},
+ st:[
+  [
+   {n:"Saque",cst:"—",ac:"Passiva",
+    sab:"A arma já está na sua mão antes de você decidir sacá-la.",
+    ef:"Sacar, trocar de arma ou recarregar nunca gasta ação. Você sempre age primeiro na primeira rodada de um confronto de curta distância. Ao se mover e atirar no mesmo turno, ganhe 1 de Momentum extra."},
+   {n:"Fogo Rápido",cst:"1 Momentum",ac:"Ação",
+    sab:"Um alvo é pouco. Você tem balas para todos.",
+    ef:"Dispare em dois alvos diferentes (ou dois tiros no mesmo), cada um com dano normal. Cada acerto devolve Momentum."}
+  ],
+  [
+   {n:"Giro",cst:"2 Momentum",ac:"Ação",
+    sab:"Você roda, e quando para, todos ao seu redor já caíram.",
+    ef:"Atire em todos os inimigos em Curto ao seu redor, um tiro cada. Se algum cair, o Momentum gasto volta."},
+   {n:"Gatilho Nervoso",cst:"1 Momentum",ac:"Reação",
+    sab:"Alguém se mexeu. Você já atirou.",
+    ef:"Quando um inimigo em Curto se move, saca, ou age contra você ou um aliado, atire nele primeiro — se causar dano, a ação dele sai com −2 ou falha."}
+  ],
+  [
+   {n:"Dança do Revólver",cst:"Momentum sustentado (3+)",ac:"Passiva",
+    sab:"Você não anda pela luta. Você a coreografa.",
+    ef:"Com Momentum 3+, mover-se não provoca reações, você atira entre movimentos, e cada inimigo que erra um ataque contra você abre a guarda para seu próximo tiro (dano dobrado)."},
+   {n:"Recarga no Sangue",cst:"—",ac:"Gatilho",
+    sab:"Cada corpo no chão é uma desculpa para continuar.",
+    ef:"Ao reduzir um inimigo a 0, recupere munição cheia instantaneamente, ganhe 2 de Momentum, e seu próximo tiro nesta rodada ignora Absorção."}
+  ],
+  [
+   {n:"Tempo de Pólvora",cst:"—",ac:"Passiva",
+    sab:"Para você, o segundo entre o gatilho e o impacto é longo o bastante para viver dentro dele.",
+    ef:"Teto de Momentum sobe para 8. Com Momentum 5+, ganha uma Ação extra de disparo por turno, reage a quantos gatilhos quiser (gastando Momentum), e abate projéteis dirigidos a você no ar.",
+    req:{nv:12}},
+   {n:"Seis Balas, Seis Mortes",cst:"todo o Momentum (mínimo 6)",ac:"Ação · 1×/campanha",
+    sab:"Você mira em tudo de uma vez.",
+    ef:"Queime todo o Momentum (6+) para designar até 6 alvos visíveis e disparar em todos simultaneamente, acerto automático e dano máximo, ignorando cobertura e Absorção. Alvos comuns morrem; nomeados ficam Atordoados, Sangrando e desarmados.",
+    req:{nv:12}}
+  ]
+ ]}
+]},
 
 "Sobrevivente":{f:"O mato só mata quem não escuta.",vida:2,comb:"fol",cv:2,tre:["Sobrevivência","Atletismo","Percepção"],profs:"armas Restritas (caça), navegação, veículos comuns",
 base:[
@@ -838,7 +1062,8 @@ function fixS(){const d=DEF();
  for(const k of["hab","mag","mae"])if(!Array.isArray(S.custom[k]))S.custom[k]=[];
  if(!Array.isArray(S.sess.notes))S.sess.notes=[];if(!Array.isArray(S.sess.log))S.sess.log=[];
  if(typeof S.per!=="object"||!S.per)S.per={};if(typeof S.cond!=="object"||!S.cond)S.cond={};
- if(!S.inv.pieces)S.inv.pieces=[];if(!S.inv.bag)S.inv.bag=[];if(!S.inv.seq)S.inv.seq=1;}
+ if(!S.inv.pieces)S.inv.pieces=[];if(!S.inv.bag)S.inv.bag=[];if(!S.inv.seq)S.inv.seq=1;
+ for(const m of S.maest)if(typeof m.rec!=="number")m.rec=0;}
 
 /* ---------- salvar ---------- */
 let _st=null;
@@ -1064,6 +1289,25 @@ function recCard(k,nm,mx){return `<div class="rec"><div class="rn">${nm} <b>máx
  <input type="number" id="cur_${k}" value="${curOf(k)}" onchange="setCur('${k}',this.value)"><span class="mx">/ ${mx}</span>
  <button class="stp" onclick="stepRec('${k}',1)">+</button></div>
  <div class="bar"><i id="bar_${k}"></i></div></div>`;}
+/* medidores de maestria — recurso próprio de uma trilha (Fúria, etc.) */
+const RESET_LB={cena:"nova cena",sessao:"nova sessão",permanente:"permanente"};
+function meterOf(m){const md=m&&!m.cu?maeData(m):null;return(md&&md.medidor)||null;}
+function meterCap(m){const d=meterOf(m);return d?{min:d.min,max:d.tetos[m.st]}:null;}
+function meterVal(m){const c=meterCap(m);return c?Math.max(c.min,Math.min(c.max,m.rec||0)):0;}
+function meterCard(m,i){const d=meterOf(m);if(!d)return "";
+ const tp=d.tetos[m.st],v=meterVal(m),pc=tp>d.min?Math.round((v-d.min)/(tp-d.min)*100):0;
+ return `<div class="rec" id="mtr_${i}" style="margin-top:8px"><div class="rn">${esc(d.nome)} <b>teto ${tp} · ${STG[m.st]}</b></div><div class="rv">
+ <button class="stp" onclick="stepMeter(${i},-1)">−</button>
+ <input type="number" id="mcur_${i}" min="${d.min}" max="${tp}" value="${v}" onchange="setMeter(${i},this.value)"><span class="mx">/ ${tp}</span>
+ <button class="stp" onclick="stepMeter(${i},1)">+</button>
+ ${d.reset?`<button class="btn mini" style="margin-left:auto" onclick="resetMeter(${i})">zerar (${RESET_LB[d.reset]||esc(d.reset)})</button>`:""}</div>
+ <div class="bar"><i id="mbar_${i}" style="width:${pc}%"></i></div></div>`;}
+function meterSync(i){const el=$("mtr_"+i);if(el)el.outerHTML=meterCard(S.maest[i],i);}
+function meterPut(i,v){const m=S.maest[i];if(!m)return;const c=meterCap(m);if(!c)return;
+ m.rec=Math.max(c.min,Math.min(c.max,isNaN(v)?c.min:v));save();meterSync(i);}
+function stepMeter(i,d){const m=S.maest[i];if(m)meterPut(i,meterVal(m)+d);}
+function setMeter(i,v){meterPut(i,parseInt(v,10));}
+function resetMeter(i){const m=S.maest[i];if(!m)return;const c=meterCap(m);if(c)meterPut(i,c.min);}
 function skillsHTML(sessOnly){let out="",cur="";
  const list=PERICIAS.map((p,i)=>({p,i})).filter(o=>!sessOnly||S.per[o.p[0]]||SESS_ALL);
  for(const {p,i} of list){const an=ATTRS.find(a=>a[0]===p[1]);
@@ -1211,7 +1455,7 @@ function openMaeModal(){const mtL=mtTot()-mtUsado();let body="";
  <div style="text-align:right;margin-top:10px"><button class="btn" onclick="closeModal()">fechar</button></div>`);}
 function chkEscolha(){if(mtTot()-mtUsado()<1){toast("Sem Escolha de Maestria livre — elas chegam nos níveis 1, 4, 8 e 12.");return false;}return true;}
 function openMae(f,i){if(!chkEscolha())return;const m=FARDOS[f].mae[i];
- S.maest.push({f,n:m.n,st:0});save();closeModal();render();toast(m.n+" — Aprendiz.");}
+ S.maest.push({f,n:m.n,st:0,rec:0});save();closeModal();render();toast(m.n+" — Aprendiz.");}
 function openMaeCustom(){if(!chkEscolha())return;const f=$("cm_f").value,n=$("cm_n").value.trim();if(!n)return toast("Dê um nome ao caminho.");
  S.maest.push({f,n,st:0,cu:true,tx:["","","",""]});save();closeModal();render();}
 function maeData(m){const d=FARDOS[m.f];return d?d.mae.find(x=>x.n===m.n):null;}
@@ -1223,7 +1467,8 @@ function maeCard(m,i){const md=m.cu?null:maeData(m),imposta=(m.f==="Sintonizador
  return `<div class="mcard"><div class="ht" style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap">
  <b style="font-family:Georgia,serif;font-size:15px">${esc(m.n)}</b><span class="tag dark">${m.f}</span>
  ${imposta?`<span class="tag warn">imposta</span>`:""}${md&&md.s?`<span class="src">${esc(md.s)}</span>`:""}</div>
- ${md&&md.regra?`<div class="hcard regra" style="margin-top:8px"><div class="ht"><b>◆ ${md.regra[0]}</b></div><div class="hx">${esc(md.regra[1])}</div></div>`:""}
+ ${md&&md.regra?`<div class="hcard regra" style="margin-top:8px"><div class="ht"><b>◆ ${esc(md.regra.n)}</b>${md.regra.cst?`<span class="tag dark">${esc(md.regra.cst)}</span>`:""}${md.regra.ac?`<span class="tag dark">${esc(md.regra.ac)}</span>`:""}</div>${md.regra.sab?`<div class="hsab">${esc(md.regra.sab)}</div>`:""}<div class="hx">${esc(md.regra.ef)}</div></div>`:""}
+ ${meterCard(m,i)}
  <div class="mrail">${STG.map((n,s)=>`<div class="mst ${s<=m.st?"on":s===m.st+1?"next":""}">${n}</div>`).join("")}</div>
  ${body}
  <div style="display:flex;gap:6px;margin-top:8px">
