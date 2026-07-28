@@ -312,10 +312,60 @@ body[data-el=obs][data-band="5"] #fx-tunnel{animation:scopobreath 11s ease-in-ou
 body[data-el=obs][data-band="3"] #fx-eye{opacity:.035;visibility:visible;--eyeb:22px}
 body[data-el=obs][data-band="4"] #fx-eye{opacity:.075;visibility:visible;--eyeb:15px}
 body[data-el=obs][data-band="5"] #fx-eye{opacity:.12;visibility:visible;--eyeb:10px}
-/* asc: listras de ferrugem e tremor */
-body[data-el=asc] .panel{border-image:repeating-linear-gradient(45deg,var(--ecd) 0 8px,var(--line) 8px 16px) 1}
-body[data-el=asc][data-band="4"] .wrap,body[data-el=asc][data-band="5"] .wrap{animation:servo 3.5s steps(2) infinite}
-@keyframes servo{0%,96%{transform:none}98%{transform:translate(1px,-1px)}}
+/* ===== asc — carne virando máquina: servo-travamento, aço frio, ferrugem =====
+   o medo aqui é a INTERFACE SE MOVENDO ERRADO. tudo abaixo trava animação e transição
+   DECORATIVA; input/textarea/select e o scroll ficam de fora — digitar é sempre imediato. */
+/* --srvstep: o tamanho do passo do servo. quanto mais alta a banda, menos passos = mais travado */
+body[data-el=asc][data-band="1"],body[data-el=asc][data-band="2"]{--srvstep:steps(4,end);--vib:0px}
+body[data-el=asc][data-band="3"]{--srvstep:steps(3,end);--vib:.35px}
+body[data-el=asc][data-band="4"]{--srvstep:steps(3,end);--vib:.5px}
+body[data-el=asc][data-band="5"]{--srvstep:steps(2,end);--vib:.75px}
+body[data-el=asc] .btn,body[data-el=asc] .tabs button,body[data-el=asc] .rseg,body[data-el=asc] .rec .stp,
+body[data-el=asc] .bar i,body[data-el=asc] .dropzone,body[data-el=asc] .sw,body[data-el=asc] .sc,
+body[data-el=asc] .doc,body[data-el=asc] #rollcard,body[data-el=asc] #whisper,body[data-el=asc] .toast,
+body[data-el=asc] .mtier,body[data-el=asc] .elc{transition-timing-function:var(--srvstep,ease)}
+/* a moldura: ferrugem na borda, aço polido por dentro — cresce com a banda */
+body[data-el=asc] .panel{border-image:repeating-linear-gradient(45deg,var(--ecd) 0 8px,var(--line) 8px 16px) 1;
+ box-shadow:inset 0 1px 0 rgba(198,214,228,calc(.03 + var(--band)*.03)),inset 0 -1px 0 rgba(0,0,0,calc(.22 + var(--band)*.08))}
+body[data-el=asc] .panel::before{content:"";position:absolute;inset:0;pointer-events:none;
+ background:linear-gradient(104deg,transparent 0 16%,rgba(200,216,230,calc(.004 + var(--band)*.011)) 25% 32%,transparent 41% 63%,rgba(200,216,230,calc(.003 + var(--band)*.008)) 70% 74%,transparent 82%)}
+/* o tremor do motor: a "pele" da ficha vibra em passos travados. sub-pixel, camada própria —
+   o texto é rasterizado uma vez e só se translada, então nada relayoutiza nem borra */
+body[data-el=asc][data-band="3"] .wrap{animation:srvvib .6s steps(1,end) infinite}
+body[data-el=asc][data-band="4"] .wrap{animation:srvvib .42s steps(1,end) infinite}
+body[data-el=asc][data-band="5"] .wrap{animation:srvvib .28s steps(1,end) infinite}
+@keyframes srvvib{0%{transform:translate3d(0,0,0)}25%{transform:translate3d(var(--vib,0px),calc(var(--vib,0px)*-.7),0)}
+ 50%{transform:translate3d(calc(var(--vib,0px)*-.8),calc(var(--vib,0px)*.5),0)}
+ 75%{transform:translate3d(calc(var(--vib,0px)*.4),var(--vib,0px),0)}100%{transform:translate3d(0,0,0)}}
+/* o servo: a junta que se reposiciona sozinha. o painel em uso (:focus-within) nunca se mexe */
+@keyframes servo{0%,88%{transform:none}90%{transform:translate(1px,-1px)}93%{transform:translate(-1px,0)}96%{transform:translate(1px,0)}100%{transform:none}}
+body[data-el=asc][data-band="2"] .panel:not(:focus-within),body[data-el=asc][data-band="3"] .panel:not(:focus-within),
+body[data-el=asc][data-band="4"] .panel:not(:focus-within),body[data-el=asc][data-band="5"] .panel:not(:focus-within){animation:servo 3.5s steps(1,end) infinite}
+body[data-el=asc] .panel:not(:focus-within):nth-of-type(2n){animation-delay:-1.2s}
+body[data-el=asc] .panel:not(:focus-within):nth-of-type(3n){animation-delay:-2.4s}
+body[data-el=asc][data-band="5"] .attr:not(:focus-within),body[data-el=asc][data-band="5"] .rec:not(:focus-within){animation:servo 4.4s steps(1,end) infinite}
+body[data-el=asc][data-band="5"] .attr:not(:focus-within):nth-child(2n),body[data-el=asc][data-band="5"] .rec:not(:focus-within):nth-child(2n){animation-delay:-1.9s}
+body[data-el=asc][data-band="5"] .attr:not(:focus-within):nth-child(3n),body[data-el=asc][data-band="5"] .rec:not(:focus-within):nth-child(3n){animation-delay:-3.3s}
+/* braço robótico parando: o conteúdo novo assenta com overshoot travado (só na troca de aba).
+   o shorthand vem depois dos delays do servo de propósito — zera o atraso negativo deles;
+   backwards segura o 0% durante o escalonamento abaixo, senão os painéis piscam antes de cair */
+body[data-el=asc] .asc-land .panel:not(:focus-within){animation:srvland .44s steps(3,end) backwards}
+body[data-el=asc] .asc-land .panel:not(:focus-within):nth-of-type(2n){animation-delay:.07s}
+body[data-el=asc] .asc-land .panel:not(:focus-within):nth-of-type(3n){animation-delay:.13s}
+@keyframes srvland{0%{transform:translateY(-7px);opacity:.2}40%{transform:translateY(3px);opacity:1}64%{transform:translateY(-2px)}82%{transform:translateY(1px)}100%{transform:none}}
+/* a pele que descasca: aço polido e trilha de circuito por baixo da superfície */
+.fx-peel{position:fixed;pointer-events:none;z-index:9;border-radius:2px;overflow:hidden;opacity:0;
+ background:repeating-linear-gradient(101deg,#22262b 0 5px,#3f474f 5px 8px,#14171a 8px 13px),
+  repeating-linear-gradient(0deg,rgba(150,200,214,.16) 0 1px,transparent 1px 6px);
+ box-shadow:inset 0 0 10px rgba(0,0,0,.85),0 0 0 1px rgba(190,206,220,.18);animation:ascpeel 1.05s steps(8,end)}
+@keyframes ascpeel{0%{opacity:0;clip-path:inset(0 100% 0 0)}16%{opacity:.9;clip-path:inset(0 10% 0 0)}
+ 68%{opacity:.85;clip-path:inset(0 6% 0 0)}100%{opacity:0;clip-path:inset(0 0 0 100%)}}
+/* a junta que emperra (força o mesmo fim de curso 3×) e o salto mecânico que se corrige */
+.fx-jam{animation:ascjam .62s steps(2,end)}
+@keyframes ascjam{0%{transform:none}18%{transform:translateX(3px)}30%{transform:translateX(2.2px)}44%{transform:translateX(3.4px)}
+ 56%{transform:translateX(2.4px)}70%{transform:translateX(3.6px)}82%{transform:translateX(2.6px)}100%{transform:none}}
+.fx-jolt{animation:ascjolt .5s steps(1,end)}
+@keyframes ascjolt{0%{transform:none}14%{transform:translate(5px,-3px)}44%{transform:translate(5px,-3px)}58%{transform:translate(-2px,1px)}76%{transform:translate(1px,0)}100%{transform:none}}
 /* pacto: linha de assinatura sob os títulos */
 body[data-el=pac][data-band="2"] .panel h2,body[data-el=pac][data-band="3"] .panel h2,body[data-el=pac][data-band="4"] .panel h2,body[data-el=pac][data-band="5"] .panel h2{border-bottom:1px solid var(--ecd);padding-bottom:5px}
 /* germe: musgo nos cantos, cresce com a banda */
@@ -343,14 +393,19 @@ body[data-band="5"] .panel h2:not(:hover){filter:blur(.4px)}
 body[data-band="5"] .panel h2:hover,body[data-band="5"] h1:hover{animation:none;filter:none}
 /* calmar / reduced motion */
 body.calm *,body.calm *::before,body.calm *::after{animation:none!important;transition:none!important}
-body.calm #fx-canvas,body.calm #whisper,body.calm #fx-eye,body.calm #fx-tunnel,body.calm .fx-flash,body.calm #fx-void,body.calm #fx-black,body.calm .fx-ghost{display:none}
+body.calm #fx-canvas,body.calm #whisper,body.calm #fx-eye,body.calm #fx-tunnel,body.calm .fx-flash,body.calm #fx-void,body.calm #fx-black,body.calm .fx-ghost,body.calm .fx-peel{display:none}
 body.calm[data-el=vaz] .panel,body.calm[data-el=vaz] .tabs button{opacity:1!important;filter:none!important}
 body.calm[data-el=eco] h1,body.calm[data-el=eco] .panel h2{text-shadow:calc(var(--band)*1.2px) calc(var(--band)*1.2px) 0 rgba(127,184,168,.35)!important}
 body.calm[data-el=eco] .hx,body.calm[data-el=eco] .hint,body.calm[data-el=eco] label{text-shadow:none!important}
-@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}#fx-canvas,#fx-eye,#fx-tunnel,.fx-flash,#fx-void,#fx-black,.fx-ghost{display:none}
+/* asc: o servo destrava — movimento fluido de volta, sem resíduo de transform */
+body.calm[data-el=asc] .wrap,body.calm[data-el=asc] .panel,body.calm[data-el=asc] .attr,body.calm[data-el=asc] .rec,
+body.calm[data-el=asc] .panel h2,body.calm[data-el=asc] label,body.calm[data-el=asc] .hint{transform:none!important}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}#fx-canvas,#fx-eye,#fx-tunnel,.fx-flash,#fx-void,#fx-black,.fx-ghost,.fx-peel{display:none}
  body[data-el=vaz] .panel,body[data-el=vaz] .tabs button{opacity:1!important;filter:none!important}
  body[data-el=eco] h1,body[data-el=eco] .panel h2{text-shadow:calc(var(--band)*1.2px) calc(var(--band)*1.2px) 0 rgba(127,184,168,.35)!important}
- body[data-el=eco] .hx,body[data-el=eco] .hint,body[data-el=eco] label{text-shadow:none!important}}
+ body[data-el=eco] .hx,body[data-el=eco] .hint,body[data-el=eco] label{text-shadow:none!important}
+ body[data-el=asc] .wrap,body[data-el=asc] .panel,body[data-el=asc] .attr,body[data-el=asc] .rec,
+ body[data-el=asc] .panel h2,body[data-el=asc] label,body[data-el=asc] .hint{transform:none!important}}
 @media(max-width:640px){h1{font-size:20px;letter-spacing:5px}.wrap{padding:10px 10px 50px}.elc{width:100%}}
 
 </style>
@@ -1805,6 +1860,12 @@ const SUS_ECO={
 lo:["você já leu isso","isto já aconteceu","de novo","você reconhece este momento","já estava assim"],
 mid:["você já esteve exatamente aqui","a resposta veio antes da pergunta","quantas vezes já?","você não saiu daqui","outra vez. outra vez. outra vez."],
 hi:["você lembra. eu sei que lembra.","aconteceu de novo, como sempre acontece","você já viveu isto e vai viver outra vez","não foi a primeira vez. não vai ser a última.","volte ao começo. você sabe o caminho."]};
+/* asc: nada aqui ameaça nem lamenta — é sereno, superior, com certeza absoluta de estar certo.
+   soa quase gentil, e é exatamente isso que arrepia */
+const SUS_ASC={
+lo:["a carne é lenta","você pode ser melhor que isto","a dor é só um sinal mal projetado","por que ainda sente?","a carne é fraca, substitua-a"],
+mid:["remova o que falha","emoção é ineficiência","o metal não hesita","você não precisa mais dormir","um parafuso a mais"],
+hi:["não sinto mais falta de nada. você também não vai.","a carne era o rascunho","eu me consertei. você ainda pode.","logo você vai agradecer","não dói mais. nada mais dói."]};
 const ELEMS=[
 {id:"obs",g:"⊙",n:"Observação",v:"registra",fr:"O que você vê fica registrado. O que registra você, também.",
 lei:["Lei do Registro","O que você vê através da Observação fica registrado — revisitável mentalmente e transmissível: um toque na testa compartilha o registro em flash. E espiar o anômalo tem preço: a coisa pode notar o olhar."],
@@ -1821,7 +1882,7 @@ sus:["sobra menos","o que faltava aqui?","ninguém lembra","o silêncio anda com
 {id:"asc",g:"⌬",n:"Ascensão",v:"acumula",fr:"A carne é um rascunho. A Ascensão não teve paciência de esperar a versão final.",
 lei:["Sem Regra","A Ascensão é o único elemento cuja Sobrecarga não tem teto de Juízo — empilhe quanto quiser. Mas cada ponto além do seu Juízo soma +2 ao Refluxo. E a carne lembra: toda magia da Ascensão sobre si mesmo deixa um traço físico visível enquanto durar."],
 marca:["Um zumbido baixo sob a pele; relógios adiantam perto de você — −1 em contato gentil (mãos frias, duras demais), +1 em testes técnicos.","Uma junta range ao acordar; há algo duro sob o antebraço que médicos querem examinar — −1 social com quem nota o errado; máquinas simples funcionam melhor na sua mão.","Seu peso está errado para o seu tamanho; a voz carrega um sopro de estática — −1 com estranhos, e 1×/cena uma máquina próxima “coopera” de graça."],
-sus:["a carne é fraca, substitua-a","você ouviu o servo-motor?","nenhuma delas acha que terminou","um parafuso a mais","acumule"]},
+sus:SUS_ASC.lo,susB:SUS_ASC},
 {id:"pac",g:"⚖",n:"Pacto",v:"troca",fr:"Tudo se anota. Nada se esquece.",
 lei:["Lei do Consentimento","O Pacto prefere acordos. Sobre alvos voluntários: conjure com +1 e sem resistência. Involuntários resistem, e a maioria dos efeitos exige o Nome, sangue ou algo pessoal. Forçar é possível — e sempre mancha. Cada barganha fica registrada."],
 marca:["Uma marca fina e elegante na pele, que ninguém lembra de ter visto surgir — −1 para esconder o que você é de quem entende, +1 em negociação formal.","As pessoas sentem, sem saber por quê, que devem algo a você — −1 em convívio casual; papéis e contratos que você toca não se perdem nem rasgam por acidente.","Sua assinatura aparece onde você nunca assinou — −1 em amizade desinteressada (tudo soa cláusula), e 1×/sessão você sabe o preço exato de alguém."],
@@ -2023,7 +2084,7 @@ function updDock(){const d=$("divDock");const n=S.div.filter(x=>x&&x.trim()).len
 let FX={run:false,q:false,ps:[],last:0};
 function syncFX(){const b=bandOf(S.ruido||0);const want=!!S.elem&&b>0&&!S.ui.calm&&!document.hidden;
  if(want&&!FX.run){FX.run=true;fxKick();}if(!want){FX.run=false;const cv=$("fx-canvas");if(cv){const x=cv.getContext&&cv.getContext("2d");if(x)x.clearRect(0,0,cv.width,cv.height);}}
- scopoSync();vazioSync();ecoSync();}
+ scopoSync();vazioSync();ecoSync();ascSync();}
 /* FX.q garante um único rAF pendente: desligar e religar no mesmo frame não duplica o loop */
 function fxKick(){if(FX.q)return;FX.q=true;rAF(fxTick);}
 function fxTick(t){FX.q=false;if(!FX.run)return;const cv=$("fx-canvas");if(!cv)return;const ctx=cv.getContext&&cv.getContext("2d");if(!ctx){FX.run=false;return;}
@@ -2066,7 +2127,9 @@ function whisperLoop(){const b=bandOf(S.ruido||0),e=ELM(S.elem);
  if(sig===_wsig&&_wt)return; /* render() roda a cada clique: sem mudança relevante, o ciclo em curso segue */
  _wsig=sig;clearTimeout(_wt);_wt=null;clearTimeout(_wEt);_wEt=null;
  if(!e||b<1||S.ui.mute||S.ui.calm)return;
- let delay=[0,55,40,28,20,14][b]*1000*(0.7+Math.random()*.6);
+ const base=[0,55,40,28,20,14][b]*1000;
+ /* o Ascensão é metronômico: intervalos quase idênticos, precisão de máquina */
+ let delay=base*(e.id==="asc"?(.97+Math.random()*.06):(0.7+Math.random()*.6));
  if(e.id==="obs"&&b>=4)delay*=.6; /* no ápice do Observação eles se acumulam */
  if(e.id==="vaz")delay*=1.45; /* o Vazio é vagaroso: mais espaçado, nunca frenético */
  _wt=setTimeout(()=>{_wt=null;const lst=susOf(e,b);let tx=lst[Math.floor(Math.random()*lst.length)];
@@ -2131,8 +2194,8 @@ function flashSched(){clearTimeout(_ft);_ft=setTimeout(()=>{flashNow();flashSche
 
 /* --- a presença: Web Audio, só depois de um gesto do usuário e com o mute desligado ---
    o contexto é compartilhado; cada elemento tem suas próprias vozes, todas em ganho 0 */
-let AUD={ctx:null,gain:null,ogain:null,vgain:null,eg:null,gest:false,on:false,von:false,eon:false,timer:null,vtimer:null,etimer:null};
-function audGesture(){if(AUD.gest)return;AUD.gest=true;scopoSync();vazioSync();ecoSync();}
+let AUD={ctx:null,gain:null,ogain:null,vgain:null,eg:null,agn:null,gest:false,on:false,von:false,eon:false,aon:false,timer:null,vtimer:null,etimer:null,atimer:null};
+function audGesture(){if(AUD.gest)return;AUD.gest=true;scopoSync();vazioSync();ecoSync();ascSync();}
 ["pointerdown","keydown","touchstart"].forEach(ev=>addEventListener(ev,audGesture,{once:true,passive:true}));
 function audBuild(){if(AUD.ctx)return true;
  const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return false;
@@ -2146,7 +2209,18 @@ function audBuild(){if(AUD.ctx)return true;
   const og=c.createGain();og.gain.value=0;o.connect(og);og.connect(c.destination);o.start();
   const vg=c.createGain();vg.gain.value=0;vg.connect(c.destination); /* drone do Vazio */
   for(const hz of [44,44.6]){const v=c.createOscillator();v.type="sine";v.frequency.value=hz;v.connect(vg);v.start();}
-  AUD.ctx=c;AUD.gain=g;AUD.ogain=og;AUD.vgain=vg;return true;}catch(e){return false;}}
+  /* zumbido de máquina do Ascensão: 60Hz de rede + harmônico batendo de leve + um grão
+     metálico (serra estreitada em 1,85kHz). frio, contínuo, sem calor nenhum */
+  const ag=c.createGain();ag.gain.value=0;ag.connect(c.destination);
+  const a1=c.createOscillator();a1.type="sine";a1.frequency.value=60;a1.connect(ag);a1.start();
+  const a2=c.createOscillator();a2.type="sine";a2.frequency.value=120.3;
+  const a2g=c.createGain();a2g.gain.value=.32;a2.connect(a2g);a2g.connect(ag);a2.start();
+  const a3=c.createOscillator();a3.type="sawtooth";a3.frequency.value=60;
+  const af=c.createBiquadFilter();af.type="bandpass";af.frequency.value=1850;af.Q.value=7;
+  /* o 31º harmônico da serra sai fraquíssimo do bandpass, mas 1,85kHz é onde o ouvido é
+     sensível: mesmo em .45 ele só arranha o zumbido, nunca chia */
+  const a3g=c.createGain();a3g.gain.value=.45;a3.connect(af);af.connect(a3g);a3g.connect(ag);a3.start();
+  AUD.ctx=c;AUD.gain=g;AUD.ogain=og;AUD.vgain=vg;AUD.agn=ag;return true;}catch(e){return false;}}
 function audOff(){clearTimeout(AUD.timer);AUD.timer=null;AUD.on=false;
  if(!AUD.ctx)return;try{const t=AUD.ctx.currentTime;
   for(const g of [AUD.gain.gain,AUD.ogain.gain]){g.cancelScheduledValues(t);g.setTargetAtTime(0,t,.4);}}catch(e){}}
@@ -2321,9 +2395,109 @@ function ecoSync(){const b=bandOf(S.ruido||0),on=ecoOn(1);
  if(on&&b>=5){if(!_lpT)loopSched();}else{clearTimeout(_lpT);_lpT=null;ecoLoopClear();}
  ecoAudSync(on&&b>=4&&!S.ui.mute);}
 
+/* ============ CARNE-METAL — elemento Ascensão ============
+   o servo-travamento e os reflexos de aço são CSS puro (grátis, e somem junto com o data-el).
+   aqui ficam só o que precisa de tempo: a pele que descasca, a junta que emperra e os servos
+   do áudio. nada muta o DOM real nem S: overlays pointer-events:none e classes efêmeras. */
+const ascOn=min=>S.elem==="asc"&&bandOf(S.ruido||0)>=(min||1)&&!S.ui.calm&&!RM()&&!document.hidden;
+
+/* --- o assentamento: só na troca de aba, o conteúdo novo para como braço robótico --- */
+let _lndT=null,_lndEl=null;
+function ascLandClear(){clearTimeout(_lndT);_lndT=null;
+ if(_lndEl){_lndEl.classList.remove("asc-land");_lndEl=null;}}
+function ascLand(){ascLandClear();if(!ascOn(3))return;
+ const m=S.ui.sess?$("sessview"):$("mainview");if(!m)return;
+ _lndEl=m;m.classList.add("asc-land");
+ _lndT=setTimeout(ascLandClear,560);}
+
+/* --- a pele que descasca: um overlay revela aço e circuito por baixo, e fecha ---
+   candidatos: a borda de cima de um painel ou a caixa de um título. nunca sob o cursor,
+   sob edição, nem com modal aberto */
+let _pkT=null,_pkEl=null;
+function peelClear(){if(_pkEl&&_pkEl.parentNode)_pkEl.parentNode.removeChild(_pkEl);_pkEl=null;}
+function peelPick(){const out=[];
+ document.querySelectorAll(".panel").forEach(p=>{
+  if(p.matches(":hover"))return;
+  if(document.activeElement&&p.contains(document.activeElement))return;
+  const r=p.getBoundingClientRect();
+  if(r.width<130||r.top<10||r.top>innerHeight-46)return;
+  out.push({x:r.left,y:r.top,w:r.width,h:7}); /* a borda abrindo */
+  const h=p.querySelector("h2");if(!h)return;
+  const q=h.getBoundingClientRect();
+  if(q.width>70&&q.height>8&&q.top>10&&q.bottom<innerHeight-10)out.push({x:q.left-4,y:q.top-3,w:q.width+8,h:q.height+6});});
+ return out.length?out[Math.floor(Math.random()*out.length)]:null;}
+function peelNow(){peelClear();
+ if(!ascOn(4)||$("modal").classList.contains("on"))return;
+ const a=peelPick();if(!a)return;
+ const d=document.createElement("div");d.className="fx-peel";
+ d.style.cssText=`left:${Math.round(a.x)}px;top:${Math.round(a.y)}px;width:${Math.round(a.w)}px;height:${Math.round(a.h)}px`;
+ document.body.appendChild(d);_pkEl=d;
+ setTimeout(peelClear,1100);}
+function peelSched(){clearTimeout(_pkT);_pkT=setTimeout(()=>{peelNow();peelSched();},20000+Math.random()*20000);}
+
+/* --- o glitch mecânico: a junta emperra e força o mesmo fim de curso, ou salta e se corrige.
+   só em texto — nunca em campo de edição, botão ou aba, para não desalinhar um clique --- */
+let _jmT=null,_jmEl=null;
+function jamClear(){if(_jmEl){_jmEl.classList.remove("fx-jam","fx-jolt");_jmEl=null;}}
+function jamNow(){jamClear();
+ if(!ascOn(5)||$("modal").classList.contains("on"))return;
+ const out=[];document.querySelectorAll(".panel h2,label,.hint,.rec .rn,.attr .an").forEach(el=>{
+  if(el.querySelector("input,textarea,select,button"))return;
+  if(el.matches(":hover"))return;
+  if(document.activeElement&&el.contains(document.activeElement))return;
+  const r=el.getBoundingClientRect();
+  if(r.width<40||r.height<8||r.top<12||r.bottom>innerHeight-12)return;out.push(el);});
+ if(!out.length)return;
+ _jmEl=out[Math.floor(Math.random()*out.length)];
+ _jmEl.classList.add(Math.random()<.6?"fx-jam":"fx-jolt");
+ setTimeout(jamClear,900);}
+function jamSched(){clearTimeout(_jmT);_jmT=setTimeout(()=>{jamNow();jamSched();},26000+Math.random()*26000);}
+
+/* --- o servo sonoro: um whirr de motor reposicionando, sintetizado com varredura de pitch --- */
+const ascLvl=b=>b>=5?.016:.010;
+function ascClick(t){const c=AUD.ctx;try{ /* o estalo metálico da trava encaixando */
+ const g=c.createGain(),f=c.createBiquadFilter(),o=c.createOscillator();
+ f.type="bandpass";f.frequency.value=2300+Math.random()*1000;f.Q.value=14;
+ o.type="square";o.frequency.value=2400;
+ g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.018,t+.003);g.gain.exponentialRampToValueAtTime(.0001,t+.05);
+ o.connect(f);f.connect(g);g.connect(c.destination);o.start(t);o.stop(t+.09);}catch(e){}}
+function ascServo(){if(!AUD.ctx||S.ui.mute||!ascOn(4))return;
+ const c=AUD.ctx,t=c.currentTime,b=bandOf(S.ruido||0),dur=.15+Math.random()*.12,pico=b>=5?.028:.019;
+ try{const g=c.createGain(),f=c.createBiquadFilter(),o=c.createOscillator();
+  f.type="bandpass";f.Q.value=3.2;f.frequency.setValueAtTime(650,t);
+  f.frequency.linearRampToValueAtTime(1800,t+dur*.5);f.frequency.linearRampToValueAtTime(600,t+dur);
+  o.type="sawtooth";o.frequency.setValueAtTime(150+Math.random()*60,t);
+  o.frequency.linearRampToValueAtTime(500+Math.random()*230,t+dur*.45);
+  o.frequency.linearRampToValueAtTime(230,t+dur); /* sobe rápido, freia: o motor achando a posição */
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(pico,t+.012);
+  g.gain.setValueAtTime(pico,t+dur-.03);g.gain.exponentialRampToValueAtTime(.0001,t+dur+.06);
+  o.connect(f);f.connect(g);g.connect(c.destination);o.start(t);o.stop(t+dur+.12);
+  if(b>=5)ascClick(t+dur+.02);}catch(e){}}
+function ascAudOff(){clearTimeout(AUD.atimer);AUD.atimer=null;AUD.aon=false;
+ if(!AUD.ctx||!AUD.agn)return;try{const t=AUD.ctx.currentTime;
+  AUD.agn.gain.cancelScheduledValues(t);AUD.agn.gain.setTargetAtTime(0,t,.5);}catch(e){}}
+function ascAudTick(){if(!AUD.aon)return;const b=bandOf(S.ruido||0);
+ ascServo();
+ AUD.atimer=setTimeout(ascAudTick,(b>=5?5+Math.random()*7:8+Math.random()*10)*1000);}
+function ascAudSync(want,b){
+ if(!want||!AUD.gest)return ascAudOff();
+ if(!audBuild())return;
+ if(AUD.ctx.state==="suspended")AUD.ctx.resume().catch(()=>{});
+ try{const t=AUD.ctx.currentTime;AUD.agn.gain.cancelScheduledValues(t);
+  AUD.agn.gain.setTargetAtTime(ascLvl(b),t,1.6);}catch(e){}
+ if(!AUD.aon){AUD.aon=true;AUD.atimer=setTimeout(ascAudTick,(5+Math.random()*7)*1000);}}
+
+/* sair do Ascensão (ou calmar) apaga timers, overlays, classes e o zumbido —
+   o travamento em si é CSS por data-el, então volta ao movimento suave sozinho */
+function ascSync(){const b=bandOf(S.ruido||0),on=ascOn(1);
+ if(!on)ascLandClear();
+ if(on&&b>=4){if(!_pkT)peelSched();}else{clearTimeout(_pkT);_pkT=null;peelClear();}
+ if(on&&b>=5){if(!_jmT)jamSched();}else{clearTimeout(_jmT);_jmT=null;jamClear();}
+ ascAudSync(on&&b>=4&&!S.ui.mute,b);}
+
 /* ---------- abas / navegação ---------- */
 const TABS=[["inicial","Inicial"],["sint","Sintonizar"],["hab","Habilidades"],["mag","Magias"],["tal","Talentos"],["inv","Inventário"],["bib","Biblioteca"],["div","Dívidas & Notas"]];
-function go(t){S.ui.tab=t;save();render();window.scrollTo(0,0);}
+function go(t){S.ui.tab=t;save();render();ascLand();window.scrollTo(0,0);}
 function render(){fixS();
  $("tabsrow").innerHTML=TABS.map(([id,lb])=>{let l=esc(lb);
   if(id==="sint"&&S.elem)l=`<span class="tglifo">${ELM(S.elem).g}</span> Sintonizar`;
@@ -2335,7 +2509,7 @@ function render(){fixS();
  $("foot").textContent=alien("O QUE OLHA DEMAIS E OLHADO DE VOLTA")+"  ·  protocolo 4ª edição · 2002";}
 function toggleSess(){S.ui.sess=!S.ui.sess;save();
  $("btnSess").textContent=S.ui.sess?"◼ Encerrar sessão":"▶ Sessão";
- if(S.ui.sess)rSess();applyTheme();window.scrollTo(0,0);}
+ if(S.ui.sess)rSess();applyTheme();ascLand();window.scrollTo(0,0);}
 
 /* modal */
 function modal(html){$("modalbox").innerHTML=html;$("modal").classList.add("on");}
@@ -2348,7 +2522,7 @@ function boot(){loadAuto();
  $("btnExp").onclick=exportJSON;
  $("btnImp").onclick=()=>$("impFile").click();
  $("impFile").addEventListener("change",e=>{if(e.target.files[0])importJSON(e.target.files[0]);e.target.value="";});
- $("btnMute").onclick=()=>{S.ui.mute=!S.ui.mute;save();$("btnMute").classList.toggle("on",S.ui.mute);toast(S.ui.mute?"Sussurros silenciados.":"Os sussurros voltaram.");whisperLoop();scopoSync();vazioSync();ecoSync();};
+ $("btnMute").onclick=()=>{S.ui.mute=!S.ui.mute;save();$("btnMute").classList.toggle("on",S.ui.mute);toast(S.ui.mute?"Sussurros silenciados.":"Os sussurros voltaram.");whisperLoop();scopoSync();vazioSync();ecoSync();ascSync();};
  $("btnCalm").onclick=()=>{S.ui.calm=!S.ui.calm;save();$("btnCalm").classList.toggle("on",S.ui.calm);applyTheme();whisperLoop();toast(S.ui.calm?"Efeitos reduzidos.":"Efeitos completos.");};
  $("btnSess").onclick=toggleSess;
  $("btnMute").classList.toggle("on",S.ui.mute);$("btnCalm").classList.toggle("on",S.ui.calm);
