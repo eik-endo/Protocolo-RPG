@@ -398,9 +398,46 @@ body[data-el=pac][data-band="5"] #fx-vign::after{--pk:.82;animation:pacresp 8s e
 /* o número que hesita: 150ms de sobreposição opaca — o input embaixo nunca é tocado */
 .pac-hes{position:fixed;pointer-events:none;z-index:9;overflow:hidden;white-space:nowrap;
  display:flex;align-items:center;justify-content:center}
-/* germe: musgo nos cantos, cresce com a banda */
-body[data-el=ger] .panel::before{content:"";position:absolute;left:-30px;bottom:-30px;width:calc(40px + var(--band)*26px);height:calc(40px + var(--band)*26px);background:radial-gradient(circle,rgba(111,154,78,.28),transparent 70%);pointer-events:none}
+/* ===== ger — nojo e body-horror: a superfície fica ÚMIDA e ORGÂNICA =====
+   o asc trava em passos de servo; aqui é o contrário: tudo é mole, morno e escorrido.
+   o que custa por frame (respiração, inchaço) é só transform — composita na GPU.
+   o que é textura (musgo, membrana, brilho úmido) é estático: pinta uma vez e fica. */
+/* musgo nos cantos: agora com uma segunda mancha e um veio escuro de mofo por cima */
+body[data-el=ger] .panel::before{content:"";position:absolute;left:-30px;bottom:-30px;width:calc(40px + var(--band)*30px);height:calc(40px + var(--band)*30px);pointer-events:none;
+ background:radial-gradient(circle at 30% 70%,rgba(111,154,78,calc(.26 + var(--band)*.05)),transparent 70%),
+  radial-gradient(circle at 62% 44%,rgba(79,109,52,calc(.1 + var(--band)*.045)),transparent 62%)}
 body[data-el=ger][data-band="4"] .panel::after,body[data-el=ger][data-band="5"] .panel::after{content:"❋";position:absolute;right:8px;bottom:4px;color:var(--ecd);font-size:11px;opacity:.6}
+/* a membrana: borda que amolece e um brilho de coisa molhada por dentro. tudo estático */
+body[data-el=ger][data-band="3"] .panel,body[data-el=ger][data-band="4"] .panel,body[data-el=ger][data-band="5"] .panel{
+ border-radius:calc(4px + var(--band)*2.5px);border-color:rgba(111,154,78,calc(.16 + var(--band)*.08));
+ box-shadow:inset 0 2px 7px rgba(186,224,152,calc(.012 + var(--band)*.012)),
+  inset 0 calc(var(--band)*-3px) calc(var(--band)*9px) rgba(41,64,26,calc(.08 + var(--band)*.06))}
+body[data-el=ger][data-band="5"] .panel h2{text-shadow:0 1px 5px rgba(111,154,78,.4)}
+/* a respiração orgânica: mole, lenta e fora de compasso entre painéis. sub-pixel, só scale */
+body[data-el=ger][data-band="4"] .panel:not(:focus-within):not(:hover):not(.ger-swell){animation:gerresp 7.4s ease-in-out infinite}
+body[data-el=ger][data-band="5"] .panel:not(:focus-within):not(:hover):not(.ger-swell){animation:gerresp 5.6s ease-in-out infinite}
+body[data-el=ger] .panel:nth-of-type(2n){animation-delay:-2.3s}
+body[data-el=ger] .panel:nth-of-type(3n){animation-delay:-4.1s}
+@keyframes gerresp{0%,100%{transform:scale(1)}52%{transform:scale(1.004,1.006)}}
+/* o inchaço: algo se remexe por baixo do painel e assenta. irregular de propósito —
+   :not(.ger-swell) acima tira a respiração do caminho, então não há briga de specificity */
+body[data-el=ger] .panel.ger-swell{animation:gerincha 2.6s ease-in-out}
+@keyframes gerincha{0%,100%{transform:scale(1)}
+ 26%{transform:scale(1.009,1.015)}48%{transform:scale(1.004,1.007)}72%{transform:scale(1.012,1.021)}}
+/* a cicatriz: você arrancou o texto, e a borda de baixo do campo abre e fecha em cima disso.
+   fica na aresta inferior — nunca por cima do que você está escrevendo */
+.ger-scar{position:fixed;pointer-events:none;z-index:9;border-radius:5px;opacity:0;transform-origin:20% 50%;
+ background:linear-gradient(90deg,transparent,rgba(141,187,98,.62) 18%,rgba(176,214,132,.5) 42%,rgba(79,109,52,.55) 74%,transparent),
+  radial-gradient(ellipse at 38% 50%,rgba(200,230,170,.4),transparent 65%);
+ box-shadow:0 0 9px rgba(111,154,78,.45),inset 0 0 5px rgba(30,52,18,.6);animation:gercic 1.25s ease-in-out}
+@keyframes gercic{0%{opacity:0;transform:scaleX(.16)}20%{opacity:.92;transform:scaleX(1)}
+ 62%{opacity:.78;transform:scaleX(.97)}100%{opacity:0;transform:scaleX(.05)}}
+/* o crescimento: só avança enquanto você NÃO mexe. volta a interagir e ele recua sozinho */
+.ger-grow{position:fixed;pointer-events:none;z-index:6;width:160px;height:160px;border-radius:50%;
+ transform-origin:0 100%;filter:blur(4px);opacity:0;transform:scale(.16);
+ background:radial-gradient(circle at 10% 90%,rgba(141,187,98,.5),rgba(111,154,78,.3) 34%,rgba(79,109,52,.14) 60%,transparent 78%);
+ transition:transform 9s cubic-bezier(.22,.62,.3,1),opacity 6s ease-out}
+.ger-grow.on{opacity:1;transform:scale(1)}
 /* vazio: a interface só existe enquanto você olha direto para ela — some devagar, volta na hora.
    :hover e :focus-within nunca esmaecem, então a área em uso é sempre a mais sólida da tela */
 body[data-el=vaz] .panel{transition:opacity 1.6s ease-out,filter 1.6s ease-out}
@@ -424,7 +461,7 @@ body[data-band="5"] .panel h2:hover,body[data-band="5"] h1:hover{animation:none;
 /* calmar / reduced motion */
 body.calm *,body.calm *::before,body.calm *::after{animation:none!important;transition:none!important}
 body.calm #fx-canvas,body.calm #whisper,body.calm #fx-eye,body.calm #fx-tunnel,body.calm .fx-flash,body.calm #fx-void,body.calm #fx-black,body.calm .fx-ghost,body.calm .fx-peel,
-body.calm .pac-caret,body.calm .pac-sug,body.calm .pac-hes,body.calm #fx-vign::after{display:none}
+body.calm .pac-caret,body.calm .pac-sug,body.calm .pac-hes,body.calm #fx-vign::after,body.calm .ger-scar,body.calm .ger-grow{display:none}
 body.calm[data-el=vaz] .panel,body.calm[data-el=vaz] .tabs button{opacity:1!important;filter:none!important}
 body.calm[data-el=eco] h1,body.calm[data-el=eco] .panel h2{text-shadow:calc(var(--band)*1.2px) calc(var(--band)*1.2px) 0 rgba(127,184,168,.35)!important}
 body.calm[data-el=eco] .hx,body.calm[data-el=eco] .hint,body.calm[data-el=eco] label{text-shadow:none!important}
@@ -432,7 +469,7 @@ body.calm[data-el=eco] .hx,body.calm[data-el=eco] .hint,body.calm[data-el=eco] l
 body.calm[data-el=asc] .wrap,body.calm[data-el=asc] .panel,body.calm[data-el=asc] .attr,body.calm[data-el=asc] .rec,
 body.calm[data-el=asc] .panel h2,body.calm[data-el=asc] label,body.calm[data-el=asc] .hint{transform:none!important}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}
- #fx-canvas,#fx-eye,#fx-tunnel,.fx-flash,#fx-void,#fx-black,.fx-ghost,.fx-peel,.pac-caret,.pac-sug,.pac-hes,#fx-vign::after{display:none}
+ #fx-canvas,#fx-eye,#fx-tunnel,.fx-flash,#fx-void,#fx-black,.fx-ghost,.fx-peel,.pac-caret,.pac-sug,.pac-hes,#fx-vign::after,.ger-scar,.ger-grow{display:none}
  body[data-el=vaz] .panel,body[data-el=vaz] .tabs button{opacity:1!important;filter:none!important}
  body[data-el=eco] h1,body[data-el=eco] .panel h2{text-shadow:calc(var(--band)*1.2px) calc(var(--band)*1.2px) 0 rgba(127,184,168,.35)!important}
  body[data-el=eco] .hx,body[data-el=eco] .hint,body[data-el=eco] label{text-shadow:none!important}
@@ -1904,6 +1941,17 @@ const SUS_PAC={
 lo:["eu ouvi isso","continue. estou interessado.","você queria dizer outra coisa","sei que você está aí","fale. eu escuto."],
 mid:["posso fazer isso valer a pena","é só pedir","você já sabe o preço","deixa eu ajudar","nós podemos resolver isso agora"],
 hi:["{nome}. eu sei o que você quer.","aceite e acabou, {nome}","você me chamou primeiro","não foi você que começou esta conversa?","diga sim. só isso."]};
+/* ger: o nojo é de TEXTURA e de INVASÃO — úmido, morno, algo criando raiz sob a pele.
+   nada de sangue nem víscera: o que embrulha é a ideia de já estar hospedando aquilo */
+const SUS_GER={
+lo:["está quente aqui dentro","algo se mexeu sob a sua pele","você sente coçar?","está germinando","não coce. vai espalhar.",
+ "tem algo crescendo aí","o cheiro é seu","está úmido","isso não é sujeira","já criou raiz"],
+mid:["está dentro de você agora","não adianta lavar","você já faz parte","sente inchar?","abriu uma fresta e entrou",
+ "está se alimentando","logo vai romper a pele","você está mais quente que ontem","não é febre. é vida.","cresce quando você dorme",
+ "tem gosto na sua boca?","já chegou no osso"],
+hi:["você é solo fértil, {nome}","obrigado por hospedar","não vai doer. só vai abrir.","estamos quase prontos para florescer",
+ "você nunca esteve sozinho aí dentro","sinta as raízes","isto sempre foi um jardim","seu corpo já não é só seu",
+ "respire fundo. nós respiramos junto.","quase lá. mais um pouco e brotamos.","você vai gostar do que nasce","não resista. floresça."]};
 const ELEMS=[
 {id:"obs",g:"⊙",n:"Observação",v:"registra",fr:"O que você vê fica registrado. O que registra você, também.",
 lei:["Lei do Registro","O que você vê através da Observação fica registrado — revisitável mentalmente e transmissível: um toque na testa compartilha o registro em flash. E espiar o anômalo tem preço: a coisa pode notar o olhar."],
@@ -1928,7 +1976,7 @@ sus:SUS_PAC.lo,susB:SUS_PAC},
 {id:"ger",g:"❋",n:"Germe",v:"infecta",fr:"O que você planta fica plantado.",
 lei:["Lei da Semeadura","O Germe não conjura efeitos: planta sementes. Todo efeito contínuo compõe sozinho, turno a turno, e não expira por tempo: precisa ser tratado, queimado ou arrancado. E a Sobrecarga do Germe não come Sintonia: come Vida."],
 marca:["Cheiro de terra molhada e de algo doce; plantas se inclinam de leve para você — −1 em ambientes assépticos e formais, imune a enjoo por cheiro.","Suas feridas fecham com um musgo fino; comida estraga rápido perto de você — −1 para dividir mesa e teto, +1 em Resistência contra doença e veneno.","Algo verde se move sob a sua pele quando ninguém olha; flores pequenas nascem onde você dorme — quem repara testa Coragem (7); venenos comuns não fazem mais efeito."],
-sus:["deixa crescer","a sala tem mais verde do que tinha","ignorar é adubo","ele lembra de cada doação","sem pressa"]}];
+sus:SUS_GER.lo,susB:SUS_GER}];
 
 const GRAUS=[{g:1,lim:6,rq:"⟑⋏⊙⌖◊ ≥1"},{g:2,lim:8,rq:"⟑⋏⊙⌖◊ ≥2 · nível 4"},{g:3,lim:10,rq:"⟑⋏⊙⌖◊ ≥4 · nível 8"},{g:4,lim:12,rq:"⟑⋏⊙⌖◊ ≥6 · nível 12"}];
 function grauOK(g,ru,nv){if(g===1)return ru>=1;if(g===2)return ru>=2&&nv>=4;if(g===3)return ru>=4&&nv>=8;return ru>=6&&nv>=12;}
@@ -2122,7 +2170,8 @@ function updDock(){const d=$("divDock");const n=S.div.filter(x=>x&&x.trim()).len
 let FX={run:false,q:false,ps:[],last:0};
 function syncFX(){const b=bandOf(S.ruido||0);const want=!!S.elem&&b>0&&!S.ui.calm&&!document.hidden;
  if(want&&!FX.run){FX.run=true;fxKick();}if(!want){FX.run=false;const cv=$("fx-canvas");if(cv){const x=cv.getContext&&cv.getContext("2d");if(x)x.clearRect(0,0,cv.width,cv.height);}}
- scopoSync();vazioSync();ecoSync();ascSync();pacSync();}
+ scopoSync();vazioSync();ecoSync();ascSync();pacSync();gerSync();
+ fxTrigSync();} /* por último: ele compara o retrato de antes com o estado já assentado */
 /* FX.q garante um único rAF pendente: desligar e religar no mesmo frame não duplica o loop */
 function fxKick(){if(FX.q)return;FX.q=true;rAF(fxTick);}
 function fxTick(t){FX.q=false;if(!FX.run)return;const cv=$("fx-canvas");if(!cv)return;const ctx=cv.getContext&&cv.getContext("2d");if(!ctx){FX.run=false;return;}
@@ -2171,9 +2220,11 @@ function whisperLoop(){const b=bandOf(S.ruido||0),e=ELM(S.elem);
  if(e.id==="obs"&&b>=4)delay*=.6; /* no ápice do Observação eles se acumulam */
  if(e.id==="vaz")delay*=1.45; /* o Vazio é vagaroso: mais espaçado, nunca frenético */
  _wt=setTimeout(()=>{_wt=null;const lst=susOf(e,b);let tx=lst[Math.floor(Math.random()*lst.length)];
-  if(e.id==="pac")tx=pacTx(tx); /* o nome entra na hora de falar: reflete o campo agora, não o de antes */
-  /* o Pacto fala claro: garatujar uma palavra apagaria justamente o nome, e ele quer ser entendido */
-  if(b>=4&&e.id!=="pac"&&Math.random()<.5){const ws=tx.split(" ");const i=Math.floor(Math.random()*ws.length);ws[i]=alien(ws[i]);tx=ws.join(" ");}
+  const temNome=tx.indexOf("{nome}")>=0;
+  tx=pacTx(tx); /* o nome entra na hora de falar: reflete o campo agora, não o de antes */
+  /* o Pacto fala claro; e frase com nome nunca é garatujada — sortear a palavra errada
+     apagaria justamente o nome, que é o motivo de a frase existir */
+  if(b>=4&&e.id!=="pac"&&!temNome&&Math.random()<.5){const ws=tx.split(" ");const i=Math.floor(Math.random()*ws.length);ws[i]=alien(ws[i]);tx=ws.join(" ");}
   const l=(8+Math.random()*70)+"%",tp=(10+Math.random()*75)+"%";
   showWhisper(tx,l,tp);
   whisperLoop(); /* reagenda o ciclo primeiro: ele limpa ecos pendentes */
@@ -2181,6 +2232,98 @@ function whisperLoop(){const b=bandOf(S.ruido||0),e=ELM(S.elem);
   if(e.id==="eco"&&Math.random()<(b>=4?.5:.35))
    _wEt=setTimeout(()=>{_wEt=null;if(S.elem==="eco"&&!S.ui.mute&&!S.ui.calm)showWhisper(tx,l,tp);},4600+Math.random()*4200);
   },delay);}
+
+/* ============ MOTOR DE GATILHOS — a ficha PERCEBE o que você faz ============
+   os sussurros do whisperLoop são clima: caem no relógio, independem de você. estes são
+   REAÇÃO: nascem de uma ação sua, e é daí que vem o susto — a ficha estava prestando atenção.
+
+   o motor é genérico. cada elemento declara TRIG[id] (frases por gatilho) e, se quiser,
+   TRIGFX[id] (efeito visual por gatilho). quem não declarar nada simplesmente não reage —
+   e nem chega a instalar listener. hoje só o Germe preenche; obs/vaz/eco/asc/pac entram
+   depois sem tocar em uma linha daqui.
+
+   SEGURANÇA: o motor só LÊ ação e MOSTRA texto. não escreve em campo, não chama save/setF,
+   não muta S. o trecho apagado que ele cita é lido para exibição e nunca reinserido. */
+const TRIG={},TRIGFX={};
+/* min = banda a partir da qual o gatilho existe; cd = carência do próprio gatilho */
+const TRIGDEF={
+ noiseup :{min:1,cd:9000},
+ erase   :{min:2,cd:14000},
+ resource:{min:2,cd:16000},
+ tabopen :{min:2,cd:20000},
+ idle    :{min:2,cd:40000},
+ click   :{min:3,cd:45000}};
+/* sem elemento, sem banda, calmo, movimento reduzido ou aba oculta: o motor nem existe.
+   (mute NÃO entra: isto é texto na tela, não som — silenciar sussurros não cega a ficha) */
+const TRIGON=()=>!!(S.elem&&(TRIG[S.elem]||TRIGFX[S.elem])&&bandOf(S.ruido||0)>=1&&!S.ui.calm&&!RM()&&!document.hidden);
+let TG={bound:false,last:-1e9,cd:{},idleT:null,seed:null,act:0};
+
+function fxTrigger(tipo,dados){
+ if(!TRIGON())return false;
+ const d=TRIGDEF[tipo];if(!d)return false;
+ const b=bandOf(S.ruido||0);if(b<d.min)return false;
+ /* o efeito visual corre com a carência dele mesmo: a cicatriz aparece mesmo quando a
+    frase está em silêncio, senão o gesto ficaria sem resposta nenhuma */
+ const fx=TRIGFX[S.elem]&&TRIGFX[S.elem][tipo];if(fx)fx(dados||{},b);
+ const lst=TRIG[S.elem]&&TRIG[S.elem][tipo];if(!lst||!lst.length)return false;
+ const now=performance.now();
+ if(now-TG.last<6000+Math.random()*3000)return false; /* carência geral: uma reação por ~6–9s */
+ if(now-(TG.cd[tipo]||-1e9)<d.cd)return false;        /* e cada gatilho tem a sua, mais longa */
+ TG.last=now;TG.cd[tipo]=now;
+ let tx=pacTx(lst[Math.floor(Math.random()*lst.length)]); /* {nome} */
+ if(tx.indexOf("{apagado}")>=0) /* só LÊ o trecho apagado para citá-lo; nunca o devolve ao campo */
+  tx=tx.replace(/\{apagado\}/g,(((dados&&dados.txt)||"").trim().slice(0,20))||"aquilo");
+ showWhisper(tx,(8+Math.random()*70)+"%",(10+Math.random()*75)+"%");
+ return true;}
+
+/* --- atividade do usuário: rearma o ocioso e avisa o elemento (o Germe usa para RECUAR) --- */
+function trigAct(){TG.act=performance.now();
+ const fx=TRIGFX[S.elem]&&TRIGFX[S.elem].act;if(fx&&TRIGON())fx();
+ trigIdleArm();}
+function trigIdleArm(){clearTimeout(TG.idleT);TG.idleT=null;
+ if(!TG.bound)return;
+ /* rearma sozinho: ficar parado mais tempo continua alimentando o gatilho */
+ TG.idleT=setTimeout(()=>{TG.idleT=null;if(!document.hidden)fxTrigger("idle",{});trigIdleArm();},25000);}
+/* mousemove dispara aos milhares: só conta como atividade a cada 2s */
+function trigMove(){if(performance.now()-TG.act<2000)return;trigAct();}
+function trigKey(){trigAct();}
+function trigDown(e){trigAct();
+ const t=e.target&&e.target.closest&&e.target.closest("button");
+ if(t)fxTrigger("click",{el:t});}
+/* apagou um naco de texto? o motor guarda o valor anterior por campo, em memória volátil */
+const _trigVal=new WeakMap();
+function trigInput(e){const t=e.target;if(!TXIN(t))return;
+ const prev=_trigVal.has(t)?_trigVal.get(t):(t.defaultValue||""),now=t.value||"";
+ _trigVal.set(t,now);trigAct();
+ if(now.length>=prev.length-6)return; /* corrigir uma letra não é apagar */
+ const gone=_apagado(prev,now);
+ if(gone.length<6)return;
+ fxTrigger("erase",{txt:gone,el:t});}
+function trigBind(on){if(on===TG.bound)return;TG.bound=on;
+ const m=on?"addEventListener":"removeEventListener";
+ document[m]("input",trigInput,{capture:true,passive:true});
+ document[m]("pointerdown",trigDown,{capture:true,passive:true});
+ document[m]("keydown",trigKey,{capture:true,passive:true});
+ document[m]("mousemove",trigMove,{capture:true,passive:true});
+ if(on)trigIdleArm();
+ else{clearTimeout(TG.idleT);TG.idleT=null;TG.cd={};TG.last=-1e9;}}
+
+/* tabopen, noiseup e resource não precisam de listener: syncFX roda depois de toda mudança
+   de estado, então basta comparar o retrato anterior com o de agora. um gatilho por vez. */
+function fxTrigSync(){const on=TRIGON();
+ trigBind(on);
+ const s={el:S.elem||"",b:bandOf(S.ruido||0),tab:(S.ui.tab||"")+(S.ui.sess?"|s":""),
+  vida:curOf("vida"),fol:curOf("fol"),sin:curOf("sin"),luc:curOf("luc")};
+ const p=TG.seed;TG.seed=s;
+ if(!p||p.el!==s.el||!on)return; /* primeira leitura ou troca de elemento: só semeia */
+ const rec=["vida","fol","sin","luc"].filter(k=>s[k]!==p[k]);
+ /* carregar outra ficha, importar um JSON ou subir de nível mexe em várias coisas de uma vez.
+    isso não é uma AÇÃO do jogador sobre a ficha: é outro estado. só semeia, sem reagir. */
+ if(rec.length+(s.b!==p.b?1:0)+(s.tab!==p.tab?1:0)>1)return;
+ if(s.b>p.b)return void fxTrigger("noiseup",{de:p.b,para:s.b});
+ if(s.tab!==p.tab)return void fxTrigger("tabopen",{tab:s.tab});
+ if(rec.length){const k=rec[0];
+  fxTrigger("resource",{rec:k,dir:s[k]<p[k]?-1:1,de:p[k],para:s[k]});}}
 
 /* ============ ESCOPOFOBIA — piloto do elemento Observação ============
    tudo aqui morre com body.calm, com prefers-reduced-motion e com a aba oculta.
@@ -2234,8 +2377,8 @@ function flashSched(){clearTimeout(_ft);_ft=setTimeout(()=>{flashNow();flashSche
 
 /* --- a presença: Web Audio, só depois de um gesto do usuário e com o mute desligado ---
    o contexto é compartilhado; cada elemento tem suas próprias vozes, todas em ganho 0 */
-let AUD={ctx:null,gain:null,ogain:null,vgain:null,eg:null,agn:null,pgn:null,gest:false,on:false,von:false,eon:false,aon:false,pon:false,timer:null,vtimer:null,etimer:null,atimer:null,ptimer:null};
-function audGesture(){if(AUD.gest)return;AUD.gest=true;scopoSync();vazioSync();ecoSync();ascSync();pacSync();}
+let AUD={ctx:null,gain:null,ogain:null,vgain:null,eg:null,agn:null,pgn:null,ggn:null,gest:false,on:false,von:false,eon:false,aon:false,pon:false,gon:false,timer:null,vtimer:null,etimer:null,atimer:null,ptimer:null,gtimer:null};
+function audGesture(){if(AUD.gest)return;AUD.gest=true;scopoSync();vazioSync();ecoSync();ascSync();pacSync();gerSync();}
 ["pointerdown","keydown","touchstart"].forEach(ev=>addEventListener(ev,audGesture,{once:true,passive:true}));
 function audBuild(){if(AUD.ctx)return true;
  const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return false;
@@ -2269,7 +2412,15 @@ function audBuild(){if(AUD.ctx)return true;
   const p2g=c.createGain();p2g.gain.value=.2;p2.connect(p2g);p2g.connect(pbr);p2.start();
   const plf=c.createOscillator();plf.type="sine";plf.frequency.value=.15; /* ~9 respiros por minuto */
   const plg=c.createGain();plg.gain.value=.46;plf.connect(plg);plg.connect(pbr.gain);plf.start();
-  AUD.ctx=c;AUD.gain=g;AUD.ogain=og;AUD.vgain=vg;AUD.agn=ag;AUD.pgn=pgn;return true;}catch(e){return false;}}
+  /* germe: o úmido. o mesmo ruído marrom, mas num passa-baixa RESSONANTE cujo corte vagueia
+     devagar — é o que separa "algo mole se remexendo" de um chiado parado */
+  const gg=c.createGain();gg.gain.value=0;gg.connect(c.destination);
+  const gsrc=c.createBufferSource();gsrc.buffer=buf;gsrc.loop=true;
+  const gf=c.createBiquadFilter();gf.type="lowpass";gf.frequency.value=150;gf.Q.value=6;
+  gsrc.connect(gf);gf.connect(gg);gsrc.start();
+  const glf=c.createOscillator();glf.type="sine";glf.frequency.value=.07;
+  const glg=c.createGain();glg.gain.value=72;glf.connect(glg);glg.connect(gf.frequency);glf.start();
+  AUD.ctx=c;AUD.gain=g;AUD.ogain=og;AUD.vgain=vg;AUD.agn=ag;AUD.pgn=pgn;AUD.ggn=gg;return true;}catch(e){return false;}}
 function audOff(){clearTimeout(AUD.timer);AUD.timer=null;AUD.on=false;
  if(!AUD.ctx)return;try{const t=AUD.ctx.currentTime;
   for(const g of [AUD.gain.gain,AUD.ogain.gain]){g.cancelScheduledValues(t);g.setTargetAtTime(0,t,.4);}}catch(e){}}
@@ -2721,6 +2872,124 @@ function pacSync(){const b=bandOf(S.ruido||0),on=pacOn(1);
  if(on&&b>=4){if(!_autoT)autoSched();}else{clearTimeout(_autoT);_autoT=null;pacAutoClear();}
  pacAudSync(on&&b>=4&&!S.ui.mute,b);}
 
+/* ============ NOJO / BODY-HORROR — elemento Germe ============
+   o musgo, a membrana e a respiração mole são CSS puro (grátis, e somem com o data-el).
+   aqui fica o que é REATIVO: a cicatriz de quando você arranca texto, o crescimento que só
+   avança na sua ausência de ação, o inchaço do ápice e o som úmido.
+   mesma regra de sempre: overlay pointer-events:none e classe efêmera. nada toca S nem campo. */
+const gerOn=min=>S.elem==="ger"&&bandOf(S.ruido||0)>=(min||1)&&!S.ui.calm&&!RM()&&!document.hidden;
+const gerModal=()=>$("modal").classList.contains("on");
+
+/* --- a cicatriz: você arrancou, e a aresta de baixo do campo abre e fecha por cima disso.
+   fica na borda inferior de propósito: o campo em edição nunca é encoberto --- */
+let _scEl=null,_scRm=null;
+function gerScarClear(){clearTimeout(_scRm);_scRm=null;
+ if(_scEl&&_scEl.parentNode)_scEl.parentNode.removeChild(_scEl);_scEl=null;}
+function gerScar(d){gerScarClear();
+ if(!gerOn(3)||gerModal())return;
+ const t=d&&d.el;if(!t||!t.isConnected)return;
+ const r=t.getBoundingClientRect();
+ if(r.width<60||r.height<12||r.bottom<20||r.top>innerHeight-20)return;
+ const h=7,el=document.createElement("div");el.className="ger-scar";
+ el.style.cssText=`left:${Math.round(r.left+3)}px;top:${Math.round(r.bottom-h-3)}px;`+
+  `width:${Math.round(r.width-6)}px;height:${h}px`;
+ document.body.appendChild(el);_scEl=el;
+ _scRm=setTimeout(gerScarClear,1300);}
+
+/* --- o crescimento: nasce no canto de um painel e avança devagar ENQUANTO você não mexe.
+   voltar a interagir faz recuar — o bicho só cresce quando ninguém está olhando --- */
+let _grEl=null,_grRm=null;
+function gerGrowClear(){clearTimeout(_grRm);_grRm=null;
+ if(_grEl&&_grEl.parentNode)_grEl.parentNode.removeChild(_grEl);_grEl=null;}
+/* recuo: tira o .on e deixa a transição encolher antes de arrancar o nó da árvore */
+function gerGrowRecua(){if(!_grEl)return;
+ _grEl.classList.remove("on");
+ clearTimeout(_grRm);_grRm=setTimeout(gerGrowClear,6300);}
+function gerGrow(){
+ if(!gerOn(4)||gerModal())return gerGrowRecua();
+ if(_grEl){clearTimeout(_grRm);_grRm=null;_grEl.classList.add("on");return;} /* já está crescendo */
+ const out=[];document.querySelectorAll(".panel").forEach(p=>{
+  if(p.matches(":hover"))return;
+  if(document.activeElement&&p.contains(document.activeElement))return;
+  const r=p.getBoundingClientRect();
+  if(r.width<130||r.height<60||r.bottom<80||r.top>innerHeight-40)return;
+  out.push(r);});
+ if(!out.length)return;
+ const r=out[Math.floor(Math.random()*out.length)];
+ const d=document.createElement("div");d.className="ger-grow";
+ /* ancorado no canto inferior esquerdo do painel, que é de onde o musgo do CSS já vem */
+ d.style.cssText=`left:${Math.round(r.left-14)}px;top:${Math.round(Math.min(innerHeight-40,r.bottom+8)-160)}px`;
+ document.body.appendChild(d);_grEl=d;
+ void d.offsetWidth; /* firma o estado inicial: sem isto a transição não tem de onde partir */
+ d.classList.add("on");}
+
+/* --- o inchaço: algo se remexe sob o painel e assenta. banda 5, raro, nunca sob edição --- */
+let _swT=null,_swEl=null,_swRm=null;
+function gerSwellClear(){clearTimeout(_swRm);_swRm=null;
+ if(_swEl){_swEl.classList.remove("ger-swell");_swEl=null;}}
+function gerSwell(){gerSwellClear();
+ if(!gerOn(5)||gerModal())return;
+ const out=[];document.querySelectorAll(".panel").forEach(p=>{
+  if(p.matches(":hover"))return;
+  if(document.activeElement&&p.contains(document.activeElement))return;
+  const r=p.getBoundingClientRect();
+  if(r.width<130||r.bottom<40||r.top>innerHeight-30)return;out.push(p);});
+ if(!out.length)return;
+ _swEl=out[Math.floor(Math.random()*out.length)];_swEl.classList.add("ger-swell");
+ _swRm=setTimeout(gerSwellClear,2700);}
+function swellSched(){clearTimeout(_swT);_swT=setTimeout(()=>{gerSwell();swellSched();},28000+Math.random()*24000);}
+
+/* --- o som úmido: o fundo viscoso vive no grafo (audBuild); aqui, o nível e o estalo --- */
+const gerLvl=b=>b>=5?.021:.012;
+/* squelch: rajada de ruído marrom curta com o corte abrindo e fechando depressa.
+   é a forma de algo mole cedendo — baixo o bastante para você não saber se ouviu */
+function gerSquelch(){if(!AUD.ctx||S.ui.mute||!gerOn(4))return;
+ const c=AUD.ctx,b=bandOf(S.ruido||0),t=c.currentTime+.02,dur=.17+Math.random()*.13;
+ try{const n=Math.floor(c.sampleRate*.45),bf=c.createBuffer(1,n,c.sampleRate),ch=bf.getChannelData(0);
+  let last=0;for(let i=0;i<n;i++){const w=Math.random()*2-1;last=(last+.06*w)/1.06;ch[i]=last*4;}
+  const s=c.createBufferSource();s.buffer=bf;
+  const f=c.createBiquadFilter();f.type="lowpass";f.Q.value=9;
+  f.frequency.setValueAtTime(150,t);
+  f.frequency.linearRampToValueAtTime(680+Math.random()*520,t+dur*.34);
+  f.frequency.exponentialRampToValueAtTime(120,t+dur); /* abre e fecha: o estalo úmido */
+  const g=c.createGain(),pico=b>=5?.055:.034;
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(pico,t+.02);
+  g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  s.connect(f);f.connect(g);g.connect(c.destination);s.start(t);s.stop(t+dur+.06);}catch(e){}}
+function gerAudOff(){clearTimeout(AUD.gtimer);AUD.gtimer=null;AUD.gon=false;
+ if(!AUD.ctx||!AUD.ggn)return;try{const t=AUD.ctx.currentTime;
+  AUD.ggn.gain.cancelScheduledValues(t);AUD.ggn.gain.setTargetAtTime(0,t,.6);}catch(e){}}
+function gerAudTick(){if(!AUD.gon)return;const b=bandOf(S.ruido||0);
+ gerSquelch();
+ AUD.gtimer=setTimeout(gerAudTick,(b>=5?15+Math.random()*11:20+Math.random()*14)*1000);}
+function gerAudSync(want,b){
+ if(!want||!AUD.gest)return gerAudOff();
+ if(!audBuild())return;
+ if(AUD.ctx.state==="suspended")AUD.ctx.resume().catch(()=>{});
+ try{const t=AUD.ctx.currentTime;AUD.ggn.gain.cancelScheduledValues(t);
+  AUD.ggn.gain.setTargetAtTime(gerLvl(b),t,1.8);}catch(e){}
+ if(!AUD.gon){AUD.gon=true;AUD.gtimer=setTimeout(gerAudTick,(7+Math.random()*9)*1000);}}
+
+/* as reações do Germe às suas ações — o motor da Parte A cuida de cooldown e de {nome}/{apagado} */
+TRIG.ger={
+ erase:["não adianta arrancar","cresce de novo","isso vai cicatrizar torto","você tirou, mas a raiz ficou",
+  "{apagado}… ainda está aí, por baixo"],
+ idle:["parou? é agora que cresce","enquanto você descansa, nós trabalhamos","não se mexer só ajuda a pegar",
+  "sente criando casca?"],
+ resource:["essa ferida é uma porta","sangue é adubo","cada corte nosso agradece","abre. deixa entrar."],
+ tabopen:["levou junto para esta página","espalhou para cá também","não tem parte limpa"],
+ noiseup:["está florescendo mais rápido agora","você chamou e nós crescemos"]};
+/* e os efeitos visuais dos mesmos gatilhos: act = "o usuário voltou a mexer" */
+TRIGFX.ger={erase:gerScar,idle:gerGrow,act:gerGrowRecua};
+
+/* sair do Germe (ou calmar) apaga timers, overlays, classes e o som — a textura é CSS por
+   data-el, então a superfície seca sozinha */
+function gerSync(){const b=bandOf(S.ruido||0),on=gerOn(1);
+ if(!on||b<3)gerScarClear();
+ if(!on||b<4)gerGrowClear();
+ if(on&&b>=5){if(!_swT)swellSched();}else{clearTimeout(_swT);_swT=null;gerSwellClear();}
+ gerAudSync(on&&b>=4&&!S.ui.mute,b);}
+
 /* ---------- abas / navegação ---------- */
 const TABS=[["inicial","Inicial"],["sint","Sintonizar"],["hab","Habilidades"],["mag","Magias"],["tal","Talentos"],["inv","Inventário"],["bib","Biblioteca"],["div","Dívidas & Notas"]];
 function go(t){S.ui.tab=t;save();render();ascLand();window.scrollTo(0,0);}
@@ -2748,7 +3017,7 @@ function boot(){loadAuto();
  $("btnExp").onclick=exportJSON;
  $("btnImp").onclick=()=>$("impFile").click();
  $("impFile").addEventListener("change",e=>{if(e.target.files[0])importJSON(e.target.files[0]);e.target.value="";});
- $("btnMute").onclick=()=>{S.ui.mute=!S.ui.mute;save();$("btnMute").classList.toggle("on",S.ui.mute);toast(S.ui.mute?"Sussurros silenciados.":"Os sussurros voltaram.");whisperLoop();scopoSync();vazioSync();ecoSync();ascSync();pacSync();};
+ $("btnMute").onclick=()=>{S.ui.mute=!S.ui.mute;save();$("btnMute").classList.toggle("on",S.ui.mute);toast(S.ui.mute?"Sussurros silenciados.":"Os sussurros voltaram.");whisperLoop();scopoSync();vazioSync();ecoSync();ascSync();pacSync();gerSync();};
  $("btnCalm").onclick=()=>{S.ui.calm=!S.ui.calm;save();$("btnCalm").classList.toggle("on",S.ui.calm);applyTheme();whisperLoop();toast(S.ui.calm?"Efeitos reduzidos.":"Efeitos completos.");};
  $("btnSess").onclick=toggleSess;
  $("btnMute").classList.toggle("on",S.ui.mute);$("btnCalm").classList.toggle("on",S.ui.calm);
