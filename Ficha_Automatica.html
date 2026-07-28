@@ -368,6 +368,36 @@ body[data-el=asc] .asc-land .panel:not(:focus-within):nth-of-type(3n){animation-
 @keyframes ascjolt{0%{transform:none}14%{transform:translate(5px,-3px)}44%{transform:translate(5px,-3px)}58%{transform:translate(-2px,1px)}76%{transform:translate(1px,0)}100%{transform:none}}
 /* pacto: linha de assinatura sob os títulos */
 body[data-el=pac][data-band="2"] .panel h2,body[data-el=pac][data-band="3"] .panel h2,body[data-el=pac][data-band="4"] .panel h2,body[data-el=pac][data-band="5"] .panel h2{border-bottom:1px solid var(--ecd);padding-bottom:5px}
+/* ===== pac — presença/intrusão: algo do outro lado responde, oferece e se aproxima =====
+   a respiração da vinheta é só opacity+transform numa camada própria: composita na GPU e
+   não repinta a tela inteira por frame (animar o box-shadow do #fx-vign faria isso).
+   o resto do Pacto é overlay efêmero criado pelo JS — nenhum deles toca em campo real */
+body[data-el=pac] #fx-vign::after{content:"";position:absolute;inset:-14%;pointer-events:none;
+ background:radial-gradient(ellipse at 50% 52%,transparent 40%,rgba(52,2,12,.42) 76%,rgba(28,0,6,.8) 100%);
+ opacity:0;will-change:opacity,transform}
+body[data-el=pac][data-band="3"] #fx-vign::after{--pk:.3;animation:pacresp 14s ease-in-out infinite}
+body[data-el=pac][data-band="4"] #fx-vign::after{--pk:.52;animation:pacresp 11s ease-in-out infinite}
+body[data-el=pac][data-band="5"] #fx-vign::after{--pk:.82;animation:pacresp 8s ease-in-out infinite}
+/* inspira devagar, segura, solta — algo grande respirando atrás do vidro */
+@keyframes pacresp{0%,100%{opacity:calc(var(--pk)*.3);transform:scale(1)}
+ 46%{opacity:var(--pk);transform:scale(1.05)}74%{opacity:calc(var(--pk)*.7);transform:scale(1.02)}}
+/* o botão que pede clique: só brilho, zero layout — e o onclick dele continua sendo só o dele */
+.pac-beg{animation:pacpede 2s ease-in-out}
+@keyframes pacpede{0%,100%{box-shadow:none}
+ 28%{box-shadow:0 0 0 1px var(--ecd),0 0 12px 1px var(--eglow)}
+ 55%{box-shadow:0 0 0 1px var(--ec),0 0 22px 4px var(--eglow)}
+ 82%{box-shadow:0 0 0 1px var(--ecd),0 0 12px 1px var(--eglow)}}
+/* o cursor fantasma: pisca num campo vazio que ninguém está usando. não é foco, é desenho */
+.pac-caret{position:fixed;pointer-events:none;z-index:9;color:var(--ec);font:14px/1 ui-monospace,Consolas,monospace;
+ text-shadow:0 0 7px var(--eglow);animation:pacpisca 1.06s steps(1,end) infinite}
+@keyframes pacpisca{0%,49%{opacity:.85}50%,100%{opacity:0}}
+/* a sugestão: a presença "completa" o que você parou de escrever — sobreposta, e some */
+.pac-sug{position:fixed;pointer-events:none;z-index:9;color:var(--ec);opacity:0;white-space:nowrap;line-height:1.25;
+ overflow:hidden;text-overflow:ellipsis;text-shadow:0 0 8px var(--eglow);animation:pacsug 1.5s ease-in-out}
+@keyframes pacsug{0%{opacity:0}20%{opacity:.55}68%{opacity:.5}100%{opacity:0}}
+/* o número que hesita: 150ms de sobreposição opaca — o input embaixo nunca é tocado */
+.pac-hes{position:fixed;pointer-events:none;z-index:9;overflow:hidden;white-space:nowrap;
+ display:flex;align-items:center;justify-content:center}
 /* germe: musgo nos cantos, cresce com a banda */
 body[data-el=ger] .panel::before{content:"";position:absolute;left:-30px;bottom:-30px;width:calc(40px + var(--band)*26px);height:calc(40px + var(--band)*26px);background:radial-gradient(circle,rgba(111,154,78,.28),transparent 70%);pointer-events:none}
 body[data-el=ger][data-band="4"] .panel::after,body[data-el=ger][data-band="5"] .panel::after{content:"❋";position:absolute;right:8px;bottom:4px;color:var(--ecd);font-size:11px;opacity:.6}
@@ -393,14 +423,16 @@ body[data-band="5"] .panel h2:not(:hover){filter:blur(.4px)}
 body[data-band="5"] .panel h2:hover,body[data-band="5"] h1:hover{animation:none;filter:none}
 /* calmar / reduced motion */
 body.calm *,body.calm *::before,body.calm *::after{animation:none!important;transition:none!important}
-body.calm #fx-canvas,body.calm #whisper,body.calm #fx-eye,body.calm #fx-tunnel,body.calm .fx-flash,body.calm #fx-void,body.calm #fx-black,body.calm .fx-ghost,body.calm .fx-peel{display:none}
+body.calm #fx-canvas,body.calm #whisper,body.calm #fx-eye,body.calm #fx-tunnel,body.calm .fx-flash,body.calm #fx-void,body.calm #fx-black,body.calm .fx-ghost,body.calm .fx-peel,
+body.calm .pac-caret,body.calm .pac-sug,body.calm .pac-hes,body.calm #fx-vign::after{display:none}
 body.calm[data-el=vaz] .panel,body.calm[data-el=vaz] .tabs button{opacity:1!important;filter:none!important}
 body.calm[data-el=eco] h1,body.calm[data-el=eco] .panel h2{text-shadow:calc(var(--band)*1.2px) calc(var(--band)*1.2px) 0 rgba(127,184,168,.35)!important}
 body.calm[data-el=eco] .hx,body.calm[data-el=eco] .hint,body.calm[data-el=eco] label{text-shadow:none!important}
 /* asc: o servo destrava — movimento fluido de volta, sem resíduo de transform */
 body.calm[data-el=asc] .wrap,body.calm[data-el=asc] .panel,body.calm[data-el=asc] .attr,body.calm[data-el=asc] .rec,
 body.calm[data-el=asc] .panel h2,body.calm[data-el=asc] label,body.calm[data-el=asc] .hint{transform:none!important}
-@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}#fx-canvas,#fx-eye,#fx-tunnel,.fx-flash,#fx-void,#fx-black,.fx-ghost,.fx-peel{display:none}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}
+ #fx-canvas,#fx-eye,#fx-tunnel,.fx-flash,#fx-void,#fx-black,.fx-ghost,.fx-peel,.pac-caret,.pac-sug,.pac-hes,#fx-vign::after{display:none}
  body[data-el=vaz] .panel,body[data-el=vaz] .tabs button{opacity:1!important;filter:none!important}
  body[data-el=eco] h1,body[data-el=eco] .panel h2{text-shadow:calc(var(--band)*1.2px) calc(var(--band)*1.2px) 0 rgba(127,184,168,.35)!important}
  body[data-el=eco] .hx,body[data-el=eco] .hint,body[data-el=eco] label{text-shadow:none!important}
@@ -1866,6 +1898,12 @@ const SUS_ASC={
 lo:["a carne é lenta","você pode ser melhor que isto","a dor é só um sinal mal projetado","por que ainda sente?","a carne é fraca, substitua-a"],
 mid:["remova o que falha","emoção é ineficiência","o metal não hesita","você não precisa mais dormir","um parafuso a mais"],
 hi:["não sinto mais falta de nada. você também não vai.","a carne era o rascunho","eu me consertei. você ainda pode.","logo você vai agradecer","não dói mais. nada mais dói."]};
+/* pac: as únicas frases dirigidas A VOCÊ. não são clima — são resposta, oferta e negociação.
+   {nome} é trocado na hora de falar (ver pacTx): personagem, jogador, ou o fallback neutro */
+const SUS_PAC={
+lo:["eu ouvi isso","continue. estou interessado.","você queria dizer outra coisa","sei que você está aí","fale. eu escuto."],
+mid:["posso fazer isso valer a pena","é só pedir","você já sabe o preço","deixa eu ajudar","nós podemos resolver isso agora"],
+hi:["{nome}. eu sei o que você quer.","aceite e acabou, {nome}","você me chamou primeiro","não foi você que começou esta conversa?","diga sim. só isso."]};
 const ELEMS=[
 {id:"obs",g:"⊙",n:"Observação",v:"registra",fr:"O que você vê fica registrado. O que registra você, também.",
 lei:["Lei do Registro","O que você vê através da Observação fica registrado — revisitável mentalmente e transmissível: um toque na testa compartilha o registro em flash. E espiar o anômalo tem preço: a coisa pode notar o olhar."],
@@ -1886,7 +1924,7 @@ sus:SUS_ASC.lo,susB:SUS_ASC},
 {id:"pac",g:"⚖",n:"Pacto",v:"troca",fr:"Tudo se anota. Nada se esquece.",
 lei:["Lei do Consentimento","O Pacto prefere acordos. Sobre alvos voluntários: conjure com +1 e sem resistência. Involuntários resistem, e a maioria dos efeitos exige o Nome, sangue ou algo pessoal. Forçar é possível — e sempre mancha. Cada barganha fica registrada."],
 marca:["Uma marca fina e elegante na pele, que ninguém lembra de ter visto surgir — −1 para esconder o que você é de quem entende, +1 em negociação formal.","As pessoas sentem, sem saber por quê, que devem algo a você — −1 em convívio casual; papéis e contratos que você toca não se perdem nem rasgam por acidente.","Sua assinatura aparece onde você nunca assinou — −1 em amizade desinteressada (tudo soa cláusula), e 1×/sessão você sabe o preço exato de alguém."],
-sus:["você aceita?","⚖ o Pacto cobra","assinado nas duas vias","sem data de validade","achou barato?"]},
+sus:SUS_PAC.lo,susB:SUS_PAC},
 {id:"ger",g:"❋",n:"Germe",v:"infecta",fr:"O que você planta fica plantado.",
 lei:["Lei da Semeadura","O Germe não conjura efeitos: planta sementes. Todo efeito contínuo compõe sozinho, turno a turno, e não expira por tempo: precisa ser tratado, queimado ou arrancado. E a Sobrecarga do Germe não come Sintonia: come Vida."],
 marca:["Cheiro de terra molhada e de algo doce; plantas se inclinam de leve para você — −1 em ambientes assépticos e formais, imune a enjoo por cheiro.","Suas feridas fecham com um musgo fino; comida estraga rápido perto de você — −1 para dividir mesa e teto, +1 em Resistência contra doença e veneno.","Algo verde se move sob a sua pele quando ninguém olha; flores pequenas nascem onde você dorme — quem repara testa Coragem (7); venenos comuns não fazem mais efeito."],
@@ -2084,7 +2122,7 @@ function updDock(){const d=$("divDock");const n=S.div.filter(x=>x&&x.trim()).len
 let FX={run:false,q:false,ps:[],last:0};
 function syncFX(){const b=bandOf(S.ruido||0);const want=!!S.elem&&b>0&&!S.ui.calm&&!document.hidden;
  if(want&&!FX.run){FX.run=true;fxKick();}if(!want){FX.run=false;const cv=$("fx-canvas");if(cv){const x=cv.getContext&&cv.getContext("2d");if(x)x.clearRect(0,0,cv.width,cv.height);}}
- scopoSync();vazioSync();ecoSync();ascSync();}
+ scopoSync();vazioSync();ecoSync();ascSync();pacSync();}
 /* FX.q garante um único rAF pendente: desligar e religar no mesmo frame não duplica o loop */
 function fxKick(){if(FX.q)return;FX.q=true;rAF(fxTick);}
 function fxTick(t){FX.q=false;if(!FX.run)return;const cv=$("fx-canvas");if(!cv)return;const ctx=cv.getContext&&cv.getContext("2d");if(!ctx){FX.run=false;return;}
@@ -2133,7 +2171,9 @@ function whisperLoop(){const b=bandOf(S.ruido||0),e=ELM(S.elem);
  if(e.id==="obs"&&b>=4)delay*=.6; /* no ápice do Observação eles se acumulam */
  if(e.id==="vaz")delay*=1.45; /* o Vazio é vagaroso: mais espaçado, nunca frenético */
  _wt=setTimeout(()=>{_wt=null;const lst=susOf(e,b);let tx=lst[Math.floor(Math.random()*lst.length)];
-  if(b>=4&&Math.random()<.5){const ws=tx.split(" ");const i=Math.floor(Math.random()*ws.length);ws[i]=alien(ws[i]);tx=ws.join(" ");}
+  if(e.id==="pac")tx=pacTx(tx); /* o nome entra na hora de falar: reflete o campo agora, não o de antes */
+  /* o Pacto fala claro: garatujar uma palavra apagaria justamente o nome, e ele quer ser entendido */
+  if(b>=4&&e.id!=="pac"&&Math.random()<.5){const ws=tx.split(" ");const i=Math.floor(Math.random()*ws.length);ws[i]=alien(ws[i]);tx=ws.join(" ");}
   const l=(8+Math.random()*70)+"%",tp=(10+Math.random()*75)+"%";
   showWhisper(tx,l,tp);
   whisperLoop(); /* reagenda o ciclo primeiro: ele limpa ecos pendentes */
@@ -2194,8 +2234,8 @@ function flashSched(){clearTimeout(_ft);_ft=setTimeout(()=>{flashNow();flashSche
 
 /* --- a presença: Web Audio, só depois de um gesto do usuário e com o mute desligado ---
    o contexto é compartilhado; cada elemento tem suas próprias vozes, todas em ganho 0 */
-let AUD={ctx:null,gain:null,ogain:null,vgain:null,eg:null,agn:null,gest:false,on:false,von:false,eon:false,aon:false,timer:null,vtimer:null,etimer:null,atimer:null};
-function audGesture(){if(AUD.gest)return;AUD.gest=true;scopoSync();vazioSync();ecoSync();ascSync();}
+let AUD={ctx:null,gain:null,ogain:null,vgain:null,eg:null,agn:null,pgn:null,gest:false,on:false,von:false,eon:false,aon:false,pon:false,timer:null,vtimer:null,etimer:null,atimer:null,ptimer:null};
+function audGesture(){if(AUD.gest)return;AUD.gest=true;scopoSync();vazioSync();ecoSync();ascSync();pacSync();}
 ["pointerdown","keydown","touchstart"].forEach(ev=>addEventListener(ev,audGesture,{once:true,passive:true}));
 function audBuild(){if(AUD.ctx)return true;
  const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return false;
@@ -2220,7 +2260,16 @@ function audBuild(){if(AUD.ctx)return true;
   /* o 31º harmônico da serra sai fraquíssimo do bandpass, mas 1,85kHz é onde o ouvido é
      sensível: mesmo em .45 ele só arranha o zumbido, nunca chia */
   const a3g=c.createGain();a3g.gain.value=.45;a3.connect(af);af.connect(a3g);a3g.connect(ag);a3.start();
-  AUD.ctx=c;AUD.gain=g;AUD.ogain=og;AUD.vgain=vg;AUD.agn=ag;return true;}catch(e){return false;}}
+  /* pacto: presença viva do outro lado. um grave orgânico cujo GANHO sobe e desce num LFO de
+     0,15Hz — não é drone contínuo, é a cadência de uma respiração pesada e vagarosa */
+  const pgn=c.createGain();pgn.gain.value=0;pgn.connect(c.destination);
+  const pbr=c.createGain();pbr.gain.value=.5;pbr.connect(pgn); /* .5 ± .46: quase fecha e reabre */
+  const p1=c.createOscillator();p1.type="sine";p1.frequency.value=46;p1.connect(pbr);p1.start();
+  const p2=c.createOscillator();p2.type="triangle";p2.frequency.value=69.4; /* o corpo, não a nota */
+  const p2g=c.createGain();p2g.gain.value=.2;p2.connect(p2g);p2g.connect(pbr);p2.start();
+  const plf=c.createOscillator();plf.type="sine";plf.frequency.value=.15; /* ~9 respiros por minuto */
+  const plg=c.createGain();plg.gain.value=.46;plf.connect(plg);plg.connect(pbr.gain);plf.start();
+  AUD.ctx=c;AUD.gain=g;AUD.ogain=og;AUD.vgain=vg;AUD.agn=ag;AUD.pgn=pgn;return true;}catch(e){return false;}}
 function audOff(){clearTimeout(AUD.timer);AUD.timer=null;AUD.on=false;
  if(!AUD.ctx)return;try{const t=AUD.ctx.currentTime;
   for(const g of [AUD.gain.gain,AUD.ogain.gain]){g.cancelScheduledValues(t);g.setTargetAtTime(0,t,.4);}}catch(e){}}
@@ -2495,6 +2544,183 @@ function ascSync(){const b=bandOf(S.ruido||0),on=ascOn(1);
  if(on&&b>=5){if(!_jmT)jamSched();}else{clearTimeout(_jmT);_jmT=null;jamClear();}
  ascAudSync(on&&b>=4&&!S.ui.mute,b);}
 
+/* ============ PRESENÇA / INTRUSÃO — elemento Pacto ============
+   os outros cinco DECORAM a tela. o Pacto invade a conversa: ele responde ao que você acabou
+   de fazer, oferece, e no ápice te chama pelo nome. o medo é ter alguém do outro lado.
+
+   CONTRATO DE SEGURANÇA — vale para tudo que está abaixo desta linha:
+   nada aqui chama save() ou setF(), muta S, dispara oninput, rouba foco ou escreve no .value
+   de qualquer input/textarea. o botão que "pede clique" é box-shadow e nada mais: se você
+   clicar, roda o onclick normal dele, sem nada extra. o texto que "se completa" é uma div
+   sobreposta que se remove sozinha. o número que "hesita" é uma div opaca por cima do campo,
+   com o número real intacto embaixo. a autonomia é 100% ilusão; a ficha é 100% obediente. */
+const pacOn=min=>S.elem==="pac"&&bandOf(S.ruido||0)>=(min||1)&&!S.ui.calm&&!RM()&&!document.hidden;
+const pacModal=()=>$("modal").classList.contains("on");
+/* nunca sobre o que está sob o cursor nem sobre o que está em edição */
+const pacLivre=el=>!el.matches(":hover")&&!(document.activeElement&&(el===document.activeElement||el.contains(document.activeElement)));
+
+/* --- o nome: lido no instante da fala (o usuário pode trocá-lo agora), nunca cacheado --- */
+function pacNome(){return((S.nome||"").trim()||(S.jogador||"").trim()).slice(0,24);}
+/* sem nome nenhum: o vocativo do fim cai fora (soaria truncado) e o do começo vira "você" */
+function pacTx(tx){if(tx.indexOf("{nome}")<0)return tx;
+ const n=pacNome();if(n)return tx.replace(/\{nome\}/g,n);
+ return tx.replace(/ *, *\{nome\}/g,"").replace(/\{nome\}/g,"você");}
+
+/* --- parte 1: a reação. o sussurro do Pacto vem LOGO DEPOIS de você fazer algo, como se
+   a presença estivesse respondendo — e não no compasso frio de um timer --- */
+/* last começa muito no passado: a carência não deve valer para a PRIMEIRA reação da sessão */
+let PACR={bound:false,last:-1e9,t:null};
+function pacSpeak(){const b=bandOf(S.ruido||0),e=ELM("pac");if(!e)return;
+ const lst=susOf(e,b);
+ showWhisper(pacTx(lst[Math.floor(Math.random()*lst.length)]),(8+Math.random()*70)+"%",(10+Math.random()*75)+"%");
+ if(b>=4&&Math.random()<.5)pacMurmur();}
+function pacReact(){if(!pacOn(2)||S.ui.mute||PACR.t)return;
+ const now=performance.now();
+ if(now-PACR.last<9000)return; /* nem toda interação vira resposta: senão vira tique, não presença */
+ if(Math.random()>=(bandOf(S.ruido||0)>=4?.5:.3))return;
+ PACR.last=now;
+ PACR.t=setTimeout(()=>{PACR.t=null;if(pacOn(2)&&!S.ui.mute)pacSpeak();},1000+Math.random()*1000);}
+function pacBind(on){if(on===PACR.bound)return;PACR.bound=on;
+ const m=on?"addEventListener":"removeEventListener";
+ document[m]("pointerdown",pacReact,{capture:true,passive:true});
+ document[m]("focusout",pacReact,{capture:true,passive:true});}
+
+/* --- parte 2: o texto que se completa. fantasma SOBREPOSTO ao fim do que você escreveu —
+   nunca entra no campo, nunca altera o valor, nunca dispara evento --- */
+const PAC_SUG=["…e você aceitou","…como combinamos","…o preço já foi pago","…não foi?","…eu lembro disso"];
+let _pacTb=false,_sugT=null,_sugRm=null,_sugEl=null,_sugLast=-1e9,_pacKey=0,_mcx=null;
+/* medida de texto num canvas fora da tela: sem reflow, sem nó extra no documento */
+function pacTextW(cs,s){try{if(!_mcx)_mcx=document.createElement("canvas").getContext("2d");
+ _mcx.font=`${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+ return _mcx.measureText(s).width;}catch(e){return -1;}}
+function pacSugClear(){clearTimeout(_sugRm);_sugRm=null;
+ if(_sugEl&&_sugEl.parentNode)_sugEl.parentNode.removeChild(_sugEl);_sugEl=null;}
+/* cada tecla/input REARMA a espera: a sugestão só nasce depois que você para de verdade */
+function pacType(e){const t=e.target;if(!TXIN(t))return;
+ _pacKey=performance.now();clearTimeout(_sugT);_sugT=null;
+ if(!pacOn(3))return;
+ _sugT=setTimeout(()=>{_sugT=null;pacSuggest(t);},2600+Math.random()*1500);}
+function pacTypeBind(on){if(on===_pacTb)return;_pacTb=on;
+ const m=on?"addEventListener":"removeEventListener";
+ document[m]("input",pacType,{capture:true,passive:true});
+ document[m]("keydown",pacType,{capture:true,passive:true});
+ if(!on){clearTimeout(_sugT);_sugT=null;pacSugClear();}}
+function pacSuggest(t){pacSugClear();
+ if(!pacOn(3)||!t||!t.isConnected||pacModal())return;
+ if(performance.now()-_pacKey<2000)return;   /* voltou a digitar: a presença não interrompe */
+ if(performance.now()-_sugLast<32000)return; /* raro, e com carência */
+ if((t.value||"").trim().length<3||Math.random()>=.2)return;
+ const r=t.getBoundingClientRect();
+ if(r.width<70||r.height<12||r.bottom<24||r.top>innerHeight-24)return;
+ const cs=getComputedStyle(t),fs=parseFloat(cs.fontSize)||14;
+ let x=r.left+8,y=r.bottom+1; /* padrão (e único caso da textarea): flutuando sob o campo */
+ if(t.tagName==="INPUT"){ /* uma linha só: dá para medir e encostar no fim do que foi escrito */
+  const w=pacTextW(cs,t.value||"");
+  const px=r.left+(parseFloat(cs.paddingLeft)||0)+(parseFloat(cs.borderLeftWidth)||0)+w-(t.scrollLeft||0)+5;
+  /* medida suspeita (fonte que o canvas não aceitou) cai no fantasma flutuante, sem encavalar */
+  if(w>0&&px>r.left&&px<r.right-40){x=px;y=r.top+(r.height-fs*1.25)/2;}}
+ _sugLast=performance.now();
+ const d=document.createElement("div");d.className="pac-sug";
+ d.style.cssText=`left:${Math.round(x)}px;top:${Math.round(y)}px;font-size:${cs.fontSize};`+
+  `font-family:${cs.fontFamily};max-width:${Math.max(80,Math.round(innerWidth-x-12))}px`;
+ d.textContent=PAC_SUG[Math.floor(Math.random()*PAC_SUG.length)];
+ document.body.appendChild(d);_sugEl=d;
+ _sugRm=setTimeout(pacSugClear,1500);}
+
+/* --- parte 3: a autonomia simulada. três micro-intrusões, nenhuma delas executa ação --- */
+let _autoT=null,_begEl=null,_begRm=null,_carEl=null,_carRm=null,_hesEl=null,_hesRm=null;
+function pacBegClear(){clearTimeout(_begRm);_begRm=null;
+ if(_begEl){_begEl.classList.remove("pac-beg");_begEl=null;}}
+function pacCarClear(){clearTimeout(_carRm);_carRm=null;
+ if(_carEl&&_carEl.parentNode)_carEl.parentNode.removeChild(_carEl);_carEl=null;}
+function pacHesClear(){clearTimeout(_hesRm);_hesRm=null;
+ if(_hesEl&&_hesEl.parentNode)_hesEl.parentNode.removeChild(_hesEl);_hesEl=null;}
+function pacAutoClear(){pacBegClear();pacCarClear();pacHesClear();}
+/* o botão que pede clique: só stepper e aba — nada destrutivo. e é classe de brilho, mais nada:
+   ignorá-lo não faz nada, clicá-lo faz exatamente o que aquele botão sempre fez */
+function pacBeg(){const out=[];
+ document.querySelectorAll(".rec .stp,.tabs button").forEach(el=>{
+  if(!pacLivre(el))return;const r=el.getBoundingClientRect();
+  if(r.width<14||r.top<12||r.bottom>innerHeight-12)return;out.push(el);});
+ if(!out.length)return;
+ _begEl=out[Math.floor(Math.random()*out.length)];_begEl.classList.add("pac-beg");
+ _begRm=setTimeout(pacBegClear,2050);}
+/* o cursor fantasma: um caret desenhado num campo VAZIO que ninguém está usando.
+   é um span sobre a tela — o foco real do usuário fica onde ele deixou */
+function pacCaret(){const out=[];
+ document.querySelectorAll("input[type=text],textarea").forEach(el=>{
+  if(el.value||!pacLivre(el))return;const r=el.getBoundingClientRect();
+  if(r.width<90||r.height<14||r.top<12||r.bottom>innerHeight-12)return;
+  out.push({x:r.left+10,y:r.top+Math.min(9,Math.max(3,(r.height-16)/2))});});
+ if(!out.length)return;
+ const a=out[Math.floor(Math.random()*out.length)],d=document.createElement("span");
+ d.className="pac-caret";d.style.cssText=`left:${Math.round(a.x)}px;top:${Math.round(a.y)}px`;
+ d.textContent="|";
+ document.body.appendChild(d);_carEl=d;
+ _carRm=setTimeout(pacCarClear,2100);}
+/* o número que hesita: 150ms de div opaca por cima, com o valor ±1. o input embaixo segue
+   com o número certo o tempo todo — em nenhum momento S nem .value são tocados */
+function pacHesita(){const out=[];
+ document.querySelectorAll(".attr input[type=number],.rec .rv input[type=number]").forEach(el=>{
+  if(!pacLivre(el))return;
+  const v=parseInt(el.value,10);if(el.value===""||isNaN(v))return;
+  const r=el.getBoundingClientRect();
+  if(r.width<26||r.height<14||r.top<12||r.bottom>innerHeight-12)return;
+  out.push([el,r,v]);});
+ if(!out.length)return;
+ const p=out[Math.floor(Math.random()*out.length)],cs=getComputedStyle(p[0]),r=p[1];
+ const d=document.createElement("div");d.className="pac-hes";
+ d.style.cssText=`left:${r.left}px;top:${r.top}px;width:${Math.ceil(r.width)}px;height:${Math.ceil(r.height)}px;`+
+  `background:${bgOf(p[0])};color:${cs.color};font-family:${cs.fontFamily};font-size:${cs.fontSize};font-weight:${cs.fontWeight}`;
+ d.textContent=String(p[2]+(Math.random()<.5?1:-1));
+ document.body.appendChild(d);_hesEl=d;
+ _hesRm=setTimeout(pacHesClear,150);}
+function pacAuto(){pacAutoClear();
+ if(!pacOn(4)||pacModal())return;
+ const r=Math.random();if(r<.4)pacBeg();else if(r<.72)pacCaret();else pacHesita();}
+function autoSched(){clearTimeout(_autoT);_autoT=setTimeout(()=>{pacAuto();autoSched();},20000+Math.random()*25000);}
+
+/* --- parte 5: o som de NÃO ESTAR SOZINHO. a respiração vive no grafo (audBuild); aqui fica
+   o nível por banda e o murmúrio — a resposta baixa demais para se entender --- */
+const pacLvl=b=>b>=5?.034:.02;
+/* dois ou três pulsos graves com cadência de sílabas: a forma da fala, sem palavra nenhuma */
+function pacMurmur(){if(!AUD.ctx||S.ui.mute||!pacOn(4))return;
+ const c=AUD.ctx,b=bandOf(S.ruido||0),n=2+Math.floor(Math.random()*2);
+ try{const g=c.createGain();g.gain.value=0;
+  const f=c.createBiquadFilter();f.type="lowpass";f.frequency.value=340;f.Q.value=.8;
+  const o=c.createOscillator();o.type="sawtooth";
+  o.connect(f);f.connect(g);g.connect(c.destination);
+  let t=c.currentTime+.05;const lvl=b>=5?.05:.034;o.start(t-.03);
+  for(let i=0;i<n;i++){const d=.12+Math.random()*.1;
+   o.frequency.setValueAtTime(78+Math.random()*30,t);
+   o.frequency.linearRampToValueAtTime(60+Math.random()*22,t+d); /* a sílaba caindo */
+   g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(lvl,t+.05);
+   g.gain.setValueAtTime(lvl*.85,t+d-.02);g.gain.exponentialRampToValueAtTime(.0001,t+d+.07);
+   t+=d+.07+Math.random()*.07;}
+  o.stop(t+.25);}catch(e){}}
+function pacAudOff(){clearTimeout(AUD.ptimer);AUD.ptimer=null;AUD.pon=false;
+ if(!AUD.ctx||!AUD.pgn)return;try{const t=AUD.ctx.currentTime;
+  AUD.pgn.gain.cancelScheduledValues(t);AUD.pgn.gain.setTargetAtTime(0,t,.7);}catch(e){}}
+function pacAudTick(){if(!AUD.pon)return;const b=bandOf(S.ruido||0);
+ pacMurmur();
+ AUD.ptimer=setTimeout(pacAudTick,(b>=5?15+Math.random()*12:20+Math.random()*15)*1000);}
+function pacAudSync(want,b){
+ if(!want||!AUD.gest)return pacAudOff();
+ if(!audBuild())return;
+ if(AUD.ctx.state==="suspended")AUD.ctx.resume().catch(()=>{});
+ try{const t=AUD.ctx.currentTime;AUD.pgn.gain.cancelScheduledValues(t);
+  AUD.pgn.gain.setTargetAtTime(pacLvl(b),t,2.2);}catch(e){}  /* na banda 5 ela chega mais perto */
+ if(!AUD.pon){AUD.pon=true;AUD.ptimer=setTimeout(pacAudTick,(8+Math.random()*10)*1000);}}
+
+/* sair do Pacto (ou calmar, ou reduzir movimento) desliga listeners, timers, som e TODOS os
+   overlays: nenhum caret preso na tela, nenhum número congelado por cima de um campo */
+function pacSync(){const b=bandOf(S.ruido||0),on=pacOn(1);
+ pacBind(on&&b>=2&&!S.ui.mute);
+ if(!(on&&b>=2)||S.ui.mute){clearTimeout(PACR.t);PACR.t=null;}
+ pacTypeBind(on&&b>=3);
+ if(on&&b>=4){if(!_autoT)autoSched();}else{clearTimeout(_autoT);_autoT=null;pacAutoClear();}
+ pacAudSync(on&&b>=4&&!S.ui.mute,b);}
+
 /* ---------- abas / navegação ---------- */
 const TABS=[["inicial","Inicial"],["sint","Sintonizar"],["hab","Habilidades"],["mag","Magias"],["tal","Talentos"],["inv","Inventário"],["bib","Biblioteca"],["div","Dívidas & Notas"]];
 function go(t){S.ui.tab=t;save();render();ascLand();window.scrollTo(0,0);}
@@ -2522,7 +2748,7 @@ function boot(){loadAuto();
  $("btnExp").onclick=exportJSON;
  $("btnImp").onclick=()=>$("impFile").click();
  $("impFile").addEventListener("change",e=>{if(e.target.files[0])importJSON(e.target.files[0]);e.target.value="";});
- $("btnMute").onclick=()=>{S.ui.mute=!S.ui.mute;save();$("btnMute").classList.toggle("on",S.ui.mute);toast(S.ui.mute?"Sussurros silenciados.":"Os sussurros voltaram.");whisperLoop();scopoSync();vazioSync();ecoSync();ascSync();};
+ $("btnMute").onclick=()=>{S.ui.mute=!S.ui.mute;save();$("btnMute").classList.toggle("on",S.ui.mute);toast(S.ui.mute?"Sussurros silenciados.":"Os sussurros voltaram.");whisperLoop();scopoSync();vazioSync();ecoSync();ascSync();pacSync();};
  $("btnCalm").onclick=()=>{S.ui.calm=!S.ui.calm;save();$("btnCalm").classList.toggle("on",S.ui.calm);applyTheme();whisperLoop();toast(S.ui.calm?"Efeitos reduzidos.":"Efeitos completos.");};
  $("btnSess").onclick=toggleSess;
  $("btnMute").classList.toggle("on",S.ui.mute);$("btnCalm").classList.toggle("on",S.ui.calm);
