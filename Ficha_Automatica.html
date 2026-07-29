@@ -398,6 +398,15 @@ body[data-el=pac][data-band="5"] #fx-vign::after{--pk:.82;animation:pacresp 8s e
 /* o número que hesita: 150ms de sobreposição opaca — o input embaixo nunca é tocado */
 .pac-hes{position:fixed;pointer-events:none;z-index:9;overflow:hidden;white-space:nowrap;
  display:flex;align-items:center;justify-content:center}
+/* O CORPO: canvas próprio da mão, da tinta e da mancha (geometria toda em JS — ver PACX).
+   ao contrário do jardim do Germe (z2, POR TRÁS dos painéis), este fica ACIMA da ficha (z7,
+   contra z5 do .wrap): a mão precisa pairar sobre o painel que ela quase toca, e a assinatura
+   que sobra é tinta SOBRE a folha, não algo enterrado atrás dela. o que torna isso seguro é
+   pointer-events:none + opacidade baixa + a regra sagrada (nada entra na zona em uso).
+   canvas separado do #fx-canvas de propósito: mão parada é geometria PARADA, e este canvas só
+   é repintado quando alguma coisa muda (PACX.dirty), não a cada frame. */
+#fx-pact{position:fixed;inset:0;pointer-events:none;z-index:7;opacity:0;visibility:hidden;transition:opacity 2s,visibility 2s}
+body[data-el=pac] #fx-pact{visibility:visible;opacity:calc(.24 + var(--band)*.075)}
 /* ===== ger — nojo e body-horror: a superfície fica ÚMIDA e ORGÂNICA =====
    o asc trava em passos de servo; aqui é o contrário: tudo é mole, morno e escorrido.
    o que custa por frame (respiração, inchaço) é só transform — composita na GPU.
@@ -464,7 +473,7 @@ body[data-band="5"] .panel h2:hover,body[data-band="5"] h1:hover{animation:none;
 /* calmar / reduced motion */
 body.calm *,body.calm *::before,body.calm *::after{animation:none!important;transition:none!important}
 body.calm #fx-canvas,body.calm #whisper,body.calm #fx-eye,body.calm #fx-tunnel,body.calm .fx-flash,body.calm #fx-void,body.calm #fx-black,body.calm .fx-ghost,body.calm .fx-peel,
-body.calm .pac-caret,body.calm .pac-sug,body.calm .pac-hes,body.calm #fx-vign::after,body.calm .ger-scar,body.calm #fx-vines{display:none}
+body.calm .pac-caret,body.calm .pac-sug,body.calm .pac-hes,body.calm #fx-vign::after,body.calm .ger-scar,body.calm #fx-vines,body.calm #fx-pact{display:none}
 body.calm[data-el=vaz] .panel,body.calm[data-el=vaz] .tabs button{opacity:1!important;filter:none!important}
 body.calm[data-el=eco] h1,body.calm[data-el=eco] .panel h2{text-shadow:calc(var(--band)*1.2px) calc(var(--band)*1.2px) 0 rgba(127,184,168,.35)!important}
 body.calm[data-el=eco] .hx,body.calm[data-el=eco] .hint,body.calm[data-el=eco] label{text-shadow:none!important}
@@ -472,7 +481,7 @@ body.calm[data-el=eco] .hx,body.calm[data-el=eco] .hint,body.calm[data-el=eco] l
 body.calm[data-el=asc] .wrap,body.calm[data-el=asc] .panel,body.calm[data-el=asc] .attr,body.calm[data-el=asc] .rec,
 body.calm[data-el=asc] .panel h2,body.calm[data-el=asc] label,body.calm[data-el=asc] .hint{transform:none!important}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}
- #fx-canvas,#fx-eye,#fx-tunnel,.fx-flash,#fx-void,#fx-black,.fx-ghost,.fx-peel,.pac-caret,.pac-sug,.pac-hes,#fx-vign::after,.ger-scar,#fx-vines{display:none}
+ #fx-canvas,#fx-eye,#fx-tunnel,.fx-flash,#fx-void,#fx-black,.fx-ghost,.fx-peel,.pac-caret,.pac-sug,.pac-hes,#fx-vign::after,.ger-scar,#fx-vines,#fx-pact{display:none}
  body[data-el=ger] .wrap .panel{background:var(--panel)!important}
  body[data-el=vaz] .panel,body[data-el=vaz] .tabs button{opacity:1!important;filter:none!important}
  body[data-el=eco] h1,body[data-el=eco] .panel h2{text-shadow:calc(var(--band)*1.2px) calc(var(--band)*1.2px) 0 rgba(127,184,168,.35)!important}
@@ -484,7 +493,7 @@ body.calm[data-el=asc] .panel h2,body.calm[data-el=asc] label,body.calm[data-el=
 </style>
 </head>
 <body data-el="" data-band="0">
-<canvas id="fx-canvas"></canvas><canvas id="fx-vines"></canvas>
+<canvas id="fx-canvas"></canvas><canvas id="fx-vines"></canvas><canvas id="fx-pact"></canvas>
 <div id="fx-vign"></div><div id="fx-blood"></div>
 <div id="fx-tunnel"></div><div id="fx-eye"><i></i></div>
 <div id="fx-void"><i></i></div><div id="fx-black"></div>
@@ -2186,7 +2195,7 @@ function fxTick(t){FX.q=false;if(!FX.run)return;const cv=$("fx-canvas");if(!cv)r
  FX.ps=FX.ps.filter(p=>{p.life+=1;p.x+=p.vx;p.y+=p.vy;const a=Math.sin(Math.PI*Math.min(1,p.life/p.max));
   if(p.life>=p.max)return false;ctx.globalAlpha=a*p.op;fxDraw(ctx,el,p);ctx.globalAlpha=1;return true;});
  if(FX.ps.length>alvo)FX.ps.length=alvo;
- eyeStep(t);voidStep(t);vinTick(t);
+ eyeStep(t);voidStep(t);vinTick(t);pacTick(t);
  fxKick();}
 function fxNew(el,cv){const W=cv.width,H=cv.height,r=Math.random;
  const base={x:r()*W,y:r()*H,vx:(r()-.5)*.2,vy:(r()-.5)*.2,life:0,max:240+r()*240,op:.16,s:4+r()*7};
@@ -2719,12 +2728,17 @@ function ascSync(){const b=bandOf(S.ruido||0),on=ascOn(1);
    os outros cinco DECORAM a tela. o Pacto invade a conversa: ele responde ao que você acabou
    de fazer, oferece, e no ápice te chama pelo nome. o medo é ter alguém do outro lado.
 
-   CONTRATO DE SEGURANÇA — vale para tudo que está abaixo desta linha:
-   nada aqui chama save() ou setF(), muta S, dispara oninput, rouba foco ou escreve no .value
-   de qualquer input/textarea. o botão que "pede clique" é box-shadow e nada mais: se você
-   clicar, roda o onclick normal dele, sem nada extra. o texto que "se completa" é uma div
-   sobreposta que se remove sozinha. o número que "hesita" é uma div opaca por cima do campo,
-   com o número real intacto embaixo. a autonomia é 100% ilusão; a ficha é 100% obediente. */
+   CONTRATO DE SEGURANÇA — vale para tudo que está abaixo desta linha, com UMA exceção nomeada:
+   nada aqui muta S, rouba foco ou escreve no .value de qualquer input/textarea. o botão que
+   "pede clique" é box-shadow e nada mais: se você clicar, roda o onclick normal dele, sem nada
+   extra. o texto que "se completa" é uma div sobreposta que se remove sozinha. o número que
+   "hesita" é uma div opaca por cima do campo, com o número real intacto embaixo.
+
+   A EXCEÇÃO (Lei do Consentimento dramatizada): o SEQUESTRO DO CONSENTIMENTO, lá no fim deste
+   bloco, escreve de verdade — e é a única coisa neste arquivo que escreve. só na banda 5, uma
+   vez a cada 60-90s, por 3-5s, e SÓ no único campo de texto livre que já estava em foco
+   recebendo as suas teclas. nunca em número, nunca em contador de jogo, nunca em dois campos,
+   nunca em S direto. bandas 1-4 continuam 100% ilusão: ele PREFERE que você aceite. */
 const pacOn=min=>S.elem==="pac"&&bandOf(S.ruido||0)>=(min||1)&&!S.ui.calm&&!RM()&&!document.hidden;
 const pacModal=()=>$("modal").classList.contains("on");
 /* nunca sobre o que está sob o cursor nem sobre o que está em edição */
@@ -2770,7 +2784,10 @@ function pacSugClear(){clearTimeout(_sugRm);_sugRm=null;
 function pacType(e){const t=e.target;if(!TXIN(t))return;
  _pacKey=performance.now();clearTimeout(_sugT);_sugT=null;
  if(!pacOn(3))return;
- _sugT=setTimeout(()=>{_sugT=null;pacSuggest(t);},2600+Math.random()*1500);}
+ /* a confiança dele cresce com a banda: na 3 ele espera você parar de verdade, na 5 ele quase
+    não espera — é a mesma oferta, feita cada vez mais perto do seu ouvido */
+ const b=bandOf(S.ruido||0);
+ _sugT=setTimeout(()=>{_sugT=null;pacSuggest(t);},(b>=5?1500:b>=4?2000:2600)+Math.random()*1500);}
 function pacTypeBind(on){if(on===_pacTb)return;_pacTb=on;
  const m=on?"addEventListener":"removeEventListener";
  document[m]("input",pacType,{capture:true,passive:true});
@@ -2779,8 +2796,10 @@ function pacTypeBind(on){if(on===_pacTb)return;_pacTb=on;
 function pacSuggest(t){pacSugClear();
  if(!pacOn(3)||!t||!t.isConnected||pacModal())return;
  if(performance.now()-_pacKey<2000)return;   /* voltou a digitar: a presença não interrompe */
- if(performance.now()-_sugLast<32000)return; /* raro, e com carência */
- if((t.value||"").trim().length<3||Math.random()>=.2)return;
+ const b=bandOf(S.ruido||0);
+ /* carência e chance por banda: raro na 3, insistente na 5 — e ainda assim só oferta */
+ if(performance.now()-_sugLast<(b>=5?13000:b>=4?19000:28000))return;
+ if((t.value||"").trim().length<3||Math.random()>=(b>=5?.5:b>=4?.36:.24))return;
  const r=t.getBoundingClientRect();
  if(r.width<70||r.height<12||r.bottom<24||r.top>innerHeight-24)return;
  const cs=getComputedStyle(t),fs=parseFloat(cs.fontSize)||14;
@@ -2849,7 +2868,9 @@ function pacHesita(){const out=[];
 function pacAuto(){pacAutoClear();
  if(!pacOn(4)||pacModal())return;
  const r=Math.random();if(r<.4)pacBeg();else if(r<.72)pacCaret();else pacHesita();}
-function autoSched(){clearTimeout(_autoT);_autoT=setTimeout(()=>{pacAuto();autoSched();},20000+Math.random()*25000);}
+/* o intervalo é lido a cada rearme, então subir de banda aperta o cerco sem religar nada */
+function autoSched(){clearTimeout(_autoT);const b=bandOf(S.ruido||0),base=b>=5?11000:(b>=4?15000:20000);
+ _autoT=setTimeout(()=>{pacAuto();autoSched();},base+Math.random()*base);}
 
 /* --- parte 5: o som de NÃO ESTAR SOZINHO. a respiração vive no grafo (audBuild); aqui fica
    o nível por banda e o murmúrio — a resposta baixa demais para se entender --- */
@@ -2882,14 +2903,435 @@ function pacAudSync(want,b){
  try{const t=AUD.ctx.currentTime;AUD.pgn.gain.cancelScheduledValues(t);
   AUD.pgn.gain.setTargetAtTime(pacLvl(b),t,2.2);}catch(e){}  /* na banda 5 ela chega mais perto */
  if(!AUD.pon){AUD.pon=true;AUD.ptimer=setTimeout(pacAudTick,(8+Math.random()*10)*1000);}}
+/* a pena: um risco de tinta no papel — dois ou três traços de ruído num passa-banda que DESCE,
+   com o peso grave da palma apoiando por baixo. sem transiente seco: não é carimbo batido,
+   é alguém assinando devagar do outro lado da mesa */
+function pacPena(){if(!AUD.ctx||S.ui.mute||!pacOn(5))return;
+ const c=AUD.ctx;
+ try{const n=Math.floor(c.sampleRate*.9),bf=c.createBuffer(1,n,c.sampleRate),ch=bf.getChannelData(0);
+  for(let i=0;i<n;i++)ch[i]=(Math.random()*2-1)*.5;
+  const s=c.createBufferSource();s.buffer=bf;
+  const f=c.createBiquadFilter();f.type="bandpass";f.Q.value=2.4;
+  const g=c.createGain();g.gain.value=0;
+  s.connect(f);f.connect(g);g.connect(c.destination);
+  let t=c.currentTime+.03;s.start(t);
+  const k=2+Math.floor(Math.random()*2);
+  for(let i=0;i<k;i++){const d=.09+Math.random()*.07;
+   f.frequency.setValueAtTime(2500+Math.random()*900,t);
+   f.frequency.exponentialRampToValueAtTime(880+Math.random()*320,t+d);
+   g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.021,t+d*.38);
+   g.gain.linearRampToValueAtTime(.0001,t+d);
+   t+=d+.05+Math.random()*.05;}
+  s.stop(t+.1);
+  const o=c.createOscillator();o.type="sine";o.frequency.value=66;
+  const og=c.createGain();og.gain.value=0;o.connect(og);og.connect(c.destination);
+  const t0=c.currentTime+.02;o.start(t0);
+  og.gain.setValueAtTime(0,t0);og.gain.linearRampToValueAtTime(.03,t0+.2);
+  og.gain.exponentialRampToValueAtTime(.0001,t0+.8);o.stop(t0+.85);}catch(e){}}
+
+/* ================= O CORPO DO PACTO: a mão e a tinta no #fx-pact =================
+   até aqui o Pacto era voz e oferta. o que faltava era CORPO: uma mão de dedos longos que se
+   forma na borda de um painel, dobra a segunda junta para o lado errado e fica ali, a um
+   milímetro de tocar — e a assinatura a pena que ele escreve ao lado dela e deixa secar.
+   geometria toda em JS (Path2D), canvas próprio repintado só quando algo muda (PACX.dirty).
+
+   ele NÃO é bestial: nada aqui salta, pisca nem ataca. tudo se forma devagar, espera e recua.
+   quanto mais alta a banda, mais LENTO e mais confiante — o tempo está do lado dele.
+
+   REGRA SAGRADA (a mesma do jardim): onde você está, ele não chega. a zona proibida é um raio
+   em volta do cursor + o retângulo do campo em foco, e a mão inteira é testada contra ela
+   antes de nascer. o canvas é pointer-events:none e nunca recebe clique. */
+const PCAP=[0,1,1,1,2,3];                     /* mãos simultâneas por banda */
+const PIV=[0,46000,38000,25000,15000,8500];   /* intervalo-base entre aparições */
+const PFL=[.88,1,.97,.82];                    /* índice, médio, anelar, mínimo: não é um pente */
+const PACX={cv:null,cx:null,W:0,H:0,on:false,dirty:false,hs:[],ik:[],mk:[],
+ mx:-1e4,my:-1e4,mt:-1e9,zr:104,fz:null,fzt:0,lt:0,hT:null};
+addEventListener("mousemove",e=>{if(!PACX.on)return;
+ PACX.mx=e.clientX;PACX.my=e.clientY;PACX.mt=performance.now();},{passive:true});
+/* a mancha é ancorada no PAINEL, não na tela: rolar move a marca, e move junto com o painel */
+addEventListener("scroll",()=>{if(PACX.on&&PACX.mk.length)PACX.dirty=true;},{passive:true});
+
+/* --- a zona proibida: testada contra o retângulo TODO da mão, não contra um ponto --- */
+function pacForbBox(o){
+ if(performance.now()-PACX.mt<5000){
+  const x=Math.max(o.l,Math.min(o.r,PACX.mx)),y=Math.max(o.t,Math.min(o.b,PACX.my));
+  const dx=x-PACX.mx,dy=y-PACX.my;
+  if(dx*dx+dy*dy<PACX.zr*PACX.zr)return true;}
+ const f=PACX.fz;
+ return !!(f&&o.l<f.r&&o.r>f.l&&o.t<f.b&&o.b>f.t);}
+/* a cor do tema, escurecida por k: lê o _ecCache, nunca getComputedStyle por frame */
+function pacCor(k,a){const h=(_ecCache||"#c13a52").replace("#","");
+ const v=h.length===3?h[0]+h[0]+h[1]+h[1]+h[2]+h[2]:h.slice(0,6);
+ let n=parseInt(v,16);if(isNaN(n))n=0xc13a52;
+ return `rgba(${Math.round(((n>>16)&255)*k)},${Math.round(((n>>8)&255)*k)},${Math.round((n&255)*k)},${a})`;}
+/* PRNG semeado: a mancha precisa ser redesenhada IGUAL a cada repintura, então a geometria
+   dela não pode sair de Math.random — sai de uma semente guardada na própria linha */
+const pacRnd=s=>()=>{s=(s*1664525+1013904223)%4294967296;return s/4294967296;};
+/* a fita: mesmo truque do caule das vinhas (polígono preenchido, espessura variável dentro de
+   UM Path2D). vinRibbon só lê .pts, então serve para dedo e para tinta sem cópia nenhuma */
+const pacFita=P=>vinRibbon({pts:P},P.length);
+/* corta a corrente numa fração, interpolando a última ponta: é o que faz o dedo CRESCER em vez
+   de aparecer ponto a ponto, e o que faz a tinta ser ESCRITA em vez de surgir pronta */
+function pacCorte(P,f){const n=P.length;
+ if(f>=1)return P;
+ const e=1+(n-1)*(f<0?0:f),k=Math.floor(e),r=e-k;
+ if(k<2)return null;
+ const Q=P.slice(0,k);
+ if(r>.03&&k<n){const a=P[k-1],b=P[k];
+  Q.push({x:a.x+(b.x-a.x)*r,y:a.y+(b.y-a.y)*r,w:Math.max(.3,(a.w+(b.w-a.w)*r)*.85)});}
+ return Q;}
+
+/* --- o dedo: três falanges. a PRIMEIRA junta dobra para onde deveria; a SEGUNDA dobra para o
+   lado errado, e a terceira continua nessa direção impossível. de propósito sutil: o que
+   incomoda é levar dois segundos para entender por que aquela mão está errada --- */
+function pacDedo(x,y,a,L,w0){
+ /* a dobra errada é MODESTA de propósito: passando de ~35° a mão vira garra de bicho, e o
+    Pacto não é bestial. o incômodo tem que vir da direção, não do exagero */
+ const seg=[.40,.34,.26],b=[.10+Math.random()*.10,-(.32+Math.random()*.22),-(.09+Math.random()*.15)];
+ const P=[{x,y,w:w0}];let ca=a,cx=x,cy=y,acc=0;
+ for(let s=0;s<3;s++){ca+=b[s];const ln=L*seg[s];
+  for(let i=0;i<3;i++){cx+=Math.cos(ca)*ln/3;cy+=Math.sin(ca)*ln/3;acc+=ln/3;
+   P.push({x:cx,y:cy,w:Math.max(.5,w0*(1-.62*acc/L))});}}
+ return P;}
+/* a mão em espaço LOCAL, apontando para +x: palma em cunha (pulso fino, dorso largo), quatro
+   dedos na borda dela e o polegar saindo de baixo. na banda 1-2 fica só a falange da ponta */
+function pacMaoGeo(h){const L=h.L,PW=L*.36,PL=L*.5,ch=[];
+ if(!h.tip)ch.push([{x:-L*.14,y:0,w:PW*.42},{x:PL*.46,y:0,w:PW*.64},{x:PL,y:0,w:PW*.54}]);
+ const nf=h.tip?(1+(Math.random()<.35?1:0)):4;
+ for(let i=0;i<nf;i++){const u=nf>1?i/(nf-1):.42;
+  const P=pacDedo(PL,(u-.5)*PW*.88,(u-.5)*.28+(Math.random()-.5)*.08,
+   L*(h.tip?1:PFL[i])*(.94+Math.random()*.12),L*.062);
+  ch.push(h.tip?P.slice(6):P);}
+ if(!h.tip)ch.push(pacDedo(PL*.34,PW*.58,.72+Math.random()*.16,L*.6,L*.07));
+ return ch;}
+/* o retângulo que a mão ocupa NA TELA: bbox local com os quatro cantos girados */
+function pacBBox(h){let l=1e9,t=1e9,r=-1e9,b=-1e9;
+ for(const P of h.ch)for(const p of P){
+  if(p.x<l)l=p.x;if(p.x>r)r=p.x;if(p.y<t)t=p.y;if(p.y>b)b=p.y;}
+ const co=Math.cos(h.a),si=Math.sin(h.a),X=[],Y=[],C=[[l,t],[r,t],[r,b],[l,b]];
+ for(const q of C){X.push(h.x+q[0]*co-q[1]*si);Y.push(h.y+q[0]*si+q[1]*co);}
+ return {l:Math.min.apply(null,X),r:Math.max.apply(null,X),
+  t:Math.min.apply(null,Y),b:Math.max.apply(null,Y)};}
+
+/* --- onde ela aparece: na BORDA de um painel, com a raiz fora e a ponta entrando uns 14px.
+   não no meio da tela: ela vem de fora, como quem se apoia na mesa para alcançar a folha --- */
+function pacPaineis(){const out=[];
+ document.querySelectorAll(".wrap .panel").forEach(el=>{const r=el.getBoundingClientRect();
+  if(r.width<140||r.height<54)return;
+  if(r.bottom<50||r.top>innerHeight-50)return;
+  out.push({el,r});});
+ return out;}
+function pacBorda(p,R,evit){const r=p.r;
+ const jx=r.left+r.width*(.22+Math.random()*.56),jy=r.top+r.height*(.24+Math.random()*.52);
+ const cand=[{x:r.left-R+14,y:jy,a:0,mx:r.left,my:jy},
+  {x:r.right+R-14,y:jy,a:Math.PI,mx:r.right,my:jy},
+  {x:jx,y:r.top-R+14,a:Math.PI/2,mx:jx,my:r.top},
+  {x:jx,y:r.bottom+R-14,a:-Math.PI/2,mx:jx,my:r.bottom}];
+ /* borda sem espaço nasce sem palma, e mão por cima do cabeçalho não é mão: é mancha. sobram
+    as bordas onde o braço realmente cabe — e a lateral, que é por onde se alcança uma folha,
+    entra sorteada em dobro */
+ let out=cand.filter(o=>o.x>-R*.35&&o.x<PACX.W+R*.35&&o.y>70&&o.y<PACX.H-16);
+ if(!out.length)out=cand.filter(o=>o.x>-R*.6&&o.x<PACX.W+R*.6&&o.y>-R*.6&&o.y<PACX.H+R*.6);
+ if(!out.length)out=cand;
+ const pes=[];for(const o of out){pes.push(o);if(o.a===0||o.a===Math.PI)pes.push(o);}
+ out=pes;
+ /* durante o sequestro há um retângulo a evitar (o campo que você está usando): ele pega a
+    borda MAIS LONGE dele — os dedos tocam o painel, nunca a zona onde você digita */
+ if(evit){const cx=(evit.l+evit.r)/2,cy=(evit.t+evit.b)/2;let bo=out[0],bd=-1;
+  for(const o of out){const dx=o.mx-cx,dy=o.my-cy,d=dx*dx+dy*dy;if(d>bd){bd=d;bo=o;}}
+  return bo;}
+ return out[Math.floor(Math.random()*out.length)];}
+/* um canto da tela, para a ponta de dedo das bandas 1-2: raiz fora, apontando para o miolo */
+function pacCanto(R){const r=Math.random,q=Math.floor(r()*4),lx=(q===0||q===3),ty=(q<2);
+ const x=lx?-R*.35:PACX.W+R*.35,y=ty?-R*.25:PACX.H+R*.25;
+ return {x,y,a:Math.atan2(PACX.H*.5-y,PACX.W*.5-x)+(r()-.5)*.5};}
+
+/* nasce: cinco tentativas de achar lugar longe de você. a mão do sequestro (pin) é a única que
+   ignora a zona proibida — mas mesmo ela escolhe a borda mais longe do campo em uso */
+function pacMaoNova(pin,evit,pan,dur){
+ if(!PACX.on||!PACX.cx)return null;
+ const b=bandOf(S.ruido||0);
+ if(!pin){let viv=0;for(const h of PACX.hs)if(h.ph!==2)viv++;
+  if(viv>=PCAP[b])return null;}
+ const tip=!pin&&b<=2,L=tip?(20+Math.random()*13):(38+b*7+Math.random()*20),R=L*1.52;
+ for(let k=0;k<5;k++){
+  let pos=null,pel=null;
+  if(tip)pos=pacCanto(R);
+  else{let ps;
+   if(pan)ps=[{el:pan,r:pan.getBoundingClientRect()}];
+   else{ps=pacPaineis();if(!ps.length)return null;}
+   const p=ps[Math.floor(Math.random()*ps.length)];
+   if(!pin&&!pacLivre(p.el))continue;   /* painel sob o cursor ou em edição: não é a vez dele */
+   pos=pacBorda(p,R,evit);pel=p.el;}
+  const h={x:pos.x,y:pos.y,a:pos.a+(Math.random()-.5)*(tip?.5:.22),L,tip,pin:!!pin,pan:pel,
+   ch:null,paths:null,pk:-1,grad:null,ph:0,t:0,
+   gr:pin?(380+Math.random()*180):(tip?(340+Math.random()*260):(1000+Math.random()*700+(b>=5?600:0))),
+   hd:pin?(dur||4000):(tip?(300+Math.random()*500):(1800+b*700+Math.random()*1800)),
+   fd:tip?(500+Math.random()*300):(900+Math.random()*600)};
+  h.ch=pacMaoGeo(h);
+  if(!pin&&pacForbBox(pacBBox(h)))continue;
+  PACX.hs.push(h);PACX.dirty=true;return h;}
+ return null;}
+function pacMaoSched(prim){clearTimeout(PACX.hT);PACX.hT=null;
+ if(!PACX.on)return;
+ const iv=(PIV[bandOf(S.ruido||0)]||30000)*(prim?.22:(.55+Math.random()*.9));
+ PACX.hT=setTimeout(()=>{PACX.hT=null;
+  if(!pacModal())pacMaoNova(false,null,null,0);
+  pacMaoSched();},iv);}
+/* a mão desenhada: a base é quase preta (silhueta), a ponta dos dedos se perde no ar. o
+   gradiente é criado em espaço local e pintado sob translate+rotate, então acompanha a mão */
+function pacMaoDraw(c,h){
+ let p=1,al=1,rec=1;
+ if(h.ph===0){p=Math.min(1,h.t/h.gr);al=Math.min(1,p*1.5);}
+ else if(h.ph===2){const q=Math.min(1,h.t/h.fd);al=1-q;rec=1-q*.45;}  /* recua enquanto se desfaz */
+ if(al<=.012)return;
+ const n=h.ch.length,key=Math.round(p*rec*120);
+ if(h.pk!==key){h.pk=key;h.paths=[];
+  const sp=.13,esc=Math.max(.2,1-(n-1)*sp);   /* os dedos crescem UM A UM, não todos juntos */
+  for(let i=0;i<n;i++){const f=(p*rec-i*sp)/esc;
+   const Q=pacCorte(h.ch[i],f<0?0:(f>1?1:f));
+   h.paths.push(Q?pacFita(Q):null);}}
+ if(!h.grad){const g=c.createLinearGradient(0,0,h.L*1.6,0);
+  g.addColorStop(0,pacCor(.34,.9));g.addColorStop(.55,pacCor(.72,.62));g.addColorStop(1,pacCor(1,.2));
+  h.grad=g;}
+ c.save();c.translate(h.x,h.y);c.rotate(h.a);
+ c.globalAlpha=al*(h.tip?.55:.66);c.fillStyle=h.grad;
+ for(const q of h.paths)if(q)c.fill(q);
+ c.restore();c.globalAlpha=1;}
+
+/* --- A TINTA: o gesto de assinar, nunca palavra nenhuma. um traço cursivo com pressão de pena
+   (engrossa na descida, afina na subida), uma laçada no meio e o rabisco arrastado do fim.
+   escreve em ~1s e depois SECA — a tinta some da folha como se nunca tivesse existido --- */
+function pacSigPts(rnd,W,H,w0){
+ /* 44 pontos: menos que isso e a fita mostra as facetas — assinatura tem que CORRER, não
+    serrar. a segunda frequência é discreta pelo mesmo motivo */
+ /* f1 é quantas subidas e descidas cabem na largura: com 2 ou 3 sai uma onda, com 3 a 5 sai
+    letra. é essa frequência que separa "rabisco" de "alguém escrevendo um nome" */
+ const n=44,f1=2.9+rnd()*1.9,f2=3.4+rnd()*2.2,p1=rnd()*6.2832,p2=rnd()*6.2832,
+  lac=rnd()<.7,lu=.26+rnd()*.3,inc=(rnd()-.5)*.5,P=[];
+ for(let i=0;i<n;i++){const u=i/(n-1),an=p1+u*6.2832*f1;
+  let x=u*W,y=Math.sin(an)*H*.46+Math.sin(p2+u*6.2832*f2)*H*.12+(u-.5)*H*inc;
+  if(lac){const d=(u-lu)/.14;
+   if(d>-1&&d<1){const q=(d+1)*3.1416;x+=Math.sin(q)*W*.05;y+=(1-Math.cos(q))*H*.5;}}
+  /* pressão de pena: engrossa na descida, afina na subida — e nunca chega a sumir no meio */
+  const pr=Math.max(0,Math.cos(an)),tp=Math.min(1,Math.min(u,1-u)*7);
+  P.push({x,y,w:Math.max(.3,w0*(.5+pr*.5)*(.3+tp*.7))});}
+ const ly=P[n-1].y;
+ for(let i=1;i<=5;i++)P.push({x:W+i*W*.07,y:ly+Math.sin(i*.9)*H*.07,w:Math.max(.25,w0*(.5-i*.09))});
+ return P;}
+function pacInkNova(h){
+ const R=h.L*1.52,co=Math.cos(h.a),si=Math.sin(h.a);
+ const W=Math.min(146,58+h.L*1.05),H=W*.25;
+ /* perto de onde a mão apareceu, e sempre na horizontal: assinatura em pé não é assinatura */
+ let x=h.x+co*R*.72-si*h.L*.5-W*.5+(Math.random()-.5)*20;
+ let y=h.y+si*R*.72+co*h.L*.5+(Math.random()-.5)*16;
+ x=Math.max(10,Math.min(PACX.W-W-10,x));
+ y=Math.max(H+10,Math.min(PACX.H-H-10,y));
+ PACX.ik.push({x,y,rot:(Math.random()-.5)*.16,ph:0,t:0,path:null,pk:-1,
+  P:pacSigPts(pacRnd(Math.floor(Math.random()*1e9)+1),W,H,Math.max(.8,h.L*.026)),
+  wr:900+Math.random()*500,dr:800+Math.random()*600});
+ PACX.dirty=true;}
+function pacInkDraw(c,k){
+ const p=k.ph===0?Math.min(1,k.t/k.wr):1;
+ const al=k.ph===0?.9:Math.max(0,1-k.t/k.dr)*.9;
+ if(al<=.01)return;
+ const key=Math.round(p*100);
+ if(k.pk!==key){k.pk=key;const Q=pacCorte(k.P,p);k.path=Q?pacFita(Q):null;}
+ if(!k.path)return;
+ c.save();c.translate(k.x,k.y);c.rotate(k.rot);
+ c.globalAlpha=al;c.fillStyle=pacCor(.88,.78);c.fill(k.path);
+ c.restore();c.globalAlpha=1;}
+
+/* --- A MANCHA: forçar sempre mancha. depois de cada sequestro fica uma assinatura fantasma no
+   canto daquele painel, e cada novo sequestro no MESMO painel sobrepõe outra linha — mais
+   densa, mais ilegível, nunca removida. é EFÊMERA: vive só nesta aba do navegador, não entra
+   em S nem no localStorage (não é dado de personagem, é o rastro de uma sessão).
+   ancorada pela CHAVE do painel (aba + posição + título), porque render() recria os nós. --- */
+function pacKey(el){const h=el.querySelector("h2");
+ const t=h?h.textContent.replace(/\s+/g," ").trim().slice(0,48):"";
+ let i=0,n=el;while((n=n.previousElementSibling))i++;
+ return (S.ui.tab||"")+"|"+i+"|"+t;}
+function pacMarca(pan){if(!pan)return;
+ const k=pacKey(pan);let m=null;
+ for(const x of PACX.mk)if(x.k===k)m=x;
+ if(!m){m={k,el:pan,rt:0,ls:[]};PACX.mk.push(m);}
+ m.el=pan;
+ m.ls.push({sd:Math.floor(Math.random()*1e9)+1,dx:(Math.random()-.5)*14,dy:(Math.random()-.5)*7,
+  rot:(Math.random()-.5)*.22,sc:.82+Math.random()*.36,al:.22+Math.random()*.09,path:null,pw:0});
+ if(m.ls.length>9)m.ls.shift();   /* teto de densidade: mais que isto é borrão, não assinatura */
+ PACX.dirty=true;}
+function pacMarcaDraw(c,m){
+ if(!m.el||!m.el.isConnected){   /* um re-render trocou o nó: reencontra o painel pela chave */
+  const t=performance.now();if(t-m.rt<400)return;
+  m.rt=t;m.el=null;
+  const ps=document.querySelectorAll(".wrap .panel");
+  for(const el of ps)if(pacKey(el)===m.k){m.el=el;break;}
+  if(!m.el)return;}                /* painel de outra aba: a marca espera você voltar */
+ const r=m.el.getBoundingClientRect();
+ if(r.width<80||r.bottom<10||r.top>PACX.H)return;
+ const W=Math.min(132,r.width*.36),H=W*.19,bx=r.right-W-14,by=r.bottom-12;
+ for(const l of m.ls){
+  if(!l.path||Math.abs(l.pw-W)>4){l.pw=W;
+   l.path=pacFita(pacSigPts(pacRnd(l.sd),W,H,.9));}
+  c.save();c.translate(bx+l.dx,by+l.dy);c.rotate(l.rot);c.scale(l.sc,l.sc);
+  c.globalAlpha=l.al;c.fillStyle=pacCor(.92,.85);c.fill(l.path);c.restore();}
+ c.globalAlpha=1;}
+
+/* --- a repintura: só com PACX.dirty. ordem = mancha (tinta seca, por baixo), mão, tinta --- */
+function pacDraw(){const c=PACX.cx;if(!c)return;
+ c.clearRect(0,0,PACX.W,PACX.H);
+ for(const m of PACX.mk)pacMarcaDraw(c,m);
+ for(const h of PACX.hs)pacMaoDraw(c,h);
+ for(const k of PACX.ik)pacInkDraw(c,k);}
+/* --- o passo por frame: pendurado no fxTick, sem rAF próprio. mão parada e mancha não custam
+   nada; só o que está se formando, secando ou recuando paga repintura --- */
+function pacTick(t){
+ if(!PACX.on||!PACX.cx)return;
+ if(PACX.cv.width!==innerWidth||PACX.cv.height!==innerHeight)pacResize();
+ const dt=Math.min(60,t-(PACX.lt||t));PACX.lt=t;
+ if(t-PACX.fzt>320){PACX.fzt=t;const a=document.activeElement;let r=null;
+  if(a&&a!==document.body&&a.getBoundingClientRect){const q=a.getBoundingClientRect();
+   if(q.width>0&&q.height>0)r={l:q.left-22,r:q.right+22,t:q.top-22,b:q.bottom+22};}
+  PACX.fz=r;}
+ const b=bandOf(S.ruido||0);let mortas=false,secas=false;
+ for(const h of PACX.hs){h.t+=dt;
+  if(h.ph===0){PACX.dirty=true;
+   if(h.t>=h.gr){h.ph=1;h.t=0;h.pk=-1;
+    /* formada a mão, ele assina do lado dela — no ápice, quase sempre */
+    if(!h.tip&&Math.random()<(h.pin?.92:(b>=5?.8:(b>=4?.55:.4))))pacInkNova(h);}}
+  else if(h.ph===1){ /* a mão do sequestro fica enquanto a janela durar, não pelo relógio dela */
+   if(h.t>=h.hd&&!(h.pin&&PACH.el)){h.ph=2;h.t=0;PACX.dirty=true;}}
+  else{PACX.dirty=true;if(h.t>=h.fd){h.dead=1;mortas=true;}}}
+ if(mortas)PACX.hs=PACX.hs.filter(h=>!h.dead);
+ for(const k of PACX.ik){k.t+=dt;PACX.dirty=true;
+  if(k.ph===0){if(k.t>=k.wr){k.ph=1;k.t=0;}}
+  else if(k.t>=k.dr){k.dead=1;secas=true;}}
+ if(secas)PACX.ik=PACX.ik.filter(k=>!k.dead);
+ if(PACH.el&&!PACH.el.isConnected)pacHijEnd();  /* o campo saiu do DOM: solta a tecla na hora */
+ if(PACX.dirty){PACX.dirty=false;pacDraw();}}
+function pacResize(){const cv=PACX.cv;if(!cv)return;
+ PACX.W=cv.width=innerWidth;PACX.H=cv.height=innerHeight;
+ for(const h of PACX.hs)h.grad=null;
+ PACX.dirty=true;}
+function pacMount(){const cv=$("fx-pact");if(!cv||!cv.getContext)return false;
+ PACX.cv=cv;PACX.cx=cv.getContext("2d");if(!PACX.cx)return false;pacResize();return true;}
+/* sair do Pacto: nenhuma mão pendurada, nenhuma tecla presa, nenhuma marca sobrando */
+function pacTear(){clearTimeout(PACX.hT);PACX.hT=null;
+ pacHijEnd(true);
+ PACX.hs=[];PACX.ik=[];PACX.mk=[];PACX.dirty=false;PACX.fz=null;
+ if(PACX.cx)PACX.cx.clearRect(0,0,PACX.W,PACX.H);}
+
+/* ================= O SEQUESTRO DO CONSENTIMENTO — só no ápice =================
+   a Lei do Consentimento: ele PREFERE que você aceite. bandas 1-4 são oferta e só oferta —
+   sussurro, sugestão sobreposta, botão que pede, mão que quase toca. na banda 5, e só nela, ele
+   força: uma vez a cada 60-90s, por 3-5s (ou 8-12 teclas, o que vier primeiro), as suas letras
+   saem como "eu aceito". e forçar MANCHA — o que ficou escrito fica. nada aqui reverte,
+   corrige nem pede desculpa: apagar é trabalho seu. esse é o preço.
+
+   O QUE ELE PODE TOCAR (pacHijOK): um único campo de TEXTO LIVRE dentro de um .panel que já
+   estava em foco recebendo as SUAS teclas. contador de jogo é impossível por construção —
+   Vida/Fôlego/Sintonia/Lucidez, os máximos, os medidores de maestria, PP e atributos são todos
+   input[type=number], e aqui só passa TEXTAREA ou input[type=text]. fora disso ainda caem: o
+   que está em modal, a busca de talentos, a lista de dívidas (o dock CONTA dívidas) e os campos
+   que comitam em Enter/botão. na dúvida sobre um campo, ele fica de fora.
+   A ESCRITA é o caminho normal de qualquer tecla sua: .value do campo focado + um evento input
+   (que é o que o oninput da ficha ouve para salvar). nunca S direto, nunca eval, nunca
+   innerHTML, nunca um segundo campo.
+   E FORA DA JANELA ATIVA nenhuma tecla é interceptada: preventDefault só existe dentro do
+   if(PACH.el), e o listener só está no documento na banda 5. */
+const PAC_FRAS="eu aceito ";                        /* o espaço faz a frase reiniciar legível */
+const PAC_NOHIJ={snIn:1,slotName:1,pieceName:1};    /* comitam em Enter/botão: fora */
+let PACH={bound:false,last:-1e9,cd:70000,el:null,i:0,max:0,end:0,t:null,hand:null,pan:null};
+function pacHijOK(el){
+ if(!el||!el.isConnected||el.disabled||el.readOnly)return false;
+ const tg=el.tagName;
+ if(tg!=="TEXTAREA"&&!(tg==="INPUT"&&el.type==="text"))return false;
+ if(el.inputMode&&/num|dec|tel/i.test(el.inputMode))return false;
+ if(el.id&&PAC_NOHIJ[el.id])return false;
+ if(el.closest("#modal,.tbar,#divlist"))return false;
+ if(!el.closest(".wrap .panel"))return false;
+ const r=el.getBoundingClientRect();
+ return r.width>60&&r.height>12&&r.bottom>20&&r.top<innerHeight-20;}
+/* escreve UMA letra, no lugar da que você digitou, no campo que já estava focado */
+function pacHijEscreve(){const el=PACH.el;
+ if(!el||!el.isConnected)return void pacHijEnd();
+ const ch=PAC_FRAS[PACH.i%PAC_FRAS.length];PACH.i++;
+ const v=el.value||"";
+ let s=el.selectionStart,e=el.selectionEnd;
+ if(typeof s!=="number"||s<0||s>v.length)s=v.length;
+ if(typeof e!=="number"||e<s||e>v.length)e=s;
+ el.value=v.slice(0,s)+ch+v.slice(e);
+ try{el.selectionStart=el.selectionEnd=s+1;}catch(_){}
+ try{el.dispatchEvent(new Event("input",{bubbles:true}));}catch(_){}}
+function pacHijStart(el){const now=performance.now();
+ PACH.el=el;PACH.i=0;PACH.max=8+Math.floor(Math.random()*5);
+ PACH.end=now+3000+Math.random()*2000;
+ PACH.last=now;PACH.cd=60000+Math.random()*30000;   /* a carência do próximo já é sorteada aqui */
+ PACH.pan=el.closest(".wrap .panel");
+ clearTimeout(PACH.t);PACH.t=setTimeout(()=>pacHijEnd(),PACH.end-now+40);
+ /* e a mão vem para ESTE painel, na borda mais longe do campo: dedos na moldura, não no texto */
+ const r=el.getBoundingClientRect();
+ PACH.hand=pacMaoNova(true,{l:r.left,t:r.top,r:r.right,b:r.bottom},PACH.pan,PACH.end-now+700);
+ pacPena();}
+function pacHijTenta(el){
+ if(!pacOn(5)||pacModal())return;
+ const now=performance.now();
+ if(now-PACH.last<PACH.cd)return;      /* nunca dois seguidos: 60-90s de silêncio entre eles */
+ if(!pacHijOK(el))return;
+ if(Math.random()>=.3)return;          /* nem toda tecla elegível: ele escolhe o momento */
+ pacHijStart(el);}
+/* o fim da janela: o controle volta na hora, o que ficou fica, e no lugar da mão fica a mancha.
+   duro = desmonte (trocou de elemento, calmou, caiu de banda): a mão sai sem recuar. a MANCHA
+   fica de qualquer jeito se alguma letra foi escrita — forçar sempre mancha, e cair de banda
+   não desfaz o que já aconteceu. (no desmonte total, pacTear limpa as marcas em seguida.) */
+function pacHijEnd(duro){clearTimeout(PACH.t);PACH.t=null;
+ const pan=PACH.pan,n=PACH.i,h=PACH.hand;
+ PACH.el=null;PACH.pan=null;PACH.hand=null;PACH.i=0;PACH.max=0;PACH.end=0;
+ if(h&&h.ph!==2&&!duro){h.ph=2;h.t=0;PACX.dirty=true;}
+ if(n>0&&pan&&pan.isConnected)pacMarca(pan);}
+/* a única tecla que ele pega é a IMPRESSA (key de 1 caractere, sem ctrl/alt/meta). Backspace,
+   Tab, Enter, setas, atalhos e IME passam intactos: dá para corrigir e sair a qualquer momento */
+function pacHijKey(e){
+ if(PACH.el){
+  if(e.target!==PACH.el)return void pacHijEnd();       /* mudou de campo: acabou, sem prender nada */
+  if(e.ctrlKey||e.metaKey||e.altKey||!e.key||e.key.length!==1)return;
+  if(performance.now()>=PACH.end||PACH.i>=PACH.max)return void pacHijEnd();
+  e.preventDefault();
+  pacHijEscreve();
+  if(PACH.i>=PACH.max)pacHijEnd();
+  return;}
+ if(e.ctrlKey||e.metaKey||e.altKey||!e.key||e.key.length!==1)return;
+ pacHijTenta(e.target);}
+function pacHijOut(e){if(PACH.el&&e.target===PACH.el)pacHijEnd();}
+function pacHijDown(e){if(PACH.el&&e.target!==PACH.el)pacHijEnd();}
+function pacHijBind(on){if(on===PACH.bound)return;PACH.bound=on;
+ const m=on?"addEventListener":"removeEventListener";
+ /* o único listener não-passivo do arquivo: é o que permite o preventDefault da janela ativa */
+ document[m]("keydown",pacHijKey,true);
+ document[m]("focusout",pacHijOut,{capture:true,passive:true});
+ document[m]("pointerdown",pacHijDown,{capture:true,passive:true});
+ /* chegar no ápice não é o mesmo que agir: ele espera meia dúzia de dezenas de segundos antes
+    da primeira vez (o Math.max preserva a carência de um sequestro recente) */
+ if(on)PACH.last=Math.max(PACH.last,performance.now()-PACH.cd+22000+Math.random()*12000);
+ else pacHijEnd(true);}
 
 /* sair do Pacto (ou calmar, ou reduzir movimento) desliga listeners, timers, som e TODOS os
-   overlays: nenhum caret preso na tela, nenhum número congelado por cima de um campo */
+   overlays: nenhum caret preso na tela, nenhum número congelado por cima de um campo, nenhuma
+   mão no canvas e nenhuma tecla interceptada */
 function pacSync(){const b=bandOf(S.ruido||0),on=pacOn(1);
  pacBind(on&&b>=2&&!S.ui.mute);
  if(!(on&&b>=2)||S.ui.mute){clearTimeout(PACR.t);PACR.t=null;}
  pacTypeBind(on&&b>=3);
  if(on&&b>=4){if(!_autoT)autoSched();}else{clearTimeout(_autoT);_autoT=null;pacAutoClear();}
+ if(on!==PACX.on){PACX.on=on;
+  if(on){if(!pacMount())PACX.on=false;else pacMaoSched(true);}
+  else pacTear();}
+ else if(on){ /* a banda caiu: o que passa do teto RECUA, não desaparece no ar */
+  const cap=PCAP[b];let viv=0;
+  for(const h of PACX.hs)if(h.ph!==2)viv++;
+  for(const h of PACX.hs){if(viv<=cap)break;
+   if(h.ph!==2&&!h.pin){h.ph=2;h.t=0;viv--;PACX.dirty=true;}}}
+ pacHijBind(on&&b>=5);   /* fora do ápice o listener não está nem no documento */
  pacAudSync(on&&b>=4&&!S.ui.mute,b);}
 
 /* ============ NOJO / BODY-HORROR — elemento Germe ============
