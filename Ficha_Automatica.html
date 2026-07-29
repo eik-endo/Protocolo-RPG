@@ -432,12 +432,15 @@ body[data-el=ger] .panel.ger-swell{animation:gerincha 2.6s ease-in-out}
  box-shadow:0 0 9px rgba(111,154,78,.45),inset 0 0 5px rgba(30,52,18,.6);animation:gercic 1.25s ease-in-out}
 @keyframes gercic{0%{opacity:0;transform:scaleX(.16)}20%{opacity:.92;transform:scaleX(1)}
  62%{opacity:.78;transform:scaleX(.97)}100%{opacity:0;transform:scaleX(.05)}}
-/* o crescimento: só avança enquanto você NÃO mexe. volta a interagir e ele recua sozinho */
-.ger-grow{position:fixed;pointer-events:none;z-index:6;width:160px;height:160px;border-radius:50%;
- transform-origin:0 100%;filter:blur(4px);opacity:0;transform:scale(.16);
- background:radial-gradient(circle at 10% 90%,rgba(141,187,98,.5),rgba(111,154,78,.3) 34%,rgba(79,109,52,.14) 60%,transparent 78%);
- transition:transform 9s cubic-bezier(.22,.62,.3,1),opacity 6s ease-out}
-.ger-grow.on{opacity:1;transform:scale(1)}
+/* O JARDIM: canvas próprio, ATRÁS da interface (z2, contra z5 do .wrap). as vinhas crescem
+   por trás dos painéis e por fora deles — a geometria é toda JS (ver VIN), aqui só a camada.
+   canvas separado do #fx-canvas de propósito: vinha madura é geometria PARADA, e este canvas
+   só é repintado quando alguma coisa muda (VIN.dirty), não a cada frame. */
+#fx-vines{position:fixed;inset:0;pointer-events:none;z-index:2;opacity:0;visibility:hidden;transition:opacity 2.2s,visibility 2.2s}
+body[data-el=ger] #fx-vines{visibility:visible;opacity:calc(.34 + var(--band)*.13)}
+/* e o painel deixa passar o que cresce atrás dele: o vidro embaça, o texto continua opaco em
+   cima. sem isto as vinhas morreriam sob os painéis e o jardim não cercaria nada */
+body[data-el=ger]:not(.calm) .wrap .panel{background:rgba(24,20,15,calc(.95 - var(--band)*.032))}
 /* vazio: a interface só existe enquanto você olha direto para ela — some devagar, volta na hora.
    :hover e :focus-within nunca esmaecem, então a área em uso é sempre a mais sólida da tela */
 body[data-el=vaz] .panel{transition:opacity 1.6s ease-out,filter 1.6s ease-out}
@@ -461,7 +464,7 @@ body[data-band="5"] .panel h2:hover,body[data-band="5"] h1:hover{animation:none;
 /* calmar / reduced motion */
 body.calm *,body.calm *::before,body.calm *::after{animation:none!important;transition:none!important}
 body.calm #fx-canvas,body.calm #whisper,body.calm #fx-eye,body.calm #fx-tunnel,body.calm .fx-flash,body.calm #fx-void,body.calm #fx-black,body.calm .fx-ghost,body.calm .fx-peel,
-body.calm .pac-caret,body.calm .pac-sug,body.calm .pac-hes,body.calm #fx-vign::after,body.calm .ger-scar,body.calm .ger-grow{display:none}
+body.calm .pac-caret,body.calm .pac-sug,body.calm .pac-hes,body.calm #fx-vign::after,body.calm .ger-scar,body.calm #fx-vines{display:none}
 body.calm[data-el=vaz] .panel,body.calm[data-el=vaz] .tabs button{opacity:1!important;filter:none!important}
 body.calm[data-el=eco] h1,body.calm[data-el=eco] .panel h2{text-shadow:calc(var(--band)*1.2px) calc(var(--band)*1.2px) 0 rgba(127,184,168,.35)!important}
 body.calm[data-el=eco] .hx,body.calm[data-el=eco] .hint,body.calm[data-el=eco] label{text-shadow:none!important}
@@ -469,7 +472,8 @@ body.calm[data-el=eco] .hx,body.calm[data-el=eco] .hint,body.calm[data-el=eco] l
 body.calm[data-el=asc] .wrap,body.calm[data-el=asc] .panel,body.calm[data-el=asc] .attr,body.calm[data-el=asc] .rec,
 body.calm[data-el=asc] .panel h2,body.calm[data-el=asc] label,body.calm[data-el=asc] .hint{transform:none!important}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}
- #fx-canvas,#fx-eye,#fx-tunnel,.fx-flash,#fx-void,#fx-black,.fx-ghost,.fx-peel,.pac-caret,.pac-sug,.pac-hes,#fx-vign::after,.ger-scar,.ger-grow{display:none}
+ #fx-canvas,#fx-eye,#fx-tunnel,.fx-flash,#fx-void,#fx-black,.fx-ghost,.fx-peel,.pac-caret,.pac-sug,.pac-hes,#fx-vign::after,.ger-scar,#fx-vines{display:none}
+ body[data-el=ger] .wrap .panel{background:var(--panel)!important}
  body[data-el=vaz] .panel,body[data-el=vaz] .tabs button{opacity:1!important;filter:none!important}
  body[data-el=eco] h1,body[data-el=eco] .panel h2{text-shadow:calc(var(--band)*1.2px) calc(var(--band)*1.2px) 0 rgba(127,184,168,.35)!important}
  body[data-el=eco] .hx,body[data-el=eco] .hint,body[data-el=eco] label{text-shadow:none!important}
@@ -480,7 +484,7 @@ body.calm[data-el=asc] .panel h2,body.calm[data-el=asc] label,body.calm[data-el=
 </style>
 </head>
 <body data-el="" data-band="0">
-<canvas id="fx-canvas"></canvas>
+<canvas id="fx-canvas"></canvas><canvas id="fx-vines"></canvas>
 <div id="fx-vign"></div><div id="fx-blood"></div>
 <div id="fx-tunnel"></div><div id="fx-eye"><i></i></div>
 <div id="fx-void"><i></i></div><div id="fx-black"></div>
@@ -2182,7 +2186,7 @@ function fxTick(t){FX.q=false;if(!FX.run)return;const cv=$("fx-canvas");if(!cv)r
  FX.ps=FX.ps.filter(p=>{p.life+=1;p.x+=p.vx;p.y+=p.vy;const a=Math.sin(Math.PI*Math.min(1,p.life/p.max));
   if(p.life>=p.max)return false;ctx.globalAlpha=a*p.op;fxDraw(ctx,el,p);ctx.globalAlpha=1;return true;});
  if(FX.ps.length>alvo)FX.ps.length=alvo;
- eyeStep(t);voidStep(t);
+ eyeStep(t);voidStep(t);vinTick(t);
  fxKick();}
 function fxNew(el,cv){const W=cv.width,H=cv.height,r=Math.random;
  const base={x:r()*W,y:r()*H,vx:(r()-.5)*.2,vy:(r()-.5)*.2,life:0,max:240+r()*240,op:.16,s:4+r()*7};
@@ -2412,14 +2416,30 @@ function audBuild(){if(AUD.ctx)return true;
   const p2g=c.createGain();p2g.gain.value=.2;p2.connect(p2g);p2g.connect(pbr);p2.start();
   const plf=c.createOscillator();plf.type="sine";plf.frequency.value=.15; /* ~9 respiros por minuto */
   const plg=c.createGain();plg.gain.value=.46;plf.connect(plg);plg.connect(pbr.gain);plf.start();
-  /* germe: o úmido. o mesmo ruído marrom, mas num passa-baixa RESSONANTE cujo corte vagueia
-     devagar — é o que separa "algo mole se remexendo" de um chiado parado */
+  /* germe: TERRA MOLHADA + VENTO DISTANTE. nada de percussivo — duas camadas de ruído que
+     respiram em ritmos de propósito incomensuráveis (.07 / .045 / .021 Hz), então o ambiente
+     nunca repete um ciclo audível: é orgânico, úmido e vivo sem nunca virar padrão */
   const gg=c.createGain();gg.gain.value=0;gg.connect(c.destination);
+  /* 1) a terra: ruído marrom num passa-baixa RESSONANTE cujo corte vagueia devagar —
+     é o que separa "algo mole se remexendo lá embaixo" de um chiado parado */
   const gsrc=c.createBufferSource();gsrc.buffer=buf;gsrc.loop=true;
-  const gf=c.createBiquadFilter();gf.type="lowpass";gf.frequency.value=150;gf.Q.value=6;
+  const gf=c.createBiquadFilter();gf.type="lowpass";gf.frequency.value=138;gf.Q.value=7;
   gsrc.connect(gf);gf.connect(gg);gsrc.start();
   const glf=c.createOscillator();glf.type="sine";glf.frequency.value=.07;
-  const glg=c.createGain();glg.gain.value=72;glf.connect(glg);glg.connect(gf.frequency);glf.start();
+  const glg=c.createGain();glg.gain.value=66;glf.connect(glg);glg.connect(gf.frequency);glf.start();
+  /* 2) o vento: ruído branco num passa-banda que VARRE devagar (.021Hz = uma passagem a cada
+     ~48s), com o volume indo e voltando num LFO diferente. rajada que chega, passa pelas
+     folhas e vai embora. o ganho fica em .3 ± .28: entre rajadas quase silencia */
+  const wbuf=c.createBuffer(1,n,c.sampleRate),wch=wbuf.getChannelData(0);
+  for(let i=0;i<n;i++)wch[i]=(Math.random()*2-1)*.5;
+  const wsrc=c.createBufferSource();wsrc.buffer=wbuf;wsrc.loop=true;
+  const wf=c.createBiquadFilter();wf.type="bandpass";wf.frequency.value=540;wf.Q.value=.85;
+  const wgn=c.createGain();wgn.gain.value=.3;
+  wsrc.connect(wf);wf.connect(wgn);wgn.connect(gg);wsrc.start();
+  const wlf=c.createOscillator();wlf.type="sine";wlf.frequency.value=.045;
+  const wlg=c.createGain();wlg.gain.value=.28;wlf.connect(wlg);wlg.connect(wgn.gain);wlf.start();
+  const wsw=c.createOscillator();wsw.type="sine";wsw.frequency.value=.021;
+  const wswg=c.createGain();wswg.gain.value=320;wsw.connect(wswg);wswg.connect(wf.frequency);wsw.start();
   AUD.ctx=c;AUD.gain=g;AUD.ogain=og;AUD.vgain=vg;AUD.agn=ag;AUD.pgn=pgn;AUD.ggn=gg;return true;}catch(e){return false;}}
 function audOff(){clearTimeout(AUD.timer);AUD.timer=null;AUD.on=false;
  if(!AUD.ctx)return;try{const t=AUD.ctx.currentTime;
@@ -2873,9 +2893,12 @@ function pacSync(){const b=bandOf(S.ruido||0),on=pacOn(1);
  pacAudSync(on&&b>=4&&!S.ui.mute,b);}
 
 /* ============ NOJO / BODY-HORROR — elemento Germe ============
-   o musgo, a membrana e a respiração mole são CSS puro (grátis, e somem com o data-el).
-   aqui fica o que é REATIVO: a cicatriz de quando você arranca texto, o crescimento que só
-   avança na sua ausência de ação, o inchaço do ápice e o som úmido.
+   o coração daqui é O JARDIM (VIN, mais abaixo): vinhas de geometria viva que crescem das
+   bordas para dentro em canvas próprio, com folhas, flores que abrem e coisas que espreitam
+   entre a folhagem. o musgo, a membrana e a respiração mole continuam em CSS puro — são o
+   que dá textura aos painéis, por onde as vinhas passam por trás.
+   e o que é REATIVO fica aqui: a cicatriz de quando você arranca texto, o broto que nasce
+   dela, o surto de crescimento do ócio, o recuo diante do cursor e o som úmido.
    mesma regra de sempre: overlay pointer-events:none e classe efêmera. nada toca S nem campo. */
 const gerOn=min=>S.elem==="ger"&&bandOf(S.ruido||0)>=(min||1)&&!S.ui.calm&&!RM()&&!document.hidden;
 const gerModal=()=>$("modal").classList.contains("on");
@@ -2896,32 +2919,285 @@ function gerScar(d){gerScarClear();
  document.body.appendChild(el);_scEl=el;
  _scRm=setTimeout(gerScarClear,1300);}
 
-/* --- o crescimento: nasce no canto de um painel e avança devagar ENQUANTO você não mexe.
-   voltar a interagir faz recuar — o bicho só cresce quando ninguém está olhando --- */
-let _grEl=null,_grRm=null;
-function gerGrowClear(){clearTimeout(_grRm);_grRm=null;
- if(_grEl&&_grEl.parentNode)_grEl.parentNode.removeChild(_grEl);_grEl=null;}
-/* recuo: tira o .on e deixa a transição encolher antes de arrancar o nó da árvore */
-function gerGrowRecua(){if(!_grEl)return;
- _grEl.classList.remove("on");
- clearTimeout(_grRm);_grRm=setTimeout(gerGrowClear,6300);}
-function gerGrow(){
- if(!gerOn(4)||gerModal())return gerGrowRecua();
- if(_grEl){clearTimeout(_grRm);_grRm=null;_grEl.classList.add("on");return;} /* já está crescendo */
- const out=[];document.querySelectorAll(".panel").forEach(p=>{
-  if(p.matches(":hover"))return;
-  if(document.activeElement&&p.contains(document.activeElement))return;
-  const r=p.getBoundingClientRect();
-  if(r.width<130||r.height<60||r.bottom<80||r.top>innerHeight-40)return;
-  out.push(r);});
- if(!out.length)return;
- const r=out[Math.floor(Math.random()*out.length)];
- const d=document.createElement("div");d.className="ger-grow";
- /* ancorado no canto inferior esquerdo do painel, que é de onde o musgo do CSS já vem */
- d.style.cssText=`left:${Math.round(r.left-14)}px;top:${Math.round(Math.min(innerHeight-40,r.bottom+8)-160)}px`;
- document.body.appendChild(d);_grEl=d;
- void d.offsetWidth; /* firma o estado inicial: sem isto a transição não tem de onde partir */
- d.classList.add("on");}
+/* ================= O JARDIM: vinhas procedurais no #fx-vines =================
+   geometria viva, não CSS nem imagem. cada vinha é uma curva que AVANÇA ponto a ponto de
+   uma borda da tela para dentro, virando sozinha por ruído senoidal, ramificando, soltando
+   folha e abrindo flor na ponta madura.
+
+   o que faz isto rodar liso é o CICLO DE VIDA. uma vinha nasce CRESCENDO (recalcula a ponta,
+   refaz o Path2D); ao chegar no fim vira MADURA e a geometria congela num Path2D cacheado —
+   dali em diante ela custa um fill(). e o canvas inteiro só é repintado quando VIN.dirty:
+   com tudo maduro e o cursor parado, o jardim custa ZERO por frame.
+
+   REGRA SAGRADA: onde você está, nada cresce. a zona proibida (um raio em volta do cursor +
+   o retângulo do campo em foco) é desviada pela ponta que cresce e faz murchar a vinha que
+   já estava lá. a ficha continua 100% usável — e o canvas é pointer-events:none. */
+const VCAP=[0,3,6,11,17,24];            /* vinhas simultâneas (galhos inclusos) por banda */
+const VGRW=[0,2,2,3,4,5];               /* quantas podem estar CRESCENDO ao mesmo tempo */
+/* teto duro de pontos: é o custo de uma repintura. está ~25% acima do que o jardim cheio
+   de cada banda realmente usa — é rede de segurança, não régua: se ele encostasse toda hora,
+   as vinhas amadureceriam cortadas no meio em vez de terminarem onde deviam */
+const VPTS=[0,500,900,1500,2100,2800];
+const VIN={cv:null,cx:null,W:0,H:0,vs:[],on:false,dirty:false,
+ mx:-1e4,my:-1e4,mt:-1e9,zr:118,fz:null,fzt:0,
+ budT:null,lkT:null,lk:null,boost:0,lt:0,pts:0,cull:false,spr:-1e9,blm:-1e9};
+/* Perlin de pobre: três senos de frequências incomensuráveis. o bastante para a ponta virar
+   de um jeito que não parece nem reta nem sorteada — parece que ela está PROCURANDO */
+const vnz=(s,i)=>Math.sin(s+i*.131)*.54+Math.sin(s*1.73+i*.049)*.33+Math.sin(s*2.91+i*.283)*.13;
+addEventListener("mousemove",e=>{if(!VIN.on)return;
+ VIN.mx=e.clientX;VIN.my=e.clientY;VIN.mt=performance.now();},{passive:true});
+
+/* --- a zona proibida --- */
+function vinForb(x,y){
+ if(performance.now()-VIN.mt<5000){const dx=x-VIN.mx,dy=y-VIN.my;
+  if(dx*dx+dy*dy<VIN.zr*VIN.zr)return true;}
+ const r=VIN.fz;return !!(r&&x>r.l&&x<r.r&&y>r.t&&y<r.b);}
+
+/* --- nascer --- */
+function vinPush(o){const b=bandOf(S.ruido||0);
+ if(VIN.vs.length>=VCAP[b]||VIN.pts>=VPTS[b])return null;
+ /* verdes com variação de matiz E de claridade: chapar tudo numa cor só mataria o volume */
+ const hue=o.hue!=null?o.hue+(Math.random()-.5)*10:86+Math.random()*30,lig=24+Math.random()*15;
+ const v={pts:[{x:o.x,y:o.y,w:o.w}],a0:o.a,w0:o.w,max:o.max,spd:o.spd||18,dep:o.dep||0,
+  seed:Math.random()*97,acc:0,ph:0,lv:[],fl:[],rt:0,side:1,hue,
+  lstep:4+Math.floor(Math.random()*3),
+  stem:`hsl(${hue.toFixed(0)},32%,${(lig*.72).toFixed(1)}%)`,
+  leaf:`hsl(${hue.toFixed(0)},${(30+Math.random()*16).toFixed(0)}%,${lig.toFixed(1)}%)`,
+  bx0:o.x,bx1:o.x,by0:o.y,by1:o.y,path:null,lpath:null,ck:-1};
+ VIN.vs.push(v);VIN.pts++;VIN.dirty=true;return v;}
+/* madura: a geometria congela. daqui em diante o Path2D é reaproveitado a cada repintura.
+   e o toco que não vingou (a ponta nasceu em cima de você e parou no primeiro passo) é
+   marcado para varrer — senão ele ocuparia uma vaga do teto para sempre, sem desenhar nada */
+function vinMature(v){v.ph=1;const b=bandOf(S.ruido||0);
+ if(v.pts.length<3){v.dead=1;VIN.cull=true;return false;}
+ if(v.pts.length>8&&Math.random()<.2+b*.07)vinFlor(v,v.pts[v.pts.length-1],1.1+Math.random()*.9);
+ return false;}
+function vinFlor(v,p,dur){if(v.fl.length>2)return;
+ v.fl.push({x:p.x,y:p.y,i:v.pts.length-1,t:0,dur,n:5+(Math.random()<.35?1:0),r:3.6+Math.random()*3.4,
+  a0:Math.random()*6.2832,
+  pc:`hsl(${(v.hue-14).toFixed(0)},${(26+Math.random()*16).toFixed(0)}%,${(54+Math.random()*14).toFixed(0)}%)`,
+  cc:`hsl(${(v.hue-24).toFixed(0)},34%,13%)`});
+ VIN.dirty=true;}
+
+/* --- crescer: um passo --- */
+function vinGrow(v){const P=v.pts,i=P.length,p=P[i-1],b=bandOf(S.ruido||0);
+ if(i>=v.max||VIN.pts>=VPTS[b])return vinMature(v);
+ let a=v.a0+vnz(v.seed,i)*.86;
+ const st=4+Math.random()*1.8;
+ let nx=p.x+Math.cos(a)*st,ny=p.y+Math.sin(a)*st;
+ /* bateu na sua zona: vira para longe do cursor. três tentativas e, se ainda for em cima de
+    você, amadurece ali mesmo. nunca força passagem — este é o contrato da regra sagrada */
+ for(let k=0;k<3&&vinForb(nx,ny);k++){
+  const fora=Math.atan2(ny-VIN.my,nx-VIN.mx);
+  a=a*.32+fora*.68+(Math.random()-.5)*.3;
+  nx=p.x+Math.cos(a)*st;ny=p.y+Math.sin(a)*st;}
+ if(vinForb(nx,ny))return vinMature(v);
+ if(nx<-40||nx>VIN.W+40||ny<-40||ny>VIN.H+40)return vinMature(v);
+ const w=Math.max(.5,v.w0*Math.pow(1-i/v.max,.82));
+ P.push({x:nx,y:ny,w});VIN.pts++;
+ if(nx<v.bx0)v.bx0=nx;if(nx>v.bx1)v.bx1=nx;
+ if(ny<v.by0)v.by0=ny;if(ny>v.by1)v.by1=ny;
+ if(i>3&&i%v.lstep===0){v.side=-v.side; /* folha, alternando de lado como planta de verdade */
+  v.lv.push({i,x:nx,y:ny,a:a+v.side*(.62+Math.random()*.55),s:3.4+Math.random()*4.6+v.w0});}
+ /* galho: raro por passo, e no máximo 3 níveis abaixo do tronco — senão isto explode */
+ if(v.dep<3&&i>7&&i<v.max*.82&&Math.random()<.03)
+  vinPush({x:nx,y:ny,a:a+(Math.random()<.5?-1:1)*(.5+Math.random()*.5),
+   max:Math.max(9,Math.round(v.max*(.34+Math.random()*.3))),w:w*.72,spd:v.spd*1.15,
+   dep:v.dep+1,hue:v.hue});
+ return true;}
+
+/* --- brotar de uma borda: cantos e laterais, que é de onde uma trepadeira sobe --- */
+function vinBud(){const b=bandOf(S.ruido||0),W=VIN.W,H=VIN.H,r=Math.random;
+ if(VIN.vs.length>=VCAP[b])return;
+ let g=0;for(const v of VIN.vs)if(v.ph===0)g++;
+ if(g>=VGRW[b])return;
+ let o;const e=r();
+ if(e<.33)      o={x:-8,    y:H*(.08+r()*.9), a:(r()-.5)*1.15};
+ else if(e<.66) o={x:W+8,   y:H*(.08+r()*.9), a:Math.PI+(r()-.5)*1.15};
+ else if(e<.92) o={x:W*r(), y:H+8,            a:-Math.PI/2+(r()-.5)*1.2};
+ else           o={x:W*r(), y:-8,             a:Math.PI/2+(r()-.5)};
+ /* o comprimento é o que faz a invasão: na banda 1 ela morre perto do canto (~130px), na 5
+    ela chega ao miolo da tela (~270px de média, e as maiores cruzam metade dela) */
+ o.max=Math.round((20+b*15)*(.6+r()*.85));o.w=1.5+b*.3+r()*.5;o.spd=15+r()*11;
+ vinPush(o);}
+function vinBudSched(){clearTimeout(VIN.budT);VIN.budT=null;
+ if(!VIN.on)return;
+ const iv=([0,11000,8000,5200,3300,2100][bandOf(S.ruido||0)]||8000)*(.6+Math.random()*.9);
+ VIN.budT=setTimeout(()=>{VIN.budT=null;vinBud();vinBudSched();},iv);}
+
+/* --- o recuo: o que está perto do cursor murcha (encolhe da ponta para a base) e rebrota
+   quando você para. murcha depressa, volta devagar — reconquistar tem que custar tempo --- */
+function vinRecuo(dt){const viva=performance.now()-VIN.mt<3500,R=VIN.zr,R2=R*R;
+ for(const v of VIN.vs){let tgt=0;
+  if(viva&&v.bx1>VIN.mx-R&&v.bx0<VIN.mx+R&&v.by1>VIN.my-R&&v.by0<VIN.my+R){
+   let d2=1e9;const P=v.pts;
+   for(let i=P.length-1;i>=0;i-=2){const dx=P[i].x-VIN.mx,dy=P[i].y-VIN.my,q=dx*dx+dy*dy;
+    if(q<d2)d2=q;}
+   if(d2<R2)tgt=Math.min(1,1.18-Math.sqrt(d2)/R);}
+  if(tgt===0&&v.rt===0)continue;
+  const k=Math.min(1,(tgt>v.rt?.09:.018)*(dt/16.7));
+  let nv=v.rt+(tgt-v.rt)*k;
+  if(tgt===0&&nv<.006)nv=0;              /* encosta no zero em vez de rastejar para sempre */
+  if(nv===v.rt)continue;
+  if(nv!==0&&Math.abs(nv-v.rt)<.0012)continue; /* variação invisível não paga uma repintura */
+  v.rt=nv;VIN.dirty=true;}}
+
+/* --- desenho: o caule é um POLÍGONO preenchido, não um traço. é o que permite a espessura
+   afinar da base à ponta dentro de UM Path2D — e Path2D cacheado é o barato da vinha madura */
+function vinNorm(P,i,n){const a=P[i>0?i-1:0],b=P[i<n-1?i+1:n-1];
+ const dx=b.x-a.x,dy=b.y-a.y,l=Math.hypot(dx,dy)||1;return [-dy/l,dx/l];}
+function vinRibbon(v,n){const p=new Path2D(),P=v.pts;
+ for(let i=0;i<n;i++){const N=vinNorm(P,i,n),w=P[i].w,x=P[i].x+N[0]*w,y=P[i].y+N[1]*w;
+  i?p.lineTo(x,y):p.moveTo(x,y);}
+ for(let i=n-1;i>=0;i--){const N=vinNorm(P,i,n),w=P[i].w;
+  p.lineTo(P[i].x-N[0]*w,P[i].y-N[1]*w);}
+ p.closePath();return p;}
+function vinFolhas(v,n){const p=new Path2D();
+ for(const L of v.lv){if(L.i>=n)continue;
+  const c=Math.cos(L.a),s=Math.sin(L.a),ln=L.s,wd=L.s*.44;
+  const mx=L.x+c*ln*.45,my=L.y+s*ln*.45,px=-s*wd,py=c*wd;
+  p.moveTo(L.x,L.y);
+  p.quadraticCurveTo(mx+px,my+py,L.x+c*ln,L.y+s*ln);
+  p.quadraticCurveTo(mx-px,my-py,L.x,L.y);}
+ return p;}
+function vinPaint(c,v){const n=v.pts.length;
+ const use=v.rt>0?Math.floor(n*(1-.62*v.rt)):n;
+ /* o cache: enquanto use não muda, os dois Path2D valem. vinha madura com o cursor longe
+    nunca muda use — é aí que ela passa a custar dois fill() e mais nada */
+ if(v.ck!==use){v.ck=use;
+  if(use>=2){v.path=vinRibbon(v,use);v.lpath=vinFolhas(v,use);}else{v.path=v.lpath=null;}}
+ if(!v.path)return;
+ const al=1-.55*v.rt;
+ c.globalAlpha=al;c.fillStyle=v.stem;c.fill(v.path);
+ c.globalAlpha=al*.88;c.fillStyle=v.leaf;c.fill(v.lpath);
+ c.globalAlpha=1;}
+/* a flor abre: as pétalas se AFASTAM do centro por interpolação, e o miolo escuro fica */
+function vinFlorDraw(c,v,f){const t=f.t<0?0:(f.t>1?1:f.t);
+ const e=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2,R=f.r*(.18+e*.82);
+ c.save();c.translate(f.x,f.y);
+ c.globalAlpha=Math.min(1,t*3)*(1-.6*v.rt);
+ c.fillStyle=f.pc;
+ for(let i=0;i<f.n;i++){c.save();c.rotate(f.a0+i*6.2832/f.n+e*.55);
+  c.beginPath();c.ellipse(R*.72,0,R*.8,R*.4,0,0,6.2832);c.fill();c.restore();}
+ c.fillStyle=f.cc;c.beginPath();c.arc(0,0,Math.max(.7,R*.3),0,6.2832);c.fill();
+ c.restore();c.globalAlpha=1;}
+
+/* --- AS COISAS QUE ESPREITAM: no meio de uma moita fechada, uma forma que NÃO é planta se
+   insinua por 1-2s e some. desenhada ANTES das vinhas, então a folhagem passa POR CIMA —
+   meio escondida é o que a torna pior do que à mostra. nunca sobre a sua zona. --- */
+function vinDenso(){const cand=[];
+ for(const v of VIN.vs){if(v.ph!==1)continue;
+  for(let i=0;i<v.lv.length;i+=2)cand.push(v.lv[i]);}
+ if(cand.length<6)return null;
+ let best=null,bn=-1;
+ for(let k=0;k<9;k++){const L=cand[Math.floor(Math.random()*cand.length)];
+  if(L.x<70||L.x>VIN.W-70||L.y<70||L.y>VIN.H-70||vinForb(L.x,L.y))continue;
+  let n=0;for(const o of cand){const dx=o.x-L.x,dy=o.y-L.y;if(dx*dx+dy*dy<11000)n++;}
+  if(n>bn){bn=n;best=L;}}
+ return bn>=3?best:null;}
+function vinLurk(){const b=bandOf(S.ruido||0);
+ if(!VIN.on||b<3||VIN.lk)return;
+ const L=vinDenso();if(!L)return;
+ const olho=Math.random()<(b>=5?.66:.55);
+ VIN.lk={k:olho?"o":"v",x:L.x,y:L.y,t:0,dur:1.5+Math.random()*.9,
+  r:olho?(22+Math.random()*16+b*2):(52+Math.random()*40),rot:(Math.random()-.5)*.5,
+  encara:olho&&b>=5&&Math.random()<.5, /* banda 5: ele para de procurar e ENCARA */
+  vx:olho?0:(Math.random()-.5)*.22,vy:olho?0:-.05-Math.random()*.12};
+ VIN.dirty=true;}
+function vinLurkSched(){clearTimeout(VIN.lkT);VIN.lkT=null;
+ if(!VIN.on)return;
+ const b=bandOf(S.ruido||0),iv=b>=5?(10+Math.random()*12):(15+Math.random()*25);
+ VIN.lkT=setTimeout(()=>{VIN.lkT=null;vinLurk();vinLurkSched();},iv*1000);}
+function vinLurkDraw(c,L){const al=Math.sin(Math.PI*Math.min(1,Math.max(0,L.t)));
+ if(al<=.01)return;
+ if(L.k==="v"){ /* o vulto: silhueta sem forma definida, atrás das vinhas, andando devagar */
+  const g=c.createRadialGradient(L.x,L.y,0,L.x,L.y,L.r);
+  g.addColorStop(0,`rgba(2,5,2,${(al*.9).toFixed(3)})`);
+  g.addColorStop(.42,`rgba(3,8,3,${(al*.62).toFixed(3)})`);
+  g.addColorStop(.76,`rgba(5,11,4,${(al*.24).toFixed(3)})`);
+  g.addColorStop(1,"rgba(5,11,4,0)");
+  c.fillStyle=g;c.beginPath();c.ellipse(L.x,L.y,L.r*.62,L.r,0,0,6.2832);c.fill();
+  const hy=L.y-L.r*.78,hr=L.r*.3; /* a cabeça: só o bastante para insinuar alguém ali */
+  const g2=c.createRadialGradient(L.x,hy,0,L.x,hy,hr);
+  g2.addColorStop(0,`rgba(2,5,2,${(al*.85).toFixed(3)})`);
+  g2.addColorStop(.7,`rgba(3,8,3,${(al*.4).toFixed(3)})`);
+  g2.addColorStop(1,"rgba(3,8,3,0)");
+  c.fillStyle=g2;c.beginPath();c.arc(L.x,hy,hr,0,6.2832);c.fill();
+  return;}
+ /* o olho: mesma anatomia do olho do Observação (íris em gradiente radial + pupila preta),
+    só que ele ABRE entre as folhas — a pálpebra é o recorte, e a altura dela é a abertura */
+ const ab=Math.min(1,al*1.5),R=L.r,h=R*.6*ab;
+ if(h<.6)return;
+ c.save();c.translate(L.x,L.y);c.rotate(L.rot);c.globalAlpha=al;
+ c.beginPath();c.ellipse(0,0,R*1.14,h*1.35,0,0,6.2832);c.fillStyle="rgba(5,9,4,.9)";c.fill();
+ c.save();c.beginPath();c.ellipse(0,0,R,h,0,0,6.2832);c.clip();
+ c.fillStyle="#c7d2b2";c.fillRect(-R,-h,R*2,h*2);
+ const seg=L.encara?0:1,ir=R*.36;
+ const px=seg?Math.max(-R*.42,Math.min(R*.42,(VIN.mx-L.x)*.14)):0;
+ const py=seg?Math.max(-h*.35,Math.min(h*.35,(VIN.my-L.y)*.1)):0;
+ const g=c.createRadialGradient(px,py,ir*.05,px,py,ir);
+ g.addColorStop(0,"#000");g.addColorStop(.42,"#000");g.addColorStop(.5,"#3d5a2a");
+ g.addColorStop(.84,"#8dbb62");g.addColorStop(1,"rgba(18,30,10,.9)");
+ c.fillStyle=g;c.beginPath();c.arc(px,py,ir,0,6.2832);c.fill();
+ c.restore();
+ c.globalAlpha=al*.8;c.lineWidth=Math.max(1,R*.07);c.strokeStyle="rgba(6,12,5,.95)";
+ c.beginPath();c.ellipse(0,0,R,h,0,0,6.2832);c.stroke();
+ c.restore();c.globalAlpha=1;}
+
+/* --- a repintura: só acontece com VIN.dirty. ordem = espreito, folhagem, flores --- */
+function vinDraw(){const c=VIN.cx;if(!c)return;
+ c.clearRect(0,0,VIN.W,VIN.H);
+ if(VIN.lk)vinLurkDraw(c,VIN.lk);
+ for(const v of VIN.vs)vinPaint(c,v);
+ /* a flor vive na ponta: se o recuo já comeu o ponto dela (v.ck = quanto sobrou da vinha),
+    ela some junto. flor solta boiando no ar entregaria o truque na hora */
+ for(const v of VIN.vs)for(const f of v.fl)if(f.i<v.ck)vinFlorDraw(c,v,f);}
+
+/* --- o passo por frame: pendurado no fxTick, sem rAF próprio. só pontas ativas, flores
+   abrindo, recuo e espreito custam alguma coisa; o resto está congelado em Path2D --- */
+function vinTick(t){
+ if(!VIN.on||!VIN.cx)return;
+ if(VIN.cv.width!==innerWidth||VIN.cv.height!==innerHeight)vinResize();
+ const dt=Math.min(60,t-(VIN.lt||t));VIN.lt=t;
+ /* a zona de foco custa um getBoundingClientRect: 3x por segundo, não 60 */
+ if(t-VIN.fzt>320){VIN.fzt=t;const a=document.activeElement;let r=null;
+  if(a&&a!==document.body&&a.getBoundingClientRect){const q=a.getBoundingClientRect();
+   if(q.width>0&&q.height>0)r={l:q.left-26,r:q.right+26,t:q.top-26,b:q.bottom+26};}
+  VIN.fz=r;}
+ if(VIN.boost>0)VIN.boost=Math.max(0,VIN.boost-dt);
+ const mul=VIN.boost>0?2.7:1;
+ for(let i=0;i<VIN.vs.length;i++){const v=VIN.vs[i];
+  if(v.ph===0){v.acc+=dt*.001*v.spd*mul;
+   let k=0;while(v.acc>=1&&k<7){v.acc-=1;k++;if(!vinGrow(v))break;}
+   if(k)VIN.dirty=true;}
+  const F=v.fl;for(let j=0;j<F.length;j++)if(F[j].t<1){F[j].t+=dt/(F[j].dur*1000);VIN.dirty=true;}}
+ if(VIN.cull){VIN.cull=false;
+  VIN.vs=VIN.vs.filter(v=>{if(!v.dead)return true;VIN.pts-=v.pts.length;return false;});}
+ vinRecuo(dt);
+ if(VIN.lk){const L=VIN.lk;L.t+=dt/(L.dur*1000);L.x+=L.vx*dt*.06;L.y+=L.vy*dt*.06;
+  if(L.t>=1)VIN.lk=null;
+  VIN.dirty=true;}
+ if(VIN.dirty){VIN.dirty=false;vinDraw();}}
+
+/* --- montar / desmontar: sair do Germe não deixa uma folha nem um timer para trás --- */
+function vinResize(){const cv=VIN.cv;if(!cv)return;
+ VIN.W=cv.width=innerWidth;VIN.H=cv.height=innerHeight;VIN.dirty=true;}
+function vinMount(){const cv=$("fx-vines");if(!cv||!cv.getContext)return false;
+ VIN.cv=cv;VIN.cx=cv.getContext("2d");if(!VIN.cx)return false;vinResize();return true;}
+function vinTear(){clearTimeout(VIN.budT);VIN.budT=null;clearTimeout(VIN.lkT);VIN.lkT=null;
+ VIN.vs=[];VIN.lk=null;VIN.pts=0;VIN.boost=0;VIN.dirty=false;VIN.cull=false;VIN.fz=null;
+ if(VIN.cx)VIN.cx.clearRect(0,0,VIN.W,VIN.H);}
+function vinSync(){const on=gerOn(1);
+ if(on!==VIN.on){VIN.on=on;
+  if(on){if(!vinMount()){VIN.on=false;return;}
+   vinBudSched();vinLurkSched();vinBud();vinBud();} /* não começa vazio: já há algo no canto */
+  else vinTear();
+  return;}
+ if(!on)return;
+ const b=bandOf(S.ruido||0);
+ while(VIN.vs.length>VCAP[b]){const v=VIN.vs.shift();VIN.pts-=v.pts.length;VIN.dirty=true;}
+ if(VIN.pts<0)VIN.pts=0;
+ if(b<3&&VIN.lk){VIN.lk=null;VIN.dirty=true;}}
 
 /* --- o inchaço: algo se remexe sob o painel e assenta. banda 5, raro, nunca sob edição --- */
 let _swT=null,_swEl=null,_swRm=null;
@@ -2939,36 +3215,126 @@ function gerSwell(){gerSwellClear();
  _swRm=setTimeout(gerSwellClear,2700);}
 function swellSched(){clearTimeout(_swT);_swT=setTimeout(()=>{gerSwell();swellSched();},28000+Math.random()*24000);}
 
-/* --- o som úmido: o fundo viscoso vive no grafo (audBuild); aqui, o nível e o estalo --- */
-const gerLvl=b=>b>=5?.021:.012;
-/* squelch: rajada de ruído marrom curta com o corte abrindo e fechando depressa.
-   é a forma de algo mole cedendo — baixo o bastante para você não saber se ouviu */
-function gerSquelch(){if(!AUD.ctx||S.ui.mute||!gerOn(4))return;
- const c=AUD.ctx,b=bandOf(S.ruido||0),t=c.currentTime+.02,dur=.17+Math.random()*.13;
- try{const n=Math.floor(c.sampleRate*.45),bf=c.createBuffer(1,n,c.sampleRate),ch=bf.getChannelData(0);
-  let last=0;for(let i=0;i<n;i++){const w=Math.random()*2-1;last=(last+.06*w)/1.06;ch[i]=last*4;}
+/* --- o som: TERRA MOLHADA + VENTO vivem no grafo (audBuild); aqui ficam o nível e os
+   eventos. NADA percussivo: sem estalo, sem batida. só coisas úmidas e folhagem --- */
+const gerLvl=b=>b>=5?.030:(b>=4?.021:.013);
+/* bolha: a terra soltando ar. o ataque é MOLE de propósito (42% da duração subindo) —
+   se atacasse rápido viraria percussão, e é justamente isso que saiu daqui */
+function gerBolha(){if(!AUD.ctx||S.ui.mute||!gerOn(3))return;
+ const c=AUD.ctx,b=bandOf(S.ruido||0),t=c.currentTime+.02,dur=.3+Math.random()*.24;
+ try{const n=Math.floor(c.sampleRate*.7),bf=c.createBuffer(1,n,c.sampleRate),ch=bf.getChannelData(0);
+  let last=0;for(let i=0;i<n;i++){const w=Math.random()*2-1;last=(last+.05*w)/1.05;ch[i]=last*4;}
   const s=c.createBufferSource();s.buffer=bf;
-  const f=c.createBiquadFilter();f.type="lowpass";f.Q.value=9;
-  f.frequency.setValueAtTime(150,t);
-  f.frequency.linearRampToValueAtTime(680+Math.random()*520,t+dur*.34);
-  f.frequency.exponentialRampToValueAtTime(120,t+dur); /* abre e fecha: o estalo úmido */
-  const g=c.createGain(),pico=b>=5?.055:.034;
-  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(pico,t+.02);
+  const f=c.createBiquadFilter();f.type="lowpass";f.Q.value=11;
+  f.frequency.setValueAtTime(80,t);
+  f.frequency.linearRampToValueAtTime(190+Math.random()*160,t+dur*.55);
+  f.frequency.linearRampToValueAtTime(70,t+dur);
+  const g=c.createGain();
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(b>=5?.05:.032,t+dur*.42);
   g.gain.exponentialRampToValueAtTime(.0001,t+dur);
-  s.connect(f);f.connect(g);g.connect(c.destination);s.start(t);s.stop(t+dur+.06);}catch(e){}}
+  s.connect(f);f.connect(g);g.connect(c.destination);s.start(t);s.stop(t+dur+.05);}catch(e){}}
+/* farfalhar: a folhagem se mexendo toda de uma vez. ruído branco num passa-banda que DESCE */
+function gerRustle(dur,lvl){if(!AUD.ctx||S.ui.mute||!gerOn(2))return;
+ const c=AUD.ctx,t=c.currentTime+.02,D=dur||1.2;
+ try{const n=Math.floor(c.sampleRate*(D+.3)),bf=c.createBuffer(1,n,c.sampleRate),ch=bf.getChannelData(0);
+  for(let i=0;i<n;i++)ch[i]=(Math.random()*2-1)*.6;
+  const s=c.createBufferSource();s.buffer=bf;
+  const f=c.createBiquadFilter();f.type="bandpass";f.Q.value=1.1;
+  f.frequency.setValueAtTime(1500+Math.random()*700,t);
+  f.frequency.exponentialRampToValueAtTime(430,t+D);
+  const g=c.createGain();
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.026*(lvl||1),t+D*.3);
+  g.gain.linearRampToValueAtTime(.0001,t+D);
+  s.connect(f);f.connect(g);g.connect(c.destination);s.start(t);s.stop(t+D+.1);}catch(e){}}
+/* descolar: a flor abrindo de repente. passa-banda ressonante SUBINDO sobre ruído — é o som
+   de duas superfícies molhadas se separando, e não tem transiente seco nenhum */
+function gerDescolar(){if(!AUD.ctx||S.ui.mute||!gerOn(2))return;
+ const c=AUD.ctx,t=c.currentTime+.02,D=.42+Math.random()*.2;
+ try{const n=Math.floor(c.sampleRate*.8),bf=c.createBuffer(1,n,c.sampleRate),ch=bf.getChannelData(0);
+  let last=0;for(let i=0;i<n;i++){const w=Math.random()*2-1;last=(last+.3*w)/1.3;ch[i]=last*1.6;}
+  const s=c.createBufferSource();s.buffer=bf;
+  const f=c.createBiquadFilter();f.type="bandpass";f.Q.value=8;
+  f.frequency.setValueAtTime(220,t);
+  f.frequency.exponentialRampToValueAtTime(1250+Math.random()*500,t+D);
+  const g=c.createGain();
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.05,t+D*.35);
+  g.gain.exponentialRampToValueAtTime(.0001,t+D+.1);
+  s.connect(f);f.connect(g);g.connect(c.destination);s.start(t);s.stop(t+D+.2);}catch(e){}}
+/* úmido curto: o broto rompendo onde você apagou. mesma família, mais grave e mais rápido */
+function gerWet(){if(!AUD.ctx||S.ui.mute||!gerOn(2))return;
+ const c=AUD.ctx,t=c.currentTime+.02,D=.26+Math.random()*.12;
+ try{const n=Math.floor(c.sampleRate*.5),bf=c.createBuffer(1,n,c.sampleRate),ch=bf.getChannelData(0);
+  let last=0;for(let i=0;i<n;i++){const w=Math.random()*2-1;last=(last+.16*w)/1.16;ch[i]=last*2.4;}
+  const s=c.createBufferSource();s.buffer=bf;
+  const f=c.createBiquadFilter();f.type="lowpass";f.Q.value=7;
+  f.frequency.setValueAtTime(160,t);
+  f.frequency.linearRampToValueAtTime(760+Math.random()*300,t+D*.6);
+  f.frequency.linearRampToValueAtTime(180,t+D);
+  const g=c.createGain();
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.042,t+D*.3);
+  g.gain.exponentialRampToValueAtTime(.0001,t+D);
+  s.connect(f);f.connect(g);g.connect(c.destination);s.start(t);s.stop(t+D+.1);}catch(e){}}
 function gerAudOff(){clearTimeout(AUD.gtimer);AUD.gtimer=null;AUD.gon=false;
  if(!AUD.ctx||!AUD.ggn)return;try{const t=AUD.ctx.currentTime;
-  AUD.ggn.gain.cancelScheduledValues(t);AUD.ggn.gain.setTargetAtTime(0,t,.6);}catch(e){}}
+  AUD.ggn.gain.cancelScheduledValues(t);AUD.ggn.gain.setTargetAtTime(0,t,.8);}catch(e){}}
 function gerAudTick(){if(!AUD.gon)return;const b=bandOf(S.ruido||0);
- gerSquelch();
- AUD.gtimer=setTimeout(gerAudTick,(b>=5?15+Math.random()*11:20+Math.random()*14)*1000);}
+ gerBolha();
+ AUD.gtimer=setTimeout(gerAudTick,(b>=5?9+Math.random()*9:14+Math.random()*13)*1000);}
+/* o surto do noiseup: o ambiente inteiro sobe e volta sozinho em ~5s */
+function gerAudPush(){if(!AUD.ctx||!AUD.gon||S.ui.mute)return;
+ try{const t=AUD.ctx.currentTime,l=gerLvl(bandOf(S.ruido||0));
+  AUD.ggn.gain.cancelScheduledValues(t);
+  AUD.ggn.gain.setTargetAtTime(l*2.1,t,.7);
+  AUD.ggn.gain.setTargetAtTime(l,t+5,2.4);}catch(e){}}
 function gerAudSync(want,b){
  if(!want||!AUD.gest)return gerAudOff();
  if(!audBuild())return;
  if(AUD.ctx.state==="suspended")AUD.ctx.resume().catch(()=>{});
  try{const t=AUD.ctx.currentTime;AUD.ggn.gain.cancelScheduledValues(t);
-  AUD.ggn.gain.setTargetAtTime(gerLvl(b),t,1.8);}catch(e){}
- if(!AUD.gon){AUD.gon=true;AUD.gtimer=setTimeout(gerAudTick,(7+Math.random()*9)*1000);}}
+  AUD.ggn.gain.setTargetAtTime(gerLvl(b),t,2.2);}catch(e){}
+ if(!AUD.gon){AUD.gon=true;AUD.gtimer=setTimeout(gerAudTick,(6+Math.random()*8)*1000);}}
+
+/* --- as reações às SUAS ações: agora VISUAL + SOM, não só a frase. o motor de gatilhos
+   cuida da carência da frase; cada efeito guarda a sua para não virar spam --- */
+/* parou: o jardim ACELERA e a folhagem farfalha. o silêncio é o que deixa ele tomar a tela */
+function gerIdle(){if(!VIN.on)return;
+ VIN.boost=Math.max(VIN.boost,9000);
+ vinBud();if(bandOf(S.ruido||0)>=4)vinBud();
+ gerRustle(1.1+Math.random()*.6,1);}
+/* voltou a mexer: o surto morre na hora (o recuo em si é contínuo, em vinRecuo) */
+function gerAct(){if(VIN.boost>0)VIN.boost=0;}
+/* apagou texto: uma vinha nova BROTA do ponto onde estava o que você arrancou.
+   nasce logo ABAIXO do campo, fora da zona proibida dele — o campo está em foco (você
+   acabou de escrever nele), e a regra sagrada não abre exceção nem para o próprio gatilho */
+function gerSprout(d){if(!VIN.on)return;
+ const now=performance.now();if(now-VIN.spr<7000)return;
+ const t=d&&d.el;if(!t||!t.isConnected||!t.getBoundingClientRect)return;
+ const r=t.getBoundingClientRect();
+ if(r.width<40||r.bottom<8||r.top>innerHeight-8)return;
+ const x=r.left+r.width*(.15+Math.random()*.7),y=r.bottom+30;
+ if(y>innerHeight-6||vinForb(x,y))return;
+ const b=bandOf(S.ruido||0);
+ const v=vinPush({x,y,a:Math.PI/2+(Math.random()-.5)*1.1,
+  max:Math.round(20+b*9+Math.random()*14),w:1.6+b*.22,spd:30});
+ if(v){VIN.spr=now;gerWet();}}
+/* tirou recurso: sangue é adubo. uma flor perto ABRE de repente, com o som de descolar */
+function gerBloom(d){if(!VIN.on||!(d&&d.dir<0))return;
+ const now=performance.now();if(now-VIN.blm<9000)return;
+ const cand=[];
+ for(const v of VIN.vs){if(v.ph!==1||v.fl.length>2||v.pts.length<6)continue;
+  const p=v.pts[v.pts.length-1];
+  if(p.x<10||p.x>VIN.W-10||p.y<10||p.y>VIN.H-10||vinForb(p.x,p.y))continue;
+  cand.push([v,p]);}
+ if(!cand.length)return;
+ VIN.blm=now;
+ const par=cand[Math.floor(Math.random()*cand.length)];
+ vinFlor(par[0],par[1],.5); /* DE REPENTE: meio segundo, não o 1-2s de quem abre sozinha */
+ gerDescolar();}
+/* o Ruído subiu: surto geral de crescimento e o ambiente sobe junto por alguns segundos */
+function gerSurto(){if(!VIN.on)return;
+ VIN.boost=Math.max(VIN.boost,12000);
+ vinBud();vinBud();vinBud();
+ gerRustle(1.6,1.4);gerAudPush();}
 
 /* as reações do Germe às suas ações — o motor da Parte A cuida de cooldown e de {nome}/{apagado} */
 TRIG.ger={
@@ -2979,16 +3345,17 @@ TRIG.ger={
  resource:["essa ferida é uma porta","sangue é adubo","cada corte nosso agradece","abre. deixa entrar."],
  tabopen:["levou junto para esta página","espalhou para cá também","não tem parte limpa"],
  noiseup:["está florescendo mais rápido agora","você chamou e nós crescemos"]};
-/* e os efeitos visuais dos mesmos gatilhos: act = "o usuário voltou a mexer" */
-TRIGFX.ger={erase:gerScar,idle:gerGrow,act:gerGrowRecua};
+/* e os efeitos dos mesmos gatilhos: act = "o usuário voltou a mexer" */
+TRIGFX.ger={erase:d=>{gerScar(d);gerSprout(d);},idle:gerIdle,act:gerAct,
+ resource:gerBloom,noiseup:gerSurto};
 
-/* sair do Germe (ou calmar) apaga timers, overlays, classes e o som — a textura é CSS por
-   data-el, então a superfície seca sozinha */
+/* sair do Germe (ou calmar) apaga timers, o canvas de vinhas, overlays, classes e o som —
+   a textura restante é CSS por data-el, então a superfície seca sozinha */
 function gerSync(){const b=bandOf(S.ruido||0),on=gerOn(1);
  if(!on||b<3)gerScarClear();
- if(!on||b<4)gerGrowClear();
  if(on&&b>=5){if(!_swT)swellSched();}else{clearTimeout(_swT);_swT=null;gerSwellClear();}
- gerAudSync(on&&b>=4&&!S.ui.mute,b);}
+ vinSync();
+ gerAudSync(on&&b>=3&&!S.ui.mute,b);}
 
 /* ---------- abas / navegação ---------- */
 const TABS=[["inicial","Inicial"],["sint","Sintonizar"],["hab","Habilidades"],["mag","Magias"],["tal","Talentos"],["inv","Inventário"],["bib","Biblioteca"],["div","Dívidas & Notas"]];
