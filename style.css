@@ -1,0 +1,486 @@
+/* ===== Protocolo 4a ed - folha de estilo (extraida do Ficha_Automatica.html) ===== */
+/* ===== PROTOCOLO 4ª ED — ESTILO ===== */
+:root{--bg:#0f0d0b;--panel:#18140f;--panel2:#1f1a13;--line:#332a1e;--line2:#443826;--ink:#d9d2c2;--dim:#a29679;--faint:#6d6350;--gold:#b8932f;--goldim:#7c6524;--red:#8e2020;
+--ec:#b8932f;--ecd:#7c6524;--eglow:rgba(184,147,47,.14);--band:0;}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font:14px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 50% -10%,var(--eglow),transparent 55%)}
+#fx-canvas{position:fixed;inset:0;pointer-events:none;z-index:6;opacity:.5}
+#fx-vign{position:fixed;inset:0;pointer-events:none;z-index:7;box-shadow:inset 0 0 calc(40px + var(--band)*34px) calc(var(--band)*7px) rgba(0,0,0,calc(.12 + var(--band)*.09));transition:box-shadow 1.2s}
+#fx-blood{position:fixed;inset:0;pointer-events:none;z-index:7;opacity:0;box-shadow:inset 0 0 120px 30px rgba(142,32,32,.55);transition:opacity .6s}
+/* obs — escopofobia (piloto): olho na periferia, túnel de desfoque, flash de texto */
+/* névoa periférica só com gradiente: nada de backdrop-filter — reprocessar o fundo a cada
+   frame (as partículas ficam embaixo) era o que travava a ficha nas bandas altas */
+#fx-tunnel{position:fixed;inset:0;pointer-events:none;z-index:6;opacity:0;visibility:hidden;transition:opacity 1.6s,visibility 1.6s;
+ background:radial-gradient(ellipse at 50% 45%,transparent 44%,rgba(0,0,0,calc(.03 + var(--band)*.045)) 82%,rgba(0,0,0,calc(.07 + var(--band)*.065)) 100%),
+  radial-gradient(ellipse at 50% 45%,transparent 62%,var(--eglow) 100%)}
+#fx-eye{position:fixed;inset:0;pointer-events:none;z-index:7;opacity:0;visibility:hidden;transition:opacity 2.2s,visibility 2.2s;--eyeb:20px}
+/* a difusão vem das paradas largas do gradiente; o blur fica pequeno e a caixa ganha camada
+   própria, então ele é rasterizado uma vez e o resto do tempo só se translada na GPU */
+#fx-eye i{position:absolute;left:0;top:0;width:46vmin;height:27vmin;margin:-13.5vmin 0 0 -23vmin;border-radius:50%;will-change:transform,opacity;transform:translate3d(-140vw,0,0);
+ background:radial-gradient(closest-side at 50% 50%,#000 0 9%,var(--ecd) 22% 28%,var(--ec) 36% 42%,rgba(0,0,0,.55) 52% 58%,transparent 78%);filter:blur(var(--eyeb))}
+.fx-flash{position:fixed;pointer-events:none;z-index:9;overflow:hidden;white-space:nowrap;display:flex;align-items:center}
+/* vaz — horror cósmico: o buraco fica ATRÁS do conteúdo, e aparece pelos painéis que esmaecem */
+#fx-void{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:0;visibility:hidden;transition:opacity 2.4s,visibility 2.4s}
+#fx-void i{position:absolute;left:0;top:0;width:92vmin;height:74vmin;margin:-37vmin 0 0 -46vmin;border-radius:50%;will-change:transform;transform:translate3d(-150vw,0,0);
+ background:radial-gradient(closest-side at 50% 50%,#000 0 24%,rgba(2,3,10,.9) 40%,rgba(2,3,10,.5) 60%,rgba(2,3,10,.18) 78%,transparent 100%)}
+#fx-black{position:fixed;inset:0;pointer-events:none;z-index:10;background:#000;opacity:0}
+#fx-black.on{animation:vazapaga 180ms ease-in-out}
+@keyframes vazapaga{0%{opacity:0}18%{opacity:.9}55%{opacity:.9}100%{opacity:0}}
+/* eco — déjà vu: o soluço do texto, o fantasma do que foi apagado e o micro-loop travado */
+.fx-stut{opacity:0;animation:ecosoluco 220ms steps(2)}
+@keyframes ecosoluco{0%{transform:translateX(0);opacity:0}25%{transform:translateX(3px);opacity:.8}50%{transform:translateX(-2px);opacity:.45}75%{transform:translateX(4px);opacity:.7}100%{transform:translateX(0);opacity:0}}
+.fx-ghost{position:fixed;pointer-events:none;z-index:9;color:var(--ec);font-size:13px;font-family:ui-monospace,Consolas,monospace;letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0;text-shadow:0 0 8px var(--eglow);animation:ecolembra 1.8s ease-in-out}
+@keyframes ecolembra{0%{opacity:0}22%{opacity:.5}70%{opacity:.42}100%{opacity:0}}
+.fx-loop{animation:ecoloop .42s steps(4) 3}
+@keyframes ecoloop{0%{transform:translateX(0)}30%{transform:translateX(2px)}60%{transform:translateX(-1px);opacity:.7}100%{transform:translateX(0)}}
+body.lowvida #fx-blood{opacity:1;animation:bloodpulse 2.2s ease-in-out infinite}
+@keyframes bloodpulse{50%{box-shadow:inset 0 0 160px 46px rgba(142,32,32,.7)}}
+body.lowluc .wrap{animation:lucshake 7s ease-in-out infinite}
+@keyframes lucshake{0%,92%,100%{transform:none}94%{transform:translateX(1px) skewX(.12deg)}97%{transform:translateX(-1px)}}
+#whisper{position:fixed;z-index:8;pointer-events:none;font-family:ui-monospace,Consolas,monospace;font-size:12px;letter-spacing:2px;color:var(--ec);opacity:0;transition:opacity 2.4s;max-width:240px;text-shadow:0 0 8px var(--eglow)}
+#whisper.on{opacity:calc(.28 + var(--band)*.1)}
+.wrap{position:relative;z-index:5;max-width:1200px;margin:0 auto;padding:14px 16px 60px}
+/* header */
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px 16px;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:8px}
+h1{font-family:Georgia,'Times New Roman',serif;font-weight:400;font-size:26px;letter-spacing:8px;margin:0;color:var(--ink)}
+h1 b{color:var(--ec);font-weight:400}
+.sub{font-size:10px;letter-spacing:4px;color:var(--faint);text-transform:uppercase}
+.hbtns{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+button{cursor:pointer;font:inherit}
+.btn{background:var(--panel2);border:1px solid var(--line2);color:var(--dim);padding:6px 12px;border-radius:3px;font-size:12px;letter-spacing:.5px;transition:.18s}
+.btn:hover{color:var(--ink);border-color:var(--ec)}
+.btn.gold{border-color:var(--goldim);color:var(--gold)}
+.btn.gold:hover{border-color:var(--ec);color:var(--ec)}
+.btn.del{border-color:#4a2020;color:#b06a6a}.btn.del:hover{border-color:var(--red);color:#e08a8a}
+.btn.mini{padding:2px 8px;font-size:11px}
+.btn.on{border-color:var(--ec);color:var(--ec);background:rgba(0,0,0,.25)}
+/* tabs */
+.tabs{display:flex;gap:2px;flex-wrap:wrap;margin:10px 0 16px;border-bottom:1px solid var(--line)}
+.tabs button{background:none;border:none;border-bottom:2px solid transparent;color:var(--faint);padding:8px 13px;font-size:12px;letter-spacing:2.5px;text-transform:uppercase;transition:.2s}
+.tabs button:hover{color:var(--dim)}
+.tabs button.active{color:var(--ec);border-bottom-color:var(--ec)}
+.tabs .tglifo{font-size:14px;letter-spacing:0}
+/* dívida dock */
+#divDock{display:none;margin:0 0 12px;padding:7px 14px;border:1px solid #4a2020;background:rgba(142,32,32,.08);color:#c88;font-size:12px;letter-spacing:1px;border-radius:3px}
+#divDock.on{display:block}
+body[data-el="pac"] #divDock.on{animation:dockpulse 3s ease-in-out infinite;border-color:var(--ec)}
+@keyframes dockpulse{50%{background:rgba(163,38,56,.18)}}
+/* panels */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:900px){.grid2,.grid3{grid-template-columns:1fr}}
+.panel{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:14px 16px;margin-bottom:14px;overflow:hidden}
+.panel h2{font-family:Georgia,serif;font-weight:400;font-size:13px;letter-spacing:4px;text-transform:uppercase;color:var(--ec);margin:0 0 12px;display:flex;align-items:baseline;gap:8px}
+.panel h2 small{font-size:10px;letter-spacing:1px;color:var(--faint);text-transform:none;font-family:system-ui}
+label{display:block;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--faint);margin:0 0 3px}
+input[type=text],input[type=number],select,textarea{width:100%;background:#0c0a08;border:1px solid var(--line);color:var(--ink);padding:7px 9px;border-radius:3px;font:inherit;outline:none;transition:border .2s}
+input:focus,select:focus,textarea:focus{border-color:var(--ecd)}
+textarea{resize:vertical;min-height:70px}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.row>div{flex:1;min-width:130px}
+.hint{font-size:11px;color:var(--faint);line-height:1.5;margin-top:6px}
+.rw{font-family:ui-monospace,Consolas,monospace;letter-spacing:3px;color:var(--ec);cursor:help;text-shadow:0 0 calc(var(--band)*2px) var(--eglow);filter:none}
+body[data-band="3"] .rw,body[data-band="4"] .rw,body[data-band="5"] .rw{animation:rwjit 5s steps(2) infinite}
+@keyframes rwjit{0%,96%{text-shadow:0 0 6px var(--eglow)}98%{text-shadow:-1px 0 var(--red),1px 0 var(--ec)}}
+/* atributos */
+.attrs{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+@media(max-width:700px){.attrs{grid-template-columns:repeat(2,1fr)}}
+.attr{background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:8px;text-align:center}
+.attr .an{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--dim)}
+.attr input{text-align:center;font-size:20px;font-family:Georgia,serif;border:none;background:none;color:var(--ink);margin:2px 0}
+.attr .ad{font-size:9px;color:var(--faint);letter-spacing:.5px}
+/* recursos */
+.recs{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.rec{background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:9px 11px}
+.rec .rn{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--dim);display:flex;justify-content:space-between}
+.rec .rn b{color:var(--faint);font-weight:400}
+.rec .rv{display:flex;align-items:center;gap:6px;margin-top:5px}
+.rec .rv input{width:56px;text-align:center;font-size:17px;font-family:Georgia,serif;padding:3px}
+.rec .rv .mx{color:var(--faint);font-size:13px}
+.rec .rv .mx input{width:46px;text-align:center;font-size:13px;font-family:Georgia,serif;padding:2px 3px;color:var(--dim)}
+.rec .rv .mx input::placeholder{color:var(--faint);opacity:1}
+.rec .stp{background:none;border:1px solid var(--line2);color:var(--dim);width:24px;height:24px;border-radius:3px;line-height:1}
+.rec .stp:hover{border-color:var(--ec);color:var(--ec)}
+.bar{height:4px;background:#0c0a08;border-radius:2px;margin-top:7px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ec);transition:width .4s}
+body[data-el="ger"] .bar i{animation:breathe 4s ease-in-out infinite}
+@keyframes breathe{50%{filter:brightness(1.25)}}
+/* ruído tracker */
+.rtrack{display:flex;gap:3px;flex-wrap:wrap;margin-top:8px}
+.rseg{width:22px;height:26px;border:1px solid var(--line2);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:12px;color:transparent;cursor:pointer;transition:.15s;background:#0c0a08}
+.rseg:nth-child(4n){margin-right:7px}
+.rseg.on{border-color:var(--ec);color:var(--ec);background:var(--eglow);text-shadow:0 0 6px var(--eglow)}
+.rseg:hover{border-color:var(--dim)}
+/* perícias */
+.skills{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:4px 14px}
+.skill{display:flex;align-items:center;gap:7px;padding:3px 6px;border-radius:3px;font-size:12.5px;cursor:pointer;border:1px solid transparent;transition:.15s}
+.skill:hover{background:var(--panel2);border-color:var(--line)}
+.skill input[type=checkbox]{width:13px;height:13px;accent-color:var(--ec);cursor:pointer}
+.skill .nm{flex:1;color:var(--dim)}
+.skill.tr .nm{color:var(--ink)}
+.skill .at{font-size:9px;color:var(--faint);letter-spacing:1px;text-transform:uppercase}
+.skill .bn{font-family:Georgia,serif;color:var(--ec);min-width:26px;text-align:right}
+.sgroup{grid-column:1/-1;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--faint);border-bottom:1px solid var(--line);padding:8px 0 3px;margin-top:2px}
+/* chips condições */
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line2);border-radius:12px;padding:3px 11px;font-size:11px;color:var(--faint);cursor:pointer;transition:.15s;letter-spacing:.5px}
+.chip:hover{color:var(--dim);border-color:var(--dim)}
+.chip.on{border-color:var(--red);color:#d88;background:rgba(142,32,32,.12)}
+/* cards de habilidade / magia / talento */
+.hcard{background:var(--panel2);border:1px solid var(--line);border-left:2px solid var(--ecd);border-radius:3px;padding:9px 12px;margin-bottom:8px}
+.hcard .ht{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.hcard .ht b{font-family:Georgia,serif;font-weight:400;font-size:14px;color:var(--ink);letter-spacing:.5px}
+.tag{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ec);border:1px solid var(--ecd);border-radius:2px;padding:1px 6px}
+.tag.dark{color:var(--faint);border-color:var(--line2)}
+.tag.warn{color:#c66;border-color:#5a2a2a}
+.tag.ok{color:#8fae6a;border-color:#42552e}
+.hcard .hx{font-size:12.5px;color:var(--dim);margin-top:5px;line-height:1.55}
+.hcard .hx em{color:var(--ink);font-style:normal;font-weight:600}
+.hcard .hsab{font-style:italic;opacity:.8;font-size:12px;color:var(--dim);margin-top:5px;line-height:1.5}
+.hcard .src{margin-left:auto;font-size:9px;letter-spacing:1px;color:var(--faint);text-transform:uppercase}
+.hcard.locked{opacity:.55}
+.hcard.regra{border-left-color:var(--red)}
+.secband{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--faint);border-bottom:1px solid var(--line);padding:14px 0 5px;margin-bottom:10px}
+.secband b{color:var(--ec);font-weight:400}
+/* wallet */
+.wallet{display:flex;gap:14px;flex-wrap:wrap;align-items:center;background:var(--panel2);border:1px solid var(--line);border-radius:3px;padding:8px 14px;margin-bottom:12px;font-size:12px;color:var(--dim)}
+.wallet b{font-family:Georgia,serif;font-size:16px;color:var(--ec);font-weight:400}
+.wallet .neg b{color:#c66}
+/* maestrias */
+.mcard{background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:11px 13px;margin-bottom:10px}
+.mrail{display:flex;gap:5px;margin:8px 0}
+.mst{flex:1;text-align:center;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--faint);border:1px solid var(--line2);border-radius:2px;padding:4px 2px}
+.mst.on{color:var(--ec);border-color:var(--ec);background:var(--eglow)}
+.mst.next{border-style:dashed}
+/* fardo chips */
+.fchip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--ecd);border-radius:3px;padding:5px 11px;font-size:12px;color:var(--ink);background:var(--panel2);margin:0 6px 6px 0}
+.fchip small{color:var(--faint);font-size:10px}
+.fchip .x{color:var(--faint);cursor:pointer;padding:0 2px}.fchip .x:hover{color:var(--red)}
+/* ===== SINTONIZAR ===== */
+#sintwrap{position:relative;min-height:70vh;padding:20px 0 30px}
+#sintwrap .fala{ text-align:center;font-size:11px;letter-spacing:3px;color:var(--faint);margin:6px 0 26px;animation:falabr 6s ease-in-out infinite}
+@keyframes falabr{50%{opacity:.55}}
+.elring{display:flex;flex-wrap:wrap;justify-content:center;gap:20px;max-width:960px;margin:0 auto}
+.elc{--c:#888;position:relative;width:255px;min-height:190px;background:linear-gradient(180deg,#16120d,#100d09);border:1px solid var(--line2);border-radius:5px;padding:20px 18px 16px;cursor:pointer;text-align:center;transition:transform .3s,border-color .3s,box-shadow .3s;overflow:hidden}
+.elc:hover{transform:translateY(-6px) scale(1.02);border-color:var(--c);box-shadow:0 8px 40px -8px var(--c)}
+.elc .eg{font-size:44px;color:var(--c);display:block;text-shadow:0 0 22px var(--c);transition:.3s}
+.elc:hover .eg{transform:scale(1.12)}
+.elc .en{font-family:Georgia,serif;font-size:17px;letter-spacing:5px;text-transform:uppercase;margin:10px 0 2px;color:var(--ink)}
+.elc .ev{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--c)}
+.elc .ef{font-size:11px;color:var(--faint);margin-top:10px;line-height:1.5;font-style:italic}
+.elc.dim{opacity:.32;filter:grayscale(.7)}
+.elc.dim:hover{opacity:.75;filter:none}
+.elc.sel{border-color:var(--c);box-shadow:0 0 55px -10px var(--c);transform:scale(1.04)}
+.elc.sel::after{content:"⟑⋏⊙⌖◊ sintonizado";position:absolute;top:8px;right:10px;font-size:8px;letter-spacing:2px;color:var(--c);font-family:ui-monospace,monospace}
+@media(min-width:960px){.elring .elc:nth-child(1){transform:translateY(18px)}.elring .elc:nth-child(2){transform:translateY(-12px)}.elring .elc:nth-child(3){transform:translateY(10px)}.elring .elc:nth-child(4){transform:translateY(-6px)}.elring .elc:nth-child(5){transform:translateY(16px)}.elring .elc:nth-child(6){transform:translateY(-10px)}
+.elring .elc:hover{transform:translateY(-8px) scale(1.03)}}
+/* micro-temas nos cards */
+.elc[data-el=obs]::before{content:"⊙";position:absolute;left:10px;top:10px;font-size:11px;color:var(--c);opacity:.35;animation:blinkeye 5s infinite}
+@keyframes blinkeye{0%,90%,100%{opacity:.35}95%{opacity:0}}
+.elc[data-el=eco] .en{text-shadow:2px 2px 0 rgba(127,184,168,.25)}
+.elc[data-el=vaz]{box-shadow:inset 0 0 34px 6px #000}
+.elc[data-el=asc]::after{content:"";position:absolute;inset:auto 0 0 0;height:4px;background:repeating-linear-gradient(45deg,#b04a3a 0 6px,transparent 6px 12px);opacity:.5}
+.elc[data-el=pac]::before{content:"§";position:absolute;right:12px;bottom:8px;color:var(--c);opacity:.3;font-family:Georgia,serif}
+.elc[data-el=ger]::before{content:"";position:absolute;left:-20px;bottom:-20px;width:80px;height:80px;background:radial-gradient(circle,rgba(111,154,78,.4),transparent 70%);}
+/* altar */
+#altar{max-width:760px;margin:34px auto 0;border:1px solid var(--ecd);border-radius:5px;background:var(--panel);padding:20px 24px}
+#altar h3{font-family:Georgia,serif;font-weight:400;letter-spacing:5px;text-transform:uppercase;color:var(--ec);margin:0 0 4px;display:flex;gap:12px;align-items:center}
+#altar .mtier{border-left:2px solid var(--line2);padding:8px 0 8px 14px;margin:10px 0}
+#altar .mtier.on{border-left-color:var(--ec)}
+#altar .mtier .mt{font-size:10px;letter-spacing:2px;color:var(--ec);text-transform:uppercase}
+#altar .mtier.off .mt{color:var(--faint)}
+#altar .mtier .mx{font-size:12.5px;color:var(--dim);margin-top:3px}
+#altar .mtier.off .mx{color:var(--faint);font-family:ui-monospace,monospace;letter-spacing:2px}
+/* transição */
+#transOv{position:fixed;inset:0;z-index:60;pointer-events:none;opacity:0}
+#transOv.go{pointer-events:all;opacity:1}
+#transOv.t-obs{background:radial-gradient(circle at 50% 50%,transparent 0,#000 0);animation:iris 1.5s ease-in-out forwards}
+@keyframes iris{0%{background:radial-gradient(circle at 50% 50%,transparent 150%,#000 150%)}45%{background:radial-gradient(circle at 50% 50%,transparent 0%,#000 2%)}100%{background:radial-gradient(circle at 50% 50%,transparent 150%,#000 152%)}}
+#transOv.t-eco{background:#7fb8a822;animation:stutter 1.3s steps(1) forwards}
+@keyframes stutter{0%{opacity:1}14%{opacity:0}28%{opacity:.9}42%{opacity:0}60%{opacity:.7}74%{opacity:0}88%{opacity:.4}100%{opacity:0}}
+#transOv.t-vaz{animation:engolir 1.6s ease-in forwards}
+@keyframes engolir{0%{box-shadow:inset 0 0 0 0 #000}55%{box-shadow:inset 0 0 220px 48vmax #04050a}100%{box-shadow:inset 0 0 0 0 transparent}}
+#transOv.t-asc{background:repeating-linear-gradient(45deg,#b04a3a 0 14px,#1a0f0c 14px 28px);animation:ferrugem 1.4s ease-in-out forwards}
+@keyframes ferrugem{0%{transform:translateY(-100%)}45%{transform:translateY(0)}60%{transform:translateY(0)}100%{transform:translateY(100%)}}
+#transOv.t-pac{display:flex;align-items:center;justify-content:center;background:rgba(20,6,8,.85);animation:fade 1.6s forwards}
+#transOv.t-pac::after{content:"⚖";font-size:130px;color:#a32638;text-shadow:0 0 60px #a32638;animation:selo 1.6s cubic-bezier(.2,2.4,.4,1) forwards}
+@keyframes selo{0%{transform:scale(4);opacity:0}35%{transform:scale(1);opacity:1}75%{transform:scale(1);opacity:1}100%{transform:scale(1);opacity:0}}
+@keyframes fade{0%{opacity:1}80%{opacity:1}100%{opacity:0}}
+#transOv.t-ger{background:radial-gradient(circle at 20% 100%,#3d5a2a 0 8%,transparent 8%),radial-gradient(circle at 80% 90%,#3d5a2a 0 6%,transparent 6%),radial-gradient(circle at 50% 110%,#2c421f 0 10%,transparent 10%);background-color:transparent;animation:crescer 1.7s ease-in forwards}
+@keyframes crescer{0%{background-size:0 0,0 0,0 0;opacity:1}55%{background-size:600% 600%,500% 500%,700% 700%;opacity:1}100%{background-size:700% 700%,600% 600%,800% 800%;opacity:0}}
+/* ===== ROLETA ===== */
+#roleta{border:1px solid var(--ecd);border-radius:5px;background:linear-gradient(180deg,var(--panel2),#0d0a08);padding:18px;text-align:center;margin-top:18px}
+#roleta .rq{font-style:italic;color:var(--faint);font-size:12px;margin-bottom:12px}
+.slotbox{width:230px;height:56px;margin:0 auto 14px;border:1px solid var(--line2);border-radius:4px;overflow:hidden;position:relative;background:#0a0806}
+.slotbox::before,.slotbox::after{content:"";position:absolute;left:0;right:0;height:14px;z-index:2;pointer-events:none}
+.slotbox::before{top:0;background:linear-gradient(#0a0806,transparent)}
+.slotbox::after{bottom:0;background:linear-gradient(transparent,#0a0806)}
+#slotreel{transition:none}
+#slotreel div{height:56px;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:22px;letter-spacing:6px;text-transform:uppercase;color:var(--ink)}
+#slotreel div span{font-size:13px;color:var(--ec);margin-right:10px}
+.slotwin{animation:winflash .8s ease-out}
+@keyframes winflash{0%{box-shadow:0 0 0 0 var(--ec)}40%{box-shadow:0 0 60px 6px var(--ec)}100%{box-shadow:0 0 0 0 transparent}}
+/* toolbar talentos */
+.tbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;position:sticky;top:0;background:var(--bg);padding:8px 0;z-index:8;border-bottom:1px solid var(--line);margin-bottom:12px}
+.tbar input[type=text]{max-width:220px}
+.tbar select{max-width:170px;width:auto}
+/* ===== INVENTÁRIO ===== */
+.inv-top{display:flex;gap:18px;flex-wrap:wrap}
+.inv-left{flex:1 1 340px}.inv-right{flex:0 1 300px}
+#invGrid{position:relative;display:grid;gap:2px;background:#0a0806;border:1px solid var(--line);padding:2px;width:max-content;border-radius:3px}
+#invGrid .cell{width:38px;height:38px;background:#14100c;border-radius:2px}
+.piece{position:absolute;cursor:grab;z-index:5}
+.piece.dragging{opacity:.85;cursor:grabbing}
+.bag{display:flex;gap:10px;flex-wrap:wrap;min-height:56px;border:1px dashed var(--line2);border-radius:3px;padding:8px}
+.bagpiece{border-radius:3px;color:#0d0b0a;font-weight:700;font-size:9px;display:flex;align-items:center;justify-content:center;padding:3px;border:1px solid rgba(0,0,0,.35);text-align:center;line-height:1.05;cursor:grab;min-width:34px}
+.shape-editor{display:grid;grid-template-columns:repeat(5,22px);gap:2px;margin:6px 0}
+.sc{width:22px;height:22px;background:#0c0a08;border:1px solid var(--line);border-radius:2px;cursor:pointer}
+.sc.on{background:var(--ec);border-color:var(--ec)}
+.swatches{display:flex;gap:5px;margin:4px 0 8px;flex-wrap:wrap}
+.sw{width:20px;height:20px;border-radius:3px;cursor:pointer;border:2px solid transparent}
+.sw.sel{border-color:var(--ink)}
+/* ===== BIBLIOTECA ===== */
+.docgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.doc{background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:10px;display:flex;flex-direction:column;gap:6px}
+.doc .dth{height:100px;display:flex;align-items:center;justify-content:center;background:#0c0a08;border-radius:3px;overflow:hidden;font-size:34px;color:var(--faint);cursor:pointer}
+.doc .dth img{width:100%;height:100%;object-fit:cover}
+.doc input{font-size:11px;padding:4px 6px}
+.doc .dbtns{display:flex;gap:4px;justify-content:space-between}
+.dropzone{border:1px dashed var(--line2);border-radius:4px;padding:26px;text-align:center;color:var(--faint);font-size:12px;letter-spacing:1px;margin-bottom:14px;transition:.2s;cursor:pointer}
+.dropzone.over{border-color:var(--ec);color:var(--ec);background:var(--eglow)}
+/* ===== MODO SESSÃO ===== */
+#sessview{display:none}
+body.sess #mainview,body.sess .tabs{display:none}
+body.sess #sessview{display:block}
+.sessgrid{display:grid;grid-template-columns:1.15fr .85fr;gap:14px}
+@media(max-width:900px){.sessgrid{grid-template-columns:1fr}}
+.bigrec{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.bigrec .rec .rv input{font-size:24px;width:70px}
+.bigrec .rec .rv .mx input{font-size:15px;width:54px}
+.bigrec .rec .stp{width:34px;height:34px;font-size:16px}
+.slog{max-height:220px;overflow:auto;font-size:12px;color:var(--dim)}
+.slog div{border-bottom:1px solid var(--line);padding:4px 0}
+.snote{display:flex;gap:6px;margin-bottom:8px}
+.snlist{max-height:300px;overflow:auto}
+.snlist .sn{border-left:2px solid var(--ecd);padding:4px 10px;margin-bottom:6px;font-size:12.5px;color:var(--dim)}
+.snlist .sn b{color:var(--faint);font-weight:400;font-size:10px;margin-right:8px;font-family:ui-monospace,monospace}
+/* rolagem flutuante */
+#rollcard{position:fixed;right:22px;bottom:22px;z-index:70;background:var(--panel);border:1px solid var(--ec);border-radius:5px;padding:12px 18px;min-width:190px;opacity:0;transform:translateY(14px);transition:.3s;pointer-events:none;box-shadow:0 8px 40px -8px rgba(0,0,0,.8)}
+#rollcard.on{opacity:1;transform:none}
+#rollcard .rl{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--faint)}
+#rollcard .rt{font-family:Georgia,serif;font-size:26px;color:var(--ink)}
+#rollcard .rt small{font-size:12px;color:var(--faint)}
+#rollcard .rg{font-size:11px;letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+.g-crit{color:#e0c25a}.g-total{color:#8fae6a}.g-parcial{color:#c9a227}.g-falha{color:#c66}
+/* modal */
+#modal{position:fixed;inset:0;z-index:80;background:rgba(6,5,3,.78);display:none;align-items:flex-start;justify-content:center;padding:6vh 14px;overflow:auto}
+#modal.on{display:flex}
+#modalbox{background:var(--panel);border:1px solid var(--line2);border-radius:5px;max-width:640px;width:100%;padding:18px 20px}
+#modalbox h3{font-family:Georgia,serif;font-weight:400;letter-spacing:3px;text-transform:uppercase;color:var(--ec);margin:0 0 12px;font-size:14px}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--panel2);border:1px solid var(--goldim);color:var(--ink);padding:9px 16px;border-radius:4px;font-size:13px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:90}
+.toast.show{opacity:1}
+.foot{text-align:center;font-size:10px;color:var(--faint);letter-spacing:3px;margin-top:34px;font-family:ui-monospace,monospace}
+/* ===== TEMAS DE ELEMENTO ===== */
+body[data-el=obs]{--ec:#c9a227;--ecd:#8a6f1c;--eglow:rgba(201,162,39,.16)}
+body[data-el=eco]{--ec:#7fb8a8;--ecd:#4f7a6d;--eglow:rgba(127,184,168,.13)}
+body[data-el=vaz]{--ec:#7c8fb5;--ecd:#48566f;--eglow:rgba(90,107,140,.14);--bg:#0a0b10;--panel:#10121a;--panel2:#141724;--line:#232838;--line2:#2f374d}
+body[data-el=asc]{--ec:#c15a45;--ecd:#7d3527;--eglow:rgba(176,74,58,.15)}
+body[data-el=pac]{--ec:#c13a52;--ecd:#77202f;--eglow:rgba(163,38,56,.15)}
+body[data-el=ger]{--ec:#8dbb62;--ecd:#4f6d34;--eglow:rgba(111,154,78,.14)}
+/* eco: ghosting nos títulos, crescente com a banda */
+body[data-el=eco] h1,body[data-el=eco] .panel h2{text-shadow:calc(var(--band)*1.2px) calc(var(--band)*1.2px) 0 rgba(127,184,168,.35)}
+/* eco: o rastro vira temporal — segunda camada mais atrasada, e a cada re-render ele "custa a chegar" */
+body[data-el=eco][data-band="3"] h1,body[data-el=eco][data-band="3"] .panel h2,body[data-el=eco][data-band="4"] h1,body[data-el=eco][data-band="4"] .panel h2,body[data-el=eco][data-band="5"] h1,body[data-el=eco][data-band="5"] .panel h2{
+ text-shadow:calc(var(--band)*1.2px) calc(var(--band)*1.2px) 0 rgba(127,184,168,.35),calc(var(--band)*2.7px) calc(var(--band)*2.2px) 0 rgba(127,184,168,.15);
+ transition:text-shadow 1.1s ease-out;animation:ecoghost 1.1s ease-out}
+@keyframes ecoghost{from{text-shadow:calc(var(--band)*3.6px) calc(var(--band)*3px) 0 rgba(127,184,168,.42),calc(var(--band)*7px) calc(var(--band)*5.5px) 0 rgba(127,184,168,.22)}}
+body[data-el=eco][data-band="5"] .hx,body[data-el=eco][data-band="5"] .hint,body[data-el=eco][data-band="5"] label{text-shadow:1.5px 1.4px 0 rgba(127,184,168,.14);transition:text-shadow 1.3s ease-out}
+/* obs: olho que pisca nos títulos */
+body[data-el=obs][data-band="2"] .panel h2::after,body[data-el=obs][data-band="3"] .panel h2::after,body[data-el=obs][data-band="4"] .panel h2::after,body[data-el=obs][data-band="5"] .panel h2::after{content:"⊙";font-size:10px;color:var(--ec);animation:blinkeye 6s infinite}
+/* obs: escopofobia — a nuca (banda 2+) e o olho na periferia (banda 3+) */
+body[data-el=obs][data-band="2"] #fx-tunnel,body[data-el=obs][data-band="3"] #fx-tunnel,body[data-el=obs][data-band="4"] #fx-tunnel,body[data-el=obs][data-band="5"] #fx-tunnel{opacity:1;visibility:visible}
+body[data-el=obs][data-band="5"] #fx-tunnel{animation:scopobreath 11s ease-in-out infinite;will-change:opacity}
+@keyframes scopobreath{0%,100%{opacity:.7}50%{opacity:1}}
+body[data-el=obs][data-band="3"] #fx-eye{opacity:.035;visibility:visible;--eyeb:22px}
+body[data-el=obs][data-band="4"] #fx-eye{opacity:.075;visibility:visible;--eyeb:15px}
+body[data-el=obs][data-band="5"] #fx-eye{opacity:.12;visibility:visible;--eyeb:10px}
+/* ===== asc — carne virando máquina: servo-travamento, aço frio, ferrugem =====
+   o medo aqui é a INTERFACE SE MOVENDO ERRADO. tudo abaixo trava animação e transição
+   DECORATIVA; input/textarea/select e o scroll ficam de fora — digitar é sempre imediato. */
+/* --srvstep: o tamanho do passo do servo. quanto mais alta a banda, menos passos = mais travado */
+body[data-el=asc][data-band="1"],body[data-el=asc][data-band="2"]{--srvstep:steps(4,end);--vib:0px}
+body[data-el=asc][data-band="3"]{--srvstep:steps(3,end);--vib:.35px}
+body[data-el=asc][data-band="4"]{--srvstep:steps(3,end);--vib:.5px}
+body[data-el=asc][data-band="5"]{--srvstep:steps(2,end);--vib:.75px}
+body[data-el=asc] .btn,body[data-el=asc] .tabs button,body[data-el=asc] .rseg,body[data-el=asc] .rec .stp,
+body[data-el=asc] .bar i,body[data-el=asc] .dropzone,body[data-el=asc] .sw,body[data-el=asc] .sc,
+body[data-el=asc] .doc,body[data-el=asc] #rollcard,body[data-el=asc] #whisper,body[data-el=asc] .toast,
+body[data-el=asc] .mtier,body[data-el=asc] .elc{transition-timing-function:var(--srvstep,ease)}
+/* a moldura: ferrugem na borda, aço polido por dentro — cresce com a banda */
+body[data-el=asc] .panel{border-image:repeating-linear-gradient(45deg,var(--ecd) 0 8px,var(--line) 8px 16px) 1;
+ box-shadow:inset 0 1px 0 rgba(198,214,228,calc(.03 + var(--band)*.03)),inset 0 -1px 0 rgba(0,0,0,calc(.22 + var(--band)*.08))}
+body[data-el=asc] .panel::before{content:"";position:absolute;inset:0;pointer-events:none;
+ background:linear-gradient(104deg,transparent 0 16%,rgba(200,216,230,calc(.004 + var(--band)*.011)) 25% 32%,transparent 41% 63%,rgba(200,216,230,calc(.003 + var(--band)*.008)) 70% 74%,transparent 82%)}
+/* o tremor do motor: a "pele" da ficha vibra em passos travados. sub-pixel, camada própria —
+   o texto é rasterizado uma vez e só se translada, então nada relayoutiza nem borra */
+body[data-el=asc][data-band="3"] .wrap{animation:srvvib .6s steps(1,end) infinite}
+body[data-el=asc][data-band="4"] .wrap{animation:srvvib .42s steps(1,end) infinite}
+body[data-el=asc][data-band="5"] .wrap{animation:srvvib .28s steps(1,end) infinite}
+@keyframes srvvib{0%{transform:translate3d(0,0,0)}25%{transform:translate3d(var(--vib,0px),calc(var(--vib,0px)*-.7),0)}
+ 50%{transform:translate3d(calc(var(--vib,0px)*-.8),calc(var(--vib,0px)*.5),0)}
+ 75%{transform:translate3d(calc(var(--vib,0px)*.4),var(--vib,0px),0)}100%{transform:translate3d(0,0,0)}}
+/* o servo: a junta que se reposiciona sozinha. o painel em uso (:focus-within) nunca se mexe */
+@keyframes servo{0%,88%{transform:none}90%{transform:translate(1px,-1px)}93%{transform:translate(-1px,0)}96%{transform:translate(1px,0)}100%{transform:none}}
+body[data-el=asc][data-band="2"] .panel:not(:focus-within),body[data-el=asc][data-band="3"] .panel:not(:focus-within),
+body[data-el=asc][data-band="4"] .panel:not(:focus-within),body[data-el=asc][data-band="5"] .panel:not(:focus-within){animation:servo 3.5s steps(1,end) infinite}
+body[data-el=asc] .panel:not(:focus-within):nth-of-type(2n){animation-delay:-1.2s}
+body[data-el=asc] .panel:not(:focus-within):nth-of-type(3n){animation-delay:-2.4s}
+body[data-el=asc][data-band="5"] .attr:not(:focus-within),body[data-el=asc][data-band="5"] .rec:not(:focus-within){animation:servo 4.4s steps(1,end) infinite}
+body[data-el=asc][data-band="5"] .attr:not(:focus-within):nth-child(2n),body[data-el=asc][data-band="5"] .rec:not(:focus-within):nth-child(2n){animation-delay:-1.9s}
+body[data-el=asc][data-band="5"] .attr:not(:focus-within):nth-child(3n),body[data-el=asc][data-band="5"] .rec:not(:focus-within):nth-child(3n){animation-delay:-3.3s}
+/* braço robótico parando: o conteúdo novo assenta com overshoot travado (só na troca de aba).
+   o shorthand vem depois dos delays do servo de propósito — zera o atraso negativo deles;
+   backwards segura o 0% durante o escalonamento abaixo, senão os painéis piscam antes de cair */
+body[data-el=asc] .asc-land .panel:not(:focus-within){animation:srvland .44s steps(3,end) backwards}
+body[data-el=asc] .asc-land .panel:not(:focus-within):nth-of-type(2n){animation-delay:.07s}
+body[data-el=asc] .asc-land .panel:not(:focus-within):nth-of-type(3n){animation-delay:.13s}
+@keyframes srvland{0%{transform:translateY(-7px);opacity:.2}40%{transform:translateY(3px);opacity:1}64%{transform:translateY(-2px)}82%{transform:translateY(1px)}100%{transform:none}}
+/* a pele que descasca: aço polido e trilha de circuito por baixo da superfície */
+.fx-peel{position:fixed;pointer-events:none;z-index:9;border-radius:2px;overflow:hidden;opacity:0;
+ background:repeating-linear-gradient(101deg,#22262b 0 5px,#3f474f 5px 8px,#14171a 8px 13px),
+  repeating-linear-gradient(0deg,rgba(150,200,214,.16) 0 1px,transparent 1px 6px);
+ box-shadow:inset 0 0 10px rgba(0,0,0,.85),0 0 0 1px rgba(190,206,220,.18);animation:ascpeel 1.05s steps(8,end)}
+@keyframes ascpeel{0%{opacity:0;clip-path:inset(0 100% 0 0)}16%{opacity:.9;clip-path:inset(0 10% 0 0)}
+ 68%{opacity:.85;clip-path:inset(0 6% 0 0)}100%{opacity:0;clip-path:inset(0 0 0 100%)}}
+/* a junta que emperra (força o mesmo fim de curso 3×) e o salto mecânico que se corrige */
+.fx-jam{animation:ascjam .62s steps(2,end)}
+@keyframes ascjam{0%{transform:none}18%{transform:translateX(3px)}30%{transform:translateX(2.2px)}44%{transform:translateX(3.4px)}
+ 56%{transform:translateX(2.4px)}70%{transform:translateX(3.6px)}82%{transform:translateX(2.6px)}100%{transform:none}}
+.fx-jolt{animation:ascjolt .5s steps(1,end)}
+@keyframes ascjolt{0%{transform:none}14%{transform:translate(5px,-3px)}44%{transform:translate(5px,-3px)}58%{transform:translate(-2px,1px)}76%{transform:translate(1px,0)}100%{transform:none}}
+/* pacto: linha de assinatura sob os títulos */
+body[data-el=pac][data-band="2"] .panel h2,body[data-el=pac][data-band="3"] .panel h2,body[data-el=pac][data-band="4"] .panel h2,body[data-el=pac][data-band="5"] .panel h2{border-bottom:1px solid var(--ecd);padding-bottom:5px}
+/* ===== pac — presença/intrusão: algo do outro lado responde, oferece e se aproxima =====
+   a respiração da vinheta é só opacity+transform numa camada própria: composita na GPU e
+   não repinta a tela inteira por frame (animar o box-shadow do #fx-vign faria isso).
+   o resto do Pacto é overlay efêmero criado pelo JS — nenhum deles toca em campo real */
+body[data-el=pac] #fx-vign::after{content:"";position:absolute;inset:-14%;pointer-events:none;
+ background:radial-gradient(ellipse at 50% 52%,transparent 40%,rgba(52,2,12,.42) 76%,rgba(28,0,6,.8) 100%);
+ opacity:0;will-change:opacity,transform}
+body[data-el=pac][data-band="3"] #fx-vign::after{--pk:.3;animation:pacresp 14s ease-in-out infinite}
+body[data-el=pac][data-band="4"] #fx-vign::after{--pk:.52;animation:pacresp 11s ease-in-out infinite}
+body[data-el=pac][data-band="5"] #fx-vign::after{--pk:.82;animation:pacresp 8s ease-in-out infinite}
+/* inspira devagar, segura, solta — algo grande respirando atrás do vidro */
+@keyframes pacresp{0%,100%{opacity:calc(var(--pk)*.3);transform:scale(1)}
+ 46%{opacity:var(--pk);transform:scale(1.05)}74%{opacity:calc(var(--pk)*.7);transform:scale(1.02)}}
+/* o botão que pede clique: só brilho, zero layout — e o onclick dele continua sendo só o dele */
+.pac-beg{animation:pacpede 2s ease-in-out}
+@keyframes pacpede{0%,100%{box-shadow:none}
+ 28%{box-shadow:0 0 0 1px var(--ecd),0 0 12px 1px var(--eglow)}
+ 55%{box-shadow:0 0 0 1px var(--ec),0 0 22px 4px var(--eglow)}
+ 82%{box-shadow:0 0 0 1px var(--ecd),0 0 12px 1px var(--eglow)}}
+/* o cursor fantasma: pisca num campo vazio que ninguém está usando. não é foco, é desenho */
+.pac-caret{position:fixed;pointer-events:none;z-index:9;color:var(--ec);font:14px/1 ui-monospace,Consolas,monospace;
+ text-shadow:0 0 7px var(--eglow);animation:pacpisca 1.06s steps(1,end) infinite}
+@keyframes pacpisca{0%,49%{opacity:.85}50%,100%{opacity:0}}
+/* a sugestão: a presença "completa" o que você parou de escrever — sobreposta, e some */
+.pac-sug{position:fixed;pointer-events:none;z-index:9;color:var(--ec);opacity:0;white-space:nowrap;line-height:1.25;
+ overflow:hidden;text-overflow:ellipsis;text-shadow:0 0 8px var(--eglow);animation:pacsug 1.5s ease-in-out}
+@keyframes pacsug{0%{opacity:0}20%{opacity:.55}68%{opacity:.5}100%{opacity:0}}
+/* o número que hesita: 150ms de sobreposição opaca — o input embaixo nunca é tocado */
+.pac-hes{position:fixed;pointer-events:none;z-index:9;overflow:hidden;white-space:nowrap;
+ display:flex;align-items:center;justify-content:center}
+/* O CORPO: canvas próprio da mão, da tinta e da mancha (geometria toda em JS — ver PACX).
+   ao contrário do jardim do Germe (z2, POR TRÁS dos painéis), este fica ACIMA da ficha (z7,
+   contra z5 do .wrap): a mão precisa pairar sobre o painel que ela quase toca, e a assinatura
+   que sobra é tinta SOBRE a folha, não algo enterrado atrás dela. o que torna isso seguro é
+   pointer-events:none + opacidade baixa + a regra sagrada (nada entra na zona em uso).
+   canvas separado do #fx-canvas de propósito: mão parada é geometria PARADA, e este canvas só
+   é repintado quando alguma coisa muda (PACX.dirty), não a cada frame. */
+#fx-pact{position:fixed;inset:0;pointer-events:none;z-index:7;opacity:0;visibility:hidden;transition:opacity 2s,visibility 2s}
+body[data-el=pac] #fx-pact{visibility:visible;opacity:calc(.24 + var(--band)*.075)}
+/* ===== ger — nojo e body-horror: a superfície fica ÚMIDA e ORGÂNICA =====
+   o asc trava em passos de servo; aqui é o contrário: tudo é mole, morno e escorrido.
+   o que custa por frame (respiração, inchaço) é só transform — composita na GPU.
+   o que é textura (musgo, membrana, brilho úmido) é estático: pinta uma vez e fica. */
+/* musgo nos cantos: agora com uma segunda mancha e um veio escuro de mofo por cima */
+body[data-el=ger] .panel::before{content:"";position:absolute;left:-30px;bottom:-30px;width:calc(40px + var(--band)*30px);height:calc(40px + var(--band)*30px);pointer-events:none;
+ background:radial-gradient(circle at 30% 70%,rgba(111,154,78,calc(.26 + var(--band)*.05)),transparent 70%),
+  radial-gradient(circle at 62% 44%,rgba(79,109,52,calc(.1 + var(--band)*.045)),transparent 62%)}
+body[data-el=ger][data-band="4"] .panel::after,body[data-el=ger][data-band="5"] .panel::after{content:"❋";position:absolute;right:8px;bottom:4px;color:var(--ecd);font-size:11px;opacity:.6}
+/* a membrana: borda que amolece e um brilho de coisa molhada por dentro. tudo estático */
+body[data-el=ger][data-band="3"] .panel,body[data-el=ger][data-band="4"] .panel,body[data-el=ger][data-band="5"] .panel{
+ border-radius:calc(4px + var(--band)*2.5px);border-color:rgba(111,154,78,calc(.16 + var(--band)*.08));
+ box-shadow:inset 0 2px 7px rgba(186,224,152,calc(.012 + var(--band)*.012)),
+  inset 0 calc(var(--band)*-3px) calc(var(--band)*9px) rgba(41,64,26,calc(.08 + var(--band)*.06))}
+body[data-el=ger][data-band="5"] .panel h2{text-shadow:0 1px 5px rgba(111,154,78,.4)}
+/* a respiração orgânica: mole, lenta e fora de compasso entre painéis. sub-pixel, só scale */
+body[data-el=ger][data-band="4"] .panel:not(:focus-within):not(:hover):not(.ger-swell){animation:gerresp 7.4s ease-in-out infinite}
+body[data-el=ger][data-band="5"] .panel:not(:focus-within):not(:hover):not(.ger-swell){animation:gerresp 5.6s ease-in-out infinite}
+body[data-el=ger] .panel:nth-of-type(2n){animation-delay:-2.3s}
+body[data-el=ger] .panel:nth-of-type(3n){animation-delay:-4.1s}
+@keyframes gerresp{0%,100%{transform:scale(1)}52%{transform:scale(1.004,1.006)}}
+/* o inchaço: algo se remexe por baixo do painel e assenta. irregular de propósito —
+   :not(.ger-swell) acima tira a respiração do caminho, então não há briga de specificity */
+body[data-el=ger] .panel.ger-swell{animation:gerincha 2.6s ease-in-out}
+@keyframes gerincha{0%,100%{transform:scale(1)}
+ 26%{transform:scale(1.009,1.015)}48%{transform:scale(1.004,1.007)}72%{transform:scale(1.012,1.021)}}
+/* a cicatriz: você arrancou o texto, e a borda de baixo do campo abre e fecha em cima disso.
+   fica na aresta inferior — nunca por cima do que você está escrevendo */
+.ger-scar{position:fixed;pointer-events:none;z-index:9;border-radius:5px;opacity:0;transform-origin:20% 50%;
+ background:linear-gradient(90deg,transparent,rgba(141,187,98,.62) 18%,rgba(176,214,132,.5) 42%,rgba(79,109,52,.55) 74%,transparent),
+  radial-gradient(ellipse at 38% 50%,rgba(200,230,170,.4),transparent 65%);
+ box-shadow:0 0 9px rgba(111,154,78,.45),inset 0 0 5px rgba(30,52,18,.6);animation:gercic 1.25s ease-in-out}
+@keyframes gercic{0%{opacity:0;transform:scaleX(.16)}20%{opacity:.92;transform:scaleX(1)}
+ 62%{opacity:.78;transform:scaleX(.97)}100%{opacity:0;transform:scaleX(.05)}}
+/* O JARDIM: canvas próprio, ATRÁS da interface (z2, contra z5 do .wrap). as vinhas crescem
+   por trás dos painéis e por fora deles — a geometria é toda JS (ver VIN), aqui só a camada.
+   canvas separado do #fx-canvas de propósito: vinha madura é geometria PARADA, e este canvas
+   só é repintado quando alguma coisa muda (VIN.dirty), não a cada frame. */
+#fx-vines{position:fixed;inset:0;pointer-events:none;z-index:2;opacity:0;visibility:hidden;transition:opacity 2.2s,visibility 2.2s}
+body[data-el=ger] #fx-vines{visibility:visible;opacity:calc(.34 + var(--band)*.13)}
+/* e o painel deixa passar o que cresce atrás dele: o vidro embaça, o texto continua opaco em
+   cima. sem isto as vinhas morreriam sob os painéis e o jardim não cercaria nada */
+body[data-el=ger]:not(.calm) .wrap .panel{background:rgba(24,20,15,calc(.95 - var(--band)*.032))}
+/* vazio: a interface só existe enquanto você olha direto para ela — some devagar, volta na hora.
+   :hover e :focus-within nunca esmaecem, então a área em uso é sempre a mais sólida da tela */
+body[data-el=vaz] .panel{transition:opacity 1.6s ease-out,filter 1.6s ease-out}
+body[data-el=vaz] .tabs button{transition:opacity 1.6s ease-out,color .2s,border-color .2s}
+body[data-el=vaz] .panel:hover,body[data-el=vaz] .panel:focus-within{transition:opacity .16s,filter .16s}
+body[data-el=vaz] .tabs button:hover{transition:opacity .16s,color .2s,border-color .2s}
+body[data-el=vaz][data-band="1"] .panel:not(:hover):not(:focus-within),body[data-el=vaz][data-band="2"] .panel:not(:hover):not(:focus-within){opacity:.9}
+body[data-el=vaz][data-band="3"] .panel:not(:hover):not(:focus-within){opacity:.65;filter:saturate(.55)}
+body[data-el=vaz][data-band="4"] .panel:not(:hover):not(:focus-within){opacity:.55;filter:saturate(.4)}
+body[data-el=vaz][data-band="5"] .panel:not(:hover):not(:focus-within){opacity:.35;filter:saturate(.22)}
+body[data-el=vaz][data-band="1"] .tabs button:not(.active):not(:hover),body[data-el=vaz][data-band="2"] .tabs button:not(.active):not(:hover){opacity:.78}
+body[data-el=vaz][data-band="3"] .tabs button:not(.active):not(:hover),body[data-el=vaz][data-band="4"] .tabs button:not(.active):not(:hover){opacity:.5}
+body[data-el=vaz][data-band="5"] .tabs button:not(.active):not(:hover){opacity:.3}
+body[data-el=vaz][data-band="4"] #fx-void{opacity:.55;visibility:visible}
+body[data-el=vaz][data-band="5"] #fx-void{opacity:.85;visibility:visible}
+/* colapso 17–20: perturbador, nunca bloqueante */
+body[data-band="5"] h1{animation:aberra 4s steps(3) infinite}
+@keyframes aberra{0%,94%{text-shadow:none}96%{text-shadow:-2px 0 var(--red),2px 0 var(--ec)}98%{text-shadow:2px 0 var(--red),-2px 0 var(--ec)}}
+body[data-band="5"] .panel h2:not(:hover){filter:blur(.4px)}
+body[data-band="5"] .panel h2:hover,body[data-band="5"] h1:hover{animation:none;filter:none}
+/* calmar / reduced motion */
+body.calm *,body.calm *::before,body.calm *::after{animation:none!important;transition:none!important}
+body.calm #fx-canvas,body.calm #whisper,body.calm #fx-eye,body.calm #fx-tunnel,body.calm .fx-flash,body.calm #fx-void,body.calm #fx-black,body.calm .fx-ghost,body.calm .fx-peel,
+body.calm .pac-caret,body.calm .pac-sug,body.calm .pac-hes,body.calm #fx-vign::after,body.calm .ger-scar,body.calm #fx-vines,body.calm #fx-pact{display:none}
+body.calm[data-el=vaz] .panel,body.calm[data-el=vaz] .tabs button{opacity:1!important;filter:none!important}
+body.calm[data-el=eco] h1,body.calm[data-el=eco] .panel h2{text-shadow:calc(var(--band)*1.2px) calc(var(--band)*1.2px) 0 rgba(127,184,168,.35)!important}
+body.calm[data-el=eco] .hx,body.calm[data-el=eco] .hint,body.calm[data-el=eco] label{text-shadow:none!important}
+/* asc: o servo destrava — movimento fluido de volta, sem resíduo de transform */
+body.calm[data-el=asc] .wrap,body.calm[data-el=asc] .panel,body.calm[data-el=asc] .attr,body.calm[data-el=asc] .rec,
+body.calm[data-el=asc] .panel h2,body.calm[data-el=asc] label,body.calm[data-el=asc] .hint{transform:none!important}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}
+ #fx-canvas,#fx-eye,#fx-tunnel,.fx-flash,#fx-void,#fx-black,.fx-ghost,.fx-peel,.pac-caret,.pac-sug,.pac-hes,#fx-vign::after,.ger-scar,#fx-vines,#fx-pact{display:none}
+ body[data-el=ger] .wrap .panel{background:var(--panel)!important}
+ body[data-el=vaz] .panel,body[data-el=vaz] .tabs button{opacity:1!important;filter:none!important}
+ body[data-el=eco] h1,body[data-el=eco] .panel h2{text-shadow:calc(var(--band)*1.2px) calc(var(--band)*1.2px) 0 rgba(127,184,168,.35)!important}
+ body[data-el=eco] .hx,body[data-el=eco] .hint,body[data-el=eco] label{text-shadow:none!important}
+ body[data-el=asc] .wrap,body[data-el=asc] .panel,body[data-el=asc] .attr,body[data-el=asc] .rec,
+ body[data-el=asc] .panel h2,body[data-el=asc] label,body[data-el=asc] .hint{transform:none!important}}
+@media(max-width:640px){h1{font-size:20px;letter-spacing:5px}.wrap{padding:10px 10px 50px}.elc{width:100%}}
+
