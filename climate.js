@@ -21,7 +21,7 @@ function applyTheme(){const b=bandOf(S.ruido||0);
 let FX={run:false,q:false,ps:[],last:0};
 function syncFX(){const b=bandOf(S.ruido||0);const want=!!S.elem&&b>0&&!S.ui.calm&&!document.hidden;
  if(want&&!FX.run){FX.run=true;fxKick();}if(!want){FX.run=false;const cv=$("fx-canvas");if(cv){const x=cv.getContext&&cv.getContext("2d");if(x)x.clearRect(0,0,cv.width,cv.height);}}
- scopoSync();vazioSync();ecoSync();ascSync();pacSync();gerSync();
+ scopoSync();vazSync();ecoSync();ascSync();pacSync();gerSync();
  fxTrigSync();} /* por último: ele compara o retrato de antes com o estado já assentado */
 /* FX.q garante um único rAF pendente: desligar e religar no mesmo frame não duplica o loop */
 function fxKick(){if(FX.q)return;FX.q=true;rAF(fxTick);}
@@ -33,7 +33,7 @@ function fxTick(t){FX.q=false;if(!FX.run)return;const cv=$("fx-canvas");if(!cv)r
  FX.ps=FX.ps.filter(p=>{p.life+=1;p.x+=p.vx;p.y+=p.vy;const a=Math.sin(Math.PI*Math.min(1,p.life/p.max));
   if(p.life>=p.max)return false;ctx.globalAlpha=a*p.op;fxDraw(ctx,el,p);ctx.globalAlpha=1;return true;});
  if(FX.ps.length>alvo)FX.ps.length=alvo;
- eyeStep(t);voidStep(t);ClimateEffect.tickAll(t);pacTick(t);
+ eyeStep(t);ClimateEffect.tickAll(t);pacTick(t);
  fxKick();}
 function fxNew(el,cv){const W=cv.width,H=cv.height,r=Math.random;
  const base={x:r()*W,y:r()*H,vx:(r()-.5)*.2,vy:(r()-.5)*.2,life:0,max:240+r()*240,op:.16,s:4+r()*7};
@@ -346,7 +346,7 @@ function flashSched(){clearTimeout(_ft);_ft=setTimeout(()=>{flashNow();flashSche
 /* --- a presença: Web Audio, só depois de um gesto do usuário e com o mute desligado ---
    o contexto é compartilhado; cada elemento tem suas próprias vozes, todas em ganho 0 */
 let AUD={ctx:null,gain:null,ogain:null,vgain:null,eg:null,agn:null,pgn:null,ggn:null,gest:false,on:false,von:false,eon:false,aon:false,pon:false,gon:false,timer:null,vtimer:null,etimer:null,atimer:null,ptimer:null,gtimer:null};
-function audGesture(){if(AUD.gest)return;AUD.gest=true;scopoSync();vazioSync();ecoSync();ascSync();pacSync();gerSync();}
+function audGesture(){if(AUD.gest)return;AUD.gest=true;scopoSync();vazSync();ecoSync();ascSync();pacSync();gerSync();}
 ["pointerdown","keydown","touchstart"].forEach(ev=>addEventListener(ev,audGesture,{once:true,passive:true}));
 function audBuild(){if(AUD.ctx)return true;
  const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return false;
@@ -427,54 +427,390 @@ function scopoSync(){const b=bandOf(S.ruido||0),on=scopoOn()&&!document.hidden;
  audSync(on&&b>=4&&!S.ui.mute,b);}
 
 /* ============ HORROR CÓSMICO — elemento Vazio ============
-   onde a escopofobia acrescenta, o Vazio subtrai: a interface, a cor e o som vão embora.
-   o esvaecimento é CSS puro (grátis); aqui ficam só o buraco, o apagão e o vácuo auditivo. */
-const vazioOn=min=>S.elem==="vaz"&&bandOf(S.ruido||0)>=(min||1)&&!S.ui.calm&&!RM()&&!document.hidden;
+   onde a escopofobia ACRESCENTA (um olho, um vulto, uma frase a mais), o Vazio SUBTRAI. e
+   agora subtrai de verdade, em seis camadas que conversam entre si:
 
-/* --- o buraco que vagueia: duas senoides lentas de períodos diferentes, sem estado a manter --- */
-function voidStep(t){if(!vazioOn(4))return;
- const w=$("fx-void"),i=w&&w.firstElementChild;if(!i)return;
- const x=innerWidth*(.5+.42*Math.sin(t*3.1e-5)+.07*Math.sin(t*1.07e-4));
- const y=innerHeight*(.5+.38*Math.cos(t*2.4e-5)+.08*Math.cos(t*8.9e-5));
- i.style.transform=`translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0)`;}
+   1. BURACOS QUE ENGOLEM  — preto absoluto com o horizonte em degradê. deslizam das bordas
+      para dentro, PUXAM e dissolvem as partículas do #fx-canvas, CRESCEM quando você fica
+      parado e RECUAM perto do cursor. banda 1: um mínimo, num canto. banda 5: vários, grandes.
+   2. ESTRELAS QUE SE APAGAM — um céu de pontos parados demais que se apagam um a um e nunca
+      voltam na mesma proporção: o céu só rareia. e, só na banda 5 e com minutos de carência,
+      A FORMA VASTA — sem olho, sem rosto, no limiar da percepção: só uma região por onde as
+      estrelas somem ao passar, e da qual dá para duvidar depois.
+   3. DISTORÇÃO DO ESPAÇO — perto de um buraco o céu entorta na radial, e um trecho de texto
+      REAL estica na direção dele e volta inteiro (transform CSS, sempre reversível).
+   4. SUBTRAÇÃO DE MATÉRIA — pedaços da interface piscam para fora por instantes. NUNCA sai do
+      DOM, nunca encosta em .value nem em S — e os contadores essenciais (Vida, Fôlego,
+      Sintonia, Lucidez e suas barras) são território proibido inteiro.
+   5. O SILÊNCIO QUE CORTA — o drone que você não nota é cortado para você sentir a falta. até
+      a banda 4 ele só AFUNDA (o ar continua); na 5 o corte é ABSOLUTO, e dura mais.
+   6. REATIVIDADE — o Vazio agora RESPONDE (TRIG.vaz/TRIGFX.vaz): o ócio faz os buracos
+      avançarem e o ar abafar, apagar/gastar recebe a frase de dispensa, e há o teletransporte
+      curto — algo muda de lugar, mas nunca sob o seu olhar.
 
-/* --- o apagão: vislumbre do nada, banda 5 e raro --- */
-let _bt=null,_bto=null;
-function blackClear(){clearTimeout(_bto);_bto=null;const b=$("fx-black");if(b)b.classList.remove("on");}
-function blackNow(){const el=$("fx-black");if(!el||!vazioOn(5))return;
- if($("modal").classList.contains("on"))return;
- const a=document.activeElement,tg=a&&a.tagName;
- if(tg==="INPUT"||tg==="TEXTAREA"||tg==="SELECT"||(a&&a.isContentEditable))return; /* nunca durante edição */
- el.classList.remove("on");void el.offsetWidth; /* reinicia a animação */
- el.classList.add("on");
- _bto=setTimeout(()=>{el.classList.remove("on");_bto=null;},280);}
-function blackSched(){clearTimeout(_bt);_bt=setTimeout(()=>{blackNow();blackSched();},25000+Math.random()*25000);}
+   o esvaecimento dos painéis por banda continua sendo CSS puro (grátis) — e é justamente ele
+   que deixa o canvas, que fica ATRÁS da interface, aparecer por trás dos painéis. o gate do
+   elemento é a regra 4 da base, sem cópia local: VAZ é o ClimateEffect do Vazio. */
+const vazModal=()=>$("modal").classList.contains("on");
 
-/* --- o vácuo auditivo: um drone que você não nota, cortado a seco para você sentir o silêncio --- */
+const VHOL=[0,1,1,2,3,5];              /* buracos simultâneos por banda */
+const VHR =[0,30,46,74,116,190];       /* raio visual maduro (o miolo preto é ~46% disto) */
+const VSTR=[0,26,38,54,74,96];         /* estrelas do céu, por banda */
+
+/* o Vazio É um ClimateEffect: canvas, cursor, zona proibida, gate, loop, teardown e áudio vêm
+   da base; o que está declarado aqui embaixo é só o que é do Vazio */
+const VAZ=new ClimateEffect({id:"vaz",cv:"fx-void",zr:120,pad:26,
+ timers:["subT","subRm","strSch","strT","vastT","mufT","retT"],
+ state:{hl:[],st:[],vast:null,lb:-1,cut:0,muf:0,tp:-1e9,pux:-1e9,
+  subT:null,subRm:null,subEl:null,strSch:null,strT:null,strEl:null,vastT:null,mufT:null,retT:null},
+ /* já entra com céu e com o primeiro buraco: o Vazio nunca começa cheio de nada */
+ mount(){const b=bandOf(S.ruido||0);VAZ.lb=b;
+  vazSemear(VSTR[b]);
+  for(let i=0;i<Math.min(2,VHOL[b]);i++)vazBuraco(b,true);
+  vazSubSched();vazStrSched();vazVastSched();VAZ.dirty=true;},
+ /* regra 6 — nada sobra: nem buraco, nem estrela, nem classe pendurada em texto de verdade */
+ tear(){VAZ.hl.length=0;VAZ.st.length=0;VAZ.vast=null;VAZ.lb=-1;VAZ.cut=0;VAZ.muf=0;
+  vazSubClear();vazStrClear();},
+ /* só na MUDANÇA de banda: se isto rodasse a cada syncFX (todo clique dispara um), o céu se
+    repovoaria sozinho e nunca chegaria a rarear — que é o efeito inteiro da camada 2 */
+ band(b){if(b===VAZ.lb)return;VAZ.lb=b;
+  while(VAZ.hl.length>VHOL[b])VAZ.hl.pop();
+  for(const h of VAZ.hl)if(h.r0>VHR[b])h.r0=VHR[b];
+  while(VAZ.st.length>VSTR[b])VAZ.st.pop();
+  if(VAZ.st.length<VSTR[b])vazSemear(VSTR[b]-VAZ.st.length,true);
+  if(b<5&&VAZ.vast)VAZ.vast=null;
+  VAZ.dirty=true;},
+ step:vazStep,draw:vazDraw,
+ /* o vácuo auditivo: o grafo (dois senos batendo em 44Hz) é do audBuild; o nível, o corte e
+    o abafamento são do Vazio. subir e decair o ganho é a regra 6 da base */
+ aud:{gain:"vgain",flag:"von",timer:"vtimer",fade:.5,tc:1.4,
+  lvl:b=>vazNivel(b),tick:()=>vazCut(),first:()=>(10+Math.random()*10)*1000}});
+
+/* ---------- camada 1: OS BURACOS QUE ENGOLEM ---------- */
+/* nascem numa borda e vêm para dentro. na banda baixa é um ponto quieto num canto; da 3 em
+   diante eles ATRAVESSAM a tela, e é isso que faz a sensação de avanço */
+function vazBuraco(b,jaCrescido){const W=VAZ.W,H=VAZ.H,r=Math.random;
+ if(VAZ.hl.length>=VHOL[b])return null;
+ const R=VHR[b]*(.55+r()*.7);
+ let x,y,vx,vy;
+ if(b<=2){const cx=r()<.5,cy=r()<.5;      /* um canto, e ele quase não anda */
+  x=cx?R*.55:W-R*.55;y=cy?R*.6:H-R*.6;
+  vx=(cx?1:-1)*(.002+r()*.003);vy=(cy?1:-1)*(.002+r()*.002);}
+ else{const e=Math.floor(r()*4);          /* de uma borda, avançando para o miolo */
+  if(e===0)     {x=-R*.4;      y=H*(.1+r()*.8);vx= .009+r()*.011;vy=(r()-.5)*.006;}
+  else if(e===1){x=W+R*.4;     y=H*(.1+r()*.8);vx=-.009-r()*.011;vy=(r()-.5)*.006;}
+  else if(e===2){x=W*(.1+r()*.8);y=H+R*.4;    vx=(r()-.5)*.006;  vy=-.009-r()*.011;}
+  else          {x=W*(.1+r()*.8);y=-R*.4;     vx=(r()-.5)*.006;  vy= .009+r()*.011;}}
+ const h={x,y,px:x,py:y,r:jaCrescido?R*.4:1,r0:R,g:1,vx,vy};
+ VAZ.hl.push(h);VAZ.dirty=true;return h;}
+/* o passo: deslizar, crescer no ócio, recuar do cursor. a repintura só é pedida a cada ~0,6px
+   percorrido — o Vazio é lento de propósito, e não paga um frame cheio para andar 0,2px */
+function vazBuracoStep(dt,b,parado){
+ for(let i=VAZ.hl.length-1;i>=0;i--){const h=VAZ.hl[i];
+  h.x+=h.vx*dt;h.y+=h.vy*dt;
+  if(Math.abs(h.x-h.px)+Math.abs(h.y-h.py)>.6){h.px=h.x;h.py=h.y;VAZ.dirty=true;}
+  /* REGRA SAGRADA: onde você está, nada engole. ele murcha até zero e ainda é empurrado
+     para longe do cursor — e volta ao tamanho sozinho quando você sai de perto */
+  let tgt=h.r0*h.g*(parado?1.3:1);
+  if(VAZ.forbBox({l:h.x-h.r,r:h.x+h.r,t:h.y-h.r,b:h.y+h.r})){tgt=0;
+   const dx=h.x-VAZ.mx,dy=h.y-VAZ.my,l=Math.hypot(dx,dy)||1;
+   h.x+=dx/l*.05*dt;h.y+=dy/l*.05*dt;VAZ.dirty=true;}
+  const k=Math.min(1,(tgt>h.r?.0002:.0025)*dt);  /* cresce devagar, recua depressa */
+  const nr=h.r+(tgt-h.r)*k;
+  if(Math.abs(nr-h.r)>.05){h.r=nr;VAZ.dirty=true;}
+  const F=h.r0*2;
+  if(h.x<-F||h.x>VAZ.W+F||h.y<-F||h.y>VAZ.H+F){VAZ.hl.splice(i,1);VAZ.dirty=true;}}
+ if(VAZ.hl.length<VHOL[b]&&Math.random()<.00012*dt)vazBuraco(b);}
+/* --- ENGOLIR: as partículas do #fx-canvas que chegam perto são puxadas em espiral, encolhem
+   ao cruzar o horizonte e não voltam. só toca vx/vy/s/op da partícula: o filtro do fxTick
+   descarta a que teve a vida encerrada, no mesmo frame --- */
+function vazEngolir(){if(!VAZ.hl.length||!FX.ps.length)return;
+ for(const p of FX.ps){
+  for(const h of VAZ.hl){if(h.r<6)continue;
+   const dx=h.x-p.x,dy=h.y-p.y,R=h.r*3.2,d2=dx*dx+dy*dy;
+   if(d2>R*R)continue;
+   const d=Math.sqrt(d2)||1,f=1-d/R,nx=dx/d,ny=dy/d;
+   /* amortecido: a queda tem velocidade terminal em vez de virar um estilingue */
+   p.vx=p.vx*.94+(nx*f*f*.09-ny*f*.03);
+   p.vy=p.vy*.94+(ny*f*f*.09+nx*f*.03);
+   if(d<h.r*.46){p.s*=.86;p.op*=.8;              /* cruzou o horizonte: escala→0 e apaga */
+    if(p.s<.7||d<h.r*.18)p.life=p.max;}
+   break;}}}
+/* preto absoluto no miolo; o horizonte não tem linha, tem degradê. o anel na cor do elemento
+   é o pouco que ainda circula na beirada, e só existe quando o buraco já é grande */
+function vazBuracoDraw(c,h){const R=h.r;if(R<1.2)return;
+ const g=c.createRadialGradient(h.x,h.y,0,h.x,h.y,R);
+ g.addColorStop(0,"rgba(0,0,0,1)");
+ g.addColorStop(.46,"rgba(0,0,0,1)");
+ g.addColorStop(.58,"rgba(1,2,6,.8)");
+ g.addColorStop(.74,"rgba(2,3,9,.42)");
+ g.addColorStop(.89,"rgba(2,3,9,.14)");
+ g.addColorStop(1,"rgba(2,3,9,0)");
+ c.fillStyle=g;c.beginPath();c.arc(h.x,h.y,R,0,6.2832);c.fill();
+ if(R>26){c.globalAlpha=Math.min(.42,(R-26)/150);
+  c.strokeStyle=VAZ.cor(.66,.55);c.lineWidth=Math.max(.6,R*.011);
+  c.beginPath();c.arc(h.x,h.y,R*.5,0,6.2832);c.stroke();c.globalAlpha=1;}}
+
+/* ---------- camada 2: O CÉU QUE SE APAGA ---------- */
+/* pontos PARADOS: não cintilam, não derivam. é a imobilidade que os torna errados */
+function vazSemear(n,extra){const r=Math.random;
+ if(!extra)VAZ.st.length=0;
+ for(let i=0;i<n;i++)VAZ.st.push({x:r()*VAZ.W,y:r()*VAZ.H,s:.6+r()*1.5,a:.18+r()*.5,al:1,d:0,up:0});
+ VAZ.dirty=true;}
+function vazCeuStep(dt,b){const n=VSTR[b];
+ let viv=0;for(const s of VAZ.st)if(!s.d)viv++;
+ /* uma se apaga de vez em quando (~1 a cada 16s), e volta gente numa fração do que foi —
+    o piso em 28% só existe para o céu não zerar e a camada 3 não ficar sem o que entortar */
+ if(viv>Math.max(3,Math.round(n*.28))&&Math.random()<.00006*dt){
+  const c=[];for(const s of VAZ.st)if(!s.d)c.push(s);
+  c[Math.floor(Math.random()*c.length)].d=1;}
+ if(VAZ.st.length<n&&Math.random()<.00002*dt){const r=Math.random;
+  VAZ.st.push({x:r()*VAZ.W,y:r()*VAZ.H,s:.6+r()*1.5,a:.18+r()*.5,al:0,d:0,up:1});VAZ.dirty=true;}
+ for(let i=VAZ.st.length-1;i>=0;i--){const s=VAZ.st[i];
+  if(s.d){s.al-=dt*.0016;VAZ.dirty=true;   /* fade curto: em ~0,6s ela nunca esteve ali */
+   if(s.al<=0)VAZ.st.splice(i,1);}
+  else if(s.up&&s.al<1){s.al=Math.min(1,s.al+dt*.0004);VAZ.dirty=true;}}}
+
+/* --- A FORMA VASTA: banda 5, carência de 3 a 6 minutos, e uma travessia de quase um minuto.
+   sem olho, sem rosto, sem borda: o desenho dela está no limiar da percepção de propósito, e
+   o que você percebe de verdade é indireto — as estrelas somem por onde ela passa --- */
+function vazVast(){if(!VAZ.on||bandOf(S.ruido||0)<5||VAZ.vast)return;
+ const r=Math.random,W=VAZ.W,H=VAZ.H,R=Math.min(W,H)*(.62+r()*.5),esq=r()<.5;
+ VAZ.vast={x:esq?-R*1.15:W+R*1.15,y:H*(.2+r()*.6),r:R,
+  vx:(esq?1:-1)*(W+R*2.4)/52000,vy:(r()-.5)*.004};
+ VAZ.dirty=true;}
+function vazVastSched(){clearTimeout(VAZ.vastT);VAZ.vastT=null;
+ if(!VAZ.on)return;
+ VAZ.vastT=setTimeout(()=>{VAZ.vastT=null;vazVast();vazVastSched();},(180+Math.random()*180)*1000);}
+function vazVastStep(dt){const V=VAZ.vast;if(!V)return;
+ V.x+=V.vx*dt;V.y+=V.vy*dt;VAZ.dirty=true;
+ if(V.vx>0?V.x>VAZ.W+V.r*1.2:V.x<-V.r*1.2)VAZ.vast=null;}
+/* a oclusão: a estrela dentro dela simplesmente não está mais lá enquanto ela passa */
+function vazOcl(x,y){const V=VAZ.vast;if(!V)return 1;
+ const dx=(x-V.x)/V.r,dy=(y-V.y)/(V.r*.72),d=Math.sqrt(dx*dx+dy*dy);
+ return d>=1?1:(d<.8?0:(d-.8)*5);}
+function vazVastDraw(c){const V=VAZ.vast;
+ const g=c.createRadialGradient(V.x,V.y,V.r*.2,V.x,V.y,V.r);
+ g.addColorStop(0,"rgba(0,0,0,.085)");g.addColorStop(.72,"rgba(0,0,0,.05)");
+ g.addColorStop(1,"rgba(0,0,0,0)");
+ c.fillStyle=g;c.beginPath();c.ellipse(V.x,V.y,V.r,V.r*.72,0,0,6.2832);c.fill();}
+
+/* ---------- camada 3: A DISTORÇÃO DO ESPAÇO ---------- */
+/* o céu entorta perto do que engole. é só DESENHO: a posição verdadeira da estrela nunca muda,
+   então ela volta ao lugar sozinha quando o buraco passa */
+function vazWarp(sx,sy,out){let x=sx,y=sy;
+ for(const h of VAZ.hl){if(h.r<6)continue;
+  const dx=x-h.x,dy=y-h.y,R=h.r*3.4,d=Math.hypot(dx,dy)||1;
+  if(d>R)continue;
+  const f=1-d/R,k=h.r*.5*f*f/d;
+  x-=dx*k;y-=dy*k;}
+ out[0]=x;out[1]=y;}
+/* e a distorção alcança o TEXTO: um trecho real perto de um buraco estica na direção dele e
+   volta inteiro. nunca o campo em edição, nunca o que está sob o cursor (vazAlvos cuida) */
+function vazStrClear(){clearTimeout(VAZ.strT);VAZ.strT=null;
+ const el=VAZ.strEl;VAZ.strEl=null;if(!el)return;
+ el.style.transform="";el.classList.remove("vaz-str");}
+function vazStretch(){vazStrClear();
+ if(!VAZ.on||bandOf(S.ruido||0)<4||vazModal()||!VAZ.hl.length)return;
+ /* transform desloca o alvo do CLIQUE junto com o desenho: entortar só vale para texto morto.
+    o que é clicável fica para a camada 4, que mexe em opacidade e não move nada de lugar */
+ const cand=vazAlvos().filter(p=>!vazClic(p[0]));if(!cand.length)return;
+ /* o alvo tem que estar PERTO de um buraco: quem entorta é a gravidade dele, não o acaso */
+ let alvo=null,bd=1e9,bh=null;
+ for(const p of cand){const cx=(p[1].left+p[1].right)/2,cy=(p[1].top+p[1].bottom)/2;
+  for(const h of VAZ.hl){if(h.r<20)continue;
+   const d=Math.hypot(cx-h.x,cy-h.y);
+   if(d<bd&&d<h.r*3.2){bd=d;alvo=p;bh=h;}}}
+ if(!alvo)return;
+ const el=alvo[0],r=alvo[1],cx=(r.left+r.right)/2,cy=(r.top+r.bottom)/2;
+ const ang=Math.atan2(bh.y-cy,bh.x-cx),f=Math.min(.5,(1-bd/(bh.r*3.2))*.6);
+ el.classList.add("vaz-str");
+ el.style.transform=`translate(${(Math.cos(ang)*bh.r*.11).toFixed(1)}px,${(Math.sin(ang)*bh.r*.08).toFixed(1)}px) `+
+  `scale(${(1+f*.42).toFixed(3)},${(1-f*.3).toFixed(3)}) skewX(${(Math.cos(ang)*f*10).toFixed(2)}deg)`;
+ VAZ.strEl=el;
+ /* fase 2: solta e deixa a transição do .vaz-str trazer de volta, e só então tira a classe */
+ VAZ.strT=setTimeout(()=>{VAZ.strT=null;
+  if(VAZ.strEl!==el)return;
+  el.style.transform="";
+  VAZ.strT=setTimeout(()=>{VAZ.strT=null;
+   if(VAZ.strEl===el){VAZ.strEl=null;el.classList.remove("vaz-str");}},1200);},1100+Math.random()*700);}
+function vazStrSched(){clearTimeout(VAZ.strSch);VAZ.strSch=null;
+ if(!VAZ.on)return;
+ const b=bandOf(S.ruido||0),iv=b>=5?(16+Math.random()*14):(26+Math.random()*24);
+ VAZ.strSch=setTimeout(()=>{VAZ.strSch=null;vazStretch();vazStrSched();},iv*1000);}
+
+/* ---------- camada 4: A SUBTRAÇÃO DE MATÉRIA ---------- */
+/* os alvos possíveis: texto de verdade, nunca o que você está usando — e NUNCA os contadores
+   essenciais. um .rec que contenha um input de "atual" (cur_ na ficha, scur_ na sessão, mcur_
+   nos medidores) é território proibido INTEIRO: Vida, Fôlego, Sintonia, Lucidez e as barras
+   deles ficam onde estão, sempre. eles são o que você precisa ler no meio de uma cena. */
+const VAZSEL=".hx,.panel h2,.hint,label,.tabs button";
+const VAZREC='input[id^="cur_"],input[id^="scur_"],input[id^="mcur_"]';
+const vazClic=el=>el.matches("button,a,input,select,textarea")||!!el.querySelector("button,a");
+function vazAlvos(){const out=[];
+ document.querySelectorAll(VAZSEL).forEach(el=>{
+  if(el.querySelector("input,textarea,select"))return;
+  const rec=el.closest&&el.closest(".rec");
+  if(rec&&rec.querySelector(VAZREC))return;      /* os números essenciais nunca somem */
+  if(el.matches(":hover"))return;
+  const a=document.activeElement;
+  if(a&&a!==document.body&&(el===a||el.contains(a)))return;
+  if(!el.textContent.trim())return;
+  const r=el.getBoundingClientRect();
+  if(r.width<44||r.height<9||r.height>90||r.top<4||r.bottom>innerHeight-4)return;
+  if(VAZ.forbBox({l:r.left,r:r.right,t:r.top,b:r.bottom}))return;
+  out.push([el,r]);});
+ return out;}
+function vazSubClear(){clearTimeout(VAZ.subRm);VAZ.subRm=null;
+ const el=VAZ.subEl;VAZ.subEl=null;if(!el)return;
+ el.classList.remove("vaz-sub","vaz-cut");el.style.removeProperty("--vzd");}
+function vazSub(){vazSubClear();
+ if(!VAZ.on||bandOf(S.ruido||0)<3||vazModal())return;
+ const cand=vazAlvos();if(!cand.length)return;
+ const el=cand[Math.floor(Math.random()*cand.length)][0];
+ const dur=.2+Math.random()*.4;
+ /* clip-path também recorta o CLIQUE: o que é clicável só pode piscar por opacidade, que não
+    tira o alvo do lugar nem por um frame */
+ el.style.setProperty("--vzd",dur.toFixed(2)+"s");
+ el.classList.add(!vazClic(el)&&Math.random()<.45?"vaz-cut":"vaz-sub");
+ VAZ.subEl=el;
+ VAZ.subRm=setTimeout(vazSubClear,Math.round(dur*1000)+220);}
+function vazSubSched(){clearTimeout(VAZ.subT);VAZ.subT=null;
+ if(!VAZ.on)return;
+ const b=bandOf(S.ruido||0),iv=b>=5?(7+Math.random()*8):(b>=4?(12+Math.random()*12):(20+Math.random()*20));
+ VAZ.subT=setTimeout(()=>{VAZ.subT=null;vazSub();vazSubSched();},iv*1000);}
+
+/* ---------- camada 5: O SILÊNCIO QUE CORTA ---------- */
 const vazLvl=b=>b>=5?.014:.009;
-function vazAudOff(){clearTimeout(AUD.vtimer);AUD.vtimer=null;AUD.von=false;
- if(!AUD.ctx)return;try{const t=AUD.ctx.currentTime;
-  AUD.vgain.gain.cancelScheduledValues(t);AUD.vgain.gain.setTargetAtTime(0,t,.5);}catch(e){}}
+/* na banda 5 o corte é ABSOLUTO — zero, silêncio de verdade. abaixo dela o drone só afunda:
+   some do consciente, mas o ar continua ali, e é por isso que o ápice pesa tanto mais */
+const vazDip=b=>b>=5?0:vazLvl(b)*.16;
+/* o nível que o audSync da base persegue. um syncFX no meio de um corte (qualquer clique
+   dispara um) devolveria o drone antes da hora: por isso o corte e o abafamento entram AQUI,
+   e não só como rampa solta no grafo */
+function vazNivel(b){const n=performance.now();
+ if(n<VAZ.cut)return vazDip(b);
+ return vazLvl(b)*(n<VAZ.muf?.22:1);}
 function vazCut(){if(!AUD.von||!AUD.ctx)return;
  const b=bandOf(S.ruido||0),t=AUD.ctx.currentTime,g=AUD.vgain.gain;
- const dur=b>=5?3+Math.random()*2:2+Math.random()*2; /* o silêncio dura mais no ápice */
- try{g.cancelScheduledValues(t);g.setValueAtTime(0,t); /* corte seco: o vácuo */
-  g.setValueAtTime(0,t+dur);g.linearRampToValueAtTime(vazLvl(b),t+dur+1.8);}catch(e){}
- AUD.vtimer=setTimeout(vazCut,(dur+(b>=5?14+Math.random()*12:20+Math.random()*20))*1000);}
-function vazAudSync(want,b){
- if(!want||!AUD.gest)return vazAudOff();
- if(!audBuild())return;
- if(AUD.ctx.state==="suspended")AUD.ctx.resume().catch(()=>{});
- if(!AUD.von){AUD.von=true;
-  try{const t=AUD.ctx.currentTime;AUD.vgain.gain.cancelScheduledValues(t);
-   AUD.vgain.gain.setTargetAtTime(vazLvl(b),t,1.4);}catch(e){}
-  AUD.vtimer=setTimeout(vazCut,(10+Math.random()*10)*1000);}}
+ const tot=b>=5,dur=tot?5+Math.random()*4:2+Math.random()*2,volta=tot?2.8:1.8;
+ VAZ.cut=performance.now()+dur*1000;
+ try{g.cancelScheduledValues(t);g.setValueAtTime(vazDip(b),t);   /* corte seco: o vácuo */
+  g.setValueAtTime(vazDip(b),t+dur);g.linearRampToValueAtTime(vazLvl(b),t+dur+volta);}catch(e){}
+ /* rede: se um syncFX cancelar a rampa de volta no meio do silêncio, este resync a refaz */
+ clearTimeout(VAZ.retT);
+ VAZ.retT=setTimeout(()=>{VAZ.retT=null;vazSync();},Math.round((dur+volta+.3)*1000));
+ AUD.vtimer=setTimeout(vazCut,Math.round((dur+(tot?12+Math.random()*10:20+Math.random()*20))*1000));}
+/* o ar abafa: não é o corte seco, é o ambiente perdendo densidade enquanto você não faz nada */
+function vazAbafa(){if(!VAZ.on)return;
+ const seg=10+Math.random()*8;
+ VAZ.muf=performance.now()+seg*1000;
+ clearTimeout(VAZ.mufT);
+ VAZ.mufT=setTimeout(()=>{VAZ.mufT=null;vazSync();},Math.round(seg*1000)+300);
+ vazSync();}
 
-/* espelho do scopoSync: sair do Vazio (ou calmar) apaga timers, overlay e som */
-function vazioSync(){const b=bandOf(S.ruido||0),on=vazioOn(1);
- if(on&&b>=5){if(!_bt)blackSched();}
- else{clearTimeout(_bt);_bt=null;blackClear();}
- vazAudSync(on&&b>=4&&!S.ui.mute,b);}
+/* ---------- camada 6: A REATIVIDADE ---------- */
+/* parou: os buracos AVANÇAM — nasce mais um, os que já estão engordam (com teto, senão o
+   ócio repetido os faria engolir a tela) e ficam mais rápidos. e o ar abafa junto */
+function vazIdle(){if(!VAZ.on)return;
+ const b=bandOf(S.ruido||0);
+ vazBuraco(b);
+ for(const h of VAZ.hl){h.g=Math.min(1.9,h.g*1.24);h.vx*=1.35;h.vy*=1.35;}
+ VAZ.dirty=true;vazAbafa();}
+/* voltou a mexer: o avanço morre na hora (o recuo em si é contínuo, em vazBuracoStep) */
+function vazAct(){let m=false;
+ for(const h of VAZ.hl)if(h.g>1){h.g=1;m=true;}
+ if(m)VAZ.dirty=true;}
+/* gastou recurso: um buraco PUXA — cresce de repente e leva o que estava em volta junto */
+function vazPuxa(d){if(!VAZ.on||!(d&&d.dir<0))return;
+ const now=performance.now();if(now-VAZ.pux<9000)return;
+ VAZ.pux=now;
+ if(!VAZ.hl.length){vazBuraco(bandOf(S.ruido||0),true);return;}
+ const h=VAZ.hl[Math.floor(Math.random()*VAZ.hl.length)];
+ h.g=Math.min(1.9,h.g*1.45);h.r=Math.min(h.r0*h.g,h.r+h.r0*.3);VAZ.dirty=true;}
+/* o Ruído subiu: falta menos. mais um buraco, todos avançando, e uma estrela a menos */
+function vazSurto(){if(!VAZ.on)return;
+ const b=bandOf(S.ruido||0);
+ vazBuraco(b);vazBuraco(b);
+ for(const h of VAZ.hl)h.g=Math.min(1.9,h.g*1.3);
+ const c=[];for(const s of VAZ.st)if(!s.d)c.push(s);
+ if(c.length>4)c[Math.floor(Math.random()*c.length)].d=1;
+ VAZ.dirty=true;}
+/* --- O TELETRANSPORTE CURTO: uma coisa muda de lugar, mas NUNCA sob o olhar direto. só
+   quando a janela perde o foco, ou quando o cursor está longe e parado há um tempo. você
+   volta e algo não está mais onde estava — e não há como provar que estava.
+   (a aba OCULTA já desmonta o elemento inteiro pela regra 4, então voltar para ela reencontra
+   um céu outro de qualquer jeito; o ajuste fino aqui é para a janela que perde o foco sem
+   esconder a aba, que é o caso em que o céu de antes continua na sua frente) --- */
+function vazTeleport(){
+ if(!VAZ.on||!VAZ.active(2))return;
+ const now=performance.now();if(now-VAZ.tp<20000)return;
+ const longe=now-VAZ.mt>5000,W=VAZ.W,H=VAZ.H,R=VAZ.zr;
+ const olhando=(x,y)=>!longe&&Math.hypot(x-VAZ.mx,y-VAZ.my)<R*2.6;
+ const peq=[];for(const h of VAZ.hl)if(h.r>4&&h.r<VHR[bandOf(S.ruido||0)]*.7&&!olhando(h.x,h.y))peq.push(h);
+ if(peq.length&&Math.random()<.3){const o=peq[Math.floor(Math.random()*peq.length)];
+  for(let k=0;k<8;k++){const x=W*(.08+Math.random()*.84),y=H*(.1+Math.random()*.8);
+   if(olhando(x,y)||VAZ.forbBox({l:x-o.r,r:x+o.r,t:y-o.r,b:y+o.r}))continue;
+   o.x=o.px=x;o.y=o.py=y;VAZ.tp=now;VAZ.dirty=true;return;}
+  return;}
+ const st=[];for(const s of VAZ.st)if(!s.d&&!olhando(s.x,s.y))st.push(s);
+ if(!st.length)return;
+ const s=st[Math.floor(Math.random()*st.length)];
+ for(let k=0;k<8;k++){const x=Math.random()*W,y=Math.random()*H;
+  if(olhando(x,y)||VAZ.forb(x,y))continue;
+  s.x=x;s.y=y;VAZ.tp=now;VAZ.dirty=true;return;}}
+addEventListener("blur",vazTeleport,{passive:true});
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)vazTeleport();});
+
+/* as reações do Vazio às suas ações. o tom nunca é ameaça — é DISPENSA: o que está do outro
+   lado não quer nada de você, e é exatamente por isso que dói. o motor cuida da carência e
+   das substituições de {nome}/{apagado} */
+TRIG.vaz={
+ erase:["não precisava estar aí","some mais rápido do que você apaga","{apagado} — ninguém ia ler",
+  "apagar é o trabalho mais honesto daqui","ficou igual"],
+ resource:["não muda o total","gasta. sobra o mesmo nada.","o número não estava segurando nada",
+  "isso ia embora de um jeito ou de outro"],
+ idle:["podia ficar aí para sempre","não há nada esperando você","é assim que termina: sem aviso",
+  "o resto não parou junto com você"],
+ tabopen:["aqui também não tem nada","outra página, mesma ausência","não procure: não foi guardado"],
+ noiseup:["está mais perto do fim","falta menos para não haver"]};
+/* e os efeitos dos mesmos gatilhos: act = "o usuário voltou a mexer" */
+TRIGFX.vaz={idle:vazIdle,act:vazAct,erase:()=>vazSub(),resource:vazPuxa,noiseup:vazSurto};
+
+/* --- o passo por frame. o gate, o resize, o dt, a zona de foco e a repintura por dirty são
+   da base (ClimateEffect.tick); daqui para baixo é só o Vazio --- */
+function vazStep(dt){
+ const b=bandOf(S.ruido||0),parado=performance.now()-VAZ.mt>4200;
+ vazBuracoStep(dt,b,parado);
+ vazEngolir();
+ vazCeuStep(dt,b);
+ vazVastStep(dt);
+ /* longe do olhar e parado: de raro em raro, algo se move sozinho (a carência é do teleport) */
+ if(parado&&Math.random()<.00002*dt)vazTeleport();}
+
+/* --- a repintura: só acontece com VAZ.dirty. ordem = céu, forma vasta, buracos por cima --- */
+function vazDraw(c){
+ c.clearRect(0,0,VAZ.W,VAZ.H);
+ const col=VAZ.cor(1,1),p=[0,0];      /* a cor sai do _ecCache uma vez, não por estrela */
+ c.fillStyle=col;
+ for(const s of VAZ.st){if(s.al<=0)continue;
+  const o=vazOcl(s.x,s.y);if(o<=0)continue;
+  vazWarp(s.x,s.y,p);
+  if(VAZ.forb(p[0],p[1]))continue;    /* nem um ponto de 1px entra na sua zona */
+  c.globalAlpha=s.a*s.al*o;
+  c.beginPath();c.arc(p[0],p[1],s.s,0,6.2832);c.fill();}
+ c.globalAlpha=1;
+ if(VAZ.vast)vazVastDraw(c);
+ for(const h of VAZ.hl)vazBuracoDraw(c,h);}
+
+/* espelho do gerSync: sair do Vazio (ou calmar) apaga timers, canvas, classes e som. os
+   agendadores das camadas 2/3/4 nascem no mount e morrem no tear, como no jardim */
+function vazSync(){const b=bandOf(S.ruido||0),on=VAZ.active(1);
+ if(!on||b<3){vazSubClear();vazStrClear();}
+ VAZ.sync();
+ const som=on&&b>=4&&!S.ui.mute;
+ if(!som){VAZ.cut=0;VAZ.muf=0;}      /* sem som, o corte e o abafamento não ficam pendurados */
+ VAZ.audSync(som,b);}
 
 /* ============ DÉJÀ VU — elemento Eco ============
    o Eco repete: o sussurro volta, o texto gagueja, o que você apagou reaparece.

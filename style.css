@@ -21,13 +21,9 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;bac
 #fx-eye i{position:absolute;left:0;top:0;width:46vmin;height:27vmin;margin:-13.5vmin 0 0 -23vmin;border-radius:50%;will-change:transform,opacity;transform:translate3d(-140vw,0,0);
  background:radial-gradient(closest-side at 50% 50%,#000 0 9%,var(--ecd) 22% 28%,var(--ec) 36% 42%,rgba(0,0,0,.55) 52% 58%,transparent 78%);filter:blur(var(--eyeb))}
 .fx-flash{position:fixed;pointer-events:none;z-index:9;overflow:hidden;white-space:nowrap;display:flex;align-items:center}
-/* vaz — horror cósmico: o buraco fica ATRÁS do conteúdo, e aparece pelos painéis que esmaecem */
-#fx-void{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:0;visibility:hidden;transition:opacity 2.4s,visibility 2.4s}
-#fx-void i{position:absolute;left:0;top:0;width:92vmin;height:74vmin;margin:-37vmin 0 0 -46vmin;border-radius:50%;will-change:transform;transform:translate3d(-150vw,0,0);
- background:radial-gradient(closest-side at 50% 50%,#000 0 24%,rgba(2,3,10,.9) 40%,rgba(2,3,10,.5) 60%,rgba(2,3,10,.18) 78%,transparent 100%)}
-#fx-black{position:fixed;inset:0;pointer-events:none;z-index:10;background:#000;opacity:0}
-#fx-black.on{animation:vazapaga 180ms ease-in-out}
-@keyframes vazapaga{0%{opacity:0}18%{opacity:.9}55%{opacity:.9}100%{opacity:0}}
+/* vaz — horror cósmico: o céu, os buracos e a forma vasta são geometria JS (ver VAZ), num
+   canvas ATRÁS do conteúdo (z2, contra z5 do .wrap) — o que aparece por ele são os painéis
+   já esmaecidos pela banda, lá embaixo. a camada em si está com o #fx-vines */
 /* eco — déjà vu: o soluço do texto, o fantasma do que foi apagado e o micro-loop travado */
 .fx-stut{opacity:0;animation:ecosoluco 220ms steps(2)}
 @keyframes ecosoluco{0%{transform:translateX(0);opacity:0}25%{transform:translateX(3px);opacity:.8}50%{transform:translateX(-2px);opacity:.45}75%{transform:translateX(4px);opacity:.7}100%{transform:translateX(0);opacity:0}}
@@ -457,8 +453,20 @@ body[data-el=vaz][data-band="5"] .panel:not(:hover):not(:focus-within){opacity:.
 body[data-el=vaz][data-band="1"] .tabs button:not(.active):not(:hover),body[data-el=vaz][data-band="2"] .tabs button:not(.active):not(:hover){opacity:.78}
 body[data-el=vaz][data-band="3"] .tabs button:not(.active):not(:hover),body[data-el=vaz][data-band="4"] .tabs button:not(.active):not(:hover){opacity:.5}
 body[data-el=vaz][data-band="5"] .tabs button:not(.active):not(:hover){opacity:.3}
-body[data-el=vaz][data-band="4"] #fx-void{opacity:.55;visibility:visible}
-body[data-el=vaz][data-band="5"] #fx-void{opacity:.85;visibility:visible}
+/* O CÉU E OS BURACOS: mesmo molde do jardim — canvas próprio, repintado só quando algo muda
+   (VAZ.dirty), e a presença inteira sobe com a banda em vez de aparecer de uma vez */
+#fx-void{position:fixed;inset:0;pointer-events:none;z-index:2;opacity:0;visibility:hidden;transition:opacity 2.2s,visibility 2.2s}
+body[data-el=vaz] #fx-void{visibility:visible;opacity:calc(.4 + var(--band)*.11)}
+/* camada 4 — a subtração: um pedaço da interface pisca para fora e volta INTEIRO. só
+   opacidade/recorte por menos de um segundo: nada sai do DOM e nenhum valor é tocado.
+   o recorte nunca vai para elemento clicável (clip-path também recorta o clique) */
+.vaz-sub{animation:vazsub var(--vzd,.4s) ease-in-out}
+@keyframes vazsub{0%{opacity:1}20%{opacity:0}72%{opacity:0}100%{opacity:1}}
+.vaz-cut{animation:vazcut var(--vzd,.4s) steps(1,end)}
+@keyframes vazcut{0%{clip-path:inset(0 0 0 0)}22%{clip-path:inset(0 100% 0 0)}70%{clip-path:inset(0 100% 0 0)}100%{clip-path:inset(0 0 0 0)}}
+/* camada 3 — a distorção alcança o texto: ele estica na direção do buraco e volta sozinho.
+   só transform, sempre reversível (o JS zera o inline e o VAZ.tear varre o que sobrar) */
+.vaz-str{transition:transform 1.1s cubic-bezier(.32,0,.2,1);will-change:transform}
 /* colapso 17–20: perturbador, nunca bloqueante */
 body[data-band="5"] h1{animation:aberra 4s steps(3) infinite}
 @keyframes aberra{0%,94%{text-shadow:none}96%{text-shadow:-2px 0 var(--red),2px 0 var(--ec)}98%{text-shadow:2px 0 var(--red),-2px 0 var(--ec)}}
@@ -466,18 +474,21 @@ body[data-band="5"] .panel h2:not(:hover){filter:blur(.4px)}
 body[data-band="5"] .panel h2:hover,body[data-band="5"] h1:hover{animation:none;filter:none}
 /* calmar / reduced motion */
 body.calm *,body.calm *::before,body.calm *::after{animation:none!important;transition:none!important}
-body.calm #fx-canvas,body.calm #whisper,body.calm #fx-eye,body.calm #fx-tunnel,body.calm .fx-flash,body.calm #fx-void,body.calm #fx-black,body.calm .fx-ghost,body.calm .fx-peel,
+body.calm #fx-canvas,body.calm #whisper,body.calm #fx-eye,body.calm #fx-tunnel,body.calm .fx-flash,body.calm #fx-void,body.calm .fx-ghost,body.calm .fx-peel,
 body.calm .pac-caret,body.calm .pac-sug,body.calm .pac-hes,body.calm #fx-vign::after,body.calm .ger-scar,body.calm #fx-vines,body.calm #fx-pact{display:none}
 body.calm[data-el=vaz] .panel,body.calm[data-el=vaz] .tabs button{opacity:1!important;filter:none!important}
+/* calmar no meio de uma subtração ou de uma distorção: a interface volta INTEIRA na hora */
+body.calm .vaz-sub,body.calm .vaz-cut,body.calm .vaz-str{opacity:1!important;transform:none!important;clip-path:none!important}
 body.calm[data-el=eco] h1,body.calm[data-el=eco] .panel h2{text-shadow:calc(var(--band)*1.2px) calc(var(--band)*1.2px) 0 rgba(127,184,168,.35)!important}
 body.calm[data-el=eco] .hx,body.calm[data-el=eco] .hint,body.calm[data-el=eco] label{text-shadow:none!important}
 /* asc: o servo destrava — movimento fluido de volta, sem resíduo de transform */
 body.calm[data-el=asc] .wrap,body.calm[data-el=asc] .panel,body.calm[data-el=asc] .attr,body.calm[data-el=asc] .rec,
 body.calm[data-el=asc] .panel h2,body.calm[data-el=asc] label,body.calm[data-el=asc] .hint{transform:none!important}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}
- #fx-canvas,#fx-eye,#fx-tunnel,.fx-flash,#fx-void,#fx-black,.fx-ghost,.fx-peel,.pac-caret,.pac-sug,.pac-hes,#fx-vign::after,.ger-scar,#fx-vines,#fx-pact{display:none}
+ #fx-canvas,#fx-eye,#fx-tunnel,.fx-flash,#fx-void,.fx-ghost,.fx-peel,.pac-caret,.pac-sug,.pac-hes,#fx-vign::after,.ger-scar,#fx-vines,#fx-pact{display:none}
  body[data-el=ger] .wrap .panel{background:var(--panel)!important}
  body[data-el=vaz] .panel,body[data-el=vaz] .tabs button{opacity:1!important;filter:none!important}
+ .vaz-sub,.vaz-cut,.vaz-str{opacity:1!important;transform:none!important;clip-path:none!important}
  body[data-el=eco] h1,body[data-el=eco] .panel h2{text-shadow:calc(var(--band)*1.2px) calc(var(--band)*1.2px) 0 rgba(127,184,168,.35)!important}
  body[data-el=eco] .hx,body[data-el=eco] .hint,body[data-el=eco] label{text-shadow:none!important}
  body[data-el=asc] .wrap,body[data-el=asc] .panel,body[data-el=asc] .attr,body[data-el=asc] .rec,

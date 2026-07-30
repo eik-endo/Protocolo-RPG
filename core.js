@@ -129,7 +129,7 @@ function boot(){loadAuto();
  $("btnExp").onclick=exportJSON;
  $("btnImp").onclick=()=>$("impFile").click();
  $("impFile").addEventListener("change",e=>{if(e.target.files[0])importJSON(e.target.files[0]);e.target.value="";});
- $("btnMute").onclick=()=>{S.ui.mute=!S.ui.mute;save();$("btnMute").classList.toggle("on",S.ui.mute);toast(S.ui.mute?"Sussurros silenciados.":"Os sussurros voltaram.");whisperLoop();scopoSync();vazioSync();ecoSync();ascSync();pacSync();gerSync();};
+ $("btnMute").onclick=()=>{S.ui.mute=!S.ui.mute;save();$("btnMute").classList.toggle("on",S.ui.mute);toast(S.ui.mute?"Sussurros silenciados.":"Os sussurros voltaram.");whisperLoop();scopoSync();vazSync();ecoSync();ascSync();pacSync();gerSync();};
  $("btnCalm").onclick=()=>{S.ui.calm=!S.ui.calm;save();$("btnCalm").classList.toggle("on",S.ui.calm);applyTheme();whisperLoop();toast(S.ui.calm?"Efeitos reduzidos.":"Efeitos completos.");};
  $("btnSess").onclick=toggleSess;
  $("btnMute").classList.toggle("on",S.ui.mute);$("btnCalm").classList.toggle("on",S.ui.calm);
