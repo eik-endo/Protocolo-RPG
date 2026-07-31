@@ -442,7 +442,7 @@ const OALF=[0,.42,.55,.7,.86,1];         /* e o quanto ele se deixa ver por dent
 const OREG=6;                            /* registros simultâneos */
 
 const OBS=new ClimateEffect({id:"obs",cv:"fx-eye",zr:110,pad:24,
- state:{ex:0,ey:0,r:0,r0:0,pup:.4,lid:1,bl:-1,seed:Math.random()*97,init:false,
+ state:{ex:0,ey:0,r:0,r0:0,pup:.4,hip:1,hipD:1,lid:1,bl:-1,seed:Math.random()*97,init:false,
   stg:0,stgx:0,stgy:0,stgf:0,stgL:-1e9,       /* o centro do palco */
   regs:[],hEl:null,hAcc:0,hT:0,               /* o registro */
   fls:[],gl:null,glL:-1e9,                    /* o flash e o vidro */
@@ -533,6 +533,16 @@ function obsOlhoStep(dt,t,parado){
     caminho para sempre — o passo fica menor que o limiar antes de a dilatação terminar */
  if(Math.abs(np-OBS.pup)>.002)OBS.dirty=true;
  OBS.pup=np;
+ /* O HIPPUS: a pupila de um olho vivo nunca fica parada. dois senos de períodos
+    incomensuráveis (~3,1s e ~7,3s) somados, ±3,5% do raio — o bastante para o olho não
+    parecer congelado, pouco o bastante para não competir com a dilatação de verdade.
+    é um FATOR à parte, multiplicado só na hora de desenhar: OBS.pup continua sendo só o que
+    o ócio e o centro do palco pediram, e nenhuma das duas animações sente isto.
+    o hipD guarda o valor da última repintura: comparar com o do frame anterior nunca
+    acumularia diferença, e o tremor não sairia do lugar com o olho parado */
+ const hz=t/1000;
+ OBS.hip=1+.035*(Math.sin(hz*2.03)*.62+Math.sin(hz*.86)*.38);
+ if(Math.abs(OBS.hip-OBS.hipD)*OBS.r*.15>.1){OBS.hipD=OBS.hip;OBS.dirty=true;}
  /* a piscada dele mesmo (gatilho resource): fecha e abre em ~210ms */
  if(OBS.bl>=0){OBS.bl+=dt;const p=OBS.bl/210;
   if(p>=1){OBS.bl=-1;OBS.lid=1;}else OBS.lid=Math.abs(Math.cos(p*Math.PI));
@@ -543,71 +553,165 @@ function obsOlhoStep(dt,t,parado){
 function obsVasos(c,x,y,R,ry,A,b){const n=b>=5?6:3;
  c.lineWidth=Math.max(.5,R*.008);
  for(let i=0;i<n;i++){const s=OBS.seed+i*3.7,ld=i%2?1:-1;
-  let px=x+ld*R*.95,py=y+Math.sin(s*1.9)*ry*.45;
+  let px=x+ld*R*.95,py=y+(ld<0?ry*.10:-ry*.14)+Math.sin(s*1.9)*ry*.34;
   c.strokeStyle=`rgba(152,44,36,${Math.min(1,(.15+.12*(Math.sin(s*2.3)*.5+.5))*A).toFixed(3)})`;
   c.beginPath();c.moveTo(px,py);
-  for(let k=1;k<=4;k++){px-=ld*R*.16;py+=Math.sin(s+k*1.7)*ry*.19;c.lineTo(px,py);}
+  for(let k=1;k<=4;k++){px-=ld*R*.16;py+=Math.sin(s+k*1.7)*ry*.17;c.lineTo(px,py);}
   c.stroke();}}
-/* a amêndoa em duas quadráticas, e tudo o que é do olho recortado por ela. as paradas de cor
-   vêm do gradiente antigo (preto → --ecd → --ec → preto → transparente), mas em anéis com
-   borda em vez de borrão: é a definição que faz isto virar OLHO em vez de mancha */
+
+/* --- A SILHUETA: uma amêndoa, não uma elipse. o que separa as duas é a assimetria, e ela é
+   toda anatômica: o canto interno fica mais BAIXO que o externo; a pálpebra de cima sobe alto
+   e cedo, com o pico do lado interno; a de baixo é bem mais rasa e afunda do lado externo. os
+   cantos são pontas ROMBAS — quem as arredonda é a espessura do próprio traço, com junta e
+   ponta redondas, e não uma quina desenhada.
+   as três curvas só APENSAM ao caminho corrente (quem faz o moveTo é quem chama), porque a
+   mesma silhueta é usada fechada no recorte e aberta nos dois contornos: assim o recheio e o
+   contorno não têm como sair de sincronia.
+   o envelope inteiro cabe em R x .6R em volta do centro — a mesma caixa que a zona proibida
+   já usava antes desta pintura, então nada aqui mexe na regra 3 */
+const obsCi=(c,x,y,R,ry)=>c.moveTo(x-R,y+ry*.10);   /* canto interno: mais baixo, mais romba */
+const obsCo=(c,x,y,R,ry)=>c.moveTo(x+R,y-ry*.14);   /* canto externo: mais alto, mais puxado */
+const obsSup=(c,x,y,R,ry)=>c.bezierCurveTo(x-R*.56,y-ry*1.20,x+R*.18,y-ry*1.13,x+R,y-ry*.14);
+const obsInf=(c,x,y,R,ry)=>c.bezierCurveTo(x+R*.30,y+ry*.86,x-R*.46,y+ry*.74,x-R,y+ry*.10);
+
 function obsOlhoDraw(c){
  const b=bandOf(S.ruido||0),R=OBS.r,ry=R*.58*OBS.lid;
  if(R<6||ry<1.2)return;
  const x=OBS.ex,y=OBS.ey,A=Math.min(1,OALF[b]*(OBS.stg>0&&!OBS.stgf?1.12:1));
  if(A<=.01)return;
- c.save();
- c.beginPath();
- c.moveTo(x-R,y);c.quadraticCurveTo(x,y-ry*2.06,x+R,y);
- c.quadraticCurveTo(x,y+ry*2.06,x-R,y);c.closePath();
- const sg=c.createRadialGradient(x,y,R*.08,x,y,R);
- sg.addColorStop(0,OBS.cor(.26,Math.min(1,.5*A)));       /* a esclera não é branca: é o pouco */
- sg.addColorStop(.55,OBS.cor(.17,Math.min(1,.34*A)));    /* de luz que sobra numa sala escura */
- sg.addColorStop(1,OBS.cor(.06,Math.min(1,.1*A)));       /* e ela não pode brilhar mais que a
-                                                            íris, senão o olho vira mancha */
+ /* a ponta redonda do traço transborda meia espessura para fora do canto. a silhueta é
+    construída sobre um R já descontado disso, então o desenho INTEIRO — cap incluído — para
+    exatamente em ±R: a caixa que a zona proibida usa continua valendo ao pixel */
+ const lw=Math.max(1,R*.017),Rx=R-lw*.5;
+ c.save();c.lineJoin="round";c.lineCap="round";
+ c.beginPath();obsCi(c,x,y,Rx,ry);obsSup(c,x,y,Rx,ry);obsInf(c,x,y,Rx,ry);c.closePath();
+ /* a esclera. ela NÃO sai do cor() do tema: uma esclera dourada fica ictérica, e — o que
+    importa mais — uma esclera escura não deixa o anel limbal existir. o anel é escuro; se o
+    que está do lado dele também for escuro, não há fronteira nenhuma para ver, e a íris volta
+    a flutuar. então aqui entra um cinza QUENTE e dessaturado, o branco do olho visto numa sala
+    sem luz: claro o bastante para o limbo recortar contra ele, longe o bastante do branco para
+    não gritar no meio de uma paleta que é toda penumbra */
+ const sg=c.createRadialGradient(x,y+ry*.08,R*.06,x,y-ry*.16,R);
+ sg.addColorStop(0,`rgba(170,160,140,${Math.min(1,.82*A).toFixed(3)})`);
+ sg.addColorStop(.5,`rgba(126,117,99,${Math.min(1,.62*A).toFixed(3)})`);
+ sg.addColorStop(.82,`rgba(76,69,56,${Math.min(1,.4*A).toFixed(3)})`);
+ sg.addColorStop(1,`rgba(44,40,32,${Math.min(1,.22*A).toFixed(3)})`);
  c.fillStyle=sg;c.fill();
- c.save();c.clip();
+ c.save();c.clip();       /* daqui para baixo, nada escapa da abertura */
  if(b>=4)obsVasos(c,x,y,R,ry,A,b);
- /* a íris se desloca DENTRO da esclera na direção do cursor: o corpo do olho chega atrasado,
-    mas o olhar já está em você. parado há muito tempo, ela volta ao centro e encara */
+
+ /* --- A ÍRIS. ela se desloca DENTRO da esclera na direção do cursor: o corpo do olho chega
+    atrasado, mas o olhar já está em você. parado há muito tempo, ela volta ao centro e encara.
+    e ela mora ALTA na abertura — a pálpebra de cima quase encosta nela, a de baixo deixa
+    esclera à mostra. é essa assimetria que faz um olho parecer aberto em vez de arregalado --- */
  let gx=OBS.mx,gy=OBS.my;
  if(performance.now()-OBS.mt>4000||gx<0){gx=OBS.W*.5;gy=OBS.H*.5;}
  let ox=gx-x,oy=gy-y;const ol=Math.hypot(ox,oy)||1,om=Math.min(1,ol/(R*3));
- ox=ox/ol*om*R*.26;oy=oy/ol*om*ry*.34;
- const ir=Math.min(R*.46,ry*.86),ix=x+ox,iy=y+oy,pr=ir*(.2+.3*OBS.pup);
- const ig=c.createRadialGradient(ix,iy,ir*.12,ix,iy,ir);
- ig.addColorStop(0,OBS.cor(.5,Math.min(1,.8*A)));
- ig.addColorStop(.34,OBS.cor(.82,Math.min(1,.9*A)));
- ig.addColorStop(.62,OBS.cor(1,Math.min(1,.95*A)));
- ig.addColorStop(.86,OBS.cor(.4,Math.min(1,.9*A)));
- ig.addColorStop(1,OBS.cor(.11,Math.min(1,.95*A)));
+ ox=ox/ol*om*R*.24;oy=oy/ol*om*ry*.30;
+ const ir=Math.min(R*.4,ry*.74),ix=x+ox,iy=y-ry*.17+oy;
+ const pr=ir*(.2+.3*OBS.pup)*OBS.hip;   /* o hip é o tremor de fundo, calculado no passo */
+ /* a íris é um DISCO, e ela continua colorida até a borda. deixá-la apagar para o preto no
+    limbo — que era o que estava aqui — dissolve justamente a fronteira que faz o olho existir:
+    sem borda entre íris e esclera, o que sobra é um halo aceso, e halo aceso é ícone.
+    quem fecha a íris é o anel limbal logo abaixo, não o fade.
+    o miolo do gradiente é deslocado para cima e para a esquerda: a íris fica acesa do lado de
+    onde vem a luz, e é o mesmo lado do brilho lá embaixo */
+ const ig=c.createRadialGradient(ix-ir*.18,iy-ir*.2,ir*.12,ix,iy,ir);
+ ig.addColorStop(0,OBS.cor(.92,Math.min(1,.9*A)));
+ ig.addColorStop(.34,OBS.cor(1,Math.min(1,.95*A)));
+ ig.addColorStop(.66,OBS.cor(.8,Math.min(1,.95*A)));
+ ig.addColorStop(.9,OBS.cor(.62,Math.min(1,.95*A)));
+ ig.addColorStop(1,OBS.cor(.52,Math.min(1,.95*A)));
  c.fillStyle=ig;c.beginPath();c.arc(ix,iy,ir,0,6.2832);c.fill();
- /* as fibras: 46 raios de comprimento e brilho irregulares. é o que separa íris de bolinha */
- c.lineWidth=Math.max(.6,ir*.035);
- for(let i=0;i<46;i++){const a=i/46*6.2832,f=.62+.3*(Math.sin(OBS.seed+i*2.4)*.5+.5);
-  c.strokeStyle=OBS.cor(.9,Math.min(1,(.1+.15*(Math.sin(OBS.seed*1.7+i*1.13)*.5+.5))*A));
+ /* as fibras: POUCAS, finas e de opacidade baixa — é textura, não desenho de raios. o ângulo,
+    o comprimento, o brilho e o arqueamento de cada uma saem do vnz do jardim (três senos de
+    frequências incomensuráveis), então elas não são nem regulares nem sorteadas. e elas
+    arqueiam de leve: fibra reta demais vira raio de sol */
+ const nf=34;c.lineWidth=Math.max(.5,ir*.022);
+ for(let i=0;i<nf;i++){
+  const a=i/nf*6.2832+vnz(OBS.seed,i)*.055;
+  const r0=pr*1.04,r1=ir*(.80+vnz(OBS.seed*1.9,i)*.13),mr=(r0+r1)*.5;
+  const bw=vnz(OBS.seed*3.3,i)*.05;
+  c.strokeStyle=OBS.cor(.95,Math.min(1,(.06+.10*(vnz(OBS.seed*2.7,i)*.5+.5))*A));
   c.beginPath();
-  c.moveTo(ix+Math.cos(a)*pr*1.02,iy+Math.sin(a)*pr*1.02);
-  c.lineTo(ix+Math.cos(a)*ir*f,iy+Math.sin(a)*ir*f);c.stroke();}
- c.strokeStyle=OBS.cor(.1,Math.min(1,.85*A));c.lineWidth=Math.max(1,ir*.09);
- c.beginPath();c.arc(ix,iy,ir*.96,0,6.2832);c.stroke();     /* o limbo fecha a íris */
- c.fillStyle=`rgba(0,0,0,${Math.min(1,.94*A).toFixed(3)})`; /* a pupila é buraco, não cor */
+  c.moveTo(ix+Math.cos(a)*r0,iy+Math.sin(a)*r0);
+  c.quadraticCurveTo(ix+Math.cos(a+bw)*mr,iy+Math.sin(a+bw)*mr,
+   ix+Math.cos(a)*r1,iy+Math.sin(a)*r1);
+  c.stroke();}
+
+ /* --- O ANEL LIMBAL. é o detalhe de maior impacto: sem ele a íris flutua POR CIMA da esclera;
+    com ele ela fica ENCAIXADA. vem em duas passadas — um halo escuro e macio primeiro, para a
+    transição não ter costura, e por cima um traço fino e opaco na borda exata. a cor é quase
+    preta, mas puxada para o --ecd do tema: preto puro destoaria de tudo o mais em cena --- */
+ const lg=c.createRadialGradient(ix,iy,ir*.88,ix,iy,ir*1.2);
+ lg.addColorStop(0,OBS.cor(.16,0));
+ lg.addColorStop(.38,OBS.cor(.16,Math.min(1,.5*A)));    /* o pico do halo cai em cima da borda */
+ lg.addColorStop(.72,OBS.cor(.14,Math.min(1,.26*A)));
+ lg.addColorStop(1,OBS.cor(.12,0));
+ c.fillStyle=lg;c.beginPath();c.arc(ix,iy,ir*1.2,0,6.2832);c.fill();
+ c.strokeStyle=OBS.cor(.14,Math.min(1,.95*A));c.lineWidth=Math.max(1,ir*.045);
+ c.beginPath();c.arc(ix,iy,ir*.98,0,6.2832);c.stroke();
+
+ /* a pupila é buraco, não cor — e a borda dela não é uma faca: uma sombra curtíssima por fora
+    tira o recorte de vetor que denunciava o ícone */
+ c.fillStyle=`rgba(0,0,0,${Math.min(1,.95*A).toFixed(3)})`;
  c.beginPath();c.arc(ix,iy,pr,0,6.2832);c.fill();
- c.fillStyle=`rgba(255,250,232,${Math.min(1,.3*A).toFixed(3)})`;
- c.beginPath();c.ellipse(ix-ir*.3,iy-ir*.34,ir*.15,ir*.11,-.5,0,6.2832);c.fill(); /* molhado */
+ const pg=c.createRadialGradient(ix,iy,pr*.9,ix,iy,pr*1.2);
+ pg.addColorStop(0,`rgba(0,0,0,${Math.min(1,.55*A).toFixed(3)})`);
+ pg.addColorStop(1,"rgba(0,0,0,0)");
+ c.fillStyle=pg;c.beginPath();c.arc(ix,iy,pr*1.2,0,6.2832);c.fill();
+
+ /* --- A ÓRBITA: a pálpebra de cima projeta sombra na esclera E na íris, e os cantos ficam
+    fundos. sem isto a esclera é uma chapa de cor uniforme, que é o que mais denuncia ícone.
+    entra DEPOIS da íris de propósito: a sombra é da órbita inteira, não de cada peça --- */
+ /* o degradê é medido pela ABERTURA, não por um retângulo qualquer: começar acima da pálpebra
+    gastava a parte forte da rampa fora do olho, e a esclera saía uniforme — que é exatamente
+    o que Parte 5 pede para não acontecer */
+ const og=c.createLinearGradient(0,y-ry*.9,0,y+ry*.62);
+ og.addColorStop(0,`rgba(0,0,0,${Math.min(1,.62*A).toFixed(3)})`);
+ og.addColorStop(.3,`rgba(0,0,0,${Math.min(1,.22*A).toFixed(3)})`);
+ og.addColorStop(.62,"rgba(0,0,0,0)");
+ og.addColorStop(1,`rgba(0,0,0,${Math.min(1,.26*A).toFixed(3)})`);
+ c.fillStyle=og;c.fillRect(x-R*1.02,y-ry*1.1,R*2.04,ry*1.9);
+ for(const s of [-1,1]){const qx=x+s*R*.94,qy=y+(s<0?ry*.1:-ry*.14);
+  const qg=c.createRadialGradient(qx,qy,0,qx,qy,R*.5);
+  qg.addColorStop(0,`rgba(0,0,0,${Math.min(1,.5*A).toFixed(3)})`);
+  qg.addColorStop(1,"rgba(0,0,0,0)");
+  c.fillStyle=qg;c.beginPath();c.arc(qx,qy,R*.5,0,6.2832);c.fill();}
+
+ /* --- O BRILHO. alto e à esquerda, nunca no centro da pupila: é o que diz que existe uma
+    fonte de luz na sala e que esta superfície é MOLHADA. mole nas bordas, branco só no miolo
+    e puxando para a cor do ambiente da própria ficha em volta — branco chapado vira adesivo.
+    entra por último, depois da sombra da órbita: brilho especular não recebe sombra.
+    e ele anda com a pupila, porque está grudado na córnea, não na tela --- */
+ const hx=ix-ir*.34,hy=iy-ir*.4,hr=Math.max(1.6,ir*.24);
+ const hg=c.createRadialGradient(hx,hy,0,hx,hy,hr);
+ hg.addColorStop(0,`rgba(255,253,246,${Math.min(1,.62*A).toFixed(3)})`);
+ hg.addColorStop(.42,OBS.cor(1,Math.min(1,.3*A)));
+ hg.addColorStop(1,OBS.cor(1,0));
+ c.fillStyle=hg;c.beginPath();c.arc(hx,hy,hr,0,6.2832);c.fill();
+ /* e um segundo minúsculo do outro lado, o reflexo de rebote: é ele que fecha a sensação de
+    superfície úmida em vez de disco pintado */
+ const wx=ix+ir*.3,wy=iy+ir*.34,wr=Math.max(1,ir*.1);
+ const wg=c.createRadialGradient(wx,wy,0,wx,wy,wr);
+ wg.addColorStop(0,`rgba(255,250,232,${Math.min(1,.22*A).toFixed(3)})`);
+ wg.addColorStop(1,"rgba(255,250,232,0)");
+ c.fillStyle=wg;c.beginPath();c.arc(wx,wy,wr,0,6.2832);c.fill();
  c.restore();
- /* a linha da pálpebra fechando a amêndoa. é ELA que faz a silhueta de olho aparecer por trás
-    dos painéis: sem contorno, o que sobra num vão de 20px é um borrão dourado */
- c.lineWidth=Math.max(1,R*.017);
+
+ /* o contorno das pálpebras. é ELE que faz a silhueta de olho aparecer por trás dos painéis:
+    sem contorno, o que sobra num vão de 20px é um borrão dourado. a de cima é mais forte que
+    a de baixo — é a que tem cílio e peso */
+ c.lineWidth=lw;
  c.strokeStyle=OBS.cor(.7,Math.min(1,.72*A));
- c.beginPath();c.moveTo(x-R,y);c.quadraticCurveTo(x,y-ry*2.06,x+R,y);c.stroke();
+ c.beginPath();obsCi(c,x,y,Rx,ry);obsSup(c,x,y,Rx,ry);c.stroke();
  c.strokeStyle=OBS.cor(.52,Math.min(1,.55*A));
- c.beginPath();c.moveTo(x-R,y);c.quadraticCurveTo(x,y+ry*2.06,x+R,y);c.stroke();
+ c.beginPath();obsCo(c,x,y,Rx,ry);obsInf(c,x,y,Rx,ry);c.stroke();
  /* e a prega da pálpebra de cima, um traço acima e mais fraco: é o que dá PÁLPEBRA em vez de
-    lente, e é de graça — mais uma quadrática */
+    lente, e acompanha a assimetria da curva que está por baixo */
  c.strokeStyle=OBS.cor(.34,Math.min(1,.3*A));c.lineWidth=Math.max(.7,R*.009);
- c.beginPath();c.moveTo(x-R*.86,y-ry*.24);
- c.quadraticCurveTo(x,y-ry*2.5,x+R*.86,y-ry*.24);c.stroke();
+ c.beginPath();c.moveTo(x-R*.8,y-ry*.16);
+ c.bezierCurveTo(x-R*.42,y-ry*1.25,x+R*.2,y-ry*1.25,x+R*.84,y-ry*.4);c.stroke();
  c.restore();}
 
 /* ---------- camada 2: O REGISTRO ---------- */
