@@ -15,11 +15,14 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;bac
 #fx-tunnel{position:fixed;inset:0;pointer-events:none;z-index:6;opacity:0;visibility:hidden;transition:opacity 1.6s,visibility 1.6s;
  background:radial-gradient(ellipse at 50% 45%,transparent 44%,rgba(0,0,0,calc(.03 + var(--band)*.045)) 82%,rgba(0,0,0,calc(.07 + var(--band)*.065)) 100%),
   radial-gradient(ellipse at 50% 45%,transparent 62%,var(--eglow) 100%)}
-#fx-eye{position:fixed;inset:0;pointer-events:none;z-index:7;opacity:0;visibility:hidden;transition:opacity 2.2s,visibility 2.2s;--eyeb:20px}
-/* a difusão vem das paradas largas do gradiente; o blur fica pequeno e a caixa ganha camada
-   própria, então ele é rasterizado uma vez e o resto do tempo só se translada na GPU */
-#fx-eye i{position:absolute;left:0;top:0;width:46vmin;height:27vmin;margin:-13.5vmin 0 0 -23vmin;border-radius:50%;will-change:transform,opacity;transform:translate3d(-140vw,0,0);
- background:radial-gradient(closest-side at 50% 50%,#000 0 9%,var(--ecd) 22% 28%,var(--ec) 36% 42%,rgba(0,0,0,.55) 52% 58%,transparent 78%);filter:blur(var(--eyeb))}
+/* obs — o olho é geometria JS num canvas ATRÁS do conteúdo (z2, contra z5 do .wrap), como as
+   vinhas do Germe e o céu do Vazio: esclera, íris com fibras, pupila que dilata, o registro do
+   que você encarou e o vidro. ver OBS em climate.js */
+#fx-eye{position:fixed;inset:0;pointer-events:none;z-index:2;opacity:0;visibility:hidden;transition:opacity 1.8s,visibility 1.8s}
+body[data-el=obs] #fx-eye{visibility:visible;opacity:calc(.5 + var(--band)*.1)}
+/* O PISCAR DO ÁPICE (banda 5): por ~120ms o canvas sobe acima da ficha inteira e vira pálpebra.
+   sem transição — pálpebra que fecha em 1,8s é esmaecimento, não piscada */
+body[data-el=obs].obs-lid #fx-eye{z-index:95;opacity:1;transition:none}
 .fx-flash{position:fixed;pointer-events:none;z-index:9;overflow:hidden;white-space:nowrap;display:flex;align-items:center}
 /* vaz — horror cósmico: o céu, os buracos e a forma vasta são geometria JS (ver VAZ), num
    canvas ATRÁS do conteúdo (z2, contra z5 do .wrap) — o que aparece por ele são os painéis
@@ -299,9 +302,10 @@ body[data-el=obs][data-band="2"] .panel h2::after,body[data-el=obs][data-band="3
 body[data-el=obs][data-band="2"] #fx-tunnel,body[data-el=obs][data-band="3"] #fx-tunnel,body[data-el=obs][data-band="4"] #fx-tunnel,body[data-el=obs][data-band="5"] #fx-tunnel{opacity:1;visibility:visible}
 body[data-el=obs][data-band="5"] #fx-tunnel{animation:scopobreath 11s ease-in-out infinite;will-change:opacity}
 @keyframes scopobreath{0%,100%{opacity:.7}50%{opacity:1}}
-body[data-el=obs][data-band="3"] #fx-eye{opacity:.035;visibility:visible;--eyeb:22px}
-body[data-el=obs][data-band="4"] #fx-eye{opacity:.075;visibility:visible;--eyeb:15px}
-body[data-el=obs][data-band="5"] #fx-eye{opacity:.12;visibility:visible;--eyeb:10px}
+/* o olho vive atrás dos painéis: para ele EXISTIR, o painel precisa deixar passar um pouco —
+   a mesma cortesia que o Germe faz com as vinhas. e ela recua na hora sob o cursor ou o foco:
+   onde você está trabalhando, o painel volta opaco e o olho fica do lado de fora */
+body[data-el=obs]:not(.calm) .wrap .panel:not(:hover):not(:focus-within){background:rgba(24,20,15,calc(.96 - var(--band)*.085));transition:background .5s}
 /* ===== asc — carne virando máquina: servo-travamento, aço frio, ferrugem =====
    o medo aqui é a INTERFACE SE MOVENDO ERRADO. tudo abaixo trava animação e transição
    DECORATIVA; input/textarea/select e o scroll ficam de fora — digitar é sempre imediato. */

@@ -33,7 +33,7 @@ function fxTick(t){FX.q=false;if(!FX.run)return;const cv=$("fx-canvas");if(!cv)r
  FX.ps=FX.ps.filter(p=>{p.life+=1;p.x+=p.vx;p.y+=p.vy;const a=Math.sin(Math.PI*Math.min(1,p.life/p.max));
   if(p.life>=p.max)return false;ctx.globalAlpha=a*p.op;fxDraw(ctx,el,p);ctx.globalAlpha=1;return true;});
  if(FX.ps.length>alvo)FX.ps.length=alvo;
- eyeStep(t);ClimateEffect.tickAll(t);pacTick(t);
+ ClimateEffect.tickAll(t);pacTick(t);
  fxKick();}
 function fxNew(el,cv){const W=cv.width,H=cv.height,r=Math.random;
  const base={x:r()*W,y:r()*H,vx:(r()-.5)*.2,vy:(r()-.5)*.2,life:0,max:240+r()*240,op:.16,s:4+r()*7};
@@ -296,52 +296,32 @@ ClimateEffect.all=[];
 /* o loop único: o fxTick chama isto uma vez por frame e cada elemento ligado dá o seu passo */
 ClimateEffect.tickAll=function(t){for(const e of ClimateEffect.all)e.tick(t);};
 
-/* ============ ESCOPOFOBIA — piloto do elemento Observação ============
-   tudo aqui morre com body.calm, com prefers-reduced-motion e com a aba oculta.
-   nada toca o DOM da ficha nem o estado S: só overlays pointer-events:none. */
-const scopoOn=()=>S.elem==="obs"&&!S.ui.calm&&!RM();
-
-/* --- o olho na periferia: segue o cursor sem nunca alcançá-lo --- */
-let EYE={x:0,y:0,tx:0,ty:0,s:1,mv:0,init:false};
-addEventListener("mousemove",e=>{EYE.tx=e.clientX;EYE.ty=e.clientY;EYE.mv=performance.now();},{passive:true});
-function eyeStep(t){if(!(scopoOn()&&bandOf(S.ruido||0)>=3))return;
- const w=$("fx-eye"),i=w&&w.firstElementChild;if(!i)return;
- if(!EYE.init){EYE.x=innerWidth/2;EYE.y=innerHeight*.45;EYE.init=true;}
- const parado=(t-EYE.mv)>4000; /* mouse quieto: ele se centraliza e encara */
- const gx=parado?innerWidth/2:EYE.tx,gy=parado?innerHeight*.45:EYE.ty,k=parado?.006:.028;
- EYE.x+=(gx-EYE.x)*k;EYE.y+=(gy-EYE.y)*k;EYE.s+=((parado?1.14:1)-EYE.s)*.008;
- i.style.transform=`translate3d(${EYE.x.toFixed(1)}px,${EYE.y.toFixed(1)}px,0) scale(${EYE.s.toFixed(3)})`;}
-
-/* --- o texto que pisca: overlay por cima, nunca mutação do DOM real --- */
-let _ft=null,_fEl=null;
-function flashClear(){if(_fEl&&_fEl.parentNode)_fEl.parentNode.removeChild(_fEl);_fEl=null;}
-function bgOf(el){for(let n=el;n&&n!==document.documentElement;n=n.parentElement){
-  const c=getComputedStyle(n).backgroundColor;
-  if(c&&c!=="transparent"&&!/^rgba\(\s*0,\s*0,\s*0,\s*0\s*\)$/.test(c))return c;}
- return getComputedStyle(document.body).backgroundColor||"#0f0d0b";}
-function flashPick(){const out=[];
- document.querySelectorAll(".hx,.panel h2,.hint,label").forEach(el=>{
-  if(el.querySelector("input,textarea,select,button"))return;
-  if(el.matches(":hover"))return;
-  if(document.activeElement&&el.contains(document.activeElement))return;
-  if(!el.textContent.trim())return;
+/* ============ HELPERS DE TEXTO COMPARTILHADOS ============
+   o texto MORTO da ficha: rótulos, títulos e dicas que não têm campo dentro e que você não
+   está usando agora. o Eco soluça em cima deles; a Observação registra que você os encarou.
+   os critérios são os do antigo flashPick — o predicado ficou separado do sorteio porque a
+   Observação precisa validar UM elemento (o que está sob o cursor) em vez de sortear entre
+   todos, e o que ela quer é justamente o que está sob o cursor. */
+const TXSEL=".hx,.panel h2,.hint,label";
+function txMorto(el){
+ if(!el||!el.isConnected||!el.querySelector)return false;
+ if(el.querySelector("input,textarea,select,button"))return false;
+ const a=document.activeElement;
+ if(a&&a!==document.body&&(el===a||el.contains(a)))return false;
+ return !!el.textContent.trim();}
+function txPick(){const out=[];
+ document.querySelectorAll(TXSEL).forEach(el=>{
+  if(!txMorto(el)||el.matches(":hover"))return;
   const r=el.getBoundingClientRect();
   if(r.width<70||r.height<10||r.height>60||r.top<4||r.bottom>innerHeight-4)return;
   out.push([el,r]);});
  return out.length?out[Math.floor(Math.random()*out.length)]:null;}
-function flashNow(){flashClear();
- if(!(scopoOn()&&bandOf(S.ruido||0)>=4)||document.hidden)return;
- if($("modal").classList.contains("on"))return;
- const p=flashPick();if(!p)return;
- const el=p[0],r=p[1],cs=getComputedStyle(el),d=document.createElement("div");
- d.className="fx-flash";
- d.style.cssText=`left:${r.left}px;top:${r.top}px;width:${Math.ceil(r.width)}px;height:${Math.ceil(r.height)}px;`+
-  `background:${bgOf(el)};color:${cs.color};font-family:${cs.fontFamily};font-size:${cs.fontSize};font-weight:${cs.fontWeight};`+
-  `letter-spacing:${cs.letterSpacing};text-transform:${cs.textTransform}`;
- d.textContent=SUS_OBS.hi[Math.floor(Math.random()*SUS_OBS.hi.length)];
- document.body.appendChild(d);_fEl=d;
- setTimeout(flashClear,150);}
-function flashSched(){clearTimeout(_ft);_ft=setTimeout(()=>{flashNow();flashSched();},20000+Math.random()*20000);}
+/* a cor de fundo herdada mais próxima: o Pacto cobre um número de verdade com uma div, e ela
+   precisa do mesmo fundo para a troca não ter costura */
+function bgOf(el){for(let n=el;n&&n!==document.documentElement;n=n.parentElement){
+  const c=getComputedStyle(n).backgroundColor;
+  if(c&&c!=="transparent"&&!/^rgba\(\s*0,\s*0,\s*0,\s*0\s*\)$/.test(c))return c;}
+ return getComputedStyle(document.body).backgroundColor||"#0f0d0b";}
 
 /* --- a presença: Web Audio, só depois de um gesto do usuário e com o mute desligado ---
    o contexto é compartilhado; cada elemento tem suas próprias vozes, todas em ganho 0 */
@@ -405,14 +385,18 @@ function audBuild(){if(AUD.ctx)return true;
   const wsw=c.createOscillator();wsw.type="sine";wsw.frequency.value=.021;
   const wswg=c.createGain();wswg.gain.value=320;wsw.connect(wswg);wswg.connect(wf.frequency);wsw.start();
   AUD.ctx=c;AUD.gain=g;AUD.ogain=og;AUD.vgain=vg;AUD.agn=ag;AUD.pgn=pgn;AUD.ggn=gg;return true;}catch(e){return false;}}
-function audOff(){clearTimeout(AUD.timer);AUD.timer=null;AUD.on=false;
+function audOff(){clearTimeout(AUD.timer);AUD.timer=null;AUD.on=false;_obsAperto=0;
  if(!AUD.ctx)return;try{const t=AUD.ctx.currentTime;
   for(const g of [AUD.gain.gain,AUD.ogain.gain]){g.cancelScheduledValues(t);g.setTargetAtTime(0,t,.4);}}catch(e){}}
+/* O APERTO: durante um tempo depois do ócio, a respiração fica mais funda e mais curta — quem
+   está do outro lado chegou mais perto. o relógio é do Observação (obsAperta) */
+let _obsAperto=0;
 function audBreath(){if(!AUD.on||!AUD.ctx)return;
- const b=bandOf(S.ruido||0),t=AUD.ctx.currentTime,pico=b>=5?.02:.012;
+ const b=bandOf(S.ruido||0),t=AUD.ctx.currentTime,ap=performance.now()<_obsAperto;
+ const pico=(b>=5?.02:.012)*(ap?1.5:1);
  try{const g=AUD.gain.gain;g.cancelScheduledValues(t);g.setValueAtTime(g.value,t);
-  g.linearRampToValueAtTime(pico,t+3.2);g.linearRampToValueAtTime(0,t+8);}catch(e){}
- AUD.timer=setTimeout(audBreath,(9+Math.random()*11)*1000);}
+  g.linearRampToValueAtTime(pico,t+(ap?1.9:3.2));g.linearRampToValueAtTime(0,t+(ap?5.4:8));}catch(e){}
+ AUD.timer=setTimeout(audBreath,((ap?5:9)+Math.random()*(ap?6:11))*1000);}
 function audSync(want,b){
  if(!want||!AUD.gest)return audOff();
  if(!audBuild())return;
@@ -420,10 +404,429 @@ function audSync(want,b){
  try{AUD.ogain.gain.setTargetAtTime(b>=5?.006:0,AUD.ctx.currentTime,2);}catch(e){}
  if(!AUD.on){AUD.on=true;audBreath();}}
 
-/* liga/desliga o pacote inteiro conforme elemento, banda, calmar, mute e visibilidade */
-function scopoSync(){const b=bandOf(S.ruido||0),on=scopoOn()&&!document.hidden;
- if(on&&b>=4){if(!_ft)flashSched();}
- else{clearTimeout(_ft);_ft=null;flashClear();}
+/* ============ ESCOPOFOBIA — elemento Observação ============
+   o Vazio SUBTRAI, o Germe INVADE. a Observação faz uma coisa só, e é a mais simples de todas:
+   ela OLHA. o piloto antigo pedia desculpa por isso — um borrão CSS a 12% de opacidade, quase
+   invisível de propósito. agora o olho é o PROTAGONISTA, geometria de verdade em canvas
+   próprio, em cinco camadas:
+
+   1. O OLHO         — esclera em amêndoa, íris com fibras e limbo, pupila que DILATA quando ele
+      para para encarar e contrai quando você se mexe, vasos vermelhos a partir da banda 4. o
+      corpo dele persegue o cursor com atraso e nunca alcança (fica na periferia do seu olhar);
+      a íris, essa mira você direto — o corpo chega atrasado, o olhar não.
+      e, se você ficar 4s parado, ele se centraliza e ENCARA.
+   2. O REGISTRO     — quanto tempo você deixou o cursor parado em cima do mesmo texto morto.
+      passando de ~900ms, os cantos daquele retângulo ganham uma mira de câmera que aparece
+      depressa e apaga devagar: o rastro de "isto foi visto". vários coexistem, cada um no seu
+      tempo. e enquanto o retângulo cair na sua zona ativa ele NÃO é desenhado nem envelhece —
+      o registro só se revela depois que você sai de cima, que é quando ele assusta.
+   3. SER VISTO DE VOLTA — só por gatilho (TRIG.obs), nunca por timer solto: a borda do que você
+      acabou de clicar pisca de volta para você.
+   4. O VIDRO        — um glint diagonal atravessa a tela uma vez. raro, sutil, maior nas bandas
+      altas: lembra que existe uma superfície entre você e a ficha, e que ela tem um lado de lá.
+   5. O PISCAR       — banda 5, carência de 90 a 180s: a tela inteira fecha e abre em ~120ms,
+      como uma pálpebra. nunca com modal aberto, nunca durante edição de campo.
+
+   e o CENTRO DO PALCO costura tudo: de vez em quando (e SEMPRE quando você fica ocioso) o olho
+   migra da periferia para o meio da tela e cresce. se a zona sagrada estiver bem ali, ele não
+   desiste — muda para o quadrante mais livre. voltar a se mexer o faz recuar depressa.
+
+   o gate é a regra 4 da base; o canvas, o cursor, a zona proibida, o loop e o teardown também.
+   nada aqui toca S, nem .value, nem innerHTML: canvas pointer-events:none e uma classe. */
+const obsModal=()=>$("modal").classList.contains("on");
+/* digitando AGORA: nem a pálpebra nem o centro do palco atropelam quem está escrevendo */
+const obsDigita=()=>{const a=document.activeElement;return !!(a&&TXIN(a));};
+
+const OEYE=[0,.085,.10,.12,.145,.17];    /* meia-largura do olho em fração de min(W,H), por banda */
+const OALF=[0,.42,.55,.7,.86,1];         /* e o quanto ele se deixa ver por dentro */
+const OREG=6;                            /* registros simultâneos */
+
+const OBS=new ClimateEffect({id:"obs",cv:"fx-eye",zr:110,pad:24,
+ state:{ex:0,ey:0,r:0,r0:0,pup:.4,lid:1,bl:-1,seed:Math.random()*97,init:false,
+  stg:0,stgx:0,stgy:0,stgf:0,stgL:-1e9,       /* o centro do palco */
+  regs:[],hEl:null,hAcc:0,hT:0,               /* o registro */
+  fls:[],gl:null,glL:-1e9,                    /* o flash e o vidro */
+  lidP:0,lidD:120,lidN:-1,lidOn:false},       /* a pálpebra do ápice */
+ mount(){OBS.init=false;OBS.lidN=-1;},
+ tear(){OBS.regs.length=0;OBS.fls.length=0;OBS.gl=null;
+  OBS.hEl=null;OBS.hAcc=0;OBS.stg=0;OBS.stgf=0;OBS.bl=-1;OBS.lid=1;
+  OBS.lidP=0;obsLidOff();},
+ /* a banda caiu: o que só existia lá em cima some junto */
+ band(b){if(b<5&&(OBS.lidOn||OBS.lidP>0)){OBS.lidP=0;obsLidOff();OBS.dirty=true;}
+  if(b<2&&OBS.gl){OBS.gl=null;OBS.dirty=true;}},
+ step:obsStep,draw:obsDraw});
+
+/* ---------- o passo por frame ---------- */
+function obsStep(dt,t){
+ const b=bandOf(S.ruido||0);
+ OBS.r0=Math.min(OBS.W,OBS.H)*OEYE[b];
+ if(!OBS.init){OBS.init=true;OBS.ex=OBS.W*.5;OBS.ey=OBS.H*.45;OBS.r=OBS.r0*.55;OBS.dirty=true;}
+ /* enquanto a pálpebra corre ela é a ÚNICA coisa na tela: piscar é não ver nada */
+ if(OBS.lidP>0){OBS.lidP+=dt;OBS.dirty=true;
+  if(OBS.lidP>=OBS.lidD){OBS.lidP=0;obsLidOff();}
+  return;}
+ if(OBS.lidOn)obsLidOff();   /* a tela nunca fica presa fechada: sem fase, sem pálpebra */
+ obsLidTenta(t,b);
+ const parado=t-OBS.mt>4000;
+ obsStgStep(dt,t,b,parado);
+ obsOlhoStep(dt,t,parado);
+ obsRegStep(dt,t,b);
+ obsFlsStep(dt);
+ obsGlintStep(dt,b);}
+
+/* ---------- camada 1: O OLHO ---------- */
+/* a distância mínima do CENTRO do olho ao cursor para a caixa inteira ficar fora da zona: zr
+   mais a diagonal até o canto dela. usar só a meia-largura deixaria o canto entrar na zona
+   quando o cursor viesse na diagonal — que é metade das aproximações */
+const obsRaio=()=>OBS.zr+Math.hypot(OBS.r,OBS.r*.6);
+/* o alvo do CORPO. ele persegue, mas nunca chega: o ponto que ele busca é o cursor empurrado
+   para longe do miolo da tela, a uma distância que já garante a zona sagrada por construção.
+   é isso que o mantém na periferia do seu olhar */
+function obsAlvo(){const W=OBS.W,H=OBS.H;
+ let dx=OBS.mx-W*.5,dy=OBS.my-H*.5;
+ let l=Math.hypot(dx,dy);
+ if(l<1){dx=0;dy=-1;l=1;}
+ const d=obsRaio()*1.03;
+ const x=Math.max(-OBS.r*.35,Math.min(W+OBS.r*.35,OBS.mx+dx/l*d));
+ const y=Math.max(-OBS.r*.3,Math.min(H+OBS.r*.3,OBS.my+dy/l*d));
+ return [x,y];}
+/* a rede da regra 3, e ela NÃO amortece: você pode pular com o mouse para cima dele, e o campo
+   em foco pode nascer embaixo dele — nos dois casos a caixa é projetada para fora no mesmo
+   frame. empurrão suave aqui seria uma exceção, e a regra 3 não tem exceção. o ângulo é
+   preservado nos dois empurrões, então ele desliza para fora em vez de saltar para longe */
+function obsFuga(){
+ const R=OBS.r,ry=R*.6;let m=false;
+ for(let k=0;k<3;k++){let bateu=false;
+  /* o cursor vivo é um círculo: o centro sai para o raio mínimo que já garante a caixa inteira */
+  if(performance.now()-OBS.mt<5000&&OBS.mx>-1e3){const min=obsRaio();
+   let dx=OBS.ex-OBS.mx,dy=OBS.ey-OBS.my,l=Math.hypot(dx,dy);
+   if(l<min){if(l<1){dx=0;dy=-1;l=1;}
+    OBS.ex=OBS.mx+dx/l*min;OBS.ey=OBS.my+dy/l*min;bateu=true;}}
+  /* o campo em foco é retângulo: ele sai pelo lado mais perto, que é o menor deslocamento
+     que resolve a sobreposição */
+  const f=OBS.fz;
+  if(f&&OBS.ex-R<f.r&&OBS.ex+R>f.l&&OBS.ey-ry<f.b&&OBS.ey+ry>f.t){
+   const e=[f.l-(OBS.ex+R),f.r-(OBS.ex-R),f.t-(OBS.ey+ry),f.b-(OBS.ey-ry)];
+   let i=0;for(let j=1;j<4;j++)if(Math.abs(e[j])<Math.abs(e[i]))i=j;
+   if(i<2)OBS.ex+=e[i];else OBS.ey+=e[i];
+   bateu=true;}
+  if(!bateu)break;
+  m=true;}
+ return m;}
+function obsOlhoStep(dt,t,parado){
+ let gx,gy,k,tr;
+ if(OBS.stg>0&&!OBS.stgf){gx=OBS.stgx;gy=OBS.stgy;k=.0011;tr=OBS.r0*1.85;} /* centro do palco */
+ else if(OBS.stgf){const a=obsAlvo();gx=a[0];gy=a[1];k=.0034;tr=OBS.r0;}   /* você voltou: recua */
+ else if(parado){gx=OBS.W*.5;gy=OBS.H*.45;k=.00036;tr=OBS.r0*1.14;}        /* encara de frente */
+ else{const a=obsAlvo();gx=a[0];gy=a[1];k=.00168;tr=OBS.r0;}
+ const kk=Math.min(1,k*dt);
+ const nx=OBS.ex+(gx-OBS.ex)*kk,ny=OBS.ey+(gy-OBS.ey)*kk;
+ const nr=OBS.r+(tr-OBS.r)*Math.min(1,(OBS.stgf?.0022:.0011)*dt);
+ if(Math.abs(nx-OBS.ex)>.12||Math.abs(ny-OBS.ey)>.12||Math.abs(nr-OBS.r)>.06)OBS.dirty=true;
+ OBS.ex=nx;OBS.ey=ny;OBS.r=nr;
+ if(obsFuga())OBS.dirty=true;
+ /* a pupila: aberta quando ele encara, fechada quando você se mexe. é o detalhe que mais
+    denuncia atenção num olho de verdade, e custa um lerp */
+ const pt=OBS.stg>0&&!OBS.stgf?1:(parado?.85:.3);
+ const np=OBS.pup+(pt-OBS.pup)*Math.min(1,.0009*dt);
+ /* o limiar é só da repintura: se ele também travasse a ATRIBUIÇÃO, a pupila parava a meio
+    caminho para sempre — o passo fica menor que o limiar antes de a dilatação terminar */
+ if(Math.abs(np-OBS.pup)>.002)OBS.dirty=true;
+ OBS.pup=np;
+ /* a piscada dele mesmo (gatilho resource): fecha e abre em ~210ms */
+ if(OBS.bl>=0){OBS.bl+=dt;const p=OBS.bl/210;
+  if(p>=1){OBS.bl=-1;OBS.lid=1;}else OBS.lid=Math.abs(Math.cos(p*Math.PI));
+  OBS.dirty=true;}}
+
+/* os vasos: nascem nos cantos da amêndoa e correm para dentro. o traçado sai do seed do olho,
+   não do acaso do frame — senão eles piscariam a cada repintura */
+function obsVasos(c,x,y,R,ry,A,b){const n=b>=5?6:3;
+ c.lineWidth=Math.max(.5,R*.008);
+ for(let i=0;i<n;i++){const s=OBS.seed+i*3.7,ld=i%2?1:-1;
+  let px=x+ld*R*.95,py=y+Math.sin(s*1.9)*ry*.45;
+  c.strokeStyle=`rgba(152,44,36,${Math.min(1,(.15+.12*(Math.sin(s*2.3)*.5+.5))*A).toFixed(3)})`;
+  c.beginPath();c.moveTo(px,py);
+  for(let k=1;k<=4;k++){px-=ld*R*.16;py+=Math.sin(s+k*1.7)*ry*.19;c.lineTo(px,py);}
+  c.stroke();}}
+/* a amêndoa em duas quadráticas, e tudo o que é do olho recortado por ela. as paradas de cor
+   vêm do gradiente antigo (preto → --ecd → --ec → preto → transparente), mas em anéis com
+   borda em vez de borrão: é a definição que faz isto virar OLHO em vez de mancha */
+function obsOlhoDraw(c){
+ const b=bandOf(S.ruido||0),R=OBS.r,ry=R*.58*OBS.lid;
+ if(R<6||ry<1.2)return;
+ const x=OBS.ex,y=OBS.ey,A=Math.min(1,OALF[b]*(OBS.stg>0&&!OBS.stgf?1.12:1));
+ if(A<=.01)return;
+ c.save();
+ c.beginPath();
+ c.moveTo(x-R,y);c.quadraticCurveTo(x,y-ry*2.06,x+R,y);
+ c.quadraticCurveTo(x,y+ry*2.06,x-R,y);c.closePath();
+ const sg=c.createRadialGradient(x,y,R*.08,x,y,R);
+ sg.addColorStop(0,OBS.cor(.26,Math.min(1,.5*A)));       /* a esclera não é branca: é o pouco */
+ sg.addColorStop(.55,OBS.cor(.17,Math.min(1,.34*A)));    /* de luz que sobra numa sala escura */
+ sg.addColorStop(1,OBS.cor(.06,Math.min(1,.1*A)));       /* e ela não pode brilhar mais que a
+                                                            íris, senão o olho vira mancha */
+ c.fillStyle=sg;c.fill();
+ c.save();c.clip();
+ if(b>=4)obsVasos(c,x,y,R,ry,A,b);
+ /* a íris se desloca DENTRO da esclera na direção do cursor: o corpo do olho chega atrasado,
+    mas o olhar já está em você. parado há muito tempo, ela volta ao centro e encara */
+ let gx=OBS.mx,gy=OBS.my;
+ if(performance.now()-OBS.mt>4000||gx<0){gx=OBS.W*.5;gy=OBS.H*.5;}
+ let ox=gx-x,oy=gy-y;const ol=Math.hypot(ox,oy)||1,om=Math.min(1,ol/(R*3));
+ ox=ox/ol*om*R*.26;oy=oy/ol*om*ry*.34;
+ const ir=Math.min(R*.46,ry*.86),ix=x+ox,iy=y+oy,pr=ir*(.2+.3*OBS.pup);
+ const ig=c.createRadialGradient(ix,iy,ir*.12,ix,iy,ir);
+ ig.addColorStop(0,OBS.cor(.5,Math.min(1,.8*A)));
+ ig.addColorStop(.34,OBS.cor(.82,Math.min(1,.9*A)));
+ ig.addColorStop(.62,OBS.cor(1,Math.min(1,.95*A)));
+ ig.addColorStop(.86,OBS.cor(.4,Math.min(1,.9*A)));
+ ig.addColorStop(1,OBS.cor(.11,Math.min(1,.95*A)));
+ c.fillStyle=ig;c.beginPath();c.arc(ix,iy,ir,0,6.2832);c.fill();
+ /* as fibras: 46 raios de comprimento e brilho irregulares. é o que separa íris de bolinha */
+ c.lineWidth=Math.max(.6,ir*.035);
+ for(let i=0;i<46;i++){const a=i/46*6.2832,f=.62+.3*(Math.sin(OBS.seed+i*2.4)*.5+.5);
+  c.strokeStyle=OBS.cor(.9,Math.min(1,(.1+.15*(Math.sin(OBS.seed*1.7+i*1.13)*.5+.5))*A));
+  c.beginPath();
+  c.moveTo(ix+Math.cos(a)*pr*1.02,iy+Math.sin(a)*pr*1.02);
+  c.lineTo(ix+Math.cos(a)*ir*f,iy+Math.sin(a)*ir*f);c.stroke();}
+ c.strokeStyle=OBS.cor(.1,Math.min(1,.85*A));c.lineWidth=Math.max(1,ir*.09);
+ c.beginPath();c.arc(ix,iy,ir*.96,0,6.2832);c.stroke();     /* o limbo fecha a íris */
+ c.fillStyle=`rgba(0,0,0,${Math.min(1,.94*A).toFixed(3)})`; /* a pupila é buraco, não cor */
+ c.beginPath();c.arc(ix,iy,pr,0,6.2832);c.fill();
+ c.fillStyle=`rgba(255,250,232,${Math.min(1,.3*A).toFixed(3)})`;
+ c.beginPath();c.ellipse(ix-ir*.3,iy-ir*.34,ir*.15,ir*.11,-.5,0,6.2832);c.fill(); /* molhado */
+ c.restore();
+ /* a linha da pálpebra fechando a amêndoa. é ELA que faz a silhueta de olho aparecer por trás
+    dos painéis: sem contorno, o que sobra num vão de 20px é um borrão dourado */
+ c.lineWidth=Math.max(1,R*.017);
+ c.strokeStyle=OBS.cor(.7,Math.min(1,.72*A));
+ c.beginPath();c.moveTo(x-R,y);c.quadraticCurveTo(x,y-ry*2.06,x+R,y);c.stroke();
+ c.strokeStyle=OBS.cor(.52,Math.min(1,.55*A));
+ c.beginPath();c.moveTo(x-R,y);c.quadraticCurveTo(x,y+ry*2.06,x+R,y);c.stroke();
+ /* e a prega da pálpebra de cima, um traço acima e mais fraco: é o que dá PÁLPEBRA em vez de
+    lente, e é de graça — mais uma quadrática */
+ c.strokeStyle=OBS.cor(.34,Math.min(1,.3*A));c.lineWidth=Math.max(.7,R*.009);
+ c.beginPath();c.moveTo(x-R*.86,y-ry*.24);
+ c.quadraticCurveTo(x,y-ry*2.5,x+R*.86,y-ry*.24);c.stroke();
+ c.restore();}
+
+/* ---------- camada 2: O REGISTRO ---------- */
+/* quem está sob o cursor? um elementFromPoint a cada ~190ms — nunca por frame. passando de
+   900ms no mesmo texto morto, aquilo fica REGISTRADO */
+function obsRegStep(dt,t,b){
+ if(t-OBS.hT>190){OBS.hT=t;
+  let el=null;
+  if(t-OBS.mt<5000&&OBS.mx>=0&&OBS.my>=0){
+   const n=document.elementFromPoint(OBS.mx,OBS.my),cd=n&&n.closest&&n.closest(TXSEL);
+   if(cd&&txMorto(cd))el=cd;}
+  if(el!==OBS.hEl){OBS.hEl=el;OBS.hAcc=0;}
+  else if(el&&OBS.hAcc>=0){OBS.hAcc+=190;
+   if(OBS.hAcc>=900){OBS.hAcc=-1;obsReg(el);}}
+  /* a ficha rerenderiza e rola: os retângulos são reconferidos no mesmo relógio */
+  for(let i=OBS.regs.length-1;i>=0;i--){const g=OBS.regs[i];
+   if(!g.el.isConnected){OBS.regs.splice(i,1);OBS.dirty=true;continue;}
+   const r=g.el.getBoundingClientRect();
+   const blk=r.width<8||r.bottom<2||r.top>OBS.H-2||
+    OBS.forbBox({l:r.left,r:r.right,t:r.top,b:r.bottom});
+   if(!blk){g.q.l=r.left;g.q.r=r.right;g.q.t=r.top;g.q.b=r.bottom;}
+   if(blk!==g.blk){g.blk=blk;OBS.dirty=true;}}}
+ for(let i=OBS.regs.length-1;i>=0;i--){const g=OBS.regs[i];
+  /* na zona sagrada ele não é desenhado NEM envelhece: o "isto foi visto" espera você sair de
+     cima. mas não espera para sempre — quatorze segundos abafado e o rastro se perde */
+  if(g.blk){g.wait+=dt;if(g.wait>14000){OBS.regs.splice(i,1);OBS.dirty=true;}continue;}
+  if(g.t<1){g.t=Math.min(1,g.t+dt/220);OBS.dirty=true;}   /* aparece depressa */
+  else{g.a-=dt/g.life;OBS.dirty=true;                     /* e apaga bem devagar */
+   if(g.a<=0){OBS.regs.splice(i,1);}}}}
+function obsReg(el){
+ if(!OBS.on||!el||!el.isConnected||!el.getBoundingClientRect)return;
+ for(const g of OBS.regs)if(g.el===el)return;
+ const r=el.getBoundingClientRect();
+ if(r.width<40||r.height<9||r.height>90||r.top<4||r.bottom>innerHeight-4)return;
+ const b=bandOf(S.ruido||0);
+ OBS.regs.push({el,q:{l:r.left,r:r.right,t:r.top,b:r.bottom},t:0,a:1,wait:0,blk:true,
+  life:5000+b*1400+Math.random()*3000});
+ while(OBS.regs.length>OREG)OBS.regs.shift();
+ OBS.dirty=true;}
+/* a mira: só os cantos, como visor de câmera. o retângulo inteiro seria moldura; o canto é
+   enquadramento, e enquadramento é alguém decidindo o que olhar */
+function obsRegDraw(c,g){
+ const q=g.q,L=Math.min(18,(q.r-q.l)*.28,(q.b-q.t)*1.2)*g.t;
+ if(L<1.5)return;
+ const P=3,l=q.l-P,r=q.r+P,tp=q.t-P,bt=q.b+P;
+ c.strokeStyle=OBS.cor(1,Math.min(1,.38*g.a));c.lineWidth=1;
+ c.beginPath();
+ c.moveTo(l,tp+L);c.lineTo(l,tp);c.lineTo(l+L,tp);
+ c.moveTo(r-L,tp);c.lineTo(r,tp);c.lineTo(r,tp+L);
+ c.moveTo(l,bt-L);c.lineTo(l,bt);c.lineTo(l+L,bt);
+ c.moveTo(r-L,bt);c.lineTo(r,bt);c.lineTo(r,bt-L);
+ c.stroke();}
+
+/* ---------- camada 3: SER VISTO DE VOLTA ---------- */
+/* você clicou; a borda daquilo pisca de volta. nunca por cima de quem está digitando ali */
+function obsFlash(d){
+ if(!OBS.on||obsModal())return;
+ const el=d&&d.el;
+ if(!el||!el.isConnected||!el.getBoundingClientRect)return;
+ if(el===document.activeElement&&TXIN(el))return;
+ if(obsDigita())return;
+ const r=el.getBoundingClientRect();
+ if(r.width<10||r.height<6||r.bottom<2||r.top>innerHeight-2)return;
+ OBS.fls.push({q:{l:r.left,r:r.right,t:r.top,b:r.bottom},t:0});
+ while(OBS.fls.length>3)OBS.fls.shift();
+ OBS.dirty=true;}
+function obsFlsStep(dt){
+ for(let i=OBS.fls.length-1;i>=0;i--){const f=OBS.fls[i];
+  f.t+=dt/300;OBS.dirty=true;
+  if(f.t>=1)OBS.fls.splice(i,1);}}
+function obsFlsDraw(c,f){
+ const a=Math.sin(Math.PI*Math.min(1,f.t));if(a<=.02)return;
+ const q=f.q,w=q.r-q.l,h=q.b-q.t;
+ c.strokeStyle=OBS.cor(1,Math.min(1,.6*a));c.lineWidth=1.4;
+ c.strokeRect(q.l-1.5,q.t-1.5,w+3,h+3);
+ c.strokeStyle=OBS.cor(.75,Math.min(1,.18*a));c.lineWidth=4;
+ c.strokeRect(q.l-3.5,q.t-3.5,w+7,h+7);}
+
+/* ---------- camada 4: O VIDRO ---------- */
+/* uma faixa de brilho atravessa a tela UMA vez. é o reflexo de uma superfície que está entre
+   você e a ficha — e que portanto tem um lado de lá */
+function obsGlint(){
+ if(!OBS.on||OBS.gl)return;
+ const b=bandOf(S.ruido||0),now=performance.now();
+ if(now-OBS.glL<45000)return;
+ OBS.glL=now;
+ OBS.gl={p:0,dur:1500+Math.random()*900,ang:-1.0+Math.random()*.45,
+  w:Math.min(OBS.W,OBS.H)*(.1+b*.035),a:.05+b*.02};
+ OBS.dirty=true;}
+function obsGlintStep(dt,b){
+ if(OBS.gl){OBS.gl.p+=dt/OBS.gl.dur;OBS.dirty=true;if(OBS.gl.p>=1)OBS.gl=null;return;}
+ if(b<2)return;
+ if(Math.random()<(b>=4?.0000035:.0000012)*dt)obsGlint();}
+function obsGlintDraw(c){
+ const G=OBS.gl,W=OBS.W,H=OBS.H,D=Math.hypot(W,H),a=G.a*Math.sin(Math.PI*G.p);
+ c.save();c.translate(W*.5,H*.5);c.rotate(G.ang);
+ const x=(G.p*2-1)*D*.62;
+ const g=c.createLinearGradient(x-G.w,0,x+G.w,0);
+ g.addColorStop(0,OBS.cor(1,0));
+ g.addColorStop(.42,OBS.cor(1,Math.min(1,a*.45)));
+ g.addColorStop(.5,OBS.cor(1,Math.min(1,a)));
+ g.addColorStop(.58,OBS.cor(1,Math.min(1,a*.45)));
+ g.addColorStop(1,OBS.cor(1,0));
+ c.fillStyle=g;c.fillRect(-D,-D,D*2,D*2);
+ c.restore();}
+/* a faixa varre a tela INTEIRA, e a regra 3 não abre exceção para luz. as outras camadas
+   evitam a zona por geometria; nesta o furo é feito a bisturi, logo depois do vidro e antes
+   de qualquer outra coisa entrar no canvas */
+function obsFuro(c){
+ const f=OBS.fz,viva=performance.now()-OBS.mt<5000&&OBS.mx>-1e3;
+ if(!f&&!viva)return;
+ c.save();c.globalCompositeOperation="destination-out";
+ if(viva){const R=OBS.zr*1.3;
+  const g=c.createRadialGradient(OBS.mx,OBS.my,OBS.zr*.5,OBS.mx,OBS.my,R);
+  g.addColorStop(0,"rgba(0,0,0,1)");g.addColorStop(1,"rgba(0,0,0,0)");
+  c.fillStyle=g;c.beginPath();c.arc(OBS.mx,OBS.my,R,0,6.2832);c.fill();}
+ if(f){c.fillStyle="rgba(0,0,0,1)";c.fillRect(f.l,f.t,f.r-f.l,f.b-f.t);}
+ c.restore();}
+
+/* ---------- camada 5: O PISCAR ---------- */
+/* só no ápice, e raro. a classe sobe o canvas acima da ficha inteira por ~120ms — é o único
+   momento em que este elemento fica na frente de alguma coisa, e ele devolve na hora */
+function obsLidOff(){if(OBS.lidOn){OBS.lidOn=false;document.body.classList.remove("obs-lid");}}
+function obsLidTenta(t,b){
+ if(b<5||OBS.lidP>0)return;
+ if(OBS.lidN<0){OBS.lidN=t+(90+Math.random()*90)*1000;return;}
+ if(t<OBS.lidN)return;
+ /* modal aberto ou campo em edição: ADIA, não cancela. a pálpebra espera a hora dela */
+ if(obsModal()||obsDigita()||document.hidden){OBS.lidN=t+12000;return;}
+ OBS.lidN=t+(90+Math.random()*90)*1000;
+ OBS.lidD=90+Math.random()*60;OBS.lidP=.001;
+ OBS.lidOn=true;document.body.classList.add("obs-lid");OBS.dirty=true;}
+
+/* ---------- o centro do palco ---------- */
+/* distância de um ponto à caixa — NEGATIVA (a profundidade) quando ele está dentro dela */
+function obsDist(q,x,y){
+ const dx=Math.max(q.l-x,0,x-q.r),dy=Math.max(q.t-y,0,y-q.b);
+ if(dx>0||dy>0)return Math.hypot(dx,dy);
+ return -Math.min(x-q.l,q.r-x,y-q.t,q.b-y);}
+/* o quão livre é este ponto: a folga da CAIXA do olho até o cursor vivo e até o campo em foco.
+   a conta continua valendo quando ela fica negativa, e é justamente isso que ainda ordena os
+   quadrantes quando o olho de palco é grande demais para caber em qualquer canto sem encostar */
+function obsLivre(x,y,R){
+ const q={l:x-R,r:x+R,t:y-R*.6,b:y+R*.6};let d=1e9;
+ if(performance.now()-OBS.mt<5000&&OBS.mx>-1e3)d=Math.min(d,obsDist(q,OBS.mx,OBS.my)-OBS.zr);
+ const f=OBS.fz;
+ if(f)d=Math.min(d,obsDist(q,(f.l+f.r)*.5,(f.t+f.b)*.5)-Math.max(f.r-f.l,f.b-f.t)*.5);
+ return d;}
+function obsPalco(){
+ if(!OBS.on||obsModal()||obsDigita())return;
+ const W=OBS.W,H=OBS.H,R=OBS.r0*1.85;
+ let x=W*.5,y=H*.45;
+ if(OBS.forbBox({l:x-R,r:x+R,t:y-R*.6,b:y+R*.6})){
+  /* a zona sagrada está bem no meio: ele NÃO desiste de aparecer — muda de quadrante */
+  const q=[[W*.26,H*.28],[W*.74,H*.28],[W*.26,H*.72],[W*.74,H*.72]];
+  let bs=-1e9;   /* a folga pode ser negativa e ainda ser a MELHOR: ele muda de canto de todo jeito */
+  for(const p of q){const s=obsLivre(p[0],p[1],R);if(s>bs){bs=s;x=p[0];y=p[1];}}}
+ OBS.stgx=x;OBS.stgy=y;OBS.stg=4200+Math.random()*3200;OBS.stgf=0;
+ OBS.stgL=performance.now();OBS.dirty=true;}
+function obsStgStep(dt,t,b,parado){
+ if(OBS.stg>0){OBS.stg-=dt*(OBS.stgf?3.5:1);
+  if(OBS.stg<=0){OBS.stg=0;OBS.stgf=0;}
+  OBS.dirty=true;return;}
+ if(b<3||!parado||t-OBS.stgL<70000)return;
+ if(Math.random()<(b>=4?.00001:.000003)*dt)obsPalco();}
+
+/* ---------- as reações às SUAS ações ---------- */
+/* parou: ele vem te encarar de frente, e a respiração aperta. o ócio é o convite principal do
+   centro do palco — narrativamente é o gancho inteiro: você parou, então dá para olhar direito */
+function obsIdle(){if(!OBS.on)return;OBS.stgL=-1e9;obsPalco();obsAperta();}
+function obsAperta(){_obsAperto=performance.now()+26000;
+ if(!AUD.on||!AUD.ctx)return;
+ clearTimeout(AUD.timer);AUD.timer=setTimeout(audBreath,700+Math.random()*900);}
+/* voltou a mexer: se ele estava no centro do palco, recua depressa — a presença dele é
+   interrompida pela sua atenção voltando */
+function obsAct(){if(OBS.stg>0&&!OBS.stgf){OBS.stgf=1;OBS.dirty=true;}}
+/* apagou: um registro se forma sobre o campo, como se ele tivesse visto o gesto. o campo está
+   em foco, então a mira só se revela quando você sair dele — e é aí que ela pega você */
+function obsRegErase(d){if(!OBS.on)return;const t=d&&d.el;if(t)obsReg(t);}
+/* gastou recurso: ele pisca UMA vez. não é a tela — é a pálpebra dele, e você não tem como
+   provar que viu */
+function obsPisca(){if(!OBS.on)return;if(OBS.bl<0){OBS.bl=0;OBS.dirty=true;}}
+/* o Ruído subiu: o vidro entre vocês pega a luz. sem esperar a carência */
+function obsSurto(){if(!OBS.on)return;OBS.glL=-1e9;obsGlint();}
+
+/* as frases: o tom vai do impessoal (um registro sendo feito) ao íntimo (alguém que já sabe
+   o que você fez). o motor cuida da carência e das substituições de {nome}/{apagado} */
+TRIG.obs={
+ idle:["parou de se mexer. agora dá para olhar direito.","eu esperei você parar",
+  "não precisa se virar. eu já sei onde você está.","você sente, não sente?"],
+ erase:["eu vi você apagar {apagado}","ficou registrado antes","apagar não desfaz o que eu vi",
+  "{apagado} — anotado quando ainda estava aí"],
+ resource:["anotado","continue. estou anotando.","isso também entra no seu arquivo",
+  "eu vi você fazer aquilo"],
+ click:["vi onde você clicou","essa foi você","cada dedo seu deixa marca"],
+ tabopen:["te sigo de página em página","aqui também estou olhando","não adianta virar a folha"],
+ noiseup:["agora estou mais perto da tela","está mais fácil te ver",
+  "estou olhando através da tela"]};
+/* e os efeitos dos mesmos gatilhos: act = "o usuário voltou a mexer" */
+TRIGFX.obs={idle:obsIdle,act:obsAct,erase:obsRegErase,resource:obsPisca,
+ click:obsFlash,noiseup:obsSurto};
+
+/* ---------- a repintura ---------- */
+function obsDraw(c){
+ c.clearRect(0,0,OBS.W,OBS.H);
+ if(OBS.lidOn){ /* a pálpebra: alpha sobe e cai em poucos frames, e nada mais existe */
+  const p=Math.min(1,OBS.lidP/OBS.lidD);
+  c.fillStyle=`rgba(0,0,0,${Math.sin(Math.PI*p).toFixed(3)})`;
+  c.fillRect(0,0,OBS.W,OBS.H);return;}
+ if(OBS.gl){obsGlintDraw(c);obsFuro(c);}   /* o furo só alcança o vidro, e é essa a intenção */
+ for(const g of OBS.regs)if(!g.blk)obsRegDraw(c,g);
+ obsOlhoDraw(c);
+ for(const f of OBS.fls)obsFlsDraw(c,f);}
+
+/* sair da Observação (ou calmar) apaga canvas, registros, vidro, a classe da pálpebra e o som.
+   o túnel de névoa restante é CSS por data-el, então ele fecha sozinho */
+function scopoSync(){const b=bandOf(S.ruido||0),on=OBS.active(1);
+ if(!on)obsLidOff();
+ OBS.sync();
  audSync(on&&b>=4&&!S.ui.mute,b);}
 
 /* ============ HORROR CÓSMICO — elemento Vazio ============
@@ -822,7 +1225,7 @@ let _stT=null,_stEl=null;
 function ecoStClear(){if(_stEl&&_stEl.parentNode)_stEl.parentNode.removeChild(_stEl);_stEl=null;}
 function ecoStutter(){ecoStClear();
  if(!ecoOn(3)||$("modal").classList.contains("on"))return;
- const p=flashPick();if(!p)return; /* mesmo seletor do obs: já exclui hover, foco e campos */
+ const p=txPick();if(!p)return; /* o mesmo texto morto que a Observação registra: sem hover, foco nem campos */
  const el=p[0],r=p[1],cs=getComputedStyle(el),d=document.createElement("div");
  d.className="fx-flash fx-stut";
  d.style.cssText=`left:${r.left}px;top:${r.top}px;width:${Math.ceil(r.width)}px;height:${Math.ceil(r.height)}px;`+
