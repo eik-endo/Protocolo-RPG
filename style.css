@@ -27,7 +27,15 @@ body[data-el=obs].obs-lid #fx-eye{z-index:95;opacity:1;transition:none}
 /* vaz — horror cósmico: o céu, os buracos e a forma vasta são geometria JS (ver VAZ), num
    canvas ATRÁS do conteúdo (z2, contra z5 do .wrap) — o que aparece por ele são os painéis
    já esmaecidos pela banda, lá embaixo. a camada em si está com o #fx-vines */
-/* eco — déjà vu: o soluço do texto, o fantasma do que foi apagado e o micro-loop travado */
+/* eco — déjà vu. a DUPLA-VISÃO segue o mesmo molde do jardim e do céu: canvas próprio ATRÁS da
+   interface (z2, contra z5 do .wrap), repintado só quando alguma coisa muda (ECO.dirty). o
+   rastro fantasma do cursor e as cicatrizes de loop são geometria JS — ver ECO em climate.js */
+#fx-echo{position:fixed;inset:0;pointer-events:none;z-index:2;opacity:0;visibility:hidden;transition:opacity 2.2s,visibility 2.2s}
+body[data-el=eco] #fx-echo{visibility:visible;opacity:calc(.42 + var(--band)*.1)}
+/* e o painel deixa passar o que corre atrás dele, como no jardim do Germe: sem isto a
+   dupla-visão morreria sob os painéis — que é exatamente por onde o seu cursor anda */
+body[data-el=eco]:not(.calm) .wrap .panel{background:rgba(24,20,15,calc(.96 - var(--band)*.028))}
+/* eco — as camadas pontuais: o soluço do texto, o fantasma do que foi apagado e o micro-loop */
 .fx-stut{opacity:0;animation:ecosoluco 220ms steps(2)}
 @keyframes ecosoluco{0%{transform:translateX(0);opacity:0}25%{transform:translateX(3px);opacity:.8}50%{transform:translateX(-2px);opacity:.45}75%{transform:translateX(4px);opacity:.7}100%{transform:translateX(0);opacity:0}}
 .fx-ghost{position:fixed;pointer-events:none;z-index:9;color:var(--ec);font-size:13px;font-family:ui-monospace,Consolas,monospace;letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0;text-shadow:0 0 8px var(--eglow);animation:ecolembra 1.8s ease-in-out}
@@ -479,7 +487,7 @@ body[data-band="5"] .panel h2:hover,body[data-band="5"] h1:hover{animation:none;
 /* calmar / reduced motion */
 body.calm *,body.calm *::before,body.calm *::after{animation:none!important;transition:none!important}
 body.calm #fx-canvas,body.calm #whisper,body.calm #fx-eye,body.calm #fx-tunnel,body.calm .fx-flash,body.calm #fx-void,body.calm .fx-ghost,body.calm .fx-peel,
-body.calm .pac-caret,body.calm .pac-sug,body.calm .pac-hes,body.calm #fx-vign::after,body.calm .ger-scar,body.calm #fx-vines,body.calm #fx-pact{display:none}
+body.calm .pac-caret,body.calm .pac-sug,body.calm .pac-hes,body.calm #fx-vign::after,body.calm .ger-scar,body.calm #fx-vines,body.calm #fx-pact,body.calm #fx-echo{display:none}
 body.calm[data-el=vaz] .panel,body.calm[data-el=vaz] .tabs button{opacity:1!important;filter:none!important}
 /* calmar no meio de uma subtração ou de uma distorção: a interface volta INTEIRA na hora */
 body.calm .vaz-sub,body.calm .vaz-cut,body.calm .vaz-str{opacity:1!important;transform:none!important;clip-path:none!important}
@@ -489,8 +497,8 @@ body.calm[data-el=eco] .hx,body.calm[data-el=eco] .hint,body.calm[data-el=eco] l
 body.calm[data-el=asc] .wrap,body.calm[data-el=asc] .panel,body.calm[data-el=asc] .attr,body.calm[data-el=asc] .rec,
 body.calm[data-el=asc] .panel h2,body.calm[data-el=asc] label,body.calm[data-el=asc] .hint{transform:none!important}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}
- #fx-canvas,#fx-eye,#fx-tunnel,.fx-flash,#fx-void,.fx-ghost,.fx-peel,.pac-caret,.pac-sug,.pac-hes,#fx-vign::after,.ger-scar,#fx-vines,#fx-pact{display:none}
- body[data-el=ger] .wrap .panel{background:var(--panel)!important}
+ #fx-canvas,#fx-eye,#fx-tunnel,.fx-flash,#fx-void,.fx-ghost,.fx-peel,.pac-caret,.pac-sug,.pac-hes,#fx-vign::after,.ger-scar,#fx-vines,#fx-pact,#fx-echo{display:none}
+ body[data-el=ger] .wrap .panel,body[data-el=eco] .wrap .panel{background:var(--panel)!important}
  body[data-el=vaz] .panel,body[data-el=vaz] .tabs button{opacity:1!important;filter:none!important}
  .vaz-sub,.vaz-cut,.vaz-str{opacity:1!important;transform:none!important;clip-path:none!important}
  body[data-el=eco] h1,body[data-el=eco] .panel h2{text-shadow:calc(var(--band)*1.2px) calc(var(--band)*1.2px) 0 rgba(127,184,168,.35)!important}

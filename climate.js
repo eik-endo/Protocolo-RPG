@@ -1320,15 +1320,141 @@ function vazSync(){const b=bandOf(S.ruido||0),on=VAZ.active(1);
  VAZ.audSync(som,b);}
 
 /* ============ DÉJÀ VU — elemento Eco ============
-   o Eco repete: o sussurro volta, o texto gagueja, o que você apagou reaparece.
-   tudo é sobreposição efêmera — nada aqui escreve em campo, dispara oninput ou toca em S. */
+   o Eco repete. só que repetir no relógio é clima, não déjà vu: déjà vu é quando VOCÊ faz uma
+   coisa e ela volta. agora ele funciona assim, em cinco camadas:
+
+   1. A DUPLA-VISÃO — camada constante num canvas próprio, ATRÁS da ficha: o rastro fantasma do
+      seu próprio cursor, meio segundo atrasado e desenhado DUAS vezes fora de registro — uma
+      dupla exposição do seu olhar. cresce em alcance e em presença com a banda, e some perto do
+      campo em que você está escrevendo: ela repete o resto da tela, nunca você.
+   2. O FANTASMA DO APAGADO — o que você digitou e apagou reaparece em outro lugar. antes caía
+      num timer solto de 30-60s, mesmo já existindo um buffer que capturava o apagão no instante
+      exato; agora nasce do gatilho `erase`, na hora, com chance que sobe por banda (15% / 30% /
+      55%). o timer continua atrás, mais raro, para quem passa a sessão inteira sem apagar nada.
+   3. O SOLUÇO — um texto morto salta 220ms e volta ao lugar.
+   4. O MICRO-LOOP E A CICATRIZ — um elemento repete o próprio movimento 3× e trava. ficar parado
+      alimenta o loop ("você parou, e o tempo volta a se repetir"); voltar a agir o CORTA antes da
+      hora — você escapa. e onde um loop deu ao menos uma volta inteira fica um vinco duplicado,
+      fino, que não sai enquanto a aba estiver aberta: loop de novo no MESMO elemento sobrepõe
+      outra linha, mais densa, como a mancha do Pacto. é EFÊMERA — vive só nesta aba do
+      navegador, não entra em S nem no localStorage.
+   5. O ECO SONORO — um tom que volta 3-4 vezes, cada vez mais fraco e mais atrasado.
+
+   tudo é sobreposição efêmera — nada aqui escreve em campo, dispara oninput ou toca em S.
+   o gate do elemento é a regra 4 da base: ECO é o ClimateEffect do Eco, e ecoOn é o atalho que
+   as camadas de DOM (soluço, fantasma, loop) usam para pedir uma banda mínima maior. */
 const ecoOn=min=>S.elem==="eco"&&bandOf(S.ruido||0)>=(min||1)&&!S.ui.calm&&!RM()&&!document.hidden;
+const ecoModal=()=>$("modal").classList.contains("on");
+
+const ECPT=[0,10,13,17,22,28];       /* pontos guardados do rastro, por banda */
+const ECAL=[0,.15,.21,.29,.38,.50];  /* e o quanto ele se deixa ver */
+const EGCH=[0,0,0,.15,.30,.55];      /* chance de o fantasma vir NA HORA em que você apagou */
+const ECOSEL=".panel h2,.tabs button,label";  /* o que pode entrar em loop — e cicatrizar */
+
+const ECO=new ClimateEffect({id:"eco",cv:"fx-echo",zr:104,pad:22,
+ state:{tr:[],mk:[],bst:0,fade:0,vd:700,lx:-1e4,ly:-1e4,sy:-1},
+ mount(){ECO.tr.length=0;ECO.fade=0;ECO.bst=0;ECO.lx=ECO.mx;ECO.ly=ECO.my;ECO.dirty=true;},
+ /* regra 6 — nada sobra: nem rastro, nem classe de loop pendurada num nó de verdade. as
+    cicatrizes NÃO morrem aqui: calmar e movimento reduzido só as escondem (o canvas inteiro
+    sai por CSS), e quem as apaga de fato é a troca de elemento, lá no ecoSync */
+ tear(){ECO.tr.length=0;ECO.bst=0;ECO.fade=0;ecoLoopClear();},
+ step:ecoStep,draw:ecoDraw});
+
+/* --- camada 1: A DUPLA-VISÃO ---
+   regra 3, na versão que cabe aqui: o RAIO em volta do cursor não vale para uma camada cuja
+   matéria-prima É o cursor — aplicá-lo seria o mesmo que apagar a camada. o que vale, e vale
+   inteiro, é o retângulo do campo em foco: nem o rastro nem a cicatriz entram nele */
+function ecoNoFoco(x,y){const r=ECO.fz;
+ return !!(r&&x>r.l&&x<r.r&&y>r.t&&y<r.b);}
+function ecoStep(dt,t){
+ const b=bandOf(S.ruido||0);
+ if(ECO.bst>0)ECO.bst=Math.max(0,ECO.bst-dt);
+ const bst=ECO.bst>0;
+ /* a dupla-visão só corre com o cursor VIVO (mexeu nos últimos 2,6s) e longe do que você está
+    editando — e para de crescer, envelhecendo até sumir, assim que uma das duas coisas falha */
+ const quer=(t-ECO.mt<2600)&&!ecoNoFoco(ECO.mx,ECO.my)&&!ecoModal();
+ const nf=quer?Math.min(1,ECO.fade+dt/240):Math.max(0,ECO.fade-dt/200);
+ if(nf!==ECO.fade){ECO.fade=nf;if(ECO.tr.length)ECO.dirty=true;}
+ if(quer){const dx=ECO.mx-ECO.lx,dy=ECO.my-ECO.ly;
+  if(dx*dx+dy*dy>=16){ECO.lx=ECO.mx;ECO.ly=ECO.my;ECO.tr.push({x:ECO.mx,y:ECO.my,t:0});}}
+ const had=ECO.tr.length,cap=ECPT[b]+(bst?8:0);
+ while(ECO.tr.length>cap)ECO.tr.shift();
+ ECO.vd=(600+b*150)*(bst?1.7:1);
+ /* envelhecer: as idades caem do começo para o fim do vetor, então os mortos são um prefixo */
+ let mortos=0;for(const p of ECO.tr){p.t+=dt;if(p.t>=ECO.vd)mortos++;}
+ if(mortos)ECO.tr.splice(0,mortos);
+ if(had||ECO.tr.length)ECO.dirty=true;
+ /* rolar a página leva os elementos, e as cicatrizes moram na posição deles */
+ if(ECO.mk.length&&scrollY!==ECO.sy){ECO.sy=scrollY;ECO.dirty=true;}}
+/* a MESMA linha desenhada duas vezes, uma delas fora de registro: é o desencontro entre as duas
+   cópias que faz parecer dupla exposição, e não um cometa de mouse */
+function ecoTrilha(c){
+ const n=ECO.tr.length;if(n<3||ECO.fade<=0)return;
+ const b=bandOf(S.ruido||0),base=ECAL[b]*ECO.fade*(ECO.bst>0?1.5:1),vd=ECO.vd||700;
+ c.lineCap="round";c.lineJoin="round";
+ for(let d=0;d<2;d++){
+  const ox=d?2.6:0,oy=d?-2.2:0,km=d?.55:1;
+  c.strokeStyle=ECO.cor(d?.72:1,1);
+  for(let i=1;i<n;i++){
+   const p=ECO.tr[i-1],q=ECO.tr[i];
+   if(q.t<170)continue;              /* meio segundo atrasado: a cabeça não encosta no cursor */
+   const k=1-q.t/vd;if(k<=0)continue;
+   if(ecoNoFoco(q.x,q.y)||ecoNoFoco(p.x,p.y))continue;
+   c.globalAlpha=base*k*k*km;
+   c.lineWidth=(.9+k*1.9)*(d?.8:1);
+   c.beginPath();c.moveTo(p.x+ox,p.y+oy);c.lineTo(q.x+ox,q.y+oy);c.stroke();}}
+ c.globalAlpha=1;}
+
+/* --- camada 4b: A CICATRIZ DO LOOP ---
+   ancorada pela CHAVE do elemento (aba + posição + rótulo), porque render() recria os nós.
+   efêmera por sessão: só nesta aba, nunca em S, nunca no localStorage */
+function ecoKey(el){
+ const t=(el.textContent||"").replace(/\s+/g," ").trim().slice(0,48);
+ let i=0,n=el;while((n=n.previousElementSibling))i++;
+ return (S.ui.tab||"")+(S.ui.sess?"|s":"")+"|"+el.tagName+"|"+i+"|"+t;}
+function ecoCicatriz(el){
+ if(!el||!el.isConnected||!ECO.on)return;
+ const k=ecoKey(el);let m=null;
+ for(const x of ECO.mk)if(x.k===k)m=x;
+ if(!m){m={k,el,rt:0,ls:[]};ECO.mk.push(m);
+  if(ECO.mk.length>16)ECO.mk.shift();}  /* teto: 16 lugares marcados por sessão */
+ m.el=el;
+ m.ls.push({dx:(Math.random()-.5)*5,dy:(Math.random()-.5)*3.4,rot:(Math.random()-.5)*.03,
+  al:.26+Math.random()*.14,w:.7+Math.random()*.5,s:1.5+Math.random()*1.3,g:Math.random()*9});
+ if(m.ls.length>8)m.ls.shift();         /* mais que isto vira borrão, não vinco */
+ ECO.dirty=true;}
+function ecoCicDraw(c,m){
+ if(!m.el||!m.el.isConnected){  /* um re-render trocou o nó: reencontra o elemento pela chave */
+  const t=performance.now();if(t-m.rt<400)return;
+  m.rt=t;m.el=null;
+  const ns=document.querySelectorAll(ECOSEL);
+  for(const el of ns)if(ecoKey(el)===m.k){m.el=el;break;}
+  if(!m.el)return;}             /* elemento de outra aba: a marca espera você voltar */
+ const r=m.el.getBoundingClientRect();
+ if(r.width<24||r.bottom<8||r.top>ECO.H-8)return;
+ if(ECO.forbBox({l:r.left-5,r:r.right+5,t:r.top-5,b:r.bottom+5}))return;  /* regra 3 */
+ const h=(r.right-r.left)/2,cx=(r.left+r.right)/2,cy=r.bottom-1.5;
+ c.lineCap="butt";c.strokeStyle=ECO.cor(1,1);
+ for(const l of m.ls){
+  c.save();c.translate(cx+l.dx,cy+l.dy);c.rotate(l.rot);
+  c.globalAlpha=l.al;c.lineWidth=l.w;
+  c.beginPath();c.moveTo(-h,0);c.lineTo(h,0);           /* o vinco é DUPLO: duas linhas quase */
+  c.moveTo(-h+l.g,l.s);c.lineTo(h-l.g,l.s);             /* paralelas, uma sombra da outra */
+  c.stroke();c.restore();}
+ c.globalAlpha=1;}
+
+/* --- a repintura: cicatriz por baixo (é resíduo velho), rastro por cima --- */
+function ecoDraw(c){
+ c.clearRect(0,0,ECO.W,ECO.H);
+ for(const m of ECO.mk)ecoCicDraw(c,m);
+ ecoTrilha(c);}
 
 /* --- o soluço: um clone do texto que salta por 220ms e some --- */
-let _stT=null,_stEl=null;
-function ecoStClear(){if(_stEl&&_stEl.parentNode)_stEl.parentNode.removeChild(_stEl);_stEl=null;}
+let _stT=null,_stEl=null,_stRm=null;
+function ecoStClear(){clearTimeout(_stRm);_stRm=null;
+ if(_stEl&&_stEl.parentNode)_stEl.parentNode.removeChild(_stEl);_stEl=null;}
 function ecoStutter(){ecoStClear();
- if(!ecoOn(3)||$("modal").classList.contains("on"))return;
+ if(!ecoOn(3)||ecoModal())return;
  const p=txPick();if(!p)return; /* o mesmo texto morto que a Observação registra: sem hover, foco nem campos */
  const el=p[0],r=p[1],cs=getComputedStyle(el),d=document.createElement("div");
  d.className="fx-flash fx-stut";
@@ -1337,26 +1463,30 @@ function ecoStutter(){ecoStClear();
   `letter-spacing:${cs.letterSpacing};text-transform:${cs.textTransform}`;
  d.textContent=el.textContent.trim().slice(0,90);
  document.body.appendChild(d);_stEl=d;
- setTimeout(ecoStClear,240);}
+ _stRm=setTimeout(ecoStClear,240);}
 function stutSched(){clearTimeout(_stT);_stT=setTimeout(()=>{ecoStutter();stutSched();},15000+Math.random()*20000);}
 
-/* --- o fantasma do que foi digitado e apagado ---
+/* --- camada 2: o fantasma do que foi digitado e apagado ---
    ECOBUF é volátil: vive só em memória, nunca entra em S, nunca é salvo, nunca reescreve campo */
-let ECOBUF=[],_ghT=null,_ghEl=null;
+let ECOBUF=[],_ghT=null,_ghEl=null,_ghRm=null;
 const _lastVal=new WeakMap();
 const TXIN=el=>el&&(el.tagName==="TEXTAREA"||(el.tagName==="INPUT"&&(!el.type||el.type==="text"||el.type==="search")));
 function _apagado(prev,now){let a=0;const m=Math.min(prev.length,now.length);
  while(a<m&&prev[a]===now[a])a++;
  let b=0;while(b<m-a&&prev[prev.length-1-b]===now[now.length-1-b])b++;
  return prev.slice(a,prev.length-b).trim();}
+/* na CAPTURA de propósito: o motor de gatilhos escuta `input` em captura também, mas é
+   registrado depois (só quando trigBind liga). ouvir aqui primeiro garante que, quando o
+   TRIGFX.eco.erase rodar, o trecho apagado JÁ é o último item do buffer */
 document.addEventListener("input",e=>{const t=e.target;if(!TXIN(t))return;
  const prev=_lastVal.has(t)?_lastVal.get(t):(t.defaultValue||""),now=t.value||"";
  _lastVal.set(t,now);
  if(S.elem!=="eco"||now.length>=prev.length-2)return;
  const gone=_apagado(prev,now);
  if(gone.length<4)return;
- ECOBUF.push(gone.slice(0,60));if(ECOBUF.length>10)ECOBUF.shift();},{passive:true});
-function ecoGhClear(){if(_ghEl&&_ghEl.parentNode)_ghEl.parentNode.removeChild(_ghEl);_ghEl=null;}
+ ECOBUF.push(gone.slice(0,60));if(ECOBUF.length>10)ECOBUF.shift();},{capture:true,passive:true});
+function ecoGhClear(){clearTimeout(_ghRm);_ghRm=null;
+ if(_ghEl&&_ghEl.parentNode)_ghEl.parentNode.removeChild(_ghEl);_ghEl=null;}
 /* um campo de texto vazio, visível, sem foco nem cursor em cima — senão, um ponto solto da tela */
 function ghostSpot(){const out=[];
  document.querySelectorAll("input[type=text],textarea").forEach(el=>{
@@ -1366,29 +1496,44 @@ function ghostSpot(){const out=[];
   out.push({x:r.left+9,y:r.top+Math.min(9,(r.height-15)/2),w:r.width-18});});
  if(out.length)return out[Math.floor(Math.random()*out.length)];
  return {x:innerWidth*(.1+Math.random()*.45),y:innerHeight*(.2+Math.random()*.55),w:260};}
-function ecoGhost(){ecoGhClear();
- if(!ecoOn(4)||!ECOBUF.length||$("modal").classList.contains("on"))return;
- const tx=ECOBUF[Math.floor(Math.random()*ECOBUF.length)],a=ghostSpot();
+/* mostrar um trecho: quem chama diz a banda mínima, porque o fantasma do gatilho existe uma
+   banda antes do fantasma do timer */
+function ecoGhMostra(tx,min){ecoGhClear();
+ if(!ecoOn(min||4)||!tx||ecoModal())return;
+ const a=ghostSpot();
  const d=document.createElement("div");d.className="fx-ghost";
  d.style.cssText=`left:${Math.round(a.x)}px;top:${Math.round(a.y)}px;max-width:${Math.round(a.w)}px`;
  d.textContent=tx;
  document.body.appendChild(d);_ghEl=d;
- setTimeout(ecoGhClear,1900);}
-function ghostSched(){clearTimeout(_ghT);_ghT=setTimeout(()=>{ecoGhost();ghostSched();},30000+Math.random()*30000);}
+ _ghRm=setTimeout(ecoGhClear,1900);}
+/* o timer de fundo: agora é o RESERVA do gatilho, não o motor principal — mais espaçado, e
+   sorteando qualquer coisa do buffer (o gatilho é que cita o apagão exato de agora) */
+function ecoGhost(){
+ if(!ECOBUF.length)return void ecoGhClear();
+ ecoGhMostra(ECOBUF[Math.floor(Math.random()*ECOBUF.length)],4);}
+function ghostSched(){clearTimeout(_ghT);_ghT=setTimeout(()=>{ecoGhost();ghostSched();},55000+Math.random()*45000);}
 
-/* --- o micro-loop: um elemento repete o mesmo movimento 3× e destrava --- */
-let _lpT=null,_lpEl=null;
-function ecoLoopClear(){if(_lpEl){_lpEl.classList.remove("fx-loop");_lpEl=null;}}
-function ecoLoopNow(){ecoLoopClear();
- if(!ecoOn(5)||$("modal").classList.contains("on"))return;
- const out=[];document.querySelectorAll(".panel h2,.tabs button,label").forEach(el=>{
+/* --- camada 4: o micro-loop: um elemento repete o mesmo movimento 3× e destrava ---
+   a animação são 3 voltas de .42s: passados ~460ms, uma volta INTEIRA já aconteceu, e é isso
+   que a cicatriz registra. o teto de 1500ms é o fim natural (as três voltas + a folga) */
+let _lpT=null,_lpEl=null,_lpRm=null,_lpT0=0;
+function ecoLoopClear(){clearTimeout(_lpRm);_lpRm=null;
+ if(_lpEl){_lpEl.classList.remove("fx-loop");_lpEl=null;}}
+function ecoLoopNow(min){ecoLoopClear();
+ if(!ecoOn(min||5)||ecoModal())return;
+ const out=[];document.querySelectorAll(ECOSEL).forEach(el=>{
   if(el.matches(":hover"))return;
   if(document.activeElement&&el.contains(document.activeElement))return;
   const r=el.getBoundingClientRect();
   if(r.width<30||r.height<8||r.top<6||r.bottom>innerHeight-6)return;out.push(el);});
  if(!out.length)return;
  _lpEl=out[Math.floor(Math.random()*out.length)];_lpEl.classList.add("fx-loop");
- setTimeout(ecoLoopClear,1500);}
+ _lpT0=performance.now();
+ _lpRm=setTimeout(ecoLoopFim,1500);}
+/* o loop foi até o fim: fica o vinco no lugar onde o tempo emperrou */
+function ecoLoopFim(){_lpRm=null;
+ if(_lpEl)ecoCicatriz(_lpEl);
+ ecoLoopClear();}
 function loopSched(){clearTimeout(_lpT);_lpT=setTimeout(()=>{ecoLoopNow();loopSched();},28000+Math.random()*32000);}
 
 /* --- o eco sonoro: um tom melancólico que volta 3–4 vezes, cada vez mais longe --- */
@@ -1414,12 +1559,60 @@ function ecoAudSync(want){
  if(AUD.ctx.state==="suspended")AUD.ctx.resume().catch(()=>{});
  if(!AUD.eon){AUD.eon=true;AUD.etimer=setTimeout(ecoAudTick,(6+Math.random()*8)*1000);}}
 
-/* sair do Eco apaga timers, overlays, som — e o buffer volátil não vaza para outro personagem */
+/* --- as reações às SUAS ações: é daqui que sai o déjà vu de verdade, porque a repetição passa
+   a ter causa. o motor de gatilhos cuida da carência da frase; cada efeito guarda a sua --- */
+/* apagou: o que você acabou de arrancar volta NA HORA, em outro canto da tela. o buffer já
+   capturou o trecho no instante do apagão (listener em captura, acima) — o gatilho só decide
+   se ele aparece agora ou fica esperando o timer de fundo */
+function ecoFantasma(d){const b=bandOf(S.ruido||0);
+ if(!ecoOn(3)||Math.random()>=EGCH[b])return;
+ const tx=ECOBUF.length?ECOBUF[ECOBUF.length-1]:(((d&&d.txt)||"").trim().slice(0,60));
+ if(!tx||tx.length<4)return;
+ ecoGhMostra(tx,3);}
+/* parou: o tempo volta a se repetir. o loop vem na hora e o próximo vem bem mais cedo */
+function ecoIdle(){const b=bandOf(S.ruido||0);
+ if(!ECO.on||b<4)return;
+ if(Math.random()<(b>=5?.85:.5))ecoLoopNow(4);  /* o ócio adianta o loop uma banda inteira */
+ if(_lpT){clearTimeout(_lpT);_lpT=setTimeout(()=>{ecoLoopNow();loopSched();},9000+Math.random()*9000);}}
+/* voltou a agir: você ESCAPA do déjà vu, e ele morre antes da hora. mas se já tinha dado uma
+   volta inteira, o vinco fica mesmo assim — aquela repetição já aconteceu */
+function ecoAct(){if(!_lpEl)return;
+ if(performance.now()-_lpT0>=460)ecoCicatriz(_lpEl);
+ ecoLoopClear();}
+/* o Ruído subiu: a dupla-visão engrossa por alguns segundos — rastro mais longo e mais opaco */
+function ecoSurto(){if(!ECO.on)return;
+ ECO.bst=Math.max(ECO.bst,7000);ECO.dirty=true;
+ ecoPing();}
+
+/* as frases: o Eco não ameaça nem lamenta — CONSTATA, como quem já assistiu a isto e sabe o
+   final. no noiseup ele devolve os próprios sussurros do ápice (SUS_ECO.hi): a frase que você
+   já viu passar volta como reação, que é o déjà vu do déjà vu. o motor cuida da carência e das
+   substituições de {nome}/{apagado} */
+TRIG.eco={
+ erase:["você já apagou isso","{apagado} — você apaga sempre nessa hora","apagou de novo",
+  "{apagado}. igualzinho da outra vez.","não é a primeira vez que some daí"],
+ idle:["já ficamos parados assim","você para sempre aqui","de novo o silêncio, no mesmo ponto",
+  "volte ao começo. você sabe o caminho."],
+ resource:["esse número já foi esse número","você já gastou isso","cai igual toda vez",
+  "a mesma conta, outra vez"],
+ tabopen:["você já leu isso","já esteve nesta página","a mesma aba, de novo","já estava assim"],
+ click:["você já clicou aí","essa mão já fez esse movimento","de novo. no mesmo lugar."],
+ noiseup:SUS_ECO.hi.concat(["já subiu assim antes","você lembra desta parte"])};
+TRIGFX.eco={erase:ecoFantasma,idle:ecoIdle,act:ecoAct,noiseup:ecoSurto};
+
+/* sair do Eco apaga timers, overlays, canvas, cicatrizes e som — e o buffer volátil não vaza
+   para outro personagem. calmar/movimento reduzido passam pelo ECO.active() da base */
 function ecoSync(){const b=bandOf(S.ruido||0),on=ecoOn(1);
- if(S.elem!=="eco"){ECOBUF.length=0;clearTimeout(_wEt);_wEt=null;}
+ /* o buffer e as cicatrizes são desta sessão NESTE elemento: trocar de elemento zera os dois */
+ if(S.elem!=="eco"){ECOBUF.length=0;ECO.mk.length=0;clearTimeout(_wEt);_wEt=null;}
  if(on&&b>=3){if(!_stT)stutSched();}else{clearTimeout(_stT);_stT=null;ecoStClear();}
  if(on&&b>=4){if(!_ghT)ghostSched();}else{clearTimeout(_ghT);_ghT=null;ecoGhClear();}
- if(on&&b>=5){if(!_lpT)loopSched();}else{clearTimeout(_lpT);_lpT=null;ecoLoopClear();}
+ /* o agendador do loop continua sendo da banda 5; o que desce para a 4 é o loop POR GATILHO,
+    e por isso a classe só é varrida quando o elemento inteiro sai do ar */
+ if(on&&b>=5){if(!_lpT)loopSched();}else{clearTimeout(_lpT);_lpT=null;}
+ if(!on)ecoLoopClear();
+ ECO.sync();
+ if(ECO.on)ECO.dirty=true;  /* render() remontou a ficha: as cicatrizes mudaram de lugar */
  ecoAudSync(on&&b>=4&&!S.ui.mute);}
 
 /* ============ CARNE-METAL — elemento Ascensão ============
