@@ -194,6 +194,18 @@ body[data-el="ger"] .bar i{animation:breathe 4s ease-in-out infinite}
 .elc[data-el=asc]::after{content:"";position:absolute;inset:auto 0 0 0;height:4px;background:repeating-linear-gradient(45deg,#b04a3a 0 6px,transparent 6px 12px);opacity:.5}
 .elc[data-el=pac]::before{content:"§";position:absolute;right:12px;bottom:8px;color:var(--c);opacity:.3;font-family:Georgia,serif}
 .elc[data-el=ger]::before{content:"";position:absolute;left:-20px;bottom:-20px;width:80px;height:80px;background:radial-gradient(circle,rgba(111,154,78,.4),transparent 70%);}
+/* perfeição — o medidor do Sintonizador. herda .rec inteiro (fundo, borda, stepper, .bar) e só
+   ajusta o que a escala de 0-100 pede: largura de altar, trilho grosso o bastante para receber
+   clique, e o campo maior porque aqui cabem três dígitos */
+.rec.perf{max-width:760px;margin:30px auto 0;padding:12px 16px}
+.rec.perf .rn{align-items:baseline}
+/* a auréola precisa de corpo: no tamanho do rótulo (10px, com 2.5px de espaçamento) ela vira
+   um pontinho e some no meio das letras */
+.rec.perf .rn .pg{font-size:15px;letter-spacing:0;color:var(--ec);margin-right:3px;line-height:1}
+.rec.perf .rn b{font-family:Georgia,serif;font-size:15px;color:var(--ec);letter-spacing:1px}
+.rec.perf .rv input{width:64px}
+.rec.perf .bar.perfbar{height:10px;border-radius:3px;margin-top:9px;cursor:pointer;border:1px solid var(--line)}
+.rec.perf .bar.perfbar:hover{border-color:var(--ecd)}
 /* altar */
 #altar{max-width:760px;margin:34px auto 0;border:1px solid var(--ecd);border-radius:5px;background:var(--panel);padding:20px 24px}
 #altar h3{font-family:Georgia,serif;font-weight:400;letter-spacing:5px;text-transform:uppercase;color:var(--ec);margin:0 0 4px;display:flex;gap:12px;align-items:center}

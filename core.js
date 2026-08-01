@@ -24,6 +24,9 @@ cur:{vida:null,fol:null,sin:null,luc:null},curMax:{vida:null,fol:null,sin:null,l
    precisa de proteção: com curMax todo vazio, a migração não tem o que converter. */
 _migMaxBonus:false,
 ruido:0,elem:"",dinheiro:0,
+/* perf: a Perfeição do Sintonizador, 0-100. nasce 0, e ficha antiga (que não tem a chave)
+   herda este 0 pelo Object.assign(DEF(),json) do carregamento — não precisa de migração */
+perf:0,
 per:{},profis:"",esc:[],maest:[],tal:[],conh:[],
 custom:{hab:[],mag:[],mae:[]},cond:{},
 inv:{pieces:[],bag:[],seq:1},
@@ -40,6 +43,7 @@ function fixS(){const d=DEF();
  if(!S.inv.pieces)S.inv.pieces=[];if(!S.inv.bag)S.inv.bag=[];if(!S.inv.seq)S.inv.seq=1;
  for(const m of S.maest){if(typeof m.rec!=="number")m.rec=0;if(typeof m.recMax!=="number")m.recMax=null;
   if(typeof m.st!=="number")m.st=parseInt(m.st,10)||0;}
+ S.perf=clampPerf(S.perf);   /* ausente, texto, nulo ou fora da faixa: tudo cai em 0-100 */
  migMaxBonus();}
 
 /* ---------- migração: teto que SUBSTITUÍA → bônus que SOMA ----------
@@ -146,7 +150,7 @@ function render(){fixS();
  const R={inicial:rInicial,sint:rSint,hab:rHab,mag:rMag,tal:rTal,inv:rInv,bib:rBib,div:rDiv};
  (R[S.ui.tab]||rInicial)();
  if(S.ui.sess)rSess();
- updDock();applyTheme();whisperLoop();
+ updDock();perfDOM();applyTheme();whisperLoop();   /* perfDOM aqui pega boot, troca de personagem e importação de uma vez */
  $("foot").textContent=alien("O QUE OLHA DEMAIS E OLHADO DE VOLTA")+"  ·  protocolo 4ª edição · 2002";}
 function toggleSess(){S.ui.sess=!S.ui.sess;save();
  $("btnSess").textContent=S.ui.sess?"◼ Encerrar sessão":"▶ Sessão";
@@ -308,6 +312,59 @@ function purgeFardo(f){const nE=S.esc.filter(k=>k.startsWith(f+"|")).length,nM=S
  S.esc=S.esc.filter(k=>!k.startsWith(f+"|"));S.maest=S.maest.filter(m=>m.f!==f);
  if(nE||nM)toast(`${f} removido — ${nE*2} PP e ${nM?"escolhas de maestria":""} devolvidos.`);}
 
+/* ---------- PERFEIÇÃO — o medidor do Sintonizador ----------
+   quanto do personagem já deixou de ser carne. 0 a 100, inteiro, e MANUAL de ponta a ponta:
+   sem gatilho, sem marco, sem trava — quem move é o jogador ou o mestre. subir é decisão de
+   mesa, e por isso nada na ficha empurra este número sozinho.
+   só existe para quem carrega o Sintonizador. nas outras fichas o valor fica em 0 no estado e
+   nenhum card é renderizado — não é card escondido, é card que não existe. */
+const clampPerf=v=>{const n=parseInt(v,10);return isNaN(n)?0:Math.max(0,Math.min(100,n));};
+const perfOn=()=>owned().includes("Sintonizador");
+/* a faixa em quintos: 0-19, 20-39, 40-59, 60-79, 80-100. o 100 cai na 4 junto com o 80 de
+   propósito — quinto é quinto, e quem quiser tratar o 100 à parte tem o valor cru ao lado */
+const perfBand=v=>Math.min(4,Math.floor(clampPerf(v)/20));
+const PERF_LB=["carne — ainda é só o rascunho","as primeiras peças assentaram",
+ "metade de cada — nem carne, nem a coisa nova","a carne já é a parte que sobra",
+ "quase a versão final"];
+const perfLabel=v=>clampPerf(v)>=100?"a versão final — não sobrou rascunho":PERF_LB[perfBand(v)];
+/* A PONTE PARA O CLIMA. o valor vai para o body do mesmo jeito que data-el e data-band, mais a
+   faixa já fatiada. e é só isso: NADA lê estes atributos ainda — o climate.js não conhece nem
+   `perf` nem `perfband`. é gancho pendurado, não efeito.
+   o que sai daqui é o valor EFETIVO, não o guardado: sem o Sintonizador não há medidor, então o
+   DOM diz 0. o S.perf em si fica intacto — trocar de Fardo e voltar devolve o número na mão, e
+   ninguém perde progresso por ter experimentado outra combinação. sem isto, um personagem que
+   largou o Fardo levaria a transformação do próximo prompt junto, com um valor que a ficha
+   dele nem mostra mais. */
+function perfDOM(){const v=perfOn()?clampPerf(S.perf):0;
+ document.body.dataset.perf=v;document.body.dataset.perfband=perfBand(v);}
+/* o card. mesma anatomia dos medidores de maestria (.rec + .rn + .rv + .mxref + .bar), porque
+   é a forma que a ficha já usa para "recurso com teto e barra" — o que muda é a escala */
+function perfCard(){if(!perfOn())return "";
+ const v=clampPerf(S.perf);
+ return `<div class="rec perf" id="perfcard">
+ <div class="rn"><span><span class="pg" aria-hidden="true">⍟</span> Perfeição</span> <b id="perfpc">${v}%</b></div>
+ <div class="rv">
+  <button class="stp" onclick="stepPerf(-1)" title="−1">−</button>
+  <input type="number" id="perfcur" min="0" max="100" step="1" value="${v}" onchange="setPerf(this.value)" title="digite a porcentagem exata">
+  <span class="mx">/ 100</span>
+  <button class="stp" onclick="stepPerf(1)" title="+1">+</button>
+  <button class="btn mini" style="margin-left:auto" onclick="setPerf(0)">zerar</button></div>
+ <div class="mxref" id="perftx">${esc(perfLabel(v))}</div>
+ <div class="bar perfbar" title="clique na barra para marcar a porcentagem" onclick="perfFromClick(event,this)"><i id="perfbar" style="width:${v}%"></i></div>
+ <div class="mxref">medidor do Sintonizador · ajuste livre, sem marco e sem trava — quem sobe é você</div></div>`;}
+/* atualiza NO LUGAR em vez de refazer o card: trocar outerHTML a cada passo tiraria o foco do
+   campo no meio da digitação, e aqui o jogador fica batendo no −/+ */
+function perfSync(){if(!$("perfcard"))return;
+ const v=clampPerf(S.perf);
+ const i=$("perfcur");if(i&&i.value!==String(v))i.value=v;
+ const b=$("perfbar");if(b)b.style.width=v+"%";
+ const p=$("perfpc");if(p)p.textContent=v+"%";
+ const t=$("perftx");if(t)t.textContent=perfLabel(v);}
+function setPerf(v){S.perf=clampPerf(v);save();perfDOM();perfSync();}
+function stepPerf(d){setPerf(clampPerf(S.perf)+d);}
+function perfFromClick(ev,el){const r=el.getBoundingClientRect();if(r.width<=0)return;
+ setPerf(Math.round((ev.clientX-r.left)/r.width*100));}
+
 /* ---------- SINTONIZAR ---------- */
 function rSint(){const sel=S.elem;
  $("mainview").innerHTML=`<div id="sintwrap">
@@ -317,6 +374,7 @@ function rSint(){const sel=S.elem;
    onmouseenter="previewEl('${e.id}')" onmouseleave="previewEl(null)" onclick="clickEl('${e.id}')">
    <span class="eg">${e.g}</span><div class="en">${e.n}</div><div class="ev">— ${e.v} —</div>
    <div class="ef">${esc(e.fr)}</div></div>`).join("")}</div>
+ ${perfCard()}
  ${sel?altarHTML(ELM(sel)):`<div class="hint" style="text-align:center;margin-top:30px">Nenhum elemento sintonizado. O Ruído sobe do mesmo jeito — mas sem nome, sem Marca, sem trilha.</div>`}
  </div>`;}
 function altarHTML(e){const b=bandOf(S.ruido);
