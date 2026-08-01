@@ -108,6 +108,9 @@ body[data-band="3"] .rw,body[data-band="4"] .rw,body[data-band="5"] .rw{animatio
 .rec .rv .mx{color:var(--faint);font-size:13px}
 .rec .rv .mx input{width:46px;text-align:center;font-size:13px;font-family:Georgia,serif;padding:2px 3px;color:var(--dim)}
 .rec .rv .mx input::placeholder{color:var(--faint);opacity:1}
+/* a referência do cálculo automático: sempre à vista, e discreta o bastante para não competir
+   com o número que o jogo usa (o "máx" lá em cima, que já é base + bônus) */
+.rec .mxref{font-size:10px;letter-spacing:.6px;color:var(--faint);margin-top:5px}
 .rec .stp{background:none;border:1px solid var(--line2);color:var(--dim);width:24px;height:24px;border-radius:3px;line-height:1}
 .rec .stp:hover{border-color:var(--ec);color:var(--ec)}
 .bar{height:4px;background:#0c0a08;border-radius:2px;margin-top:7px;overflow:hidden}

@@ -16,7 +16,13 @@ const ELM=id=>ELEMS.find(e=>e.id===id)||null;
 /* ---------- estado ---------- */
 const DEF=()=>({v:4,nome:"",jogador:"",conceito:"",raiz:"",fardo:"",fardosX:[],nivel:1,
 attrs:{car:0,ner:0,jui:0,tem:0,lab:0},
-cur:{vida:null,fol:null,sin:null,luc:null},curMax:{vida:null,fol:null,sin:null,luc:null},gente:null,brio:1,defesa:8,
+cur:{vida:null,fol:null,sin:null,luc:null},curMax:{vida:null,fol:null,sin:null,luc:null,gente:null},gente:null,brio:1,defesa:8,
+/* curMax guarda BÔNUS sobre o cálculo automático, não o total. nasce `false` de propósito:
+   Object.assign(DEF(),json) só sobrescreve as chaves que o JSON tem, então uma ficha antiga
+   (que não tem esta chave) herda o `false` daqui e migra. nascesse `true`, ela herdaria o
+   `true` e o valor antigo nunca seria convertido — a migração morreria calada. ficha nova não
+   precisa de proteção: com curMax todo vazio, a migração não tem o que converter. */
+_migMaxBonus:false,
 ruido:0,elem:"",dinheiro:0,
 per:{},profis:"",esc:[],maest:[],tal:[],conh:[],
 custom:{hab:[],mag:[],mae:[]},cond:{},
@@ -32,7 +38,29 @@ function fixS(){const d=DEF();
  if(!Array.isArray(S.sess.notes))S.sess.notes=[];if(!Array.isArray(S.sess.log))S.sess.log=[];
  if(typeof S.per!=="object"||!S.per)S.per={};if(typeof S.cond!=="object"||!S.cond)S.cond={};
  if(!S.inv.pieces)S.inv.pieces=[];if(!S.inv.bag)S.inv.bag=[];if(!S.inv.seq)S.inv.seq=1;
- for(const m of S.maest){if(typeof m.rec!=="number")m.rec=0;if(typeof m.recMax!=="number")m.recMax=null;}}
+ for(const m of S.maest){if(typeof m.rec!=="number")m.rec=0;if(typeof m.recMax!=="number")m.recMax=null;
+  if(typeof m.st!=="number")m.st=parseInt(m.st,10)||0;}
+ migMaxBonus();}
+
+/* ---------- migração: teto que SUBSTITUÍA → bônus que SOMA ----------
+   até aqui, um máximo escrito na mão congelava o recurso: subir de nível ou de estágio não
+   mexia mais nele. agora o campo é um bônus permanente (de talento, de item, de penalidade)
+   somado ao cálculo automático. para não mudar do nada a ficha de ninguém, o valor antigo é
+   convertido UMA vez: bônus = total_antigo − base_de_agora, o que devolve exatamente o mesmo
+   total na tela. rodar isto duas vezes deslocaria o bônus de novo, então cada ficha carrega
+   a própria marca (_migMaxBonus) e cada maestria a dela (m._migBonus). */
+function migMaxBonus(){
+ if(!S._migMaxBonus){
+  for(const k of ["vida","fol","sin","luc"]){const o=S.curMax[k];
+   if(o==null||o==="")continue;
+   const v=parseInt(o,10);
+   S.curMax[k]=isNaN(v)?null:v-baseMaxOf(k);}   /* gente fica de fora: o campo não existia */
+  S._migMaxBonus=true;save();}
+ for(const m of S.maest){
+  if(m._migBonus)continue;
+  if(typeof m.recMax==="number"){const d=meterOf(m);
+   if(d)m.recMax=m.recMax-d.tetos[m.st];else m.recMax=null;}
+  m._migBonus=true;save();}}
 
 /* ---------- salvar ---------- */
 let _st=null;
@@ -60,18 +88,24 @@ function importJSON(file){const r=new FileReader();r.onload=()=>{try{S=Object.as
 const A=k=>{const v=parseInt(S.attrs[k],10);return isNaN(v)?0:v;};
 const FP=()=>FARDOS[S.fardo]||null;
 function owned(){const o=[];if(S.fardo&&FARDOS[S.fardo])o.push(S.fardo);for(const f of S.fardosX)if(FARDOS[f]&&!o.includes(f))o.push(f);return o;}
-/* máximos: a fórmula é o padrão; S.curMax[k] preenchido sobrescreve na mão */
+/* máximos: a fórmula manda, e S.curMax[k] é um BÔNUS PERMANENTE somado a ela — o +1 de Gente
+   do Contato Fiel, o teto extra de um item, uma penalidade de campanha. pode ser negativo; o
+   total nunca desce de 0. vazio/null é bônus zero, e aí vale a fórmula limpa. */
 function baseMaxVida(){const f=FP();return 3+A("car")+(f?f.vida*S.nivel:0);}
 function baseMaxFol(){const f=FP();return 3+A("ner")+((f&&f.comb==="fol")?f.cv*S.nivel:0);}
 function baseMaxSin(){const f=FP();return 3+A("jui")+((f&&f.comb==="sin")?f.cv*S.nivel:0);}
 function baseMaxLuc(){return 5+A("tem");}
-function baseMaxOf(k){return {vida:baseMaxVida,fol:baseMaxFol,sin:baseMaxSin,luc:baseMaxLuc}[k]();}
-function ovMax(k){const o=S.curMax&&S.curMax[k];return(o==null||o==="")?baseMaxOf(k):Math.max(0,parseInt(o,10)||0);}
+function baseMaxGente(){return 1+A("lab");}
+function baseMaxOf(k){return {vida:baseMaxVida,fol:baseMaxFol,sin:baseMaxSin,luc:baseMaxLuc,gente:baseMaxGente}[k]();}
+function bonusOf(k){const o=S.curMax&&S.curMax[k];
+ if(o==null||o==="")return 0;
+ const v=parseInt(o,10);return isNaN(v)?0:v;}
+function ovMax(k){return Math.max(0,baseMaxOf(k)+bonusOf(k));}
 function maxVida(){return ovMax("vida");}
 function maxFol(){return ovMax("fol");}
 function maxSin(){return ovMax("sin");}
 function maxLuc(){return ovMax("luc");}
-function maxGente(){return Math.max(0,1+A("lab"));}
+function maxGente(){return ovMax("gente");}
 function curOf(k){const m={vida:maxVida,fol:maxFol,sin:maxSin,luc:maxLuc}[k];const v=S.cur[k];return(v==null||v==="")?m():parseInt(v,10)||0;}
 function ppTot(){const n=S.nivel;return 2+(n-1)+(n>=8?1:0)+(n>=15?1:0);}
 function pcTot(){const n=S.nivel;return 4+2*(n-1)+(n>=8?1:0)+(n>=12?1:0)+(n>=15?1:0);}
@@ -147,8 +181,10 @@ function setNum(k,v){S[k]=parseInt(v,10)||0;save();}
 function setNivel(v){S.nivel=Math.max(1,Math.min(15,parseInt(v,10)||1));save();render();}
 function setAttr(k,v){S.attrs[k]=Math.max(-2,Math.min(4,parseInt(v,10)||0));save();render();}
 function setCur(k,v){S.cur[k]=(v===""?null:parseInt(v,10)||0);save();applyTheme();barSync();}
-function setMax(k,v){if(!S.curMax)S.curMax={vida:null,fol:null,sin:null,luc:null};
- S.curMax[k]=(v===""?null:Math.max(0,parseInt(v,10)||0));save();applyTheme();barSync();render();}
+/* o campo guarda o BÔNUS, então negativo é válido (penalidade) — quem segura o piso em 0 é o
+   ovMax, no total, não aqui */
+function setMax(k,v){if(!S.curMax)S.curMax={vida:null,fol:null,sin:null,luc:null,gente:null};
+ S.curMax[k]=(v===""?null:(parseInt(v,10)||0));save();applyTheme();barSync();render();}
 function stepRec(k,d){const m={vida:maxVida,fol:maxFol,sin:maxSin,luc:maxLuc}[k]();const v=Math.max(0,Math.min(m,curOf(k)+d));S.cur[k]=v;save();
  const i=$("cur_"+k);if(i)i.value=v;const j=$("scur_"+k);if(j)j.value=v;applyTheme();barSync();}
 function barSync(){for(const k of["vida","fol","sin","luc"]){const m={vida:maxVida,fol:maxFol,sin:maxSin,luc:maxLuc}[k]();
@@ -192,8 +228,8 @@ function rInicial(){const f=FP(),r=RAIZES.find(x=>x.n===S.raiz);
    ${recCard("vida","Vida",maxVida())}${recCard("fol","Fôlego",maxFol())}${recCard("sin","Sintonia",maxSin())}${recCard("luc","Lucidez",maxLuc())}
    <div class="rec"><div class="rn">GENTE <b>máx ${maxGente()}</b></div><div class="rv">
     <button class="stp" onclick="setGente(Math.max(0,curGente()-1));render()">−</button>
-    <input type="number" value="${curGente()}" onchange="setGente(this.value)"><span class="mx">/ ${maxGente()}</span>
-    <button class="stp" onclick="setGente(Math.min(maxGente(),curGente()+1));render()">+</button></div></div>
+    <input type="number" value="${curGente()}" onchange="setGente(this.value)"><span class="mx">/ ${maxIn("max_gente","gente")}</span>
+    <button class="stp" onclick="setGente(Math.min(maxGente(),curGente()+1));render()">+</button></div>${mxRef("gente")}</div>
    <div class="rec"><div class="rn">BRIO <b>teto 5</b></div><div class="rv">
     <button class="stp" onclick="setNum('brio',Math.max(0,S.brio-1));render()">−</button>
     <input type="number" value="${S.brio}" onchange="setNum('brio',this.value)"><span class="mx"></span>
@@ -216,25 +252,31 @@ function rInicial(){const f=FP(),r=RAIZES.find(x=>x.n===S.raiz);
 function recCard(k,nm,mx){return `<div class="rec"><div class="rn">${nm} <b>máx ${mx}</b></div><div class="rv">
  <button class="stp" onclick="stepRec('${k}',-1)">−</button>
  <input type="number" id="cur_${k}" value="${curOf(k)}" onchange="setCur('${k}',this.value)"><span class="mx">/ ${maxIn("max_"+k,k)}</span>
- <button class="stp" onclick="stepRec('${k}',1)">+</button></div>
+ <button class="stp" onclick="stepRec('${k}',1)">+</button></div>${mxRef(k)}
  <div class="bar"><i id="bar_${k}"></i></div></div>`;}
-/* campo do máximo: vazio = fórmula (mostrada como placeholder), número = teto na mão */
+/* campo do máximo: agora é o BÔNUS, não o total. vazio ou 0 = sem bônus */
 function maxIn(id,k){const o=S.curMax?S.curMax[k]:null;
- return `<input type="number" min="0" id="${id}" value="${o==null||o===""?"":o}" placeholder="${baseMaxOf(k)}" title="máximo — deixe vazio para usar o cálculo automático" onchange="setMax('${k}',this.value)">`;}
+ return `<input type="number" id="${id}" value="${o==null||o===""?"":o}" placeholder="0" title="bônus permanente sobre o cálculo do nível — ex: +1 de um talento. Deixe vazio ou 0 se não tiver nenhum." onchange="setMax('${k}',this.value)">`;}
+/* a referência: o que a ficha calcula sozinha, SEMPRE à vista. um bônus sem a base ao lado não
+   diz nada — e era isso que o antigo placeholder fazia, sumia justo quando havia o que comparar */
+const mxRef=k=>`<div class="mxref">nível sugere ${baseMaxOf(k)}</div>`;
 /* medidores de maestria — recurso próprio de uma trilha (Fúria, etc.) */
 const RESET_LB={cena:"zerar (nova cena)",sessao:"zerar (nova sessão)",permanente:"zerar"};
 function meterOf(m){const md=m&&!m.cu?maeData(m):null;return(md&&md.medidor)||null;}
+/* mesmo trato dos recursos: m.recMax é BÔNUS sobre o teto do estágio, e não um teto congelado
+   que ignorava o Aprendiz virando Veterano, Mestre e Ápice */
 function meterCap(m){const d=meterOf(m);if(!d)return null;
- return {min:d.min,max:(typeof m.recMax==="number"?m.recMax:d.tetos[m.st])};}
+ return {min:d.min,max:Math.max(d.min,d.tetos[m.st]+(typeof m.recMax==="number"?m.recMax:0))};}
 function meterVal(m){const c=meterCap(m);return c?Math.max(c.min,Math.min(c.max,m.rec||0)):0;}
 function meterCard(m,i){const d=meterOf(m);if(!d)return "";
  const tp=meterCap(m).max,v=meterVal(m),pc=tp>d.min?Math.round((v-d.min)/(tp-d.min)*100):0;
  const ov=(typeof m.recMax==="number"?m.recMax:"");
  return `<div class="rec" id="mtr_${i}" style="margin-top:8px"><div class="rn">${esc(d.nome)} <b>teto ${tp} · ${STG[m.st]}</b></div><div class="rv">
  <button class="stp" onclick="stepMeter(${i},-1)">−</button>
- <input type="number" id="mcur_${i}" min="${d.min}" max="${tp}" value="${v}" onchange="setMeter(${i},this.value)"><span class="mx">/ <input type="number" min="${d.min}" id="mmax_${i}" value="${ov}" placeholder="${d.tetos[m.st]}" title="teto — deixe vazio para usar o teto do estágio" onchange="setMeterMax(${i},this.value)"></span>
+ <input type="number" id="mcur_${i}" min="${d.min}" max="${tp}" value="${v}" onchange="setMeter(${i},this.value)"><span class="mx">/ <input type="number" id="mmax_${i}" value="${ov}" placeholder="0" title="bônus permanente sobre o teto do estágio — ex: +1 de um talento. Deixe vazio ou 0 se não tiver nenhum." onchange="setMeterMax(${i},this.value)"></span>
  <button class="stp" onclick="stepMeter(${i},1)">+</button>
  ${d.reset?`<button class="btn mini" style="margin-left:auto" onclick="resetMeter(${i})">${RESET_LB[d.reset]||"zerar ("+esc(d.reset)+")"}</button>`:""}</div>
+ <div class="mxref">estágio sugere ${d.tetos[m.st]}</div>
  <div class="bar"><i id="mbar_${i}" style="width:${pc}%"></i></div></div>`;}
 function meterSync(i){const el=$("mtr_"+i);if(el)el.outerHTML=meterCard(S.maest[i],i);}
 function meterPut(i,v){const m=S.maest[i];if(!m)return;const c=meterCap(m);if(!c)return;
@@ -242,7 +284,7 @@ function meterPut(i,v){const m=S.maest[i];if(!m)return;const c=meterCap(m);if(!c
 function stepMeter(i,d){const m=S.maest[i];if(m)meterPut(i,meterVal(m)+d);}
 function setMeter(i,v){meterPut(i,parseInt(v,10));}
 function setMeterMax(i,v){const m=S.maest[i];if(!m)return;
- m.recMax=(v===""?null:Math.max(0,parseInt(v,10)||0));save();meterSync(i);}
+ m.recMax=(v===""?null:(parseInt(v,10)||0));save();meterSync(i);}   /* bônus: negativo vale */
 function resetMeter(i){const m=S.maest[i];if(!m)return;const c=meterCap(m);if(c)meterPut(i,c.min);}
 function skillsHTML(sessOnly){let out="",cur="";
  const list=PERICIAS.map((p,i)=>({p,i})).filter(o=>!sessOnly||S.per[o.p[0]]||SESS_ALL);
@@ -585,7 +627,7 @@ function rSess(){const e=ELM(S.elem);
   return `<div class="rec"><div class="rn">${nm} <b>máx ${mx}</b></div><div class="rv">
   <button class="stp" onclick="stepRec('${k}',-1)">−</button>
   <input type="number" id="scur_${k}" value="${curOf(k)}" onchange="setCur('${k}',this.value)"><span class="mx">/ ${maxIn("smax_"+k,k)}</span>
-  <button class="stp" onclick="stepRec('${k}',1)">+</button></div><div class="bar"><i id="sbar_${k}"></i></div></div>`;}).join("")}
+  <button class="stp" onclick="stepRec('${k}',1)">+</button></div>${mxRef(k)}<div class="bar"><i id="sbar_${k}"></i></div></div>`;}).join("")}
  </div>
  <div class="row" style="margin-top:12px;align-items:center">
   <div style="flex:0;min-width:220px"><label>${W_RUIDO} · Ruído</label>
