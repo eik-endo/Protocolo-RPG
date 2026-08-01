@@ -325,7 +325,10 @@ function bgOf(el){for(let n=el;n&&n!==document.documentElement;n=n.parentElement
 
 /* --- a presença: Web Audio, só depois de um gesto do usuário e com o mute desligado ---
    o contexto é compartilhado; cada elemento tem suas próprias vozes, todas em ganho 0 */
-let AUD={ctx:null,gain:null,ogain:null,vgain:null,eg:null,agn:null,pgn:null,ggn:null,gest:false,on:false,von:false,eon:false,aon:false,pon:false,gon:false,timer:null,vtimer:null,etimer:null,atimer:null,ptimer:null,gtimer:null};
+/* ajn/jon/jtimer: o barramento ANGELICAL do Ascensão. ele é irmão do agn (o industrial) e não
+   substituto — os dois existem ao mesmo tempo no grafo, e quem decide quanto de cada um se
+   ouve é a Perfeição, num crossfade (ver ascAudSync) */
+let AUD={ctx:null,gain:null,ogain:null,vgain:null,eg:null,agn:null,ajn:null,pgn:null,ggn:null,gest:false,on:false,von:false,eon:false,aon:false,jon:false,pon:false,gon:false,timer:null,vtimer:null,etimer:null,atimer:null,jtimer:null,ptimer:null,gtimer:null};
 function audGesture(){if(AUD.gest)return;AUD.gest=true;scopoSync();vazSync();ecoSync();ascSync();pacSync();gerSync();}
 ["pointerdown","keydown","touchstart"].forEach(ev=>addEventListener(ev,audGesture,{once:true,passive:true}));
 function audBuild(){if(AUD.ctx)return true;
@@ -340,17 +343,50 @@ function audBuild(){if(AUD.ctx)return true;
   const og=c.createGain();og.gain.value=0;o.connect(og);og.connect(c.destination);o.start();
   const vg=c.createGain();vg.gain.value=0;vg.connect(c.destination); /* drone do Vazio */
   for(const hz of [44,44.6]){const v=c.createOscillator();v.type="sine";v.frequency.value=hz;v.connect(vg);v.start();}
-  /* zumbido de máquina do Ascensão: 60Hz de rede + harmônico batendo de leve + um grão
-     metálico (serra estreitada em 1,85kHz). frio, contínuo, sem calor nenhum */
+  /* ===== ASCENSÃO, EIXO RUÍDO — O INFERNO INDUSTRIAL =====
+     o zumbido frio de rede elétrica que morava aqui saiu: ele era a máquina LIGADA, e o que o
+     elemento pede agora é a máquina SOB CARGA. um E1 grave em serra + a quinta em quadrada
+     passam por um waveshaper (tanh) e saem por um passa-baixa ressonante — é a distorção que
+     dá o peso de guitarra industrial; oscilador limpo soa a sintetizador, não a equipamento.
+     por cima, o grão metálico (serra estreitada em 1,85kHz), que é o aço da coisa */
   const ag=c.createGain();ag.gain.value=0;ag.connect(c.destination);
-  const a1=c.createOscillator();a1.type="sine";a1.frequency.value=60;a1.connect(ag);a1.start();
-  const a2=c.createOscillator();a2.type="sine";a2.frequency.value=120.3;
-  const a2g=c.createGain();a2g.gain.value=.32;a2.connect(a2g);a2g.connect(ag);a2.start();
+  const shp=c.createWaveShaper();
+  {const nc=1024,cur=new Float32Array(nc);
+   for(let i=0;i<nc;i++){const x=i*2/nc-1;cur[i]=Math.tanh(x*4.4);} /* saturação mole, sem clipe duro */
+   shp.curve=cur;shp.oversample="2x";}
+  const alp=c.createBiquadFilter();alp.type="lowpass";alp.frequency.value=200;alp.Q.value=4.5;
+  shp.connect(alp);alp.connect(ag);
+  const a1=c.createOscillator();a1.type="sawtooth";a1.frequency.value=41.2;   /* E1 */
+  const a1g=c.createGain();a1g.gain.value=.62;a1.connect(a1g);a1g.connect(shp);a1.start();
+  /* a quinta desafinada em 0,3Hz: o batimento é o que faz o drone parecer VIVO e sob esforço */
+  const a2=c.createOscillator();a2.type="square";a2.frequency.value=61.9;
+  const a2g=c.createGain();a2g.gain.value=.3;a2.connect(a2g);a2g.connect(shp);a2.start();
+  const a2b=c.createOscillator();a2b.type="square";a2b.frequency.value=62.2;
+  const a2bg=c.createGain();a2bg.gain.value=.22;a2b.connect(a2bg);a2bg.connect(shp);a2b.start();
   const a3=c.createOscillator();a3.type="sawtooth";a3.frequency.value=60;
   const af=c.createBiquadFilter();af.type="bandpass";af.frequency.value=1850;af.Q.value=7;
   /* o 31º harmônico da serra sai fraquíssimo do bandpass, mas 1,85kHz é onde o ouvido é
-     sensível: mesmo em .45 ele só arranha o zumbido, nunca chia */
-  const a3g=c.createGain();a3g.gain.value=.45;a3.connect(af);af.connect(a3g);a3g.connect(ag);a3.start();
+     sensível: mesmo em .34 ele só arranha o drone, nunca chia */
+  const a3g=c.createGain();a3g.gain.value=.34;a3.connect(af);af.connect(a3g);a3g.connect(ag);a3.start();
+  /* ===== ASCENSÃO, EIXO PERFEIÇÃO — O CORAL =====
+     um acorde de senos que RESPIRAM em frequências incomensuráveis (.019 a .043Hz), então o
+     coral nunca fecha um ciclo audível: é sustentado, luminoso e não vira padrão. tudo por um
+     passa-baixa suave — o que se quer é altura e ar, não brilho de sintetizador.
+     mora no grafo ao lado do inferno; quem cruza os dois é o ganho, não a construção */
+  const jg=c.createGain();jg.gain.value=0;jg.connect(c.destination);
+  const jf=c.createBiquadFilter();jf.type="lowpass";jf.frequency.value=2100;jf.Q.value=.7;jf.connect(jg);
+  for(const [hz,lv,lf] of [[196,.5,.037],[261.63,.34,.029],[329.63,.28,.043],[392,.24,.023],[523.25,.13,.019]]){
+   const o=c.createOscillator();o.type="sine";o.frequency.value=hz;
+   const og2=c.createGain();og2.gain.value=lv*.5;
+   const l=c.createOscillator();l.type="sine";l.frequency.value=lf;
+   const lg2=c.createGain();lg2.gain.value=lv*.46;
+   l.connect(lg2);lg2.connect(og2.gain);l.start();
+   o.connect(og2);og2.connect(jf);o.start();}
+  /* e o AR da catedral: um sopro alto e quase inaudível que tira o acorde do vácuo */
+  const jn=c.createBufferSource();jn.buffer=buf;jn.loop=true;
+  const jnf=c.createBiquadFilter();jnf.type="bandpass";jnf.frequency.value=3200;jnf.Q.value=.6;
+  const jng=c.createGain();jng.gain.value=.5;
+  jn.connect(jnf);jnf.connect(jng);jng.connect(jg);jn.start();
   /* pacto: presença viva do outro lado. um grave orgânico cujo GANHO sobe e desce num LFO de
      0,15Hz — não é drone contínuo, é a cadência de uma respiração pesada e vagarosa */
   const pgn=c.createGain();pgn.gain.value=0;pgn.connect(c.destination);
@@ -384,7 +420,7 @@ function audBuild(){if(AUD.ctx)return true;
   const wlg=c.createGain();wlg.gain.value=.28;wlf.connect(wlg);wlg.connect(wgn.gain);wlf.start();
   const wsw=c.createOscillator();wsw.type="sine";wsw.frequency.value=.021;
   const wswg=c.createGain();wswg.gain.value=320;wsw.connect(wswg);wswg.connect(wf.frequency);wsw.start();
-  AUD.ctx=c;AUD.gain=g;AUD.ogain=og;AUD.vgain=vg;AUD.agn=ag;AUD.pgn=pgn;AUD.ggn=gg;return true;}catch(e){return false;}}
+  AUD.ctx=c;AUD.gain=g;AUD.ogain=og;AUD.vgain=vg;AUD.agn=ag;AUD.ajn=jg;AUD.pgn=pgn;AUD.ggn=gg;return true;}catch(e){return false;}}
 function audOff(){clearTimeout(AUD.timer);AUD.timer=null;AUD.on=false;_obsAperto=0;
  if(!AUD.ctx)return;try{const t=AUD.ctx.currentTime;
   for(const g of [AUD.gain.gain,AUD.ogain.gain]){g.cancelScheduledValues(t);g.setTargetAtTime(0,t,.4);}}catch(e){}}
@@ -1630,6 +1666,160 @@ function ecoSync(){const b=bandOf(S.ruido||0),on=ecoOn(1);
    impede a banda 5 de virar "quase contínua" e recair no problema original por outro caminho. */
 const ascOn=min=>S.elem==="asc"&&bandOf(S.ruido||0)>=(min||1)&&!S.ui.calm&&!RM()&&!document.hidden;
 const ascModal=()=>$("modal").classList.contains("on");
+
+/* ============ OS DOIS EIXOS ============================================================
+   o Ruído e a Perfeição são escalas SEPARADAS, e a Perfeição não vem do S: vem do atributo
+   que o core.js publica no body. o clima LÊ o data-perf e nunca escreve nele — o que ele
+   escreve é o --ouro, a cobertura derivada que o CSS consome, do mesmo jeito que o applyTheme
+   já escreve o --band. e o --ouro só existe enquanto o Ascensão está no ar: sair do elemento
+   ou entrar em calmar remove a propriedade, e aí nenhuma regra dourada tem de onde puxar. */
+const ascPerf=()=>{const v=parseInt(document.body.dataset.perf||"0",10);
+ return isNaN(v)?0:Math.max(0,Math.min(100,v))/100;};
+function ascOuroSync(){const st=document.body.style;
+ if(S.elem!=="asc"||S.ui.calm||RM())return void st.removeProperty("--ouro");
+ st.setProperty("--ouro",ascPerf().toFixed(3));}
+/* o medidor não passa por render() a cada passo do stepper — ele mexe no data-perf e pronto.
+   então o clima escuta o atributo: é o que faz a ficha inteira responder ao arrastar da barra
+   sem que o core.js precise conhecer o clima */
+if(window.MutationObserver)new MutationObserver(()=>{ascOuroSync();ascSync();})
+ .observe(document.body,{attributes:true,attributeFilter:["data-perf"]});
+
+/* ============ AS ENGRENAGENS — o inferno que MOVE a ficha ============
+   um canvas atrás dos painéis (z2, como o jardim do Germe e o céu do Vazio). engrenagens
+   sujas girando devagar, com dentes gastos e óleo, e uma delas é a MESTRA: cada volta que ela
+   fecha é uma batida — a moldura da ficha pulsa e o impacto soa. é isso que amarra o giro à
+   interface, em vez de deixar um enfeite girando num plano de fundo qualquer.
+   conforme a Perfeição sobe, o metal sujo vira geometria dourada limpa girando em silêncio. */
+const ASCN=[0,3,4,6,8,10];                                  /* engrenagens por banda */
+const ASCV=[0,.000075,.000105,.00014,.000185,.00024];       /* rad/ms da mestra por banda */
+const TAU=Math.PI*2;
+/* a cor: aço sujo no inferno, ouro no ápice. interpolação em rgb mesmo — são tons próximos o
+   bastante para não passar por cinza no meio do caminho */
+function ascMix(a,b,k,al){return `rgba(${Math.round(a[0]+(b[0]-a[0])*k)},${Math.round(a[1]+(b[1]-a[1])*k)},${Math.round(a[2]+(b[2]-a[2])*k)},${al})`;}
+const GC={aco:[58,50,45],ouro:[196,166,96],  /* corpo */
+ luz:[128,116,104],luzo:[252,241,203],       /* aresta iluminada */
+ esc:[16,11,9],esco:[92,74,34]};             /* sombra/vão */
+/* o desenho de UMA engrenagem, centrado na origem — vai para um sprite e não se repete por
+   frame: girar é drawImage com rotate, e é isso que deixa dez engrenagens caberem no orçamento */
+function ascGearPath(c,g,p){
+ const R=g.r,Rr=R*.83,n=g.n,pass=TAU/n,w=pass*.27,gp=pass*.5-w;
+ c.beginPath();
+ for(let i=0;i<n;i++){const a=i*pass;
+  /* dente gasto: o topo vem mais baixo e mais estreito — a máquina já rodou muito */
+  const ga=g.wr[i%g.wr.length],Rt=R*(1-ga*.16),ww=w*(1-ga*.3);
+  c.lineTo(Math.cos(a-ww)*Rt,Math.sin(a-ww)*Rt);
+  c.lineTo(Math.cos(a+ww)*Rt,Math.sin(a+ww)*Rt);
+  c.lineTo(Math.cos(a+ww+gp)*Rr,Math.sin(a+ww+gp)*Rr);
+  c.lineTo(Math.cos(a+pass-ww-gp)*Rr,Math.sin(a+pass-ww-gp)*Rr);}
+ c.closePath();
+ const gr=c.createRadialGradient(-R*.3,-R*.3,R*.15,0,0,R);
+ gr.addColorStop(0,ascMix(GC.aco,GC.ouro,p,.92));
+ gr.addColorStop(.72,ascMix(GC.esc,GC.esco,p,.95));
+ gr.addColorStop(1,ascMix(GC.aco,GC.ouro,p,.85));
+ c.fillStyle=gr;c.fill();
+ c.lineWidth=1;c.strokeStyle=ascMix(GC.luz,GC.luzo,p,.34+p*.3);c.stroke();
+ /* o vão central e os raios: sem eles a engrenagem vira uma roda dentada chapada */
+ c.beginPath();c.arc(0,0,R*.3,0,TAU);
+ c.fillStyle=ascMix(GC.esc,GC.esco,p,.9);c.fill();
+ c.strokeStyle=ascMix(GC.luz,GC.luzo,p,.3+p*.28);c.stroke();
+ c.beginPath();c.arc(0,0,R*.115,0,TAU);c.fillStyle="rgba(6,4,3,.95)";c.fill();
+ c.lineWidth=Math.max(2,R*.055);c.strokeStyle=ascMix(GC.aco,GC.ouro,p,.6+p*.25);
+ for(let i=0;i<g.rd;i++){const a=i*TAU/g.rd+g.ro;
+  c.beginPath();c.moveTo(Math.cos(a)*R*.16,Math.sin(a)*R*.16);
+  c.lineTo(Math.cos(a)*R*.74,Math.sin(a)*R*.74);c.stroke();}
+ /* o ÓLEO: manchas escuras escorrendo do eixo para fora. é o que separa maquinário sujo de
+    ícone de engrenagem — e é a primeira coisa que o ouro apaga */
+ if(p<.98)for(const o of g.oil){
+  c.save();c.rotate(o.a);
+  c.beginPath();c.ellipse(o.d*R,0,R*o.w,R*o.h,0,0,TAU);
+  c.fillStyle=`rgba(10,7,5,${(.5*(1-p)*o.o).toFixed(3)})`;c.fill();
+  c.restore();}}
+function ascSprite(g,p){const R=g.r,W=Math.ceil(R*2+8);
+ const cv=document.createElement("canvas");cv.width=cv.height=W;
+ const c=cv.getContext("2d");if(!c)return;
+ c.translate(W/2,W/2);ascGearPath(c,g,p);
+ g.sp=cv;g.spk=Math.round(p*10);}
+/* uma engrenagem nova. as grandes são poucas e lentas; as pequenas enchem os vãos e giram mais
+   rápido — proporção de trem de engrenagens, não de enfeite espalhado */
+function ascGearNew(grande){const r=Math.random,W=ASC.W||innerWidth,H=ASC.H||innerHeight;
+ const R=grande?(104+r()*86):(30+r()*54);
+ const n=Math.max(9,Math.round(R/7.2));
+ const wr=[];for(let i=0;i<7;i++)wr.push(r()<.3?r()*.9:0);   /* alguns dentes gastos */
+ const oil=[];for(let i=0,k=1+Math.floor(r()*3);i<k;i++)oil.push({a:r()*TAU,d:.32+r()*.4,w:.07+r()*.1,h:.16+r()*.16,o:.5+r()*.5});
+ return {x:r()*W,y:r()*H,r:R,n,wr,oil,rd:3+Math.floor(r()*4),ro:r()*TAU,
+  a:r()*TAU,dir:r()<.5?-1:1,k:grande?1:(.5+r()*1.5)*(R>60?1:1.8),sp:null,spk:-1,big:!!grande};}
+function ascSemear(alvo){const r=Math.random;
+ while(ASC.gs.length>alvo)ASC.gs.pop();
+ while(ASC.gs.length<alvo)ASC.gs.push(ascGearNew(ASC.gs.length<2||r()<.22));
+ /* a mestra é a maior: é a volta dela que vira batida */
+ ASC.drv=null;for(const g of ASC.gs)if(!ASC.drv||g.r>ASC.drv.r)ASC.drv=g;
+ ASC.acc=0;}
+function ascBeatClear(){clearTimeout(ASC.beatRm);ASC.beatRm=null;
+ document.body.classList.remove("asc-beat");}
+/* A BATIDA: a mestra fechou a volta. a moldura pulsa e o impacto soa — o mesmo instante para
+   os dois, que é o que faz parecer que a engrenagem MOVE a ficha e não só gira atrás dela */
+function ascBeat(p){ascBeatClear();
+ document.body.classList.add("asc-beat");
+ ASC.beatRm=setTimeout(ascBeatClear,190);
+ if(AUD.ctx&&!S.ui.mute)ascImpact(p);}
+function ascStep(dt){const b=bandOf(S.ruido||0),p=ascPerf();
+ const v=ASCV[b]||0;
+ for(const g of ASC.gs){g.a+=v*g.k*g.dir*dt;
+  if(g.spk!==Math.round(p*10))ascSprite(g,p);}   /* o ouro subiu: repinta o sprite */
+ if(ASC.drv){ASC.acc+=v*ASC.drv.k*dt;
+  if(ASC.acc>=TAU){ASC.acc-=TAU;ascBeat(p);}}
+ ASC.dirty=true;}
+/* A LAVAGEM DE FUNDO — o inferno escorrendo pelos cantos e, por cima dele, a tinta dourada. as
+   duas na mesma camada e com pesos complementares: no p=0 não há uma gota de ouro, no p=1 não
+   sobra vermelho nenhum.
+   fica em CACHE porque ela só muda quando a banda ou a Perfeição mudam — três gradientes de
+   tela cheia por quadro custavam mais que as dez engrenagens somadas (47fps contra 60) */
+function ascWash(){const b=bandOf(S.ruido||0),p=ascPerf(),W=ASC.W,H=ASC.H;
+ const k=b+"|"+Math.round(p*20)+"|"+W+"x"+H;
+ if(ASC.washk===k&&ASC.wash)return ASC.wash;
+ const cv=ASC.wash&&ASC.wash.width===W&&ASC.wash.height===H?ASC.wash:document.createElement("canvas");
+ cv.width=W;cv.height=H;
+ const c=cv.getContext("2d");if(!c)return null;
+ c.clearRect(0,0,W,H);
+ if(p<1){const a=(1-p)*(.1+b*.055);
+  let gr=c.createRadialGradient(W*.04,H*.02,0,W*.04,H*.02,Math.max(W,H)*.78);
+  gr.addColorStop(0,`rgba(96,26,18,${(a*.9).toFixed(3)})`);gr.addColorStop(1,"rgba(96,26,18,0)");
+  c.fillStyle=gr;c.fillRect(0,0,W,H);
+  gr=c.createRadialGradient(W*.98,H,0,W*.98,H,Math.max(W,H)*.7);
+  gr.addColorStop(0,`rgba(58,20,14,${(a*.8).toFixed(3)})`);gr.addColorStop(1,"rgba(58,20,14,0)");
+  c.fillStyle=gr;c.fillRect(0,0,W,H);}
+ if(p>0){const gr=c.createLinearGradient(0,0,0,H);
+  gr.addColorStop(0,`rgba(252,241,203,${(p*.10).toFixed(3)})`);
+  gr.addColorStop(.55,`rgba(226,198,132,${(p*.05).toFixed(3)})`);
+  gr.addColorStop(1,`rgba(255,250,232,${(p*.085).toFixed(3)})`);
+  c.fillStyle=gr;c.fillRect(0,0,W,H);}
+ ASC.wash=cv;ASC.washk=k;return cv;}
+function ascDraw(c){const p=ascPerf(),W=ASC.W,H=ASC.H;
+ c.clearRect(0,0,W,H);
+ const w=ascWash();if(w)c.drawImage(w,0,0);
+ /* e as engrenagens. regra 3: a que encostar na zona ativa simplesmente não é desenhada —
+    nada de maquinário passando por baixo do campo que você está preenchendo */
+ for(const g of ASC.gs){
+  if(!g.sp)ascSprite(g,p);
+  if(!g.sp)continue;
+  const R=g.r+4;
+  if(g.x+R<0||g.x-R>W||g.y+R<0||g.y-R>H)continue;
+  if(ASC.forbBox({l:g.x-R,r:g.x+R,t:g.y-R,b:g.y+R}))continue;
+  c.save();c.translate(g.x,g.y);c.rotate(g.a);
+  c.drawImage(g.sp,-g.sp.width/2,-g.sp.height/2);c.restore();}}
+const ASC=new ClimateEffect({id:"asc",cv:"fx-asc",zr:118,pad:26,fb:"#c15a45",
+ timers:["beatRm"],
+ state:{gs:[],drv:null,acc:0,lb:-1,beatRm:null,wash:null,washk:""},
+ mount(){ASC.lb=bandOf(S.ruido||0);ascSemear(ASCN[ASC.lb]);ASC.dirty=true;},
+ /* regra 6 — nada sobra: nem engrenagem, nem sprite, nem lavagem em cache, nem a classe da
+    batida no body. o cache guarda um canvas do tamanho da tela: soltá-lo é o certo */
+ tear(){ASC.gs=[];ASC.drv=null;ASC.acc=0;ASC.lb=-1;ASC.wash=null;ASC.washk="";ascBeatClear();},
+ /* só na MUDANÇA de banda: semear a cada syncFX repovoaria o trem inteiro a cada clique */
+ band(b){if(b===ASC.lb)return;ASC.lb=b;ascSemear(ASCN[b]);ASC.dirty=true;},
+ step:ascStep,draw:ascDraw});
+/* de propósito SEM o bloco `aud` da base: ela sobe e desce UM ganho, e aqui são dois — o
+   industrial e o coral, cruzados pela Perfeição. quem cuida disso é o ascAudSync, e o tear da
+   base não tem gain nenhum para mexer (this.aud é nulo, o audOff dela sai na primeira linha) */
 /* a zona ativa, na forma que o Ascensão usa em TUDO (correção, peel e jam): o que está sob o
    cursor e o que está em edição ficam de fora, sempre, e o alvo nunca é um controle.
    um painel CONTÉM campos (é um painel) — quem não pode ter campo dentro é o alvo de texto do
@@ -1718,12 +1908,15 @@ function ascCorrNow(force){
  if(!alvo)return false;                /* tudo ocupado: a máquina espera a próxima janela */
  _crForce=false;_crLast=agora;
  _crEl=alvo;alvo.classList.add("asc-correct");
- /* o estalo metálico da trava encaixando acompanha o movimento; na banda 5 o corte de luz
-    sai no MESMO instante que ele — flash e som são o mesmo evento, não dois.
-    na 4 o que sai no lugar dele é a rachadura: o mesmo ouro, ainda preso embaixo do metal */
- if(b>=5)ascJudge(alvo);
- else if(b===4&&Math.random()<.45)ascCrack(alvo);
- if(b>=4&&AUD.ctx&&!S.ui.mute)ascClick(AUD.ctx.currentTime+.005,agora<_crLoud);
+ /* O MESMO EVENTO, DUAS CARAS, e quem escolhe é a Perfeição — não a banda. no inferno é o
+    estalo metálico sujo e nada mais; no ouro é o corte de luz reto no MESMO instante do som.
+    a chance de o corte sair é o próprio p, então a travessia é contínua: em 50% metade das
+    correções vira luz, e é essa alternância que faz a ficha parecer estar sendo trocada peça
+    por peça. no meio do caminho ainda escapa a rachadura — ouro preso embaixo do metal */
+ const p=ascPerf();
+ if(Math.random()<p)ascJudge(alvo);
+ else if(p>0&&p<.8&&Math.random()<p*1.6)ascCrack(alvo);
+ if(AUD.ctx&&!S.ui.mute&&b>=2)ascClick(AUD.ctx.currentTime+.005,agora<_crLoud);
  _crRm=setTimeout(ascCorrClear,alvo.classList.contains("wrap")?480:400);
  ascCorrSched();                       /* a correção que acabou de sair reancora o agendador */
  return true;}
@@ -1732,17 +1925,17 @@ function ascCorrArm(ms){clearTimeout(_crT);
  _crT=setTimeout(()=>{_crT=null;ascCorrNow(false);if(!_crT)ascCorrSched();},Math.max(60,ms));}
 function ascCorrSched(){ascCorrArm(ascGap(bandOf(S.ruido||0)));}
 
-/* --- O OURO VAZANDO — banda 4, e só ela ------------------------------------------------
+/* --- O OURO VAZANDO — a Perfeição ainda presa embaixo do inferno ------------------------
    uma rachadura quente abre numa junta de aço por um instante, como se algo radiante estivesse
-   pressionando por baixo do metal sujo, e fecha no mesmo movimento. nunca é protagonista: sai
-   de carona na correção e no pistão, sempre com sorteio, sempre sozinha, sempre sumindo.
-   é a PRÉVIA da banda 5 — sem ela, o ouro total do ápice seria um susto vindo do nada.
-   na banda 5 ela não existe mais: lá o ouro não vaza pela junta, ele É a moldura (CSS). */
+   pressionando por baixo do metal sujo, e fecha no mesmo movimento. é o estágio INTERMEDIÁRIO
+   do eixo dourado: em perf baixo ela é o único ouro que se vê, e some quando o ouro deixa de
+   precisar vazar porque já É a moldura (perf alto, tudo CSS). nunca é protagonista — sai de
+   carona na correção e no pistão, sempre sorteada, sempre sozinha, sempre sumindo. */
 let _ckEl=null,_ckRm=null;
 function crackClear(){clearTimeout(_ckRm);_ckRm=null;
  if(_ckEl&&_ckEl.parentNode)_ckEl.parentNode.removeChild(_ckEl);_ckEl=null;}
-function ascCrack(el){
- if(!ascOn(4)||bandOf(S.ruido||0)!==4||!el||!el.getBoundingClientRect)return;
+function ascCrack(el){const p=ascPerf();
+ if(!ascOn(1)||p<=0||p>=.8||!el||!el.getBoundingClientRect)return;
  const r=el.getBoundingClientRect();
  if(r.width<90||r.height<26)return;
  const vert=Math.random()<.35;
@@ -1761,17 +1954,19 @@ function ascCrack(el){
  d.style.cssText=cs;document.body.appendChild(d);_ckEl=d;
  _ckRm=setTimeout(crackClear,470);}
 
-/* --- O PISTÃO — bandas 3-4: a máquina operando SOBRE a carne ----------------------------
+/* --- O PISTÃO — a máquina operando SOBRE a carne ----------------------------------------
    um lado do painel é comprimido e solto, travado, com o estalo metálico. a diferença para a
    correção é de quem age: a correção é o painel se ajustando, o pistão é algo de FORA prensando
-   ele. por isso os dois nunca saem juntos — e por isso ele morre na banda 5, onde não sobrou
-   carne para prensar. piso próprio, zona ativa igual à de todo o resto do elemento. */
+   ele. por isso os dois nunca saem juntos. é peça do EIXO RUÍDO: nasce na banda 3 e vai até a
+   5, e quem o mata é a Perfeição — quando não sobra carne para prensar, não há o que prensar.
+   piso próprio, zona ativa igual à de todo o resto do elemento. */
 const ASCXPISO=9000;
 let _pxT=null,_pxEl=null,_pxRm=null,_pxLast=-1e9,_pxB=false;
 function pistonClear(){clearTimeout(_pxRm);_pxRm=null;
  if(_pxEl){_pxEl.classList.remove("asc-piston");_pxEl.style.removeProperty("--porig");_pxEl=null;}}
-function pistonNow(){const b=bandOf(S.ruido||0);
- if(!ascOn(3)||b>=5||ascModal()||performance.now()-_pxLast<ASCXPISO)return false;
+function pistonNow(){const b=bandOf(S.ruido||0),p=ascPerf();
+ if(!ascOn(3)||ascModal()||performance.now()-_pxLast<ASCXPISO)return false;
+ if(Math.random()<p)return false;       /* o ouro cobriu justamente esta: o inferno rareia */
  if(_crEl)return false;                 /* correção em curso: um alvo por vez, sempre */
  const alvo=ascCorrAlvo(1);             /* o 1 tira o caso do .wrap: o pistão prensa PAINEL */
  if(!alvo||alvo===_crEl)return false;
@@ -1780,7 +1975,7 @@ function pistonNow(){const b=bandOf(S.ruido||0);
  _pxEl=alvo;alvo.style.setProperty("--porig",Math.random()<.5?"left":"right");
  alvo.classList.add("asc-piston");
  if(AUD.ctx&&!S.ui.mute)ascClick(AUD.ctx.currentTime+.07);  /* o estalo no fundo do curso */
- if(b>=4&&Math.random()<.4)ascCrack(alvo);                  /* o ouro espremido pela junta */
+ if(Math.random()<p*1.6)ascCrack(alvo);                     /* o ouro espremido pela junta */
  _pxRm=setTimeout(pistonClear,440);return true;}
 function pistonSched(){clearTimeout(_pxT);_pxB=bandOf(S.ruido||0)>=4;
  _pxT=setTimeout(()=>{pistonNow();pistonSched();},(_pxB?17+Math.random()*16:34+Math.random()*26)*1000);}
@@ -1853,41 +2048,100 @@ function jamNow(min,alvo){jamClear();
 /* também reserva de fundo: o jam de verdade nasce do que VOCÊ faz (ver TRIGFX.asc) */
 function jamSched(){clearTimeout(_jmT);_jmT=setTimeout(()=>{jamNow();jamSched();},50000+Math.random()*45000);}
 
-/* --- o servo sonoro: um whirr de motor reposicionando, sintetizado com varredura de pitch --- */
-const ascLvl=b=>b>=5?.016:.010;
-/* forte = o estalo do surto: mais alto e mais NÍTIDO (Q maior, brilho mais em cima) */
-function ascClick(t,forte){const c=AUD.ctx;if(!c)return;try{ /* o estalo metálico da trava encaixando */
- const g=c.createGain(),f=c.createBiquadFilter(),o=c.createOscillator();
- f.type="bandpass";f.frequency.value=(forte?3100:2300)+Math.random()*1000;f.Q.value=forte?24:14;
- o.type="square";o.frequency.value=2400;
- g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(forte?.036:.018,t+.003);g.gain.exponentialRampToValueAtTime(.0001,t+(forte?.07:.05));
- o.connect(f);f.connect(g);g.connect(c.destination);o.start(t);o.stop(t+.11);}catch(e){}}
-function ascServo(){if(!AUD.ctx||S.ui.mute||!ascOn(4))return;
- const c=AUD.ctx,t=c.currentTime,b=bandOf(S.ruido||0),dur=.15+Math.random()*.12,pico=b>=5?.028:.019;
+/* ============ O SOM DOS DOIS EIXOS ============
+   o RUÍDO manda no volume do industrial (drone distorcido + impactos de engrenagem + estalos
+   ásperos). a PERFEIÇÃO faz o crossfade: ela abaixa o inferno e levanta o coral, e no meio do
+   caminho os dois tocam juntos de propósito — ouvir o coral nascendo por cima da distorção é
+   parte do que a transformação deveria dar de desconfortável. */
+const ascLvl=b=>b>=5?.030:(b>=4?.024:(b>=3?.017:(b>=2?.011:.006)));
+const ascAnjLvl=p=>.012+p*.018;   /* o coral não precisa ser alto: ele precisa cobrir */
+/* o estalo. no inferno é sujo e áspero (banda larga, ruído junto); no ouro é um corte curto,
+   alto e limpo. os dois saem no mesmo evento com pesos complementares — nunca há um terceiro
+   som, é o MESMO estalo sendo trocado peça por peça, igual ao resto da ficha.
+   forte = o estalo do surto: mais alto e mais nítido */
+function ascClick(t,forte){const c=AUD.ctx;if(!c)return;const p=ascPerf();
+ try{
+  if(p<1){ /* o lado sujo */
+   const g=c.createGain(),f=c.createBiquadFilter(),o=c.createOscillator();
+   f.type="bandpass";f.frequency.value=(forte?3100:2300)+Math.random()*1000;f.Q.value=forte?9:5.5;
+   o.type="square";o.frequency.value=1900+Math.random()*900;
+   const pk=(forte?.042:.022)*(1-p);
+   g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(pk,t+.003);
+   g.gain.exponentialRampToValueAtTime(.0001,t+(forte?.09:.065));
+   o.connect(f);f.connect(g);g.connect(c.destination);o.start(t);o.stop(t+.13);
+   /* e a aspereza: um estouro curto de ruído junto do estalo. é isto que o faz soar a metal
+      batendo em metal sujo, e não a um bip de sintetizador */
+   const n=Math.floor(c.sampleRate*.05),bf=c.createBuffer(1,n,c.sampleRate),ch=bf.getChannelData(0);
+   for(let i=0;i<n;i++)ch[i]=(Math.random()*2-1)*(1-i/n);
+   const s=c.createBufferSource();s.buffer=bf;
+   const nf=c.createBiquadFilter();nf.type="bandpass";nf.frequency.value=1500+Math.random()*1400;nf.Q.value=1.1;
+   const ng=c.createGain();ng.gain.setValueAtTime(pk*.85,t);ng.gain.exponentialRampToValueAtTime(.0001,t+.06);
+   s.connect(nf);nf.connect(ng);ng.connect(c.destination);s.start(t);s.stop(t+.08);}
+  if(p>0){ /* o lado do julgamento: seno alto, ataque instantâneo, decaimento curto e limpo */
+   const g=c.createGain(),o=c.createOscillator();
+   o.type="sine";o.frequency.value=2093;                         /* C7 */
+   const o2=c.createOscillator();o2.type="sine";o2.frequency.value=3136;
+   const g2=c.createGain();g2.gain.value=.4;o2.connect(g2);g2.connect(g);
+   const pk=(forte?.03:.02)*p;
+   g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(pk,t+.002);
+   g.gain.exponentialRampToValueAtTime(.0001,t+.16);
+   o.connect(g);g.connect(c.destination);o.start(t);o2.start(t);o.stop(t+.2);o2.stop(t+.2);}
+ }catch(e){}}
+/* O IMPACTO da engrenagem-mestra: o golpe pesado do maquinário fechando a volta. corpo grave
+   com queda rápida de pitch + o baque de ruído filtrado. é a batida da "banda de metal", e é o
+   primeiro som que o ouro cala — na catedral a máquina gira sem fazer barulho */
+function ascImpact(p){const c=AUD.ctx;if(!c||S.ui.mute||!ascOn(1))return;
+ const b=bandOf(S.ruido||0),t=c.currentTime+.01,k=(1-(p==null?ascPerf():p));
+ if(k<=.02)return;
+ const pk=(b>=5?.075:(b>=4?.058:(b>=3?.042:(b>=2?.028:.017))))*k;
+ try{
+  const o=c.createOscillator();o.type="sine";
+  o.frequency.setValueAtTime(104,t);o.frequency.exponentialRampToValueAtTime(31,t+.16);
+  const g=c.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(pk,t+.006);
+  g.gain.exponentialRampToValueAtTime(.0001,t+.34);
+  o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+.4);
+  /* o baque: ruído curto num passa-baixa. dá o "peso" que o seno sozinho não tem */
+  const n=Math.floor(c.sampleRate*.2),bf=c.createBuffer(1,n,c.sampleRate),ch=bf.getChannelData(0);
+  for(let i=0;i<n;i++)ch[i]=(Math.random()*2-1)*Math.pow(1-i/n,2.4);
+  const s=c.createBufferSource();s.buffer=bf;
+  const f=c.createBiquadFilter();f.type="lowpass";f.frequency.value=340;f.Q.value=2.6;
+  const ng=c.createGain();ng.gain.setValueAtTime(pk*.9,t);ng.gain.exponentialRampToValueAtTime(.0001,t+.22);
+  s.connect(f);f.connect(ng);ng.connect(c.destination);s.start(t);s.stop(t+.26);}catch(e){}}
+/* o RANGIDO: metal sob esforço, no meio dos impactos. varredura de pitch subindo e freando */
+function ascServo(){if(!AUD.ctx||S.ui.mute||!ascOn(3))return;
+ const k=1-ascPerf();if(k<=.05)return;
+ const c=AUD.ctx,t=c.currentTime,b=bandOf(S.ruido||0),dur=.2+Math.random()*.2,pico=(b>=5?.03:.02)*k;
  try{const g=c.createGain(),f=c.createBiquadFilter(),o=c.createOscillator();
   f.type="bandpass";f.Q.value=3.2;f.frequency.setValueAtTime(650,t);
   f.frequency.linearRampToValueAtTime(1800,t+dur*.5);f.frequency.linearRampToValueAtTime(600,t+dur);
   o.type="sawtooth";o.frequency.setValueAtTime(150+Math.random()*60,t);
   o.frequency.linearRampToValueAtTime(500+Math.random()*230,t+dur*.45);
-  o.frequency.linearRampToValueAtTime(230,t+dur); /* sobe rápido, freia: o motor achando a posição */
+  o.frequency.linearRampToValueAtTime(230,t+dur); /* sobe rápido, freia: o motor sob carga */
   g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(pico,t+.012);
   g.gain.setValueAtTime(pico,t+dur-.03);g.gain.exponentialRampToValueAtTime(.0001,t+dur+.06);
-  o.connect(f);f.connect(g);g.connect(c.destination);o.start(t);o.stop(t+dur+.12);
-  if(b>=5)ascClick(t+dur+.02);}catch(e){}}
-function ascAudOff(){clearTimeout(AUD.atimer);AUD.atimer=null;AUD.aon=false;
- if(!AUD.ctx||!AUD.agn)return;try{const t=AUD.ctx.currentTime;
-  AUD.agn.gain.cancelScheduledValues(t);AUD.agn.gain.setTargetAtTime(0,t,.5);}catch(e){}}
-/* o mesmo silêncio do ápice vale para o som: na banda 5 o motor se reposiciona MENOS, não mais.
-   o que se ouve lá é o estalo seco da trava junto do corte de luz, não um servo trabalhando */
+  o.connect(f);f.connect(g);g.connect(c.destination);o.start(t);o.stop(t+dur+.12);}catch(e){}}
+/* regra 6: sair do elemento deixa OS DOIS barramentos caindo, não só o industrial */
+function ascAudOff(){clearTimeout(AUD.atimer);AUD.atimer=null;AUD.aon=false;AUD.jon=false;
+ if(!AUD.ctx)return;try{const t=AUD.ctx.currentTime;
+  for(const g of [AUD.agn,AUD.ajn]){if(!g)continue;
+   g.gain.cancelScheduledValues(t);g.gain.setTargetAtTime(0,t,.5);}}catch(e){}}
 function ascAudTick(){if(!AUD.aon)return;const b=bandOf(S.ruido||0);
  ascServo();
- AUD.atimer=setTimeout(ascAudTick,(b>=5?12+Math.random()*13:8+Math.random()*10)*1000);}
+ AUD.atimer=setTimeout(ascAudTick,(b>=5?9+Math.random()*9:13+Math.random()*13)*1000);}
+/* O CROSSFADE. os dois ganhos são complementares e ambos derivam de p: no 0 o coral está em
+   zero absoluto (nenhum ouro se ouve sem Perfeição), no 1 o industrial está em zero absoluto
+   (o inferno some mesmo com o Ruído em 5), e no meio os dois têm ganho > 0 ao mesmo tempo */
 function ascAudSync(want,b){
  if(!want||!AUD.gest)return ascAudOff();
  if(!audBuild())return;
  if(AUD.ctx.state==="suspended")AUD.ctx.resume().catch(()=>{});
- try{const t=AUD.ctx.currentTime;AUD.agn.gain.cancelScheduledValues(t);
-  AUD.agn.gain.setTargetAtTime(ascLvl(b),t,1.6);}catch(e){}
+ const p=ascPerf();
+ try{const t=AUD.ctx.currentTime;
+  AUD.agn.gain.cancelScheduledValues(t);
+  AUD.agn.gain.setTargetAtTime(ascLvl(b)*(1-p),t,1.6);
+  AUD.ajn.gain.cancelScheduledValues(t);
+  AUD.ajn.gain.setTargetAtTime(ascAnjLvl(p)*p,t,2.4);   /* o coral entra mais devagar */
+  AUD.jon=p>0;}catch(e){}
  if(!AUD.aon){AUD.aon=true;AUD.atimer=setTimeout(ascAudTick,(5+Math.random()*7)*1000);}}
 
 /* --- as reações às SUAS ações. o Ascensão não é aleatório: ele te observa e te ajusta ------
@@ -1941,20 +2195,28 @@ function ascSync(){const b=bandOf(S.ruido||0),on=ascOn(1);
  if(!on||b<3)ascCorrClear();
  /* o pistão vive na faixa 3-4 e em nenhum outro lugar: descer da 5 tem que APAGAR a classe,
     senão a compressão fica pendurada num painel que já virou geometria dourada */
- if(on&&b>=3&&b<5){if(!_pxT||_pxB!==(b>=4))pistonSched();}else{clearTimeout(_pxT);_pxT=null;}
- if(!on||b<3||b>=5)pistonClear();
- /* e o ouro é banda-exclusivo dos dois lados: a rachadura só existe na 4, o corte de luz só na
-    5. sair de qualquer uma das duas leva o seu ouro junto na mesma hora — sem esperar o timer
-    de 260ms que normalmente apaga o corte, senão uma queda de banda deixa luz de ápice acesa
-    numa banda que ainda é carne */
- if(!on||b!==4)crackClear();
- if(!on||b<5)ascJudgeClear();
+ /* o pistão é do inferno e vai até o topo do Ruído agora; quem o apaga é a Perfeição, e isso
+    é sorteio dentro do pistonNow — não gate de banda */
+ if(on&&b>=3){if(!_pxT||_pxB!==(b>=4))pistonSched();}else{clearTimeout(_pxT);_pxT=null;}
+ if(!on||b<3)pistonClear();
+ /* O OURO É EXCLUSIVO DA PERFEIÇÃO, e some no instante em que ela sai de faixa: a rachadura só
+    vive na travessia (0 < p < .8) e o corte de luz só onde há p. sem isto, baixar a barra ou
+    trocar de personagem deixaria luz dourada acesa numa ficha que voltou a ser só carne */
+ const p=ascPerf();
+ if(!on||p<=0||p>=.8)crackClear();
+ if(!on||p<=0)ascJudgeClear();
  if(on&&b>=2){if(!_pkT||_pkB!==(b>=4))peelSched();}else{clearTimeout(_pkT);_pkT=null;peelClear();}
  /* o agendador do jam continua sendo da banda 5; o que desce para a 4 é o jam POR GATILHO, e
     por isso a classe só é varrida quando o elemento inteiro sai do ar ou cai abaixo da 4 */
  if(on&&b>=5){if(!_jmT)jamSched();}else{clearTimeout(_jmT);_jmT=null;}
  if(!on||b<4)jamClear();
- ascAudSync(on&&b>=4&&!S.ui.mute,b);}
+ /* as engrenagens (regra 1/6 da base: montar, redimensionar, apagar e esquecer) e a cobertura
+    dourada que o CSS lê. o ascOuroSync também tira a variável quando o elemento sai de cena */
+ ASC.sync();ascOuroSync();
+ if(!on)ascBeatClear();
+ /* o som existe a partir da banda 1 — o industrial é o AMBIENTE do elemento agora, não um
+    extra de banda alta. o volume é que escala, e o coral entra por cima pela Perfeição */
+ ascAudSync(on&&!S.ui.mute,b);}
 
 /* ============ PRESENÇA / INTRUSÃO — elemento Pacto ============
    os outros cinco DECORAM a tela. o Pacto invade a conversa: ele responde ao que você acabou

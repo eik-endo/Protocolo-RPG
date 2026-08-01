@@ -337,55 +337,102 @@ body[data-el=obs]:not(.calm) .wrap .panel:not(:hover):not(:focus-within){backgro
    do perceptível, e o que se VÊ é a CORREÇÃO — um evento único, seco e raro, com a classe
    posta e tirada pelo climate.js. um alvo por vez, nunca um loop infinito em tudo ao mesmo
    tempo: era isso que cansava em minutos. */
-/* O ARCO POR BANDA. o Ascensão não é um estado, é um PROCESSO com começo e fim:
-   1-2 o rascunho — carne e aço fundidos à força, sujo, úmido, sob pressão;
-   3-4 a violência — o metal ganha, o pistão prensa, e na 4 o ouro começa a VAZAR pelas juntas;
-   5   a Ascensão — o ouro APAGA o rascunho. geometria reta, silêncio, nenhuma carne restante.
-   duas variáveis carregam isso: --carne (a mancha orgânica, morre subindo) e --ecj (o ouro de
-   julgamento, nasce na 4). elas nunca coexistem em pé de igualdade — é substituição, não mistura.
+/* ===== OS DOIS EIXOS =====================================================================
+   o Ascensão não tem UMA escala, tem DUAS, e elas vêm de números diferentes:
+
+   EIXO RUÍDO (data-band 1→5) — O INFERNO. carne fundida a metal, óleo, sangue escuro, aço
+   rompendo por baixo. cresce reto com a banda: 1 é sujeira no canto, 5 é a ficha inteira
+   virada um organismo-máquina sob pressão. mora em --carne.
+
+   EIXO PERFEIÇÃO (data-perf 0→100) — A ASCENSÃO. ouro radiante que APAGA o inferno. mora em
+   --ouro (0..1), escrito no body pelo climate.js a partir do data-perf que o core.js publica.
+
+   A COMPOSIÇÃO é uma tinta por cima, não uma disputa: o inferno é a camada de baixo e o ouro
+   é a de cima, com cobertura = --ouro. --infer resolve isso de uma vez — é o inferno JÁ
+   descontado do que o ouro cobriu, e todo alpha de carne/óleo/ferrugem passa por ele. daí os
+   dois extremos saírem de graça e exatos: --ouro:0 zera toda camada dourada, e --ouro:1 zera
+   --infer, então não sobra carne nenhuma por baixo do ouro nem com o Ruído em 5.
+
    --ec/--ecd seguem INTOCADOS: meio código calcula tema a partir deles (o _ecCache, inclusive). */
+body[data-el=asc]{--ouro:0;--carne:0;
+ --infer:calc(var(--carne)*(1 - var(--ouro)));
+ --ecj:rgba(252,241,203,.85);
+ /* as duas cores do inferno, já misturadas em direção ao ouro pela cobertura. o color-mix
+    aninhado é o que dá a interpolação contínua: a mesma moldura sai ferrugem no 0 e aresta
+    dourada uniforme no 100, sem salto e sem regra por faixa */
+ --infr:color-mix(in srgb,var(--ecj) calc(var(--ouro)*100%),color-mix(in srgb,var(--ecd) calc(var(--carne)*100%),var(--line)));
+ --infl:color-mix(in srgb,var(--ecj) calc(var(--ouro)*100%),color-mix(in srgb,#2b1512 calc(var(--carne)*100%),var(--line)))}
 /* --srvstep: o tamanho do passo do servo. quanto mais alta a banda, menos passos = mais travado */
-body[data-el=asc][data-band="1"]{--srvstep:steps(4,end);--vib:0px;--carne:.5}
-body[data-el=asc][data-band="2"]{--srvstep:steps(4,end);--vib:0px;--carne:1}
-body[data-el=asc][data-band="3"]{--srvstep:steps(3,end);--vib:.06px;--carne:.62}
-body[data-el=asc][data-band="4"]{--srvstep:steps(3,end);--vib:.1px;--carne:.26;--ecj:rgba(253,229,156,.62)}
-/* banda 5: nenhuma carne (--carne:0, e não "quase zero" — a substituição é total) e o tremor
-   ACABA. a máquina alcançou a perfeição: não precisa mais se corrigir tremendo */
-body[data-el=asc][data-band="5"]{--srvstep:steps(2,end);--vib:0px;--carne:0;--ecj:rgba(252,241,203,.72)}
+body[data-el=asc][data-band="1"]{--srvstep:steps(4,end);--carne:.18}
+body[data-el=asc][data-band="2"]{--srvstep:steps(4,end);--carne:.4}
+body[data-el=asc][data-band="3"]{--srvstep:steps(3,end);--carne:.62}
+body[data-el=asc][data-band="4"]{--srvstep:steps(3,end);--carne:.82}
+body[data-el=asc][data-band="5"]{--srvstep:steps(2,end);--carne:1}
 body[data-el=asc] .btn,body[data-el=asc] .tabs button,body[data-el=asc] .rseg,body[data-el=asc] .rec .stp,
 body[data-el=asc] .bar i,body[data-el=asc] .dropzone,body[data-el=asc] .sw,body[data-el=asc] .sc,
 body[data-el=asc] .doc,body[data-el=asc] #rollcard,body[data-el=asc] #whisper,body[data-el=asc] .toast,
 body[data-el=asc] .mtier,body[data-el=asc] .elc{transition-timing-function:var(--srvstep,ease)}
-/* a moldura: ferrugem na borda, aço polido por dentro — cresce com a banda.
-   o terceiro inset é a JUNTA FORÇADA das bandas baixas: o aço mordendo por dentro e a carne
-   cedendo escura em volta dele. some sozinho quando --carne chega a zero */
-body[data-el=asc] .panel{border-image:repeating-linear-gradient(45deg,var(--ecd) 0 8px,var(--line) 8px 16px) 1;
+/* AS ENGRENAGENS vivem atrás da ficha (z2, como o jardim e o céu). para elas EXISTIREM o painel
+   precisa deixar passar um pouco — a mesma cortesia que o Germe e a Observação já fazem — e a
+   fresta abre com a banda: banda 1 quase opaco, banda 5 dá para ver a máquina girando por trás.
+   sob o cursor e sob edição o painel volta a fechar: onde você trabalha, nada atravessa */
+#fx-asc{position:fixed;inset:0;pointer-events:none;z-index:2;opacity:0;visibility:hidden;transition:opacity 1.6s,visibility 1.6s}
+body[data-el=asc] #fx-asc{visibility:visible;opacity:calc(.46 + var(--band)*.1)}
+body[data-el=asc]:not(.calm) .wrap .panel:not(:hover):not(:focus-within){background:rgba(22,17,13,calc(.97 - var(--band)*.058));transition:background .5s}
+/* a moldura: ferrugem que vira aresta dourada. o último inset é a JUNTA FORÇADA do inferno —
+   o aço mordendo por dentro e a carne cedendo escura em volta — e ele morre junto com --infer */
+body[data-el=asc] .panel{border-image:repeating-linear-gradient(45deg,var(--infr) 0 8px,var(--infl) 8px 16px) 1;
  box-shadow:inset 0 1px 0 rgba(198,214,228,calc(.03 + var(--band)*.03)),inset 0 -1px 0 rgba(0,0,0,calc(.22 + var(--band)*.08)),
-  inset 0 0 calc(var(--carne,0)*15px) calc(var(--carne,0)*-3px) rgba(56,15,11,calc(var(--carne,0)*.55))}
-/* bandas 1-2: a junta não fecha direito. as faixas da moldura ficam de larguras desiguais e
-   entram tons de carne no meio da ferrugem — a fusão foi à força, não foi projetada */
-body[data-el=asc][data-band="1"] .panel,body[data-el=asc][data-band="2"] .panel{
- border-image:repeating-linear-gradient(38deg,var(--ecd) 0 5px,#2b1512 5px 9px,var(--line) 9px 14px,#3c1d16 14px 17px,var(--line2) 17px 23px) 1}
-/* a superfície do painel. de baixo para cima: manchas de carne (úmidas, escuras, entrando pelos
-   cantos), o reflexo molhado curto, e por cima o aço polido pegando a luz. tudo gradiente —
-   nenhuma imagem, nenhum desenho de ferida: o horror é industrial, é PRESSÃO e fluido */
+  inset 0 0 calc(var(--infer)*15px) calc(var(--infer)*-3px) rgba(56,15,11,calc(var(--infer)*.55))}
+/* A CAMADA DE BAIXO — o inferno na superfície do painel. de baixo para cima: manchas de carne
+   úmidas entrando pelos cantos, o óleo escorrendo, o brilho molhado e o aço sujo pegando a luz.
+   tudo gradiente: nenhuma imagem, nenhum desenho de ferida. o horror é PRESSÃO e fluido */
 body[data-el=asc] .panel::before{content:"";position:absolute;inset:0;pointer-events:none;
- background:linear-gradient(104deg,transparent 0 16%,rgba(200,216,230,calc(.004 + var(--band)*.011)) 25% 32%,transparent 41% 63%,rgba(200,216,230,calc(.003 + var(--band)*.008)) 70% 74%,transparent 82%),
-  radial-gradient(38% 20% at 26% 13%,rgba(206,140,116,calc(var(--carne,0)*.06)) 0 42%,transparent 76%),
-  radial-gradient(126% 66% at 3% 0%,rgba(86,29,22,calc(var(--carne,0)*.36)) 0 21%,rgba(49,17,14,calc(var(--carne,0)*.18)) 47%,transparent 73%),
-  radial-gradient(98% 58% at 99% 103%,rgba(74,24,18,calc(var(--carne,0)*.3)) 0 25%,transparent 65%),
-  radial-gradient(46% 118% at 64% 52%,rgba(61,21,17,calc(var(--carne,0)*.14)) 0 28%,transparent 71%)}
-/* o tremor do motor: a "pele" da ficha vibra em passos travados. sub-pixel, camada própria —
-   o texto é rasterizado uma vez e só se translada, então nada relayoutiza nem borra.
-   o ciclo é LONGO de propósito: um passo de vez em quando é presença; quatro por segundo a
-   .75px viram enjoo em dois minutos, e foi por isso que o --vib caiu para sub-décimo de pixel.
-   e na banda 5 ele simplesmente NÃO EXISTE — nem a .58s, nem a zero pixel gastando frame: a
-   máquina que chegou ao fim do processo não hesita mais, e o que resta é o corte de luz */
-body[data-el=asc][data-band="3"] .wrap{animation:srvvib 1.1s steps(1,end) infinite}
-body[data-el=asc][data-band="4"] .wrap{animation:srvvib .82s steps(1,end) infinite}
-@keyframes srvvib{0%{transform:translate3d(0,0,0)}25%{transform:translate3d(var(--vib,0px),calc(var(--vib,0px)*-.7),0)}
- 50%{transform:translate3d(calc(var(--vib,0px)*-.8),calc(var(--vib,0px)*.5),0)}
- 75%{transform:translate3d(calc(var(--vib,0px)*.4),var(--vib,0px),0)}100%{transform:translate3d(0,0,0)}}
+ background:linear-gradient(104deg,transparent 0 16%,rgba(200,216,230,calc((.004 + var(--band)*.011)*(1 - var(--ouro)))) 25% 32%,transparent 41% 63%,rgba(200,216,230,calc((.003 + var(--band)*.008)*(1 - var(--ouro)))) 70% 74%,transparent 82%),
+  radial-gradient(38% 20% at 26% 13%,rgba(206,140,116,calc(var(--infer)*.07)) 0 42%,transparent 76%),
+  linear-gradient(178deg,rgba(14,9,7,calc(var(--infer)*.5)) 0 3%,transparent 9% 84%,rgba(10,6,5,calc(var(--infer)*.42)) 96%),
+  radial-gradient(126% 66% at 3% 0%,rgba(92,30,23,calc(var(--infer)*.42)) 0 21%,rgba(49,17,14,calc(var(--infer)*.2)) 47%,transparent 73%),
+  radial-gradient(98% 58% at 99% 103%,rgba(78,25,19,calc(var(--infer)*.34)) 0 25%,transparent 65%),
+  radial-gradient(28% 74% at 82% 8%,rgba(18,13,9,calc(var(--infer)*.4)) 0 34%,transparent 72%),
+  radial-gradient(46% 118% at 64% 52%,rgba(61,21,17,calc(var(--infer)*.16)) 0 28%,transparent 71%)}
+/* A CAMADA DE CIMA — o ouro. mesma caixa, opacidade = cobertura: no --ouro:0 ela é vidro puro
+   e não existe, no 1 ela é o que se vê. geometria RETA — quatro cantos em L e a trilha central
+   do rodapé, linhas de 1px, sem raio, sem difusão, sem halo. o julgamento é uma régua */
+body[data-el=asc] .panel::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:var(--ouro);
+ background:linear-gradient(96deg,transparent 0 63%,rgba(255,250,232,.05) 69% 72%,transparent 77%),
+  linear-gradient(90deg,var(--ecj) 0 34px,transparent 34px) 0 0/100% 1px no-repeat,
+  linear-gradient(180deg,var(--ecj) 0 20px,transparent 20px) 0 0/1px 100% no-repeat,
+  linear-gradient(270deg,var(--ecj) 0 34px,transparent 34px) 100% 0/100% 1px no-repeat,
+  linear-gradient(180deg,var(--ecj) 0 20px,transparent 20px) 100% 0/1px 100% no-repeat,
+  linear-gradient(90deg,var(--ecj) 0 34px,transparent 34px) 0 100%/100% 1px no-repeat,
+  linear-gradient(0deg,var(--ecj) 0 20px,transparent 20px) 0 100%/1px 100% no-repeat,
+  linear-gradient(270deg,var(--ecj) 0 34px,transparent 34px) 100% 100%/100% 1px no-repeat,
+  linear-gradient(0deg,var(--ecj) 0 20px,transparent 20px) 100% 100%/1px 100% no-repeat,
+  linear-gradient(90deg,transparent 0 calc(50% - 26px),var(--ecj) calc(50% - 26px) calc(50% + 26px),transparent calc(50% + 26px)) 0 100%/100% 1px no-repeat}
+/* o título vai junto com a cobertura: deixar o rótulo cor de ferrugem em cima de uma moldura
+   dourada seria a coexistência que a lore nega. é `color` no seletor, não --ec/--ecd trocados —
+   o cálculo de tema (_ecCache, partículas, barras) continua lendo a cor do elemento intacta.
+   e no ouro ele para de borrar: o resto da ficha se perde na banda 5, o Ascensão é o oposto */
+body[data-el=asc] .panel h2{color:color-mix(in srgb,var(--ecj) calc(var(--ouro)*100%),var(--ec))}
+/* e as barras de recurso vão junto: são a última coisa cor de ferrugem DENTRO do painel, e
+   deixá-las vermelhas no ouro total entregaria que a substituição foi só de moldura. o resto
+   do cromo (aba ativa, número do Ruído) fica com a cor do elemento — aquilo é identidade da
+   ficha, não superfície da carne */
+body[data-el=asc] .bar i{background:color-mix(in srgb,var(--ecj) calc(var(--ouro)*100%),var(--ec))}
+body[data-el=asc] .panel h2:not(:hover){filter:blur(calc((1 - var(--ouro))*var(--band)*.08px))}
+/* A BATIDA: a engrenagem-mestra fechou uma volta e a ficha inteira sente. a moldura pulsa no
+   ritmo do maquinário — é o que amarra o giro do canvas ao movimento da interface. no ouro a
+   pulsação vira um lampejo reto em vez de um aperto sujo, e some quando o ouro é total */
+body[data-el=asc] .panel{transition:box-shadow .18s steps(2,end),background .5s}
+body[data-el=asc].asc-beat .panel:not(:hover):not(:focus-within){
+ box-shadow:inset 0 1px 0 rgba(198,214,228,calc(.03 + var(--band)*.03)),inset 0 -1px 0 rgba(0,0,0,calc(.22 + var(--band)*.08)),
+  inset 0 0 calc(var(--infer)*26px) calc(var(--infer)*-2px) rgba(84,20,14,calc(var(--infer)*.7)),
+  inset 0 0 0 1px rgba(252,241,203,calc(var(--ouro)*(1 - var(--ouro))*.5))}
+/* o TREMOR CONTÍNUO saiu daqui de vez — o srvvib infinito no .wrap e o servo infinito nos
+   painéis. era a causa do "cansa em minutos", e não pertence a nenhum dos dois eixos novos: o
+   inferno se expressa por TEXTURA e por engrenagem girando, o ouro por silêncio e luz reta.
+   nenhum dos dois é uma tela nervosa o tempo todo. o que restou de movimento são EVENTOS —
+   correção, pistão, jam, peel, batida — todos com alvo, piso de intervalo e fim. */
 /* a CORREÇÃO: o servo achando a posição certa e travando NELA. um movimento só, duro, sem
    suavização nenhuma, e assenta perfeitamente parado — sem loop e sem repetição própria.
    quem escolhe o alvo, respeita a zona ativa e cumpre o piso de intervalo é o climate.js.
@@ -395,20 +442,19 @@ body[data-el=asc][data-band="4"] .wrap{animation:srvvib .82s steps(1,end) infini
 @keyframes asccorr{0%{transform:none}12%{transform:translate(2.1px,-1.4px)}46%{transform:translate(2.1px,-1.4px)}
  64%{transform:translate(-.7px,.2px)}100%{transform:none}}
 body[data-el=asc] .asc-correct{animation:asccorr .32s steps(1,end)}
-/* banda 5: quase não sobra movimento. o servo já está certo — ele só CONFIRMA, e quem corrige
-   de verdade é a luz que passa por cima no mesmo instante (.fx-judge) */
+/* e no OURO quase não sobra movimento: o servo já está certo, ele só CONFIRMA, e quem corrige
+   de verdade é a luz reta que passa por cima no mesmo instante (.fx-judge). quem manda aqui é
+   a Perfeição, não o Ruído — por isso o gatilho é o data-perfband, os dois quintos de cima */
 @keyframes asccorr5{0%{transform:none}20%{transform:translate(.7px,-.5px)}64%{transform:translate(-.3px,0)}100%{transform:none}}
-body[data-el=asc][data-band="5"] .asc-correct{animation:asccorr5 .2s steps(1,end)}
-/* a ficha inteira se realinhando (só nas bandas altas): vence o srvvib do .wrap de propósito —
-   enquanto ela corrige, o motor de fundo está PARADO, e o tremor volta sozinho com a classe */
+body[data-el=asc][data-perfband="3"] .asc-correct,body[data-el=asc][data-perfband="4"] .asc-correct{animation:asccorr5 .2s steps(1,end)}
+/* a ficha inteira se realinhando: um movimento só, duro, e assenta */
 @keyframes asccorrw{0%{transform:translate3d(0,0,0)}12%{transform:translate3d(2.4px,-1.6px,0)}
  36%{transform:translate3d(-1.7px,.7px,0)}58%{transform:translate3d(1.2px,0,0)}
  78%{transform:translate3d(-.5px,0,0)}100%{transform:translate3d(0,0,0)}}
-body[data-el=asc][data-band="3"] .wrap.asc-correct,body[data-el=asc][data-band="4"] .wrap.asc-correct{animation:asccorrw .42s steps(1,end)}
-/* e no ápice a ficha inteira também só confirma: um passo curto, e o resto é luz */
+body[data-el=asc] .wrap.asc-correct{animation:asccorrw .42s steps(1,end)}
 @keyframes asccorrw5{0%{transform:translate3d(0,0,0)}22%{transform:translate3d(1px,-.7px,0)}
  66%{transform:translate3d(-.4px,0,0)}100%{transform:translate3d(0,0,0)}}
-body[data-el=asc][data-band="5"] .wrap.asc-correct{animation:asccorrw5 .24s steps(1,end)}
+body[data-el=asc][data-perfband="3"] .wrap.asc-correct,body[data-el=asc][data-perfband="4"] .wrap.asc-correct{animation:asccorrw5 .24s steps(1,end)}
 /* braço robótico parando: o conteúdo novo assenta com overshoot travado (só na troca de aba).
    backwards segura o 0% durante o escalonamento abaixo, senão os painéis piscam antes de cair */
 body[data-el=asc] .asc-land .panel:not(:focus-within){animation:srvland .44s steps(3,end) backwards}
@@ -422,24 +468,19 @@ body[data-el=asc] .asc-land .panel:not(:focus-within):nth-of-type(3n){animation-
 @keyframes ascpist{0%{transform:none}16%{transform:scaleX(.9915)}48%{transform:scaleX(.988)}
  66%{transform:scaleX(.9965)}100%{transform:none}}
 body[data-el=asc] .asc-piston{animation:ascpist .4s steps(1,end);transform-origin:var(--porig,left) center}
-/* a pele que descasca: aço polido e trilha de circuito por baixo da superfície */
+/* a pele que descasca. o que o recorte REVELA é o inferno por baixo: aço ENTRANDO na carne,
+   trilha quente (não fria), e fluido escuro se juntando nas duas bordas do corte — pressão e
+   vazamento, não desenho de ferida */
 .fx-peel{position:fixed;pointer-events:none;z-index:9;border-radius:2px;overflow:hidden;opacity:0;
- background:repeating-linear-gradient(101deg,#22262b 0 5px,#3f474f 5px 8px,#14171a 8px 13px),
-  repeating-linear-gradient(0deg,rgba(150,200,214,.16) 0 1px,transparent 1px 6px);
- box-shadow:inset 0 0 10px rgba(0,0,0,.85),0 0 0 1px rgba(190,206,220,.18);animation:ascpeel 1.05s steps(8,end)}
-@keyframes ascpeel{0%{opacity:0;clip-path:inset(0 100% 0 0)}16%{opacity:.9;clip-path:inset(0 10% 0 0)}
- 68%{opacity:.85;clip-path:inset(0 6% 0 0)}100%{opacity:0;clip-path:inset(0 0 0 100%)}}
-/* e o que o recorte REVELA muda com o arco — é a mesma janela, o que está do outro lado dela
-   é que está sendo trocado. bandas baixas: aço ENTRANDO na carne. a trilha por baixo vem
-   quente, não fria, e fluido escuro se junta nas duas bordas do corte (é pressão e vazamento,
-   não desenho de ferida) */
-body[data-el=asc][data-band="2"] .fx-peel,body[data-el=asc][data-band="3"] .fx-peel{
  background:repeating-linear-gradient(101deg,#241f1c 0 5px,#463a34 5px 8px,#171210 8px 13px),
   repeating-linear-gradient(0deg,rgba(198,122,98,.17) 0 1px,transparent 1px 6px);
  box-shadow:inset 0 0 10px rgba(0,0,0,.85),inset 0 3px 5px -2px rgba(44,10,8,.95),
-  inset 0 -3px 5px -2px rgba(44,10,8,.95),0 0 0 1px rgba(60,17,13,.6)}
-/* banda 5: por baixo não há mais aço sujo nem carne — há a versão final. a trilha é dourada */
-body[data-el=asc][data-band="5"] .fx-peel{
+  inset 0 -3px 5px -2px rgba(44,10,8,.95),0 0 0 1px rgba(60,17,13,.6);animation:ascpeel 1.05s steps(8,end)}
+@keyframes ascpeel{0%{opacity:0;clip-path:inset(0 100% 0 0)}16%{opacity:.9;clip-path:inset(0 10% 0 0)}
+ 68%{opacity:.85;clip-path:inset(0 6% 0 0)}100%{opacity:0;clip-path:inset(0 0 0 100%)}}
+/* e quando o ouro já tomou a ficha, o que está do outro lado do recorte foi trocado junto:
+   não há mais aço sujo nem carne debaixo da pele — há a versão final, e a trilha é dourada */
+body[data-el=asc][data-perfband="4"] .fx-peel{
  background:repeating-linear-gradient(101deg,#26241d 0 5px,#4b4637 5px 8px,#17150f 8px 13px),
   repeating-linear-gradient(0deg,rgba(255,236,180,.2) 0 1px,transparent 1px 6px);
  box-shadow:inset 0 0 10px rgba(0,0,0,.8),0 0 0 1px var(--ecj)}
@@ -471,36 +512,11 @@ body[data-el=asc][data-band="5"] .fx-peel{
  transform:translateX(-30%) rotate(13deg);animation:ascjbeam .13s steps(2,end)}
 @keyframes ascjcut{0%{opacity:0}9%{opacity:1}74%{opacity:1}100%{opacity:0}}
 @keyframes ascjbeam{0%{transform:translateX(-30%) rotate(13deg)}100%{transform:translateX(26%) rotate(13deg)}}
-/* ===== A ASCENSÃO COMPLETA (banda 5) — o ouro não se soma ao rascunho: ele o SUBSTITUI =====
-   corte de qualidade. a ferrugem sai da moldura (border-image:none devolve a aresta reta de
-   1px), a carne já saiu sozinha (--carne:0), e a superfície deixa de fingir textura: o que
-   sobra é GEOMETRIA. reta, angular, fina — circuito de catedral, não halo, não difusão */
-body[data-el=asc][data-band="5"] .panel{border-image:none;border-color:rgba(240,224,172,.42);
- box-shadow:inset 0 1px 0 var(--ecj),inset 0 -1px 0 rgba(0,0,0,.3)}
-/* o ::before para de ser superfície suja e vira um único reflexo reto e frio */
-body[data-el=asc][data-band="5"] .panel::before{
- background:linear-gradient(96deg,transparent 0 63%,rgba(255,250,232,.03) 69% 72%,transparent 77%)}
-/* e o ::after (livre no asc) desenha a aresta: os quatro cantos em L e o traço central do
-   rodapé. linhas de 1px, sem raio, sem brilho, sem difusão — o julgamento é uma régua, e é por
-   isso que ele fecha a moldura pelos cantos em vez de contorná-la inteira */
-body[data-el=asc][data-band="5"] .panel::after{content:"";position:absolute;inset:0;pointer-events:none;
- background:linear-gradient(90deg,var(--ecj) 0 34px,transparent 34px) 0 0/100% 1px no-repeat,
-  linear-gradient(180deg,var(--ecj) 0 20px,transparent 20px) 0 0/1px 100% no-repeat,
-  linear-gradient(270deg,var(--ecj) 0 34px,transparent 34px) 100% 0/100% 1px no-repeat,
-  linear-gradient(180deg,var(--ecj) 0 20px,transparent 20px) 100% 0/1px 100% no-repeat,
-  linear-gradient(90deg,var(--ecj) 0 34px,transparent 34px) 0 100%/100% 1px no-repeat,
-  linear-gradient(0deg,var(--ecj) 0 20px,transparent 20px) 0 100%/1px 100% no-repeat,
-  linear-gradient(270deg,var(--ecj) 0 34px,transparent 34px) 100% 100%/100% 1px no-repeat,
-  linear-gradient(0deg,var(--ecj) 0 20px,transparent 20px) 100% 100%/1px 100% no-repeat,
-  linear-gradient(90deg,transparent 0 calc(50% - 26px),var(--ecj) calc(50% - 26px) calc(50% + 26px),transparent calc(50% + 26px)) 0 100%/100% 1px no-repeat}
-/* e o título vai junto: o ouro não convive com o rascunho, ele o substitui — deixar o rótulo
-   cor de ferrugem em cima da moldura dourada seria justamente a coexistência que a lore nega.
-   é `color` no seletor, não --ec/--ecd trocados: o cálculo de tema (_ecCache, partículas,
-   barras) continua lendo a cor do elemento intacta */
-body[data-el=asc][data-band="5"] .panel h2{color:var(--ecj)}
-/* e ele deixa de ser desfocado: o resto da ficha borra na banda 5 porque está se perdendo — o
-   Ascensão está no oposto disso. aqui é nitidez, e é a única banda 5 que a tem */
-body[data-el=asc][data-band="5"] .panel h2:not(:hover){filter:none}
+/* o bloco "A Ascensão completa (banda 5)" que existia aqui SAIU inteiro: o ouro deixou de ser
+   consequência do Ruído. quem o traz agora é a Perfeição, e a moldura, a superfície e o título
+   dourados foram para as regras dos dois eixos lá em cima, governados por --ouro. manter as
+   duas coisas presas ao mesmo número era exatamente o que a arquitetura nova separa — com a
+   regra antiga, banda 5 com perf=0 mostraria ouro que o personagem não conquistou. */
 /* pacto: linha de assinatura sob os títulos */
 body[data-el=pac][data-band="2"] .panel h2,body[data-el=pac][data-band="3"] .panel h2,body[data-el=pac][data-band="4"] .panel h2,body[data-el=pac][data-band="5"] .panel h2{border-bottom:1px solid var(--ecd);padding-bottom:5px}
 /* ===== pac — presença/intrusão: algo do outro lado responde, oferece e se aproxima =====
@@ -626,11 +642,13 @@ body.calm[data-el=vaz] .panel,body.calm[data-el=vaz] .tabs button{opacity:1!impo
 body.calm .vaz-sub,body.calm .vaz-cut,body.calm .vaz-str{opacity:1!important;transform:none!important;clip-path:none!important}
 body.calm[data-el=eco] h1,body.calm[data-el=eco] .panel h2{text-shadow:calc(var(--band)*1.2px) calc(var(--band)*1.2px) 0 rgba(127,184,168,.35)!important}
 body.calm[data-el=eco] .hx,body.calm[data-el=eco] .hint,body.calm[data-el=eco] label{text-shadow:none!important}
-/* asc: o servo destrava — movimento fluido de volta, sem resíduo de transform. e a carne SAI:
-   as manchas todas têm o --carne no alpha, então zerar a variável limpa a superfície inteira
-   de uma vez, em qualquer banda (o !important é para vencer a regra da banda, que é mais
-   específica). o ouro estático da banda 5 fica: ele é geometria parada, não é luz piscando */
-body.calm[data-el=asc]{--carne:0!important}
+/* asc: o servo destrava — movimento fluido de volta, sem resíduo de transform. e OS DOIS EIXOS
+   caem juntos: --carne:0 apaga o inferno inteiro (toda mancha de carne, óleo e ferrugem tem o
+   --infer no alpha) e --ouro:0 apaga a camada dourada inteira (o ::after e o mix da moldura
+   têm a cobertura na opacidade). o !important é para vencer as regras de banda, mais
+   específicas — e o climate.js ainda remove o --ouro inline por cima disso */
+body.calm[data-el=asc]{--carne:0!important;--ouro:0!important}
+body.calm #fx-asc{display:none}
 body.calm[data-el=asc] .wrap,body.calm[data-el=asc] .panel,body.calm[data-el=asc] .attr,body.calm[data-el=asc] .rec,
 body.calm[data-el=asc] .panel h2,body.calm[data-el=asc] label,body.calm[data-el=asc] .hint{transform:none!important}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}
@@ -640,7 +658,8 @@ body.calm[data-el=asc] .panel h2,body.calm[data-el=asc] label,body.calm[data-el=
  .vaz-sub,.vaz-cut,.vaz-str{opacity:1!important;transform:none!important;clip-path:none!important}
  body[data-el=eco] h1,body[data-el=eco] .panel h2{text-shadow:calc(var(--band)*1.2px) calc(var(--band)*1.2px) 0 rgba(127,184,168,.35)!important}
  body[data-el=eco] .hx,body[data-el=eco] .hint,body[data-el=eco] label{text-shadow:none!important}
- body[data-el=asc]{--carne:0!important}
+ body[data-el=asc]{--carne:0!important;--ouro:0!important}
+ #fx-asc{display:none}
  body[data-el=asc] .wrap,body[data-el=asc] .panel,body[data-el=asc] .attr,body[data-el=asc] .rec,
  body[data-el=asc] .panel h2,body[data-el=asc] label,body[data-el=asc] .hint{transform:none!important}}
 @media(max-width:640px){h1{font-size:20px;letter-spacing:5px}.wrap{padding:10px 10px 50px}.elc{width:100%}}
