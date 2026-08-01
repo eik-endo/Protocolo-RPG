@@ -1739,18 +1739,43 @@ function ascSprite(g,p){const R=g.r,W=Math.ceil(R*2+8);
  const c=cv.getContext("2d");if(!c)return;
  c.translate(W/2,W/2);ascGearPath(c,g,p);
  g.sp=cv;g.spk=Math.round(p*10);}
+/* ONDE CADA UMA NASCE. sorteio puro deixava duas engrenagens uma por cima da outra e juntava
+   tudo num canto — o que se lia era borrão, não maquinário. aqui a posição sai por REJEIÇÃO
+   POR DISTÂNCIA: várias candidatas, e fica a que estiver mais longe de todas as já colocadas,
+   medindo a folga entre as BORDAS (distância entre centros menos os dois raios).
+   quando aparece uma candidata com folga suficiente, para de procurar — assim elas se espalham
+   sem ficarem todas equidistantes, que pareceria grade. se a tela estiver cheia demais para
+   caber sem encostar, fica a menos ruim: melhor sobrepor de leve do que não nascer. */
+const ASCFOLGA=16;
+function ascPos(R,exist){const r=Math.random,W=ASC.W||innerWidth,H=ASC.H||innerHeight;
+ /* a máquina passa por trás das bordas: centro pode sair um pouco da tela e a engrenagem
+    entra cortada, o que ajuda a espalhar e a dar a sensação de que ela continua lá fora */
+ const mx=R*.4,px=()=>-mx+r()*(W+mx*2),py=()=>-mx+r()*(H+mx*2);
+ let bx=px(),by=py(),bd=-1e9;
+ for(let t=0;t<90;t++){const x=px(),y=py();
+  let d=1e9;
+  for(const o of exist){const dx=x-o.x,dy=y-o.y;
+   const f=Math.sqrt(dx*dx+dy*dy)-(R+o.r+ASCFOLGA);
+   if(f<d)d=f;}
+  if(d>bd){bd=d;bx=x;by=y;}
+  if(bd>=0&&t>=11)break;}
+ return {x:bx,y:by};}
 /* uma engrenagem nova. as grandes são poucas e lentas; as pequenas enchem os vãos e giram mais
-   rápido — proporção de trem de engrenagens, não de enfeite espalhado */
-function ascGearNew(grande){const r=Math.random,W=ASC.W||innerWidth,H=ASC.H||innerHeight;
+   rápido — proporção de trem de engrenagens, não de enfeite espalhado.
+   ela GIRA NO LUGAR e só isso: x e y não são tocados em nenhum passo depois daqui */
+function ascGearNew(grande,exist){const r=Math.random;
  const R=grande?(104+r()*86):(30+r()*54);
  const n=Math.max(9,Math.round(R/7.2));
  const wr=[];for(let i=0;i<7;i++)wr.push(r()<.3?r()*.9:0);   /* alguns dentes gastos */
  const oil=[];for(let i=0,k=1+Math.floor(r()*3);i<k;i++)oil.push({a:r()*TAU,d:.32+r()*.4,w:.07+r()*.1,h:.16+r()*.16,o:.5+r()*.5});
- return {x:r()*W,y:r()*H,r:R,n,wr,oil,rd:3+Math.floor(r()*4),ro:r()*TAU,
+ const pos=ascPos(R,exist||[]);
+ return {x:pos.x,y:pos.y,r:R,n,wr,oil,rd:3+Math.floor(r()*4),ro:r()*TAU,
   a:r()*TAU,dir:r()<.5?-1:1,k:grande?1:(.5+r()*1.5)*(R>60?1:1.8),sp:null,spk:-1,big:!!grande};}
 function ascSemear(alvo){const r=Math.random;
  while(ASC.gs.length>alvo)ASC.gs.pop();
- while(ASC.gs.length<alvo)ASC.gs.push(ascGearNew(ASC.gs.length<2||r()<.22));
+ /* as grandes primeiro: são as difíceis de encaixar, e deixar para o fim seria empurrá-las
+    para cima de alguém */
+ while(ASC.gs.length<alvo)ASC.gs.push(ascGearNew(ASC.gs.length<2||r()<.22,ASC.gs));
  /* a mestra é a maior: é a volta dela que vira batida */
  ASC.drv=null;for(const g of ASC.gs)if(!ASC.drv||g.r>ASC.drv.r)ASC.drv=g;
  ASC.acc=0;}
@@ -1797,14 +1822,19 @@ function ascWash(){const b=bandOf(S.ruido||0),p=ascPerf(),W=ASC.W,H=ASC.H;
 function ascDraw(c){const p=ascPerf(),W=ASC.W,H=ASC.H;
  c.clearRect(0,0,W,H);
  const w=ascWash();if(w)c.drawImage(w,0,0);
- /* e as engrenagens. regra 3: a que encostar na zona ativa simplesmente não é desenhada —
-    nada de maquinário passando por baixo do campo que você está preenchendo */
+ /* e as engrenagens — SEM o recuo da zona ativa, de propósito. a regra 3 existe para que
+    geometria não cubra nem faça piscar o campo em que você está trabalhando, e nada aqui pode:
+    este canvas é z2, mora atrás do .wrap (z5), e o painel sob o cursor ou em edição volta a
+    ser opaco pela regra do CSS — não há caminho para uma engrenagem aparecer por cima de um
+    campo. o que havia era o efeito colateral: passar o mouse por perto APAGAVA a engrenagem,
+    e um pedaço do fundo sumindo atrás de um painel translúcido é mais chamativo do que o
+    fundo parado. quem continua sob a regra 3 é quem de fato cobre a ficha: peel, jam,
+    correção e pistão. o único descarte que sobra aqui é o de quem está fora da tela. */
  for(const g of ASC.gs){
   if(!g.sp)ascSprite(g,p);
   if(!g.sp)continue;
   const R=g.r+4;
   if(g.x+R<0||g.x-R>W||g.y+R<0||g.y-R>H)continue;
-  if(ASC.forbBox({l:g.x-R,r:g.x+R,t:g.y-R,b:g.y+R}))continue;
   c.save();c.translate(g.x,g.y);c.rotate(g.a);
   c.drawImage(g.sp,-g.sp.width/2,-g.sp.height/2);c.restore();}}
 const ASC=new ClimateEffect({id:"asc",cv:"fx-asc",zr:118,pad:26,fb:"#c15a45",

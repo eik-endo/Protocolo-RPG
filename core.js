@@ -44,7 +44,8 @@ function fixS(){const d=DEF();
  for(const m of S.maest){if(typeof m.rec!=="number")m.rec=0;if(typeof m.recMax!=="number")m.recMax=null;
   if(typeof m.st!=="number")m.st=parseInt(m.st,10)||0;}
  S.perf=clampPerf(S.perf);   /* ausente, texto, nulo ou fora da faixa: tudo cai em 0-100 */
- migMaxBonus();}
+ migMaxBonus();
+ clampCur();}              /* DEPOIS da migração: antes dela os máximos ainda são os antigos */
 
 /* ---------- migração: teto que SUBSTITUÍA → bônus que SOMA ----------
    até aqui, um máximo escrito na mão congelava o recurso: subir de nível ou de estágio não
@@ -184,11 +185,27 @@ function setF(k,v){S[k]=v;save();}
 function setNum(k,v){S[k]=parseInt(v,10)||0;save();}
 function setNivel(v){S.nivel=Math.max(1,Math.min(15,parseInt(v,10)||1));save();render();}
 function setAttr(k,v){S.attrs[k]=Math.max(-2,Math.min(4,parseInt(v,10)||0));save();render();}
-function setCur(k,v){S.cur[k]=(v===""?null:parseInt(v,10)||0);save();applyTheme();barSync();}
-/* o campo guarda o BÔNUS, então negativo é válido (penalidade) — quem segura o piso em 0 é o
-   ovMax, no total, não aqui */
+function setCur(k,v){S.cur[k]=(v===""?null:parseInt(v,10)||0);clampCur();save();applyTheme();barSync();}
+/* recebe o ABSOLUTO e grava o BÔNUS (absoluto − base). o bônus resultante pode ser negativo,
+   que é justamente o caso "quero um máximo menor que o do meu nível" — quem segura o piso em 0
+   é o ovMax, no total. campo vazio devolve o recurso ao cálculo do nível (null). */
 function setMax(k,v){if(!S.curMax)S.curMax={vida:null,fol:null,sin:null,luc:null,gente:null};
- S.curMax[k]=(v===""?null:(parseInt(v,10)||0));save();applyTheme();barSync();render();}
+ if(v===""||v==null)S.curMax[k]=null;
+ else{const n=parseInt(v,10);S.curMax[k]=isNaN(n)?null:Math.max(0,n)-baseMaxOf(k);}
+ clampCur();save();applyTheme();barSync();render();}
+/* A ATUAL NUNCA FICA ACIMA DO MÁXIMO — e só desce: subir o teto não enche o recurso sozinho.
+   mora aqui, e não em cada setter, porque o máximo muda por caminhos demais (o campo, o nível,
+   um atributo, a troca de Fardo, o estágio de uma maestria, uma ficha importada). o fixS chama
+   isto no fim de todo render, então todos eles passam pelo mesmo pente. */
+function clampCur(){
+ for(const k of["vida","fol","sin","luc"]){const v=S.cur[k];
+  if(v==null||v==="")continue;                  /* null = "cheio", acompanha o máximo sozinho */
+  const n=parseInt(v,10),m=ovMax(k);
+  if(!isNaN(n)&&n>m)S.cur[k]=m;}
+ if(S.gente!=null&&S.gente!==""){const g=parseInt(S.gente,10),m=maxGente();
+  if(!isNaN(g)&&g>m)S.gente=m;}
+ for(const m of S.maest){const c=meterCap(m);
+  if(c&&typeof m.rec==="number"&&m.rec>c.max)m.rec=c.max;}}
 function stepRec(k,d){const m={vida:maxVida,fol:maxFol,sin:maxSin,luc:maxLuc}[k]();const v=Math.max(0,Math.min(m,curOf(k)+d));S.cur[k]=v;save();
  const i=$("cur_"+k);if(i)i.value=v;const j=$("scur_"+k);if(j)j.value=v;applyTheme();barSync();}
 function barSync(){for(const k of["vida","fol","sin","luc"]){const m={vida:maxVida,fol:maxFol,sin:maxSin,luc:maxLuc}[k]();
@@ -197,7 +214,7 @@ function setRuido(n){S.ruido=Math.max(0,Math.min(20,n));save();render();}
 function clickSeg(i){setRuido(S.ruido===i+1?i:i+1);}
 function togglePer(n,ck){S.per[n]=!!ck;save();const row=$("sk_"+PERICIAS.findIndex(p=>p[0]===n));render();}
 function toggleCond(n){S.cond[n]=!S.cond[n];save();render();}
-function setGente(v){S.gente=(v===""?null:parseInt(v,10)||0);save();}
+function setGente(v){S.gente=(v===""?null:parseInt(v,10)||0);clampCur();save();}
 function curGente(){return S.gente==null?maxGente():S.gente;}
 
 /* ---------- INICIAL ---------- */
@@ -258,12 +275,21 @@ function recCard(k,nm,mx){return `<div class="rec"><div class="rn">${nm} <b>máx
  <input type="number" id="cur_${k}" value="${curOf(k)}" onchange="setCur('${k}',this.value)"><span class="mx">/ ${maxIn("max_"+k,k)}</span>
  <button class="stp" onclick="stepRec('${k}',1)">+</button></div>${mxRef(k)}
  <div class="bar"><i id="bar_${k}"></i></div></div>`;}
-/* campo do máximo: agora é o BÔNUS, não o total. vazio ou 0 = sem bônus */
-function maxIn(id,k){const o=S.curMax?S.curMax[k]:null;
- return `<input type="number" id="${id}" value="${o==null||o===""?"":o}" placeholder="0" title="bônus permanente sobre o cálculo do nível — ex: +1 de um talento. Deixe vazio ou 0 se não tiver nenhum." onchange="setMax('${k}',this.value)">`;}
-/* a referência: o que a ficha calcula sozinha, SEMPRE à vista. um bônus sem a base ao lado não
-   diz nada — e era isso que o antigo placeholder fazia, sumia justo quando havia o que comparar */
-const mxRef=k=>`<div class="mxref">nível sugere ${baseMaxOf(k)}</div>`;
+/* CAMPO DO MÁXIMO — mostra e recebe o VALOR ABSOLUTO.
+   o modelo mental de quem joga é "meu máximo é 6", não "+X sobre o que o nível calcula". o
+   campo pedia o bônus, então quem queria 6 digitava 6 e via 14 (base 8 + 6). agora ele diz e
+   aceita o total.
+   por baixo, o ARMAZENAMENTO continua sendo o bônus (digitado − base): é ele que faz o total
+   subir junto quando você ganha um nível. guardar o absoluto congelaria o recurso outra vez —
+   exatamente o bug que a migração anterior consertou, e por isso ela não é refeita aqui.
+   vazio = sem override: o campo fica cinza mostrando o que o nível sugere, e cresce sozinho */
+function maxIn(id,k){const o=S.curMax?S.curMax[k]:null,vazio=(o==null||o==="");
+ return `<input type="number" id="${id}" min="0" value="${vazio?"":ovMax(k)}" placeholder="${baseMaxOf(k)}" title="o máximo deste recurso. digite o total que você quer — a ficha guarda a diferença para o cálculo do nível, então ele continua subindo quando você sobe de nível. apague o campo para voltar ao valor sugerido." onchange="setMax('${k}',this.value)">`;}
+/* a referência: o que a ficha calcula sozinha, SEMPRE à vista — e, quando há override, o
+   caminho de volta. "zerar" seria mentira aqui: isto não põe o máximo em 0, devolve ele ao
+   cálculo do nível */
+const mxRef=k=>{const o=S.curMax?S.curMax[k]:null,ed=!(o==null||o==="");
+ return `<div class="mxref">nível sugere ${baseMaxOf(k)}${ed?` · <button type="button" class="rev" onclick="setMax('${k}','')">usar o valor do nível</button>`:""}</div>`;};
 /* medidores de maestria — recurso próprio de uma trilha (Fúria, etc.) */
 const RESET_LB={cena:"zerar (nova cena)",sessao:"zerar (nova sessão)",permanente:"zerar"};
 function meterOf(m){const md=m&&!m.cu?maeData(m):null;return(md&&md.medidor)||null;}
@@ -272,23 +298,42 @@ function meterOf(m){const md=m&&!m.cu?maeData(m):null;return(md&&md.medidor)||nu
 function meterCap(m){const d=meterOf(m);if(!d)return null;
  return {min:d.min,max:Math.max(d.min,d.tetos[m.st]+(typeof m.recMax==="number"?m.recMax:0))};}
 function meterVal(m){const c=meterCap(m);return c?Math.max(c.min,Math.min(c.max,m.rec||0)):0;}
+/* mesmo trato do maxIn: o campo do teto mostra e recebe o ABSOLUTO, guardando o bônus sobre o
+   teto do estágio — assim virar Veterano continua subindo o medidor sozinho.
+   o botão "zerar (nova cena)" ao lado NÃO é o reverter: ele põe a ATUAL no mínimo, que é outra
+   coisa. quem devolve o teto ao estágio é o link do rodapé, junto do "estágio sugere" */
 function meterCard(m,i){const d=meterOf(m);if(!d)return "";
  const tp=meterCap(m).max,v=meterVal(m),pc=tp>d.min?Math.round((v-d.min)/(tp-d.min)*100):0;
- const ov=(typeof m.recMax==="number"?m.recMax:"");
+ const ed=typeof m.recMax==="number";
  return `<div class="rec" id="mtr_${i}" style="margin-top:8px"><div class="rn">${esc(d.nome)} <b>teto ${tp} · ${STG[m.st]}</b></div><div class="rv">
  <button class="stp" onclick="stepMeter(${i},-1)">−</button>
- <input type="number" id="mcur_${i}" min="${d.min}" max="${tp}" value="${v}" onchange="setMeter(${i},this.value)"><span class="mx">/ <input type="number" id="mmax_${i}" value="${ov}" placeholder="0" title="bônus permanente sobre o teto do estágio — ex: +1 de um talento. Deixe vazio ou 0 se não tiver nenhum." onchange="setMeterMax(${i},this.value)"></span>
+ <input type="number" id="mcur_${i}" min="${d.min}" max="${tp}" value="${v}" onchange="setMeter(${i},this.value)"><span class="mx">/ <input type="number" id="mmax_${i}" min="${d.min}" value="${ed?tp:""}" placeholder="${d.tetos[m.st]}" title="o teto deste medidor. digite o total que você quer — a ficha guarda a diferença para o teto do estágio, então ele continua subindo quando a maestria avança. apague o campo para voltar ao valor do estágio." onchange="setMeterMax(${i},this.value)"></span>
  <button class="stp" onclick="stepMeter(${i},1)">+</button>
  ${d.reset?`<button class="btn mini" style="margin-left:auto" onclick="resetMeter(${i})">${RESET_LB[d.reset]||"zerar ("+esc(d.reset)+")"}</button>`:""}</div>
- <div class="mxref">estágio sugere ${d.tetos[m.st]}</div>
+ <div class="mxref">estágio sugere ${d.tetos[m.st]}${ed?` · <button type="button" class="rev" onclick="setMeterMax(${i},'')">usar o valor do estágio</button>`:""}</div>
  <div class="bar"><i id="mbar_${i}" style="width:${pc}%"></i></div></div>`;}
-function meterSync(i){const el=$("mtr_"+i);if(el)el.outerHTML=meterCard(S.maest[i],i);}
+/* trocar o outerHTML do card destrói o input que disparou o onchange. com ele ainda em foco, o
+   navegador solta um blur NO MEIO da remoção, esse blur dispara um segundo change com o mesmo
+   valor, e o segundo meterSync entra por cima do primeiro — o de fora então falha com "node to
+   be removed is no longer a child of this node", que era o erro que aparecia no console ao
+   editar o teto na mão. checar parentNode não resolve (no instante da reentrada o nó ainda
+   está no documento): o que corta é a trava de reentrância. o evento perdido não faz falta,
+   porque ele carrega exatamente o valor que a chamada de fora já gravou. */
+let _mtrSync=false;
+function meterSync(i){if(_mtrSync)return;
+ const el=$("mtr_"+i);if(!el||!el.parentNode||!S.maest[i])return;
+ _mtrSync=true;try{el.outerHTML=meterCard(S.maest[i],i);}finally{_mtrSync=false;}}
 function meterPut(i,v){const m=S.maest[i];if(!m)return;const c=meterCap(m);if(!c)return;
  m.rec=Math.max(c.min,Math.min(c.max,isNaN(v)?c.min:v));save();meterSync(i);}
 function stepMeter(i,d){const m=S.maest[i];if(m)meterPut(i,meterVal(m)+d);}
 function setMeter(i,v){meterPut(i,parseInt(v,10));}
-function setMeterMax(i,v){const m=S.maest[i];if(!m)return;
- m.recMax=(v===""?null:(parseInt(v,10)||0));save();meterSync(i);}   /* bônus: negativo vale */
+/* recebe o ABSOLUTO, grava o bônus sobre o teto do estágio. negativo vale (teto menor que o
+   que o estágio dá); vazio devolve o medidor ao estágio */
+function setMeterMax(i,v){const m=S.maest[i];if(!m)return;const d=meterOf(m);if(!d)return;
+ if(v===""||v==null)m.recMax=null;
+ else{const n=parseInt(v,10);m.recMax=isNaN(n)?null:Math.max(d.min,n)-d.tetos[m.st];}
+ const c=meterCap(m);if(c&&m.rec>c.max)m.rec=c.max;   /* a atual encosta no teto novo */
+ save();meterSync(i);}
 function resetMeter(i){const m=S.maest[i];if(!m)return;const c=meterCap(m);if(c)meterPut(i,c.min);}
 function skillsHTML(sessOnly){let out="",cur="";
  const list=PERICIAS.map((p,i)=>({p,i})).filter(o=>!sessOnly||S.per[o.p[0]]||SESS_ALL);
