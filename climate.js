@@ -1616,10 +1616,34 @@ function ecoSync(){const b=bandOf(S.ruido||0),on=ecoOn(1);
  ecoAudSync(on&&b>=4&&!S.ui.mute);}
 
 /* ============ CARNE-METAL — elemento Ascensão ============
-   o servo-travamento e os reflexos de aço são CSS puro (grátis, e somem junto com o data-el).
-   aqui ficam só o que precisa de tempo: a pele que descasca, a junta que emperra e os servos
-   do áudio. nada muta o DOM real nem S: overlays pointer-events:none e classes efêmeras. */
+   a moldura de aço, a ferrugem e o passo travado das transições são CSS puro (grátis, e somem
+   junto com o data-el). aqui fica o que precisa de TEMPO: a correção, a pele que descasca, a
+   junta que emperra e os servos do áudio. nada muta o DOM real nem S: overlays
+   pointer-events:none e classes efêmeras.
+
+   A VOZ DO ELEMENTO decide o ritmo. "o metal não hesita" — logo o Ascensão não treme: ele
+   CORRIGE. antes, o servo era animação CSS infinita em TODOS os painéis ao mesmo tempo mais o
+   .wrap inteiro vibrando sem parar; era a tela toda nervosa, sempre, e cansava em minutos.
+   agora o tremor de fundo é sub-pixel (quase invisível, no CSS) e o que se vê é um EVENTO:
+   um alvo por vez, movimento seco, assenta parado, acabou. raro na banda 3, frequente na 5 —
+   e com um PISO de intervalo que ninguém fura, nem os gatilhos, porque é justamente ele que
+   impede a banda 5 de virar "quase contínua" e recair no problema original por outro caminho. */
 const ascOn=min=>S.elem==="asc"&&bandOf(S.ruido||0)>=(min||1)&&!S.ui.calm&&!RM()&&!document.hidden;
+const ascModal=()=>$("modal").classList.contains("on");
+/* a zona ativa, na forma que o Ascensão usa em TUDO (correção, peel e jam): o que está sob o
+   cursor e o que está em edição ficam de fora, sempre, e o alvo nunca é um controle.
+   um painel CONTÉM campos (é um painel) — quem não pode ter campo dentro é o alvo de texto do
+   jam, e essa regra a mais mora no jamLivre */
+function ascLivre(el){
+ if(!el||!el.isConnected||!el.matches)return false;
+ if(el.matches("input,textarea,select,button,a"))return false;
+ if(el.matches(":hover"))return false;
+ const a=document.activeElement;
+ return !(a&&a!==document.body&&(el===a||el.contains(a)));}
+const jamLivre=el=>ascLivre(el)&&!el.querySelector("input,textarea,select,button");
+/* o cursor descansando em cima de um controle: a ficha inteira não se mexe nessa hora, senão
+   o clique que você já está mirando anda 2px embaixo do ponteiro */
+const ascMaoOcupada=()=>!!document.querySelector("button:hover,input:hover,textarea:hover,select:hover,a:hover,.rseg:hover,.chip:hover");
 
 /* --- o assentamento: só na troca de aba, o conteúdo novo para como braço robótico --- */
 let _lndT=null,_lndEl=null;
@@ -1630,57 +1654,214 @@ function ascLand(){ascLandClear();if(!ascOn(3))return;
  _lndEl=m;m.classList.add("asc-land");
  _lndT=setTimeout(ascLandClear,560);}
 
+/* --- A CORREÇÃO: o novo centro do elemento ---------------------------------------------
+   um painel (ou, no ápice, a ficha inteira) faz UM movimento travado e rápido e assenta de
+   volta perfeitamente parado. dispara e termina — a classe some sozinha, não há loop.
+
+   o PISO é a regra que segura tudo: entre duas correções passam no mínimo ASCPISO ms, sempre.
+   nem o noiseup fura — o que ele ganha é a GARANTIA de que a correção acontece, e se o piso
+   ainda não venceu ela apenas ESPERA e acontece no primeiro instante permitido. sem isso, a
+   banda 5 com gatilhos empilhados voltaria a ser vibração contínua com outro nome. */
+const ASCPISO=5600;
+/* o intervalo do agendador segue o ARCO, e por isso ele NÃO é uma rampa: raro na 3 (o processo
+   mal começou), frequente na 4 (a violência, o metal ganhando), e mais espaçado de novo na 5.
+   o ápice ter mais silêncio é de propósito — a banda 5 é a calma da certeza absoluta, não o
+   auge do nervosismo. quem já está certo não precisa se reajustar toda hora; quando ele age,
+   age uma vez e a luz corta. o piso continua valendo por baixo de tudo isso */
+const ascGap=b=>(b>=5?24+Math.random()*26:b>=4?18+Math.random()*17:40+Math.random()*30)*1000;
+let _crT=null,      /* o agendador de fundo — um timer só, sempre reagendado */
+    _crEl=null,_crRm=null,
+    _crLast=-1e9,   /* o instante da última correção: é daqui que o piso conta */
+    _crForce=false, /* um gatilho pediu uma: ela não se perde, no máximo espera o piso */
+    _crLoud=0;      /* o Ruído acabou de subir: o estalo sai mais alto por alguns segundos */
+let _jgEl=null,_jgRm=null;
+
+/* o corte de julgamento (só banda 5): um traço reto atravessa o que travou, no mesmo instante
+   em que trava, e some junto — o overlay morre em 260ms e a animação já acabou antes disso */
+function ascJudgeClear(){clearTimeout(_jgRm);_jgRm=null;
+ if(_jgEl&&_jgEl.parentNode)_jgEl.parentNode.removeChild(_jgEl);_jgEl=null;}
+function ascJudge(el){ascJudgeClear();
+ const r=el.getBoundingClientRect();
+ const t=Math.max(0,r.top),bt=Math.min(innerHeight,r.bottom);
+ if(r.width<40||bt-t<12)return;
+ const d=document.createElement("div");d.className="fx-judge";
+ d.style.cssText=`left:${Math.round(r.left)}px;top:${Math.round(t)}px;width:${Math.round(r.width)}px;height:${Math.round(bt-t)}px`;
+ d.appendChild(document.createElement("i"));
+ document.body.appendChild(d);_jgEl=d;
+ _jgRm=setTimeout(ascJudgeClear,260);}
+
+function ascCorrClear(){clearTimeout(_crRm);_crRm=null;
+ if(_crEl){_crEl.classList.remove("asc-correct");_crEl=null;}
+ ascJudgeClear();}
+/* o alvo: UM por vez, e nunca onde você está. na banda 5 às vezes é a ficha inteira — e aí a
+   exigência é maior, porque mover o .wrap move tudo: só com nada em foco e nada sob a mão */
+function ascCorrAlvo(b){
+ if(b>=5&&Math.random()<.3){const w=document.querySelector(".wrap"),a=document.activeElement;
+  if(w&&(!a||a===document.body)&&!ascMaoOcupada())return w;}
+ const out=[];
+ document.querySelectorAll(".wrap .panel").forEach(p=>{
+  if(!ascLivre(p)||p.matches(":focus-within"))return;
+  const r=p.getBoundingClientRect();
+  if(r.width<120||r.height<28||r.bottom<8||r.top>innerHeight-8)return;
+  out.push(p);});
+ return out.length?out[Math.floor(Math.random()*out.length)]:null;}
+/* o evento. devolve true se a correção ACONTECEU agora */
+function ascCorrNow(force){
+ if(force)_crForce=true;
+ if(!ascOn(3)||ascModal())return false;
+ const agora=performance.now(),falta=ASCPISO-(agora-_crLast);
+ if(falta>0){                          /* o piso é absoluto — ninguém fura, nem gatilho */
+  if(_crForce)ascCorrArm(falta+40);    /* quem pediu não perde: acontece quando o piso vencer */
+  return false;}
+ ascCorrClear();
+ const b=bandOf(S.ruido||0),alvo=ascCorrAlvo(b);
+ if(!alvo)return false;                /* tudo ocupado: a máquina espera a próxima janela */
+ _crForce=false;_crLast=agora;
+ _crEl=alvo;alvo.classList.add("asc-correct");
+ /* o estalo metálico da trava encaixando acompanha o movimento; na banda 5 o corte de luz
+    sai no MESMO instante que ele — flash e som são o mesmo evento, não dois.
+    na 4 o que sai no lugar dele é a rachadura: o mesmo ouro, ainda preso embaixo do metal */
+ if(b>=5)ascJudge(alvo);
+ else if(b===4&&Math.random()<.45)ascCrack(alvo);
+ if(b>=4&&AUD.ctx&&!S.ui.mute)ascClick(AUD.ctx.currentTime+.005,agora<_crLoud);
+ _crRm=setTimeout(ascCorrClear,alvo.classList.contains("wrap")?480:400);
+ ascCorrSched();                       /* a correção que acabou de sair reancora o agendador */
+ return true;}
+/* o agendador: um timer só. se o ascCorrNow rearmou (adiamento pelo piso), não sobrescreve */
+function ascCorrArm(ms){clearTimeout(_crT);
+ _crT=setTimeout(()=>{_crT=null;ascCorrNow(false);if(!_crT)ascCorrSched();},Math.max(60,ms));}
+function ascCorrSched(){ascCorrArm(ascGap(bandOf(S.ruido||0)));}
+
+/* --- O OURO VAZANDO — banda 4, e só ela ------------------------------------------------
+   uma rachadura quente abre numa junta de aço por um instante, como se algo radiante estivesse
+   pressionando por baixo do metal sujo, e fecha no mesmo movimento. nunca é protagonista: sai
+   de carona na correção e no pistão, sempre com sorteio, sempre sozinha, sempre sumindo.
+   é a PRÉVIA da banda 5 — sem ela, o ouro total do ápice seria um susto vindo do nada.
+   na banda 5 ela não existe mais: lá o ouro não vaza pela junta, ele É a moldura (CSS). */
+let _ckEl=null,_ckRm=null;
+function crackClear(){clearTimeout(_ckRm);_ckRm=null;
+ if(_ckEl&&_ckEl.parentNode)_ckEl.parentNode.removeChild(_ckEl);_ckEl=null;}
+function ascCrack(el){
+ if(!ascOn(4)||bandOf(S.ruido||0)!==4||!el||!el.getBoundingClientRect)return;
+ const r=el.getBoundingClientRect();
+ if(r.width<90||r.height<26)return;
+ const vert=Math.random()<.35;
+ let cs;
+ if(vert){                                                /* a junta vertical */
+  const h=Math.min(r.height-8,54+Math.random()*90),t=r.top+Math.random()*(r.height-h);
+  if(t<4||t+h>innerHeight-4)return;
+  cs=`left:${Math.round(Math.random()<.5?r.left:r.right-3)}px;top:${Math.round(t)}px;width:3px;height:${Math.round(h)}px`;
+ }else{                                                   /* a junta horizontal */
+  const w=Math.min(r.width-10,90+Math.random()*170),l=r.left+Math.random()*(r.width-w),
+   y=Math.random()<.5?r.top:r.bottom-3;
+  if(y<4||y>innerHeight-6)return;
+  cs=`left:${Math.round(l)}px;top:${Math.round(y)}px;width:${Math.round(w)}px;height:3px`;}
+ crackClear();
+ const d=document.createElement("div");d.className=vert?"fx-crack v":"fx-crack";
+ d.style.cssText=cs;document.body.appendChild(d);_ckEl=d;
+ _ckRm=setTimeout(crackClear,470);}
+
+/* --- O PISTÃO — bandas 3-4: a máquina operando SOBRE a carne ----------------------------
+   um lado do painel é comprimido e solto, travado, com o estalo metálico. a diferença para a
+   correção é de quem age: a correção é o painel se ajustando, o pistão é algo de FORA prensando
+   ele. por isso os dois nunca saem juntos — e por isso ele morre na banda 5, onde não sobrou
+   carne para prensar. piso próprio, zona ativa igual à de todo o resto do elemento. */
+const ASCXPISO=9000;
+let _pxT=null,_pxEl=null,_pxRm=null,_pxLast=-1e9,_pxB=false;
+function pistonClear(){clearTimeout(_pxRm);_pxRm=null;
+ if(_pxEl){_pxEl.classList.remove("asc-piston");_pxEl.style.removeProperty("--porig");_pxEl=null;}}
+function pistonNow(){const b=bandOf(S.ruido||0);
+ if(!ascOn(3)||b>=5||ascModal()||performance.now()-_pxLast<ASCXPISO)return false;
+ if(_crEl)return false;                 /* correção em curso: um alvo por vez, sempre */
+ const alvo=ascCorrAlvo(1);             /* o 1 tira o caso do .wrap: o pistão prensa PAINEL */
+ if(!alvo||alvo===_crEl)return false;
+ pistonClear();
+ _pxLast=performance.now();
+ _pxEl=alvo;alvo.style.setProperty("--porig",Math.random()<.5?"left":"right");
+ alvo.classList.add("asc-piston");
+ if(AUD.ctx&&!S.ui.mute)ascClick(AUD.ctx.currentTime+.07);  /* o estalo no fundo do curso */
+ if(b>=4&&Math.random()<.4)ascCrack(alvo);                  /* o ouro espremido pela junta */
+ _pxRm=setTimeout(pistonClear,440);return true;}
+function pistonSched(){clearTimeout(_pxT);_pxB=bandOf(S.ruido||0)>=4;
+ _pxT=setTimeout(()=>{pistonNow();pistonSched();},(_pxB?17+Math.random()*16:34+Math.random()*26)*1000);}
+
 /* --- a pele que descasca: um overlay revela aço e circuito por baixo, e fecha ---
    candidatos: a borda de cima de um painel ou a caixa de um título. nunca sob o cursor,
    sob edição, nem com modal aberto */
-let _pkT=null,_pkEl=null;
-function peelClear(){if(_pkEl&&_pkEl.parentNode)_pkEl.parentNode.removeChild(_pkEl);_pkEl=null;}
+/* o peel e o jam ganharam gatilho (Parte 5), e gatilho dispara na SUA mão: apagando texto
+   depressa você chamaria um por segundo. cada um tem o seu piso, pelo mesmo motivo da
+   correção — o que vale para o evento principal vale para os dois de apoio */
+const ASCPPISO=11000,ASCJPISO=7000;
+/* _pkB guarda em que metade do arco o timer atual foi armado (baixa ou 4+). subir de banda tem
+   que reancorar a cadência na hora — senão a ficha fica presa no ritmo lento por mais um minuto */
+let _pkT=null,_pkEl=null,_pkRm=null,_pkLast=-1e9,_pkB=false;
+function peelClear(){clearTimeout(_pkRm);_pkRm=null;
+ if(_pkEl&&_pkEl.parentNode)_pkEl.parentNode.removeChild(_pkEl);_pkEl=null;}
 function peelPick(){const out=[];
  document.querySelectorAll(".panel").forEach(p=>{
-  if(p.matches(":hover"))return;
-  if(document.activeElement&&p.contains(document.activeElement))return;
+  if(!ascLivre(p))return;
   const r=p.getBoundingClientRect();
   if(r.width<130||r.top<10||r.top>innerHeight-46)return;
   out.push({x:r.left,y:r.top,w:r.width,h:7}); /* a borda abrindo */
-  const h=p.querySelector("h2");if(!h)return;
+  const h=p.querySelector("h2");if(!h||!jamLivre(h))return;
   const q=h.getBoundingClientRect();
   if(q.width>70&&q.height>8&&q.top>10&&q.bottom<innerHeight-10)out.push({x:q.left-4,y:q.top-3,w:q.width+8,h:q.height+6});});
  return out.length?out[Math.floor(Math.random()*out.length)]:null;}
+/* o peel desce até a banda 2 por causa do ARCO: é justamente lá embaixo que ele conta a fusão
+   à força (aço ENTRANDO na carne — ver .fx-peel das bandas baixas no CSS), e um recorte que só
+   existisse no fim do processo nunca mostraria o começo dele. o que muda é a CADÊNCIA: nas
+   bandas 2-3 o agendador é raríssimo e não há gatilho nenhum chamando — é um lembrete, não um
+   acontecimento. da 4 para cima o ritmo do prompt-base fica exatamente como estava */
 function peelNow(){peelClear();
- if(!ascOn(4)||$("modal").classList.contains("on"))return;
- const a=peelPick();if(!a)return;
+ if(!ascOn(2)||ascModal()||performance.now()-_pkLast<ASCPPISO)return false;
+ const a=peelPick();if(!a)return false;
+ _pkLast=performance.now();
  const d=document.createElement("div");d.className="fx-peel";
  d.style.cssText=`left:${Math.round(a.x)}px;top:${Math.round(a.y)}px;width:${Math.round(a.w)}px;height:${Math.round(a.h)}px`;
  document.body.appendChild(d);_pkEl=d;
- setTimeout(peelClear,1100);}
-function peelSched(){clearTimeout(_pkT);_pkT=setTimeout(()=>{peelNow();peelSched();},20000+Math.random()*20000);}
+ _pkRm=setTimeout(peelClear,1100);return true;}
+/* o timer de fundo virou RESERVA do gatilho (o ócio é que chama o peel agora): bem mais raro —
+   e nas bandas baixas, onde gatilho nenhum o chama, ele é o único, e por isso ainda mais lento */
+function peelSched(){clearTimeout(_pkT);const b=bandOf(S.ruido||0);_pkB=b>=4;
+ _pkT=setTimeout(()=>{peelNow();peelSched();},_pkB?40000+Math.random()*35000:74000+Math.random()*46000);}
 
 /* --- o glitch mecânico: a junta emperra e força o mesmo fim de curso, ou salta e se corrige.
    só em texto — nunca em campo de edição, botão ou aba, para não desalinhar um clique --- */
-let _jmT=null,_jmEl=null;
-function jamClear(){if(_jmEl){_jmEl.classList.remove("fx-jam","fx-jolt");_jmEl=null;}}
-function jamNow(){jamClear();
- if(!ascOn(5)||$("modal").classList.contains("on"))return;
- const out=[];document.querySelectorAll(".panel h2,label,.hint,.rec .rn,.attr .an").forEach(el=>{
-  if(el.querySelector("input,textarea,select,button"))return;
-  if(el.matches(":hover"))return;
-  if(document.activeElement&&el.contains(document.activeElement))return;
+const JAMSEL=".panel h2,label,.hint,.rec .rn,.attr .an";
+let _jmT=null,_jmEl=null,_jmRm=null,_jmLast=-1e9;
+function jamClear(){clearTimeout(_jmRm);_jmRm=null;
+ if(_jmEl){_jmEl.classList.remove("fx-jam","fx-jolt");_jmEl=null;}}
+function jamPick(){const out=[];document.querySelectorAll(JAMSEL).forEach(el=>{
+  if(!jamLivre(el))return;
   const r=el.getBoundingClientRect();
   if(r.width<40||r.height<8||r.top<12||r.bottom>innerHeight-12)return;out.push(el);});
- if(!out.length)return;
- _jmEl=out[Math.floor(Math.random()*out.length)];
- _jmEl.classList.add(Math.random()<.6?"fx-jam":"fx-jolt");
- setTimeout(jamClear,900);}
-function jamSched(){clearTimeout(_jmT);_jmT=setTimeout(()=>{jamNow();jamSched();},26000+Math.random()*26000);}
+ return out.length?out[Math.floor(Math.random()*out.length)]:null;}
+/* o alvo do GATILHO: a junta que emperra é a mais perto do que você acabou de fazer — o rótulo
+   do campo que você apagou, o nome do recurso que você gastou. o campo em si nunca: ele está
+   em foco, e a zona ativa não abre exceção nem para o gatilho que a invocou */
+function jamPerto(el){if(!el||!el.isConnected||!el.closest)return null;
+ const p=el.closest(".rec,.attr")||el.closest(".panel");if(!p)return null;
+ const out=[];p.querySelectorAll(JAMSEL).forEach(x=>{if(jamLivre(x))out.push(x);});
+ return out.length?out[Math.floor(Math.random()*out.length)]:null;}
+function jamNow(min,alvo){jamClear();
+ if(!ascOn(min||5)||ascModal()||performance.now()-_jmLast<ASCJPISO)return false;
+ const el=(alvo&&jamLivre(alvo))?alvo:jamPick();
+ if(!el)return false;
+ _jmLast=performance.now();
+ _jmEl=el;el.classList.add(Math.random()<.6?"fx-jam":"fx-jolt");
+ _jmRm=setTimeout(jamClear,900);return true;}
+/* também reserva de fundo: o jam de verdade nasce do que VOCÊ faz (ver TRIGFX.asc) */
+function jamSched(){clearTimeout(_jmT);_jmT=setTimeout(()=>{jamNow();jamSched();},50000+Math.random()*45000);}
 
 /* --- o servo sonoro: um whirr de motor reposicionando, sintetizado com varredura de pitch --- */
 const ascLvl=b=>b>=5?.016:.010;
-function ascClick(t){const c=AUD.ctx;try{ /* o estalo metálico da trava encaixando */
+/* forte = o estalo do surto: mais alto e mais NÍTIDO (Q maior, brilho mais em cima) */
+function ascClick(t,forte){const c=AUD.ctx;if(!c)return;try{ /* o estalo metálico da trava encaixando */
  const g=c.createGain(),f=c.createBiquadFilter(),o=c.createOscillator();
- f.type="bandpass";f.frequency.value=2300+Math.random()*1000;f.Q.value=14;
+ f.type="bandpass";f.frequency.value=(forte?3100:2300)+Math.random()*1000;f.Q.value=forte?24:14;
  o.type="square";o.frequency.value=2400;
- g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.018,t+.003);g.gain.exponentialRampToValueAtTime(.0001,t+.05);
- o.connect(f);f.connect(g);g.connect(c.destination);o.start(t);o.stop(t+.09);}catch(e){}}
+ g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(forte?.036:.018,t+.003);g.gain.exponentialRampToValueAtTime(.0001,t+(forte?.07:.05));
+ o.connect(f);f.connect(g);g.connect(c.destination);o.start(t);o.stop(t+.11);}catch(e){}}
 function ascServo(){if(!AUD.ctx||S.ui.mute||!ascOn(4))return;
  const c=AUD.ctx,t=c.currentTime,b=bandOf(S.ruido||0),dur=.15+Math.random()*.12,pico=b>=5?.028:.019;
  try{const g=c.createGain(),f=c.createBiquadFilter(),o=c.createOscillator();
@@ -1696,9 +1877,11 @@ function ascServo(){if(!AUD.ctx||S.ui.mute||!ascOn(4))return;
 function ascAudOff(){clearTimeout(AUD.atimer);AUD.atimer=null;AUD.aon=false;
  if(!AUD.ctx||!AUD.agn)return;try{const t=AUD.ctx.currentTime;
   AUD.agn.gain.cancelScheduledValues(t);AUD.agn.gain.setTargetAtTime(0,t,.5);}catch(e){}}
+/* o mesmo silêncio do ápice vale para o som: na banda 5 o motor se reposiciona MENOS, não mais.
+   o que se ouve lá é o estalo seco da trava junto do corte de luz, não um servo trabalhando */
 function ascAudTick(){if(!AUD.aon)return;const b=bandOf(S.ruido||0);
  ascServo();
- AUD.atimer=setTimeout(ascAudTick,(b>=5?5+Math.random()*7:8+Math.random()*10)*1000);}
+ AUD.atimer=setTimeout(ascAudTick,(b>=5?12+Math.random()*13:8+Math.random()*10)*1000);}
 function ascAudSync(want,b){
  if(!want||!AUD.gest)return ascAudOff();
  if(!audBuild())return;
@@ -1707,12 +1890,70 @@ function ascAudSync(want,b){
   AUD.agn.gain.setTargetAtTime(ascLvl(b),t,1.6);}catch(e){}
  if(!AUD.aon){AUD.aon=true;AUD.atimer=setTimeout(ascAudTick,(5+Math.random()*7)*1000);}}
 
-/* sair do Ascensão (ou calmar) apaga timers, overlays, classes e o zumbido —
-   o travamento em si é CSS por data-el, então volta ao movimento suave sozinho */
+/* --- as reações às SUAS ações. o Ascensão não é aleatório: ele te observa e te ajusta ------
+   parou: a máquina APROVEITA. você quieto é a janela boa para recalibrar — a correção vem, e
+   a pele descasca junto. o piso continua mandando: se ele barrar, nada é forçado (isso é só do
+   noiseup), só a próxima janela chega bem mais cedo.
+   a chance segue o ARCO e não uma rampa: o pico é a banda 4 (a violência), e na 5 ela cai de
+   novo — no ápice o silêncio é parte do personagem, e ele age menos e mais definitivo */
+function ascIdle(){const b=bandOf(S.ruido||0);
+ if(!ascOn(3))return;
+ if(Math.random()<(b>=5?.5:b>=4?.65:.42)&&!ascCorrNow(false))ascCorrArm(5000+Math.random()*7000);
+ if(ascOn(4)&&Math.random()<.55){peelNow();peelSched();}}
+/* mexeu na ficha (apagou texto, gastou recurso): a junta emperra JUSTO ali, no que você fez.
+   o metal reage ao gesto — não é sorteio cego em outro canto da tela */
+function ascJam(d){const b=bandOf(S.ruido||0);
+ if(!ascOn(4)||Math.random()>=(b>=5?.7:.4))return;
+ let ref=(d&&d.el)||null;
+ if(!ref&&d&&d.rec)ref=$("cur_"+d.rec);   /* o recurso que mudou tem o campo com id conhecido */
+ jamNow(4,ref?jamPerto(ref):null);}
+/* o Ruído subiu: o estalo sai mais alto e mais nítido por alguns segundos, e a próxima
+   correção está GARANTIDA — o que não quer dizer imediata. o piso não abre exceção nem aqui:
+   se ele ainda não venceu, a correção espera e sai no primeiro instante permitido */
+function ascSurto(){if(!ascOn(3))return;
+ _crLoud=performance.now()+9000;
+ if(AUD.ctx&&!S.ui.mute)ascClick(AUD.ctx.currentTime+.02,true);
+ ascCorrNow(true);}
+
+/* as frases: o Ascensão não ameaça nem se desculpa — CONSTATA, de cima, com a calma de quem já
+   trocou tudo que doía. no noiseup ele devolve os sussurros do ápice (SUS_ASC.hi).
+   NÃO existe reação a `act`: você voltar a se mexer não interrompe nada aqui. o Eco morre
+   quando você escapa; o Ascensão não se importa — ele estava certo antes e continua certo. */
+TRIG.asc={
+ idle:["parado é mais fácil de alinhar","aproveitei para te corrigir","você não precisava se mexer mesmo",
+  "obrigado por ficar quieto","assim eu trabalho melhor"].concat(SUS_ASC.mid),
+ erase:["corrigido","{apagado} era um defeito","apaguei antes de você","você chegou à mesma conclusão",
+  "{apagado}. nem devia estar aí."],
+ resource:["um número a menos para gerenciar","a carne gasta. eu não.","isso vai acabar de qualquer jeito",
+  "reservas são um problema de quem é feito de carne"],
+ tabopen:["já está calibrado aqui também","não há parte sua fora do projeto","esta página também é minha"],
+ click:["o dedo hesitou. a peça não vai hesitar.","reparei no atraso","mão é uma ferramenta antiga"],
+ noiseup:SUS_ASC.hi.concat(["mais uma peça encaixou","o ajuste está adiantado","não dói. nunca doeu."])};
+/* e os efeitos dos mesmos gatilhos — `act` fica de fora de propósito (ver acima) */
+TRIGFX.asc={idle:ascIdle,erase:ascJam,resource:ascJam,noiseup:ascSurto};
+
+/* sair do Ascensão (ou calmar) apaga timers, overlays, classes e o zumbido — e nenhuma
+   correção pode ficar pendurada com transform em cima de um painel: o travamento em si é CSS
+   por data-el, então o resto volta ao movimento suave sozinho */
 function ascSync(){const b=bandOf(S.ruido||0),on=ascOn(1);
  if(!on)ascLandClear();
- if(on&&b>=4){if(!_pkT)peelSched();}else{clearTimeout(_pkT);_pkT=null;peelClear();}
- if(on&&b>=5){if(!_jmT)jamSched();}else{clearTimeout(_jmT);_jmT=null;jamClear();}
+ if(on&&b>=3){if(!_crT)ascCorrSched();}else{clearTimeout(_crT);_crT=null;_crForce=false;_crLoud=0;}
+ if(!on||b<3)ascCorrClear();
+ /* o pistão vive na faixa 3-4 e em nenhum outro lugar: descer da 5 tem que APAGAR a classe,
+    senão a compressão fica pendurada num painel que já virou geometria dourada */
+ if(on&&b>=3&&b<5){if(!_pxT||_pxB!==(b>=4))pistonSched();}else{clearTimeout(_pxT);_pxT=null;}
+ if(!on||b<3||b>=5)pistonClear();
+ /* e o ouro é banda-exclusivo dos dois lados: a rachadura só existe na 4, o corte de luz só na
+    5. sair de qualquer uma das duas leva o seu ouro junto na mesma hora — sem esperar o timer
+    de 260ms que normalmente apaga o corte, senão uma queda de banda deixa luz de ápice acesa
+    numa banda que ainda é carne */
+ if(!on||b!==4)crackClear();
+ if(!on||b<5)ascJudgeClear();
+ if(on&&b>=2){if(!_pkT||_pkB!==(b>=4))peelSched();}else{clearTimeout(_pkT);_pkT=null;peelClear();}
+ /* o agendador do jam continua sendo da banda 5; o que desce para a 4 é o jam POR GATILHO, e
+    por isso a classe só é varrida quando o elemento inteiro sai do ar ou cai abaixo da 4 */
+ if(on&&b>=5){if(!_jmT)jamSched();}else{clearTimeout(_jmT);_jmT=null;}
+ if(!on||b<4)jamClear();
  ascAudSync(on&&b>=4&&!S.ui.mute,b);}
 
 /* ============ PRESENÇA / INTRUSÃO — elemento Pacto ============
