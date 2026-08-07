@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Formulário de Admissão</title>
+<style>
+  body{
+    margin:0; background:#008080; /* o teal clássico */
+    font-family:"Tahoma","MS Sans Serif",Verdana,Geneva,sans-serif;
+    font-size:13px; color:#000; padding:18px 10px 40px;
+  }
+  .win{max-width:720px; margin:0 auto; background:#c0c0c0; border:2px solid #000;
+    border-top-color:#dfdfdf; border-left-color:#dfdfdf; border-right-color:#000; border-bottom-color:#000;
+    box-shadow:2px 2px 0 #000, inset 1px 1px 0 #fff;}
+  /* barra de título */
+  .titlebar{background:linear-gradient(90deg,#000080,#1084d0); color:#fff; font-weight:bold;
+    padding:3px 5px; display:flex; align-items:center; justify-content:space-between;}
+  .titlebar .t{padding-left:2px; font-size:13px;}
+  .titlebar .btns{display:flex; gap:2px;}
+  .titlebar .b{width:16px; height:14px; background:#c0c0c0; color:#000; border:1px solid #fff;
+    border-right-color:#000; border-bottom-color:#000; font-size:10px; line-height:12px; text-align:center; font-weight:bold;}
+  /* menu falso */
+  .menubar{background:#c0c0c0; border-bottom:1px solid #808080; padding:2px 6px; font-size:12px;}
+  .menubar span{margin-right:12px;}
+  .menubar u{text-decoration:underline;}
+
+  .body{padding:14px 16px 18px;}
+  .head-note{background:#ffffe1; border:1px solid #000; padding:8px 10px; font-size:12px; margin-bottom:14px;}
+  .head-note b{display:block; margin-bottom:3px;}
+
+  fieldset{border:2px groove #fff; margin:0 0 16px; padding:10px 12px 14px; background:#c0c0c0;}
+  legend{background:#c0c0c0; padding:0 6px; font-weight:bold; font-size:12px;}
+  .sec-sub{font-size:11px; color:#404040; margin:-2px 0 10px;}
+
+  .q{margin:0 0 12px;}
+  .q label{display:block; margin-bottom:3px;}
+  .q .num{font-weight:bold;}
+  input[type="text"], textarea{
+    width:100%; box-sizing:border-box; font-family:inherit; font-size:12px; background:#fff;
+    border:2px solid #808080; border-top-color:#404040; border-left-color:#404040;
+    border-right-color:#fff; border-bottom-color:#fff; padding:3px 4px; color:#000;
+  }
+  textarea{resize:vertical; min-height:42px;}
+  input[type="text"]{height:22px;}
+
+  /* nota do sistema (isca) — parece instrução de formulário, blend */
+  .note{margin:10px 0 12px; padding:6px 8px 8px; background:#eeeeee; border:1px dotted #808080; font-size:12px;}
+  .note i{color:#000;}
+  .note .mini{display:block; width:60%; margin-top:5px;}
+
+  .radios{margin-top:4px;} .radios label{display:inline-block; margin-right:16px; font-weight:normal;}
+
+  .actions{margin-top:6px; text-align:right;}
+  button{font-family:inherit; font-size:12px; background:#c0c0c0; padding:4px 14px;
+    border:2px solid #fff; border-right-color:#000; border-bottom-color:#000; cursor:pointer;}
+  button:active{border:2px solid #000; border-right-color:#fff; border-bottom-color:#fff;}
+
+  .foot{margin-top:14px; padding-top:8px; border-top:1px solid #808080; font-size:10px; color:#404040; text-align:center; line-height:1.6;}
+  .counter{font-family:"Courier New",monospace; background:#000; color:#0f0; padding:1px 5px; border:1px solid #808080; letter-spacing:2px;}
+  a{color:#000080;}
+</style>
+</head>
+<body>
+<div class="win">
+  <div class="titlebar">
+    <span class="t">Formulário de Admissão — Microsoft Internet Explorer</span>
+    <span class="btns"><span class="b">_</span><span class="b">□</span><span class="b">×</span></span>
+  </div>
+  <div class="menubar"><span><u>A</u>rquivo</span><span><u>E</u>ditar</span><span><u>E</u>xibir</span><span><u>F</u>avoritos</span><span><u>F</u>erramentas</span><span>Aj<u>u</u>da</span></div>
+
+  <div class="body">
+
+    <div class="head-note">
+      <b>PROGRAMA DE ADMISSÃO — PREENCHIMENTO OBRIGATÓRIO</b>
+      Responda com calma e com sinceridade. Não há respostas certas ou erradas. Preencha todos os campos na ordem apresentada. Os dados de identificação serão solicitados ao final.
+    </div>
+
+    <!-- ===================== S1 ===================== -->
+    <fieldset>
+      <legend>Seção 1 — Triagem Inicial</legend>
+      <div class="q"><label><span class="num">1.</span> Como você descreveria um dia comum na sua vida, do começo ao fim?</label><textarea rows="3"></textarea></div>
+      <div class="q"><label><span class="num">2.</span> Como você prefere passar seu tempo livre? O que te dá algum sossego?</label><textarea rows="2"></textarea></div>
+
+      <div class="note"><i>Nota de preenchimento: Você está sozinho aí? Confira uma vez antes de continuar.</i><input type="text" class="mini"></div>
+
+      <div class="q"><label><span class="num">3.</span> Você dorme bem?</label><input type="text"></div>
+      <div class="q"><label><span class="num">4.</span> O que você estava fazendo pouco antes de começar a preencher isto?</label><textarea rows="2"></textarea></div>
+    </fieldset>
+
+    <!-- ===================== S2 ===================== -->
+    <fieldset>
+      <legend>Seção 2 — Rotina e Vínculos</legend>
+      <div class="q"><label><span class="num">5.</span> Seu trajeto costuma ser sempre o mesmo? Descreva o caminho que você faria de olhos fechados.</label><textarea rows="2"></textarea></div>
+      <div class="q"><label><span class="num">6.</span> Há quanto tempo você mora onde mora? O que tem lá que você nunca conseguiu jogar fora?</label><textarea rows="2"></textarea></div>
+
+      <div class="note"><i>Nota de preenchimento: Se você sumisse hoje, o que ficaria exatamente como você deixou — intocado, esperando?</i><input type="text" class="mini"></div>
+
+      <div class="q"><label><span class="num">7.</span> Alguém depende de você? Você depende de alguém?</label><textarea rows="2"></textarea></div>
+    </fieldset>
+
+    <!-- ===================== S3 ===================== -->
+    <fieldset>
+      <legend>Seção 3 — Histórico Pessoal</legend>
+      <div class="sec-sub">Para fins de avaliação. Responda o quanto se sentir à vontade.</div>
+      <div class="q"><label><span class="num">8.</span> Quem você perdeu, e o lugar dessa pessoa continua vazio?</label><textarea rows="2"></textarea></div>
+      <div class="q"><label><span class="num">9.</span> O que você prometeu e não cumpriu — ou prometeram a você e não cumpriram?</label><textarea rows="2"></textarea></div>
+      <div class="q"><label><span class="num">10.</span> Existe algo seu que só cresce, e que você não consegue nem parar nem largar? (uma dívida, um hábito, um rancor, uma coleção)</label><textarea rows="2"></textarea></div>
+      <div class="q"><label><span class="num">11.</span> Alguma coisa se repete na sua vida sem você querer — uma data, uma briga, um sonho, uma frase?</label><textarea rows="2"></textarea></div>
+
+      <div class="note"><i>Nota de preenchimento: Esta parte — você já não preencheu antes? Tem certeza de que é a primeira vez?</i><input type="text" class="mini"></div>
+
+      <div class="q"><label><span class="num">12.</span> Do que você cuidou, com paciência, por muito tempo? O que floresceu — ou apodreceu — desse cuidado?</label><textarea rows="2"></textarea></div>
+      <div class="q"><label><span class="num">13.</span> Você já sentiu que algo, ou alguém, prestava atenção em você mais do que devia?</label><textarea rows="2"></textarea></div>
+    </fieldset>
+
+    <!-- ===================== S4 ===================== -->
+    <fieldset>
+      <legend>Seção 4 — Corpo e Sentidos</legend>
+      <div class="q"><label><span class="num">14.</span> Há alguma marca no seu corpo que conta uma história? Qual?</label><textarea rows="2"></textarea></div>
+      <div class="q"><label><span class="num">15.</span> Existe um cheiro, um som ou uma música que te arranca do presente na hora? Pra onde te leva?</label><textarea rows="2"></textarea></div>
+
+      <div class="note"><i>Nota de preenchimento: Há quanto tempo você está parado, preenchendo isto, sem se mexer?</i><input type="text" class="mini"></div>
+
+      <div class="q"><label><span class="num">16.</span> Qual parte de envelhecer, adoecer ou morrer mais te assusta?</label><textarea rows="2"></textarea></div>
+    </fieldset>
+
+    <!-- ===================== S5 ===================== -->
+    <fieldset>
+      <legend>Seção 5 — Observações Subjetivas</legend>
+      <div class="q"><label><span class="num">17.</span> O que você não suporta perder?</label><textarea rows="2"></textarea></div>
+
+      <div class="note"><i>Nota de preenchimento: Se você não aparecesse amanhã, quanto tempo levaria até alguém perceber a sua falta?</i><input type="text" class="mini"></div>
+
+      <div class="q"><label><span class="num">18.</span> O que você faria por quem ama que não faria por mais ninguém?</label><textarea rows="2"></textarea></div>
+      <div class="q"><label><span class="num">19.</span> Qual é a coisa que você nunca contou a ninguém — não por vergonha, mas porque ninguém acreditaria?</label><textarea rows="2"></textarea></div>
+
+      <div class="note"><i>Nota de preenchimento: Quantas coisas suas você conseguiria carregar numa mão só, se tivesse que sair correndo agora e nunca mais voltar?</i><input type="text" class="mini"></div>
+
+      <div class="q"><label><span class="num">20.</span> Se pudesse fazer uma única coisa durar para sempre, o que seria? E o que você estaria disposto a pagar por isso?</label><textarea rows="3"></textarea></div>
+    </fieldset>
+
+    <!-- ===================== S6 ===================== -->
+    <fieldset>
+      <legend>Seção 6 — Identificação</legend>
+      <div class="sec-sub">Agora que o resto já foi dito, e apenas para fins de registro:</div>
+      <div class="q"><label><span class="num">21.</span> Nome:</label><input type="text"></div>
+      <div class="q"><label>Idade:</label><input type="text"></div>
+      <div class="q"><label>Bairro:</label><input type="text"></div>
+
+      <div class="note"><i>Nota de preenchimento: Ao terminar isto, você vai dever alguma coisa a alguém. Tudo bem por você?</i><input type="text" class="mini"></div>
+    </fieldset>
+
+    <!-- ===================== S7 ===================== -->
+    <fieldset>
+      <legend>Seção 7 — Declaração Final</legend>
+      <div class="q"><label>Você preencheu este formulário por vontade própria?</label>
+        <div class="radios">
+          <label><input type="radio" name="vp"> Sim</label>
+          <label><input type="radio" name="vp"> Não</label>
+          <label><input type="radio" name="vp"> Não sei dizer</label>
+        </div>
+      </div>
+      <div style="font-size:12px; margin-top:8px; color:#000;">Obrigado. Este formulário não será lido por mais ninguém.</div>
+      <div class="actions">
+        <button type="button" onclick="window.print()">Imprimir</button>
+        <button type="button" onclick="alert('Recebido. Sua vaga já estava reservada.');">Enviar</button>
+      </div>
+    </fieldset>
+
+    <div class="foot">
+      Documento confidencial &middot; Programa de Admissão &middot; Porto Alegre &middot; 2002<br>
+      Melhor visualizado em 800×600 &nbsp;|&nbsp; Visitantes: <span class="counter">000001</span><br>
+      &copy; 2002 — Todos os direitos reservados. Sempre estiveram.
+    </div>
+
+  </div>
+</div>
+</body>
+</html>
