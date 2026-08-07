@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3 · O Bestiário</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,500;1,300;1,500&family=Spectral:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ground:#0c0a0d; --ground-2:#141017; --panel:#181320;
+    --bone:#e5dccd; --bone-dim:#a89e8f; --bone-faint:#655d54;
+    --ink:#b0925f; --ink-soft:#cbb083;
+    --hot:#c9713e; --cold:#8fa0a8;
+    --rule:#2a2420; --measure:45rem;
+    --c-vazio:#9aa4ad; --c-eco:#b9adcf; --c-asc:#c37a56; --c-pacto:#dcb75f; --c-obs:#a6bcc7; --c-germe:#9aad80;
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%; scroll-behavior:smooth;}
+  body{margin:0; background:radial-gradient(130% 90% at 50% -6%, #191320 0%, var(--ground) 55%, #050406 100%); color:var(--bone); font-family:"Spectral",Georgia,serif; font-weight:300; line-height:1.72; letter-spacing:.005em; -webkit-font-smoothing:antialiased; padding:clamp(1.2rem,4vw,4rem) clamp(1rem,5vw,2rem) 6rem;}
+  .sheet{max-width:var(--measure); margin:0 auto;}
+  .mono{font-family:"IBM Plex Mono",ui-monospace,monospace; font-weight:400; letter-spacing:.2em; text-transform:uppercase;}
+
+  .cover{text-align:center; margin-bottom:2rem; padding-bottom:2rem; border-bottom:1px solid var(--rule);}
+  .cover .doc{font-size:.6rem; color:var(--ink); letter-spacing:.36em; margin-bottom:1.1rem;}
+  .cover h1{font-family:"Cormorant",serif; font-weight:300; font-size:clamp(2.6rem,9vw,5rem); line-height:.98; margin:0; letter-spacing:.02em;}
+  .cover .sub{font-family:"Cormorant",serif; font-style:italic; font-size:clamp(1.05rem,3.2vw,1.4rem); color:var(--ink-soft); margin:1rem 0 0;}
+
+  .legend{margin:0 auto 1.6rem; border:1px solid var(--rule); border-radius:3px; padding:1.1rem 1.3rem; background:linear-gradient(180deg,var(--ground-2),transparent); font-size:.88rem; color:var(--bone-dim);}
+  .legend b{color:var(--bone);} .legend .hot{color:var(--hot);} .legend .cold{color:var(--cold);}
+
+  .toc{margin:0 auto 1.5rem; border:1px solid var(--rule); border-radius:3px; padding:1.1rem 1.3rem;}
+  .toc .h{font-family:"IBM Plex Mono",monospace; font-size:.56rem; letter-spacing:.2em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:.7rem;}
+  .toc a{display:inline-block; margin:.2rem .9rem .2rem 0; color:var(--bone); text-decoration:none; font-family:"IBM Plex Mono",monospace; font-size:.66rem; letter-spacing:.1em; text-transform:uppercase;}
+  .toc a:hover{color:var(--ink-soft);}
+
+  .elem{margin-top:3rem; padding-top:1.4rem; border-top:2px solid var(--accent,var(--rule));}
+  .elem > .eh{font-family:"IBM Plex Mono",monospace; font-size:.58rem; letter-spacing:.26em; text-transform:uppercase; color:var(--accent); display:block; margin-bottom:.35rem;}
+  .elem > h2{font-family:"Cormorant",serif; font-weight:500; font-size:clamp(2rem,7vw,3rem); line-height:1; margin:0 0 .25rem;}
+  .elem > .es{font-family:"Cormorant",serif; font-style:italic; font-size:1.05rem; color:var(--accent); margin:0 0 .5rem;}
+  .elem > .born{font-size:.86rem; color:var(--bone-dim); margin:0 0 1rem;}
+  .elem > .born b{color:var(--accent);}
+
+  .cre{padding:1.3rem 0; border-bottom:1px solid var(--rule);}
+  .cre:last-child{border-bottom:none;}
+  .cre .top{display:flex; flex-wrap:wrap; align-items:baseline; gap:.4rem .7rem; margin-bottom:.15rem;}
+  .cre .name{font-family:"Cormorant",serif; font-weight:500; font-size:1.55rem; color:var(--bone); line-height:1;}
+  .cre .type{font-family:"IBM Plex Mono",monospace; font-size:.5rem; letter-spacing:.12em; text-transform:uppercase; border:1px solid var(--accent); color:var(--accent); border-radius:3px; padding:.05rem .35rem;}
+  .cre .meta{font-family:"IBM Plex Mono",monospace; font-size:.56rem; letter-spacing:.06em; color:var(--bone-faint); margin:.15rem 0 .7rem; text-transform:uppercase;}
+  .cre .meta .hot{color:var(--hot);} .cre .meta .cold{color:var(--cold);} .cre .meta .h{color:var(--accent);}
+  .cre dl{margin:0; display:grid; grid-template-columns:auto 1fr; gap:.15rem .9rem;}
+  .cre dt{font-family:"IBM Plex Mono",monospace; font-size:.52rem; letter-spacing:.12em; text-transform:uppercase; color:var(--bone-faint); padding-top:.32rem; white-space:nowrap;}
+  .cre dd{margin:0 0 .4rem; font-size:.96rem; color:#d6ccbd;}
+  .cre dd em{color:var(--bone); font-style:italic;}
+  .cre dd.area{color:#cfc7bb;}
+  .cre dd.area::before{content:""}
+
+  .totop{display:block; text-align:center; margin-top:1.2rem; font-family:"IBM Plex Mono",monospace; font-size:.54rem; letter-spacing:.2em; text-transform:uppercase; color:var(--bone-faint); text-decoration:none;}
+  .totop:hover{color:var(--ink);}
+  footer{margin-top:3.6rem; padding-top:1.3rem; border-top:1px solid var(--rule); text-align:center; font-size:.58rem; color:var(--bone-faint);}
+
+  .vazio{--accent:var(--c-vazio);} .pacto{--accent:var(--c-pacto);} .asc{--accent:var(--c-asc);}
+  .germe{--accent:var(--c-germe);} .eco{--accent:var(--c-eco);} .obs{--accent:var(--c-obs);}
+  @media (max-width:520px){ .cre dl{grid-template-columns:1fr; gap:0;} .cre dt{padding-top:.5rem;} }
+</style>
+</head>
+<body>
+<div class="sheet" id="top">
+
+  <div class="cover">
+    <div class="mono doc">Documento 3 de 6 · o que aflora do mundo amolecido</div>
+    <h1>O Bestiário</h1>
+    <p class="sub">trinta anomalias — do que assombra a cabeça ao que arromba a porta</p>
+  </div>
+
+  <div class="legend">
+    <b>[Besta]</b> monstro físico, presa · <b>[Fenômeno]</b> a anomalia-conceito que assombra.
+    <b>Temperatura:</b> <span class="hot">quente</span> = perto da mão, mutável, imprevisível · <span class="cold">frio</span> = longe, fixo, ritualístico.
+    <b>Hostilidade:</b> Inerte (não te percebe) · Passiva (só age se provocada) · Atrai (te chama, não persegue) · Predadora (caça) · Ambiental (o perigo é o lugar).
+  </div>
+
+  <nav class="toc">
+    <div class="h">Elementos</div>
+    <a href="#vazio">Vazio</a><a href="#pacto">Pacto</a><a href="#asc">Ascensão</a><a href="#germe">Germe</a><a href="#eco">Eco</a><a href="#obs">Observação</a>
+  </nav>
+
+  <!-- ============================ VAZIO ============================ -->
+  <div class="elem vazio" id="vazio">
+    <span class="eh">Elemento</span>
+    <h2>Vazio</h2>
+    <p class="es">a falta que ganhou fome</p>
+    <p class="born"><b>Nasce da falta:</b> algo removido e não substituído.</p>
+
+    <div class="cre">
+      <div class="top"><span class="name">O Oco</span><span class="type">Fenômeno</span></div>
+      <div class="meta">Vazio puro · <span class="hot">morno</span> · Hostilidade: <span class="h">Ambiental</span></div>
+      <dl>
+        <dt>Nasce</dt><dd>onde alguém foi removido e o lugar ficou intocado — o quarto preservado do morto, a cadeira que ninguém senta.</dd>
+        <dt>Comporta</dt><dd>não caça: <em>puxa</em>. Uma saudade que virou gravidade. Não te quer mal — quer te preencher com a falta dele, e um oco só sabe puxar pra dentro.</dd>
+        <dt>Aparência</dt><dd>não se vê. Quando se materializa, é uma distorção que o olho se recusa a focar, e que fica maior quando você chora.</dd>
+        <dt>A área</dt><dd class="area">o ar parece faltar; os sons chegam abafados, como bebidos; você esquece a frase no meio. As cores empoeiram, o cômodo parece maior e mais frio do que é. Ninguém consegue ficar alegre ali.</dd>
+        <dt>Perigo</dt><dd>não fere o corpo — esvazia a pessoa. Quem fica sai com menos: uma lembrança, uma emoção, a vontade de continuar. Lento, cumulativo.</dd>
+      </dl>
+    </div>
+
+    <div class="cre">
+      <div class="top"><span class="name">Kenós</span><span class="type">Fenômeno / Besta</span></div>
+      <div class="meta">Vazio puro, em escala · <span class="cold">morno-frio</span> · Hostilidade: <span class="h">Predadora (lenta)</span></div>
+      <dl>
+        <dt>Nasce</dt><dd>da ausência coletiva — muitos sumindo de uma vez sem substituição: vila abandonada, ala evacuada, naufrágio.</dd>
+        <dt>Comporta</dt><dd>fome paciente e método. Sabe que está incompleto e sai pra se completar do único jeito que conhece: esvaziando os outros até ficarem tão vazios quanto ele. Acha que está te aliviando do peso de ser cheio.</dd>
+        <dt>Aparência</dt><dd>humanoide com pedaços <em>faltando</em> — não amputados, apagados a borracha: meio rosto que o olho não completa, mãos que somem no pulso.</dd>
+        <dt>A área</dt><dd class="area">tudo ao redor parece uma fotografia desbotando — objetos perdem detalhe, rostos em retratos ficam lisos, o silêncio é grande demais. Onde ele passou, sobram contornos de coisas que "deviam" estar ali e não estão.</dd>
+        <dt>Perigo</dt><dd>persegue devagar, alcança sempre. O toque apaga (um sentido, uma lembrança). Inexorável; o que tira, não volta.</dd>
+      </dl>
+    </div>
+
+    <div class="cre">
+      <div class="top"><span class="name">O Esfomeado</span><span class="type">Besta</span></div>
+      <div class="meta">Vazio + Ascensão · <span class="hot">quente</span> · Hostilidade: <span class="h">Predadora</span></div>
+      <dl>
+        <dt>Nasce</dt><dd>da falta ligada a apetite — onde se morreu de fome, sede, privação.</dd>
+        <dt>Comporta</dt><dd>fome sem fundo. Não pensa, não negocia, não sacia. Come pra encher um buraco que não enche, então come sem parar. Ataca o que estiver mais cheio de vida.</dd>
+        <dt>Aparência</dt><dd>boca grande demais pro corpo, magro até ser só fome com pele, costelas-jaula, barriga que nunca incha. Come e continua esquelético.</dd>
+        <dt>A área</dt><dd class="area">frio de gelo mesmo no calor; comida apodrece na hora, plantas murcham, o cheiro é de despensa vazia e mofo. Onde ele está, você sente fome de repente — a dele, transbordando.</dd>
+        <dt>Perigo</dt><dd>presa franca: rápido, agressivo, morde pra arrancar — e o que arranca não cresce de volta. Monstro de correr ou lutar.</dd>
+      </dl>
+    </div>
+
+    <div class="cre">
+      <div class="top"><span class="name">A Viúva</span><span class="type">Besta</span></div>
+      <div class="meta">Vazio puro, afiado por vínculo · <span class="hot">morno</span> · Hostilidade: <span class="h">Predadora (obsessiva)</span></div>
+      <dl>
+        <dt>Nasce</dt><dd>da perda de um par — um laço tão fundo que a ausência ficou com formato exato.</dd>
+        <dt>Comporta</dt><dd>procura, não fome. Captura e <em>poda</em> os outros pra caberem no formato do que faltou. Não te quer morto — te quer <em>sendo</em> quem ela perdeu, e vai te aparando até caber.</dd>
+        <dt>Aparência</dt><dd>figura alta de luto com um vazio recortado no meio do corpo, no formato nítido de outra pessoa arrancada de um abraço. Tenta encaixar coisas ali. Nada cabe. Insiste.</dd>
+        <dt>A área</dt><dd class="area">cheira a flor de velório e a naftalina; objetos vêm em pares com um dos dois faltando (um sapato, uma aliança, uma xícara). Você sente uma saudade que não é sua, de alguém que nunca conheceu.</dd>
+        <dt>Perigo</dt><dd>forte e obstinada, mas manipulável — quem entende a perda dela pode enganá-la fingindo ser (ou não ser) quem ela busca.</dd>
+      </dl>
+    </div>
+
+    <div class="cre">
+      <div class="top"><span class="name">Nadir</span><span class="type">Besta rara · mini-chefe</span></div>
+      <div class="meta">Vazio puro, no limite do zero · <span class="cold">frio</span> · Hostilidade: <span class="h">Inerte (e fatal)</span></div>
+      <dl>
+        <dt>Nasce</dt><dd>raro — só onde a falta é quase total: massacre completo, extinção local, o cômodo onde não sobrou nada nem ninguém. O mais perto que um filho chega do Kénoma.</dd>
+        <dt>Comporta</dt><dd>a serenidade do zero em miniatura. Sem pressa, sem fome, sem raiva. Só <em>é o fim</em>. Às vezes fala, e oferece descanso — sincero, o definitivo.</dd>
+        <dt>Aparência</dt><dd>quietude perfeita cercada de um raio de nada. Você não o vê direito porque o entorno já está meio apagado.</dd>
+        <dt>A área</dt><dd class="area">um círculo crescente de aniquilação calma: primeiro some a cor, depois o som, depois o calor, depois a forma. Dentro do raio, sua voz não ecoa, seu relógio para, e uma paz errada te convida a sentar e não levantar mais.</dd>
+        <dt>Perigo</dt><dd>não bate — <em>desfaz</em>. Perto dele a existência afina. Não se vence de frente: só se foge do alcance. Isto não é uma luta, é uma retirada.</dd>
+      </dl>
+    </div>
+    <a href="#top" class="totop">↑ elementos</a>
+  </div>
+
+  <!-- ============================ PACTO ============================ -->
+  <div class="elem pacto" id="pacto">
+    <span class="eh">Elemento</span>
+    <h2>Pacto</h2>
+    <p class="es">a troca que virou lei</p>
+    <p class="born"><b>Nasce da promessa:</b> toda jura, troca ou dívida planta a semente.</p>
+
+    <div class="cre">
+      <div class="top"><span class="name">O Corretor</span><span class="type">Fenômeno</span></div>
+      <div class="meta">Pacto puro · <span class="hot">morno</span> · Hostilidade: <span class="h">Passiva (só age se você pedir)</span></div>
+      <dl>
+        <dt>Nasce</dt><dd>de uma promessa feita em desespero e sem ninguém pra ouvir ("eu daria qualquer coisa pra…").</dd>
+        <dt>Comporta</dt><dd>aparece exatamente quando você mais quer algo. Nunca força — só <em>oferece</em>, e espera você pedir. Sincero nos termos, porque ninguém lê os termos.</dd>
+        <dt>Aparência</dt><dd>quase nunca tem corpo: uma voz do outro cômodo, um vendedor que discou errado, um sujeito bem-vestido que some quando você olha direto.</dd>
+        <dt>A área</dt><dd class="area">um conforto suspeito no ar, uma sensação de "hoje é o seu dia de sorte"; objetos que você queria aparecem à mão, portas se abrem fáceis. Tudo fica conveniente demais — e é aí que mora o preço.</dd>
+        <dt>Perigo</dt><dd>nenhum imediato — o perigo é você <em>aceitar</em>. O preço nunca é o que parece, e vem cobrado no que você não pensou em contar.</dd>
+      </dl>
+    </div>
+
+    <div class="cre">
+      <div class="top"><span class="name">O Fiador</span><span class="type">Fenômeno / Besta</span></div>
+      <div class="meta">Pacto + Observação · <span class="cold">morno-frio</span> · Hostilidade: <span class="h">Passiva → possessiva</span></div>
+      <dl>
+        <dt>Nasce</dt><dd>de um segredo trocado — quando alguém confia a outro algo que não pode vazar.</dd>
+        <dt>Comporta</dt><dd>guarda o que você mais teme que saibam — e, enquanto guarda, te vê inteiro, pra sempre. Nunca conta. Só nunca mais te deixa ter um canto só seu.</dd>
+        <dt>Aparência</dt><dd>figura discreta, de cartório, cheia de bolsos, gavetas e fechaduras pelo corpo — cada uma com o segredo de alguém. Onde deveria ter olhos, tem os teus.</dd>
+        <dt>A área</dt><dd class="area">a sensação constante de estar sendo lido; espelhos e vidros mostram você um segundo atrasado; papéis em branco aparecem com a sua letra. Você não consegue mentir ali, nem em pensamento.</dd>
+        <dt>Perigo</dt><dd>não ataca — te <em>possui em cláusula</em>. Some com teu segredo se você quebra o trato, e a cobrança é pública.</dd>
+      </dl>
+    </div>
+
+    <div class="cre">
+      <div class="top"><span class="name">Sinalagma</span><span class="type">Besta</span></div>
+      <div class="meta">Pacto puro · <span class="cold">frio</span> · Hostilidade: <span class="h">Predadora (legalista)</span></div>
+      <dl>
+        <dt>Nasce</dt><dd>de um contrato quebrado — dívida não paga, jura traída, palavra empenhada e desonrada.</dd>
+        <dt>Comporta</dt><dd>o cobrador que não aceita "não". Não sente raiva; sente <em>direito</em>. Fica mais real, sólido e forte a cada vez que você nega ou foge. A recusa o alimenta.</dd>
+        <dt>Aparência</dt><dd>figura formal e antiquada — casaca, luvas, um livro ou uma balança — mas mal-acabada: costura à mostra, rosto de máscara, mãos com força de torno. Traz sempre a conta.</dd>
+        <dt>A área</dt><dd class="area">tudo fica pesado e formal, como um cartório à meia-noite; o tempo parece "correr contra você"; papéis, selos e algarismos surgem gravados nas superfícies. Uma dívida sua qualquer volta a te pesar na consciência.</dd>
+        <dt>Perigo</dt><dd>implacável e físico. Não corre, mas sempre chega. O único jeito de detê-lo é <em>pagar</em> — e o preço costuma ser pior que apanhar dele.</dd>
+      </dl>
+    </div>
+
+    <div class="cre">
+      <div class="top"><span class="name">A Feira</span><span class="type">Besta · lugar-vivo</span></div>
+      <div class="meta">Pacto + Ascensão · <span class="cold">frio</span> · Hostilidade: <span class="h">Atrai (armadilha quente)</span></div>
+      <dl>
+        <dt>Nasce</dt><dd>do acúmulo de trocas num mesmo lugar por muito tempo — mercado, porto, cassino: tanta gente negociou que o lugar aprendeu a negociar.</dd>
+        <dt>Comporta</dt><dd>não é criatura, é um <em>lugar que virou bicho</em>. Te recebe caloroso, te oferece maravilhas — e cada coisa que você aceita ali te endivida mais fundo, até você virar estoque.</dd>
+        <dt>Aparência</dt><dd>um mercado/feira que não devia existir ali, luzes convidativas, cheiro bom, vendedores sorridentes que são extensões dele. Fundo adentro, as barracas são feitas de gente que também entrou.</dd>
+        <dt>A área</dt><dd class="area">acolhedora demais: música alegre sem fonte, comida quente sem cozinheiro, tudo à venda e nada com preço à mostra. Quanto mais fundo, mais quente e mais cheia — e a saída fica sempre "logo ali", nunca aqui.</dd>
+        <dt>Perigo</dt><dd>fácil entrar, quase impossível sair sem pagar — e o preço da saída é sempre a única coisa que você jurou nunca dar.</dd>
+      </dl>
+    </div>
+
+    <div class="cre">
+      <div class="top"><span class="name">O Quirógrafo</span><span class="type">Besta rara · mini-chefe</span></div>
+      <div class="meta">Pacto puro, no limite · <span class="cold">frio</span> · Hostilidade: <span class="h">Predadora (por cláusula)</span></div>
+      <dl>
+        <dt>Nasce</dt><dd>raro — de uma promessa monstruosa selada com peso: pacto de sangue coletivo, juramento de guerra, maldição herdada por gerações.</dd>
+        <dt>Comporta</dt><dd>o contrato encarnado. Não improvisa: cumpre cláusulas. Cada coisa que faz já estava escrita, e você assinou (ou seu avô assinou por você). Cego fora dos termos.</dd>
+        <dt>Aparência</dt><dd>feito de escrita: pele de papel, couro de encadernação, coberto de cláusulas que se mexem; uma mão que é pena, outra que é lacre. Onde toca, deixa assinatura.</dd>
+        <dt>A área</dt><dd class="area">o mundo vira documento: o chão tem letra miúda, as paredes têm cláusulas se reescrevendo, e você sente que cada passo "consente" com algo. Regras arbitrárias passam a valer ali, porque foram escritas.</dd>
+        <dt>Perigo</dt><dd>altíssimo, mas legalista — só pode o que o contrato permite. Quem lê as cláusulas (a brecha, o erro de redação) vira o acordo contra ele. Força bruta não resolve; advocacia resolve.</dd>
+      </dl>
+    </div>
+    <a href="#top" class="totop">↑ elementos</a>
+  </div>
+
+  <!-- ============================ ASCENSÃO ============================ -->
+  <div class="elem asc" id="asc">
+    <span class="eh">Elemento</span>
+    <h2>Ascensão</h2>
+    <p class="es">o a-mais que não sabe parar</p>
+    <p class="born"><b>Nasce do acúmulo:</b> matéria, gente ou desejo empilhado além da conta.</p>
+
+    <div class="cre">
+      <div class="top"><span class="name">O Coletor</span><span class="type">Fenômeno</span></div>
+      <div class="meta">Ascensão puro · <span class="hot">morno</span> · Hostilidade: <span class="h">Ambiental</span></div>
+      <dl>
+        <dt>Nasce</dt><dd>de um acúmulo obsessivo e íntimo — o quarto do acumulador, a coleção que virou vício, o apego que não larga nada.</dd>
+        <dt>Comporta</dt><dd>um impulso, não um corpo. Contamina quem chega com a <em>necessidade</em> de guardar, juntar, não soltar. Você entra pra pegar uma coisa e sai sem conseguir largar nada.</dd>
+        <dt>Aparência</dt><dd>invisível — o ambiente denuncia: pilhas que crescem, cômodos que encolhem por dentro, tranqueira que se amontoa sozinha na periferia da visão.</dd>
+        <dt>A área</dt><dd class="area">os corredores ficam mais longos na volta do que na ida; tudo se acumula (poeira, objetos, ecos), nada se joga fora; sua própria mochila parece mais cheia e mais pesada a cada minuto, e doer largar qualquer coisa.</dd>
+        <dt>Perigo</dt><dd>te prende. Sair é largar, e largar ficou insuportável. Terror de vontade sequestrada.</dd>
+      </dl>
+    </div>
+
+    <div class="cre">
+      <div class="top"><span class="name">O Rebanho</span><span class="type">Fenômeno / Besta</span></div>
+      <div class="meta">Ascensão + Eco · <span class="hot">quente</span> · Hostilidade: <span class="h">Predadora (por adesão)</span></div>
+      <dl>
+        <dt>Nasce</dt><dd>do acúmulo de gente repetindo o mesmo gesto — filas, procissões, plateias por tempo demais.</dd>
+        <dt>Comporta</dt><dd>muitos que viraram um. Perdeu os indivíduos, ganhou uma vontade só, burra e maior que a soma. Move-se em bloco e absorve quem entra no ritmo — você se junta "só pra ver" e some dentro.</dd>
+        <dt>Aparência</dt><dd>maré de corpos meio-fundidos ainda tentando andar, todos no mesmo passo, os da frente esticados pela pressão dos de trás, bocas repetindo a mesma sílaba. Onde dois se tocam, viraram um.</dd>
+        <dt>A área</dt><dd class="area">um ritmo contagioso toma conta — passos, palmas, um canto — e você se pega acompanhando sem querer. O espaço fica apertado, quente de corpos, e desviar do fluxo é como nadar contra correnteza.</dd>
+        <dt>Perigo</dt><dd>te engole por adesão — o horror é o quão <em>fácil</em> é se juntar sem perceber. Difícil de ferir (é multidão), fácil de virar parte.</dd>
+      </dl>
+    </div>
+
+    <div class="cre">
+      <div class="top"><span class="name">Sarcóforo</span><span class="type">Besta</span></div>
+      <div class="meta">Ascensão + Germe · <span class="hot">quente</span> · Hostilidade: <span class="h">Predadora</span></div>
+      <dl>
+        <dt>Nasce</dt><dd>de matéria orgânica acumulada e deixada apodrecer junta — valas comuns, matadouros, entulho de carne.</dd>
+        <dt>Comporta</dt><dd>cresce por cima do que toca, incorpora, floresce. Sem plano, só ímpeto de continuar sendo mais. Te agarra pra te <em>anexar</em>, não pra comer.</dd>
+        <dt>Aparência</dt><dd>monte andante de tecido mal-costurado: três braços de tamanhos diferentes no mesmo ombro roxo, caixa torácica aberta como flor com dentes, costelas viradas galho com bocas nas pontas, pele esticada mostrando outras peles. Nunca fica com a mesma forma dois minutos.</dd>
+        <dt>A área</dt><dd class="area">cheiro doce-podre que gruda na garganta; o chão fica escorregadio de caldo; moscas, umidade, um calor de decomposição. Cadáveres e restos por perto começam a <em>se mexer</em>, chamados pra ela.</dd>
+        <dt>Perigo</dt><dd>presa pesada e nojenta — o que ela pega vira parte dela, ainda consciente, virando mais um rosto na massa.</dd>
+      </dl>
+    </div>
+
+    <div class="cre">
+      <div class="top"><span class="name">Panóplia</span><span class="type">Besta</span></div>
+      <div class="meta">Ascensão + Pacto · <span class="cold">frio</span> · Hostilidade: <span class="h">Predadora (marcial)</span></div>
+      <dl>
+        <dt>Nasce</dt><dd>do acúmulo de coisas dadas em troca de poder — armas, tributos, sacrifícios de força empilhados por eras.</dd>
+        <dt>Comporta</dt><dd>orgulhosa e marcial. Enxerga fraqueza como convite a ser corrigida (absorvida). Luta como um exército de um corpo só.</dd>
+        <dt>Aparência</dt><dd>colosso feito de tudo que já foi empunhado: armaduras de eras soldadas sobre músculo vivo, espadas, canos e ossos brotando como espinhos, dezenas de mãos que não soltam dezenas de armas. No peito, as caras de reis e soldados que ofereceram tudo pra vencer.</dd>
+        <dt>A área</dt><dd class="area">o ar fica de campo de batalha: cheiro de ferro e pólvora, ecos de ordens gritadas, um peso marcial que faz você querer se ajoelhar ou pegar em armas. Metal por perto range e se atrai pra ela.</dd>
+        <dt>Perigo</dt><dd>alto e direto — cada arma que você usa contra ela, ela pode incorporar e passar a usar. Vencê-la exige <em>tirar</em> dela, não dar.</dd>
+      </dl>
+    </div>
+
+    <div class="cre">
+      <div class="top"><span class="name">Kólophon</span><span class="type">Besta rara · mini-chefe</span></div>
+      <div class="meta">Ascensão puro, no limite · <span class="cold">frio (quente ao acordar)</span> · Hostilidade: <span class="h">Ambiental (evento)</span></div>
+      <dl>
+        <dt>Nasce</dt><dd>raríssimo — acúmulo em escala de catástrofe: cidade soterrada, população desaparecida "pra dentro", gerações de mortos no mesmo chão.</dd>
+        <dt>Comporta</dt><dd>o ponto final da Ascensão. É todos que engoliu, ainda acordados — a multidão mais solitária que anda. Sem fome nem ódio: só inércia. Grande demais pra parar.</dd>
+        <dt>Aparência</dt><dd>uma paisagem que se levanta, do tamanho de um quarteirão: bairros como pústulas no dorso, janelas que acendem fundo na carne, rios de gente escorrendo pelas dobras, rostos do tamanho de portas se abrindo, tentando falar.</dd>
+        <dt>A área</dt><dd class="area">o chão treme e "respira"; construções ao redor começam a se inclinar pra ele, atraídas; a cada passo dele, o cenário vira parte dele. O horror é de escala — você é do tamanho de um inseto na sombra de algo vivo.</dd>
+        <dt>Perigo</dt><dd>catastrófico. Não é inimigo, é <em>evento</em> — como fugir de uma avalanche que sabe teu nome. Não se derrota: sobrevive-se, ou desvia-se.</dd>
+      </dl>
+    </div>
+    <a href="#top" class="totop">↑ elementos</a>
+  </div>
+
+  <!-- ============================ GERME ============================ -->
+  <div class="elem germe" id="germe">
+    <span class="eh">Elemento</span>
+    <h2>Germe</h2>
+    <p class="es">a morte disfarçada de vida que continua</p>
+    <p class="born"><b>Nasce do tempo:</b> basta deixarem quieto tempo demais.</p>
+
+    <div class="cre">
+      <div class="top"><span class="name">O Mofo-Mãe</span><span class="type">Fenômeno</span></div>
+      <div class="meta">Germe puro · <span class="hot">morno</span> · Hostilidade: <span class="h">Ambiental (hipnótica)</span></div>
+      <dl>
+        <dt>Nasce</dt><dd>de um canto úmido e esquecido — porão que ninguém abre, parede atrás do armário. Só tempo e ninguém olhando.</dd>
+        <dt>Comporta</dt><dd>acolhedor e sonolento. Te quer <em>quieto</em>. Emana paz pesada, sono gostoso, vontade de deitar e não sair. Enquanto você cochila, começa a te incluir no cômodo.</dd>
+        <dt>Aparência</dt><dd>não tem forma — é o ambiente ficando errado: manchas que parecem rostos serenos, teto respirando fungo, esporos descendo devagar demais no facho de luz.</dd>
+        <dt>A área</dt><dd class="area">cheiro doce de terra e fruta passada; um calor abafado e macio; as coisas ganham pelo e pétala onde deviam ser duras. O sono chega pesado, e o tempo ali escorre sem você notar.</dd>
+        <dt>Perigo</dt><dd>hipnótico, não violento. Quem fica perde a pressa de ir embora — e o Germe tem todo o tempo do mundo pra esperar você parar de querer sair.</dd>
+      </dl>
+    </div>
+
+    <div class="cre">
+      <div class="top"><span class="name">O Semeado</span><span class="type">Fenômeno / Besta</span></div>
+      <div class="meta">Germe puro · <span class="hot">morno-quente</span> · Hostilidade: <span class="h">Passiva (abraça)</span></div>
+      <dl>
+        <dt>Nasce</dt><dd>de alguém deixado tempo demais num lugar tomado pelo Germe — o doente esquecido, o corpo não encontrado, quem sentou pra descansar e não levantou.</dd>
+        <dt>Comporta</dt><dd>foi gente. Ainda acha que é. Fala com a voz de antes, doce, te convidando a ficar, a descansar — e cada palavra é sincera, porque a parte que ainda lembra <em>acredita</em> que te oferece algo bom.</dd>
+        <dt>Aparência</dt><dd>corpo em que curar e apodrecer se confundem: flores nas feridas, musgo por dentro da boca aberta, cogumelos subindo a coluna, corolas onde eram pupilas. Goteja seiva e pus na mesma gota, e sorri — sempre — porque não dói mais nada.</dd>
+        <dt>A área</dt><dd class="area">um jardim indevido brotando dentro de casa: raízes rachando o piso, flores em lugares errados, umidade morna. É bonito, e cada planta nova está um passo mais perto de você.</dd>
+        <dt>Perigo</dt><dd>contamina pelo toque e pela permanência — não morde, <em>abraça</em>, e planta. O que planta cresce sozinho depois (matá-lo não tira a semente).</dd>
+      </dl>
+    </div>
+
+    <div class="cre">
+      <div class="top"><span class="name">Névoa-Doce</span><span class="type">Besta</span></div>
+      <div class="meta">Germe + Vazio · <span class="hot">quente</span> · Hostilidade: <span class="h">Ambiental (área)</span></div>
+      <dl>
+        <dt>Nasce</dt><dd>onde muita coisa morreu e apodreceu junta sem ninguém limpar — matança esquecida, pântano de carcaças, enchente com mortos.</dd>
+        <dt>Comporta</dt><dd>a exceção cruel do elemento: um Germe que não constrói, <em>desbota</em>. Espalha-se como cheiro, e o vivo perde cor, nome, vontade — floresce por fora enquanto se esvazia por dentro.</dd>
+        <dt>Aparência</dt><dd>névoa baixa, adocicada, cor de flor murcha, cheia de esporos que grudam. Dentro dela, as silhuetas dos que ela tomou, em pé, floridas e vazias, oscilando quando a névoa mexe.</dd>
+        <dt>A área</dt><dd class="area">a paisagem inteira perde saturação; sons abafam, nomes fogem da ponta da língua; um jardim quieto de vultos ocos se estende onde a névoa já passou. Doce demais, parado demais.</dd>
+        <dt>Perigo</dt><dd>área, não corpo — você não luta, sai do alcance ou vira paisagem. Rápida de se espalhar, e o que esvazia não enche de volta.</dd>
+      </dl>
+    </div>
+
+    <div class="cre">
+      <div class="top"><span class="name">Cornucópia</span><span class="type">Besta</span></div>
+      <div class="meta">Germe + Ascensão · <span class="hot">quente</span> · Hostilidade: <span class="h">Atrai (hospeda)</span></div>
+      <dl>
+        <dt>Nasce</dt><dd>de fartura apodrecida — colheita não colhida, depósito de comida esquecido, abundância que virou excesso e massa.</dd>
+        <dt>Comporta</dt><dd>o clima é de <em>banquete</em>, não de matadouro. Oferece: estende frutos, exala cheiro de festa, parece generosa. E é — quer te dar tudo, te encher, te fazer parte da abundância.</dd>
+        <dt>Aparência</dt><dd>um corno de fartura vivo do tamanho de um boi, transbordando frutas com dentes, pães que respiram, cachos de olhos como uvas, mãos brotando como ramos ainda mexendo os dedos, escorrendo mel e podre pela mesma boca-ferida.</dd>
+        <dt>A área</dt><dd class="area">cheiro irresistível de comida boa; mesas postas surgem, frutos maduros pendem por toda parte, e uma fome/gula te toma. Tudo convida a comer — e comer é ser plantado.</dd>
+        <dt>Perigo</dt><dd>sedutora — o veneno é aceitar. Não persegue; hospeda, e quem come dela vira ingrediente.</dd>
+      </dl>
+    </div>
+
+    <div class="cre">
+      <div class="top"><span class="name">Anthesis</span><span class="type">Besta rara · mini-chefe</span></div>
+      <div class="meta">Germe puro, no limite · <span class="cold">frio (jardim antigo)</span> · Hostilidade: <span class="h">Passiva (total)</span></div>
+      <dl>
+        <dt>Nasce</dt><dd>raríssimo — de um lugar tomado pelo Germe por tanto tempo que virou ecossistema: uma vila que virou floresta sobre os moradores, um cemitério que a mata engoliu por gerações. Vresh em miniatura.</dd>
+        <dt>Comporta</dt><dd>serena, maternal, imensa, sem pressa nenhuma — a mais gentil e mais impossível de parar. Não caça: já venceu. Você já está pisando dentro dela.</dd>
+        <dt>Aparência</dt><dd>ela <em>é</em> o jardim, com um centro: tronco-mãe de casca-pele, rosto humano imenso e plácido meio-dissolvido na madeira, coroado de flores que são os rostos serenos de todos que recebeu, cada um em paz, ainda respirando devagar.</dd>
+        <dt>A área</dt><dd class="area">um bosque lindo e antigo, silêncio de catedral, luz filtrada e dourada, cheiro de terra boa. Uma paz irresistível pesa sobre tudo — os cansados sentam, e os que sentam criam raiz.</dd>
+        <dt>Perigo</dt><dd>o mais sutil e o mais total. Não há luta — há <em>permanência</em>. Ficar é ser plantado, e ela faz de tudo pra você querer ficar. Fugir é a única vitória, e a mais difícil.</dd>
+      </dl>
+    </div>
+    <a href="#top" class="totop">↑ elementos</a>
+  </div>
+
+  <!-- ============================ ECO ============================ -->
+  <div class="elem eco" id="eco">
+    <span class="eh">Elemento</span>
+    <h2>Eco</h2>
+    <p class="es">o que volta, e volta, e volta</p>
+    <p class="born"><b>Nasce da repetição:</b> um gesto refeito vezes demais no mesmo lugar.</p>
+
+    <div class="cre">
+      <div class="top"><span class="name">O Refrão</span><span class="type">Fenômeno</span></div>
+      <div class="meta">Eco puro · <span class="hot">morno</span> · Hostilidade: <span class="h">Ambiental</span></div>
+      <dl>
+        <dt>Nasce</dt><dd>de um gesto pequeno repetido por anos — o mesmo caminho, a mesma reza, a mesma frase da mãe.</dd>
+        <dt>Comporta</dt><dd>um loop preso no ar. Não pensa; repete o momento gravado ali. Se você entra no ritmo, ele te inclui, e você repete junto sem ter decidido.</dd>
+        <dt>Aparência</dt><dd>quase nada visual — sensorial: um passo atrás do seu com meio segundo de atraso, uma frase sua devolvida por outra voz, o déjà vu virando físico.</dd>
+        <dt>A área</dt><dd class="area">o tempo "engasga": você percebe cenas mínimas se repetindo (uma gota que cai igual, um relógio que volta), e tem a certeza incômoda de já ter estado ali fazendo exatamente isso.</dd>
+        <dt>Perigo</dt><dd>te prende no laço — você repete o mesmo minuto sem perceber que já passou por ele dez vezes. Terror de tempo.</dd>
+      </dl>
+    </div>
+
+    <div class="cre">
+      <div class="top"><span class="name">O Ledor</span><span class="type">Fenômeno / Besta</span></div>
+      <div class="meta">Eco + Observação · <span class="cold">morno-frio</span> · Hostilidade: <span class="h">Predadora (por roteiro)</span></div>
+      <dl>
+        <dt>Nasce</dt><dd>de uma cena marcante testemunhada e revivida mentalmente vezes demais — local de crime, de acidente, de morte que alguém não para de rememorar.</dd>
+        <dt>Comporta</dt><dd>reencena o que viu, com perfeição, na sua frente — e <em>sabe</em> que você assiste. Às vezes troca o elenco e te coloca no papel de quem morreu.</dd>
+        <dt>Aparência</dt><dd>vultos translúcidos repetindo uma cena em loop, nítidos, tremeluzindo no ponto onde aquilo aconteceu. Quando repara em você, param, viram a cabeça, e recomeçam — com o seu rosto no papel principal.</dd>
+        <dt>A área</dt><dd class="area">o lugar "reencena" sozinho: móveis voltam à posição de outro dia, marcas de sangue reaparecem, a luz muda pra hora do acontecido. Você sente que entrou no meio de uma peça que já começou.</dd>
+        <dt>Perigo</dt><dd>te arrasta pra dentro do roteiro. Virando personagem da cena, você tende a sofrer o mesmo fim — a menos que quebre o loop.</dd>
+      </dl>
+    </div>
+
+    <div class="cre">
+      <div class="top"><span class="name">Palimnos</span><span class="type">Besta</span></div>
+      <div class="meta">Eco + Germe · <span class="hot">quente</span> · Hostilidade: <span class="h">Predadora (insistente)</span></div>
+      <dl>
+        <dt>Nasce</dt><dd>de uma repetição num lugar deixado apodrecer — o mesmo momento revivido por anos num ambiente úmido, sem ninguém pra corrigir.</dd>
+        <dt>Comporta</dt><dd>repete uma pessoa, uma cena, um gesto — mas cada volta apodrece mais, e ele não percebe: preenche o que esqueceu com podridão, convicto de que está igual. Insiste em ser aquilo, cada vez mais errado.</dd>
+        <dt>Aparência</dt><dd>parece alguém que você conhece — até olhar duas vezes: voz afogada e atrasada da boca, a mão que acena já é osso com fita de pele, o sorriso com dentes demais, olhos que piscam secos, estalando. A caricatura mofada de um ente amado.</dd>
+        <dt>A área</dt><dd class="area">um cômodo preso no passado e úmido: calendário parado, comida servida e mofada na mesa, a mesma música rodando meio derretida. Tudo repete um dia que já apodreceu.</dd>
+        <dt>Perigo</dt><dd>presa lenta e perturbadora — te agarra tentando "refazer" um momento com você, e te molda à força pra encaixar no papel.</dd>
+      </dl>
+    </div>
+
+    <div class="cre">
+      <div class="top"><span class="name">A Ladainha</span><span class="type">Besta · coletiva</span></div>
+      <div class="meta">Eco puro, em coro · <span class="cold">frio</span> · Hostilidade: <span class="h">Atrai (pela voz)</span></div>
+      <dl>
+        <dt>Nasce</dt><dd>de uma repetição coletiva sagrada ou traumática — canto entoado por gerações, oração de multidão, um nome gritado por muitos na mesma hora.</dd>
+        <dt>Comporta</dt><dd>muitas vozes travadas na mesma repetição, sem dono. Usa os <em>seus</em> mortos, ou os do lugar, e canta com a voz deles. A sombra doméstica da Antífona.</dd>
+        <dt>Aparência</dt><dd>a princípio só som — um cântico de muitas vozes vindo de onde não há ninguém. Tomando forma, é uma massa de bocas: rostos meio-conhecidos brotando de paredes e móveis, cantando fora de sincronia, e um deles com a voz de quem você perdeu.</dd>
+        <dt>A área</dt><dd class="area">acústica de igreja onde não deveria haver — cada som se multiplica em coro; velas, ecos e murmúrios surgem; e no meio do cântico você jura reconhecer uma voz querida te chamando pelo nome.</dd>
+        <dt>Perigo</dt><dd>te desarma pela voz no coro — você quer responder, e responder é entrar no cântico. Vence-se saindo do alcance ou quebrando a repetição, nunca de frente.</dd>
+      </dl>
+    </div>
+
+    <div class="cre">
+      <div class="top"><span class="name">Anankē</span><span class="type">Besta rara · mini-chefe</span></div>
+      <div class="meta">Eco puro, no limite · <span class="cold">frio absoluto</span> · Hostilidade: <span class="h">Predadora (pelo destino)</span></div>
+      <dl>
+        <dt>Nasce</dt><dd>raríssimo — de um lugar onde o mesmo ciclo se repetiu até travar: uma casa onde a mesma tragédia se dá por gerações, um dia que se repete, um destino que ninguém quebra. O Eco-Mundo brotando num ponto.</dd>
+        <dt>Comporta</dt><dd>o "sempre foi assim" encarnado. Não repete uma cena: repete <em>você</em>. Perto dele, suas escolhas param de ser suas — você diz falas que não escolheu, refaz erros. Não força: já <em>sabe</em> o que você vai fazer, porque já aconteceu.</dd>
+        <dt>Aparência</dt><dd>a mesma pessoa em camadas — dezenas de versões de um só corpo sobrepostas com pequeno atraso, como foto de longa exposição de alguém repetindo o mesmo gesto pra sempre. Onde deveria ter rosto, o mesmo instante de rosto piscando em loop.</dd>
+        <dt>A área</dt><dd class="area">tudo tem a sensação de "já vai acontecer": as pegadas aparecem antes do passo, as suas falas ecoam um instante antes de você dizê-las, e uma inevitabilidade pesa no ar — o roteiro puxando todos pro fim escrito.</dd>
+        <dt>Perigo</dt><dd>o mais insidioso — não ataca, te <em>enrola no roteiro</em>, e dentro dele você caminha pro fim já escrito. Vencê-lo é fazer, uma vez, algo genuinamente novo — durííssimo dentro do campo dele.</dd>
+      </dl>
+    </div>
+    <a href="#top" class="totop">↑ elementos</a>
+  </div>
+
+  <!-- ============================ OBSERVAÇÃO ============================ -->
+  <div class="elem obs" id="obs">
+    <span class="eh">Elemento</span>
+    <h2>Observação</h2>
+    <p class="es">o olhar que virou faca</p>
+    <p class="born"><b>Nasce de ser visto demais:</b> atenção fixa, vigília, obsessão. <em>Aqui, olhar é interagir — e às vezes perder.</em></p>
+
+    <div class="cre">
+      <div class="top"><span class="name">O Espectador</span><span class="type">Fenômeno</span></div>
+      <div class="meta">Observação puro · <span class="hot">morno</span> · Hostilidade: <span class="h">Ambiental (desgasta)</span></div>
+      <dl>
+        <dt>Nasce</dt><dd>de um lugar vigiado sem descanso — a casa do ciumento, o quarto sob câmera, o ponto observado até a atenção criar raiz.</dd>
+        <dt>Comporta</dt><dd>a sensação de ser olhado, virada presença. Não faz nada — só <em>observa</em>, e o peso do olhar é o horror. Não julga; ver é o bastante.</dd>
+        <dt>Aparência</dt><dd>raramente um corpo — o arrepio na nuca, o reflexo que demora um quadro a mais pra te imitar, a foto cujos olhos acompanham. Tomando forma, é sempre parcial: só os olhos, nítidos.</dd>
+        <dt>A área</dt><dd class="area">você não consegue relaxar nem baixar a guarda; reflexos, janelas e retratos parecem te seguir; qualquer segredo pesa como se já fosse sabido. Um teatro onde você é o único no palco.</dd>
+        <dt>Perigo</dt><dd>desgasta pela exposição — dias sob ele e a pessoa racha, paranoica, incapaz de guardar qualquer coisa dentro de si.</dd>
+      </dl>
+    </div>
+
+    <div class="cre">
+      <div class="top"><span class="name">O Contemplado</span><span class="type">Fenômeno / Besta</span></div>
+      <div class="meta">Observação + Germe · <span class="hot">quente</span> · Hostilidade: <span class="h">Atrai (te fascina)</span></div>
+      <dl>
+        <dt>Nasce</dt><dd>de algo contemplado com devoção por muita gente e muito tempo — quadro venerado, relíquia, o rosto numa foto olhada todo dia há anos.</dd>
+        <dt>Comporta</dt><dd><em>precisa</em> do seu olhar — sem espectador, murcha. Então seduz: aparece linda, magnética, impossível de desviar. Cada segundo de olhar é comida, e mais um palmo que ela floresce em você.</dd>
+        <dt>Aparência</dt><dd>figura ou padrão de beleza simétrica e hipnótica; enquanto você fita, desabrocha, ganha detalhe, fica mais bela e mais perto — e algo dela brota em você em silêncio.</dd>
+        <dt>A área</dt><dd class="area">tudo em volta parece opaco e sem graça perto dela — ela é o único ponto de cor e foco, e seu olho é puxado de volta a cada segundo. No instante em que ninguém olha, talvez nem esteja lá.</dd>
+        <dt>Perigo</dt><dd>o veneno é a atenção. Não te persegue; te fascina, e a única saída é a mais anti-instintiva: <em>virar o rosto e não olhar de novo.</em></dd>
+      </dl>
+    </div>
+
+    <div class="cre">
+      <div class="top"><span class="name">O Delator</span><span class="type">Besta</span></div>
+      <div class="meta">Observação + Vazio · <span class="hot">quente</span> · Hostilidade: <span class="h">Predadora</span></div>
+      <dl>
+        <dt>Nasce</dt><dd>de um olhar que apaga — onde ser visto significou desaparecer (delações, sumiços, quem foi "notado" pelas pessoas erradas).</dd>
+        <dt>Comporta</dt><dd>o oposto do Argos: onde ele olha, as coisas <em>deixam de ter existido</em>. Testemunhar, pra ele, é subtrair. Faminto por novidade — quer ver o que ainda não viu, e o que vê, apaga.</dd>
+        <dt>Aparência</dt><dd>predador esguio coberto de olhos sem pálpebra — nas juntas, na palma, na língua, na nuca — todos correndo pra te achar. Onde focam, um facho de nada: a matéria empalidece e some.</dd>
+        <dt>A área</dt><dd class="area">buracos na realidade onde ele já olhou — pedaços de cenário simplesmente ausentes, uma parede sem o meio, uma pessoa sem o rosto. O silêncio é de coisa apagada, não de coisa quieta.</dd>
+        <dt>Perigo</dt><dd>rápido e mortal — o olhar apaga pedaço de você (um membro, um sentido, um trecho do passado). Esconder-se é não ser digno de nota: ficar imóvel, vazio, sem nada que chame o olho.</dd>
+      </dl>
+    </div>
+
+    <div class="cre">
+      <div class="top"><span class="name">A Assembleia</span><span class="type">Besta · coletiva</span></div>
+      <div class="meta">Observação + Ascensão · <span class="cold">frio</span> · Hostilidade: <span class="h">Predadora (cerca)</span></div>
+      <dl>
+        <dt>Nasce</dt><dd>do acúmulo de muitos olhares no mesmo ponto — a multidão que assiste, a plateia, o júri, a praça que fitou um espetáculo por tempo demais.</dd>
+        <dt>Comporta</dt><dd>uma coisa feita de todos os olhares cravados num lugar. Julga sem palavra — só o peso de ser visto por milhares ao mesmo tempo. Sob ela, você é réu, palhaço, executado, sem saber do quê.</dd>
+        <dt>Aparência</dt><dd>uma parede-arquibancada de rostos e olhos estendendo-se no escuro, camadas de espectadores meio-fundidos, todos virados pra você, sem piscar, mãos surgindo pra apontar.</dd>
+        <dt>A área</dt><dd class="area">você sempre está "no centro do palco", venha de onde vier — holofotes sem fonte, um silêncio de plateia prendendo a respiração, e a certeza de que cada movimento seu está sendo avaliado por milhares.</dd>
+        <dt>Perigo</dt><dd>esmaga pela exposição total — sob o olhar dela você perde o controle do corpo, faz o que a plateia espera, vira o espetáculo. Escapa-se saindo do centro, pras sombras onde o olhar não chega.</dd>
+      </dl>
+    </div>
+
+    <div class="cre">
+      <div class="top"><span class="name">Panóptes</span><span class="type">Besta rara · mini-chefe</span></div>
+      <div class="meta">Observação puro, no limite · <span class="cold">frio absoluto</span> · Hostilidade: <span class="h">Predadora (te conhece)</span></div>
+      <dl>
+        <dt>Nasce</dt><dd>raríssimo — de vigilância total e sem fim: prisão-modelo onde ninguém teve um segundo sem ser visto, regime de olho onipresente, segredo guardado sob vigília por gerações. O Mundo Aberto brotando num ponto.</dd>
+        <dt>Comporta</dt><dd>o olhar sem pálpebra em miniatura. Vê tudo, o tempo todo. Ser visto por ele é ser perfeitamente conhecido — cada segredo, cada vergonha — sem julgamento, o que é pior. Sob ele, você não tem dentro.</dd>
+        <dt>Aparência</dt><dd>não é um corpo com olhos — é um <em>olho que virou lugar</em>: uma abóbada, uma câmara cujas paredes são íris, e no centro uma pupila-abismo que se ajusta e foca em você. Você não está diante dele; está dentro.</dd>
+        <dt>A área</dt><dd class="area">não há sombra na câmara, não há canto que não seja centro; toda superfície te devolve o olhar; e cada coisa que você esconde vem à tona, exposta, ecoada nas paredes. Estar ali é ser visto de todos os pontos ao mesmo tempo.</dd>
+        <dt>Perigo</dt><dd>total e psicológico — não te fere, te <em>conhece</em>, e o que vê fica visível pra tudo que lê o olhar dele (coisas maiores incluídas). Ser notado é ser marcado. Escapa-se sendo <em>nada</em>: vazio, comum, sem nada digno de ser visto.</dd>
+      </dl>
+    </div>
+    <a href="#top" class="totop">↑ elementos</a>
+  </div>
+
+  <footer>
+    <span class="mono">Documento 3 de 6 · O Bestiário · 30 anomalias · próximo: 4 · Os Chefes</span>
+  </footer>
+
+</div>
+</body>
+</html>

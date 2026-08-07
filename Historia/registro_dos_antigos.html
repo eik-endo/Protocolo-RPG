@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2 · O Registro dos Antigos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,500;1,300;1,500&family=Spectral:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ground:#0d0b0e; --ground-2:#151017;
+    --bone:#e6ddce; --bone-dim:#a99f90; --bone-faint:#6a6156;
+    --ink:#b89a6a; --ink-soft:#d0b585;
+    --rule:#2c2530; --measure:44rem;
+    /* cores de assinatura por elemento */
+    --gilt:#c9a24e; --c-vazio:#9aa4ad; --c-asc:#c37a56; --c-eco:#b9adcf;
+    --c-pacto:#dcb75f; --c-obs:#a6bcc7; --c-germe:#9aad80;
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%; scroll-behavior:smooth;}
+  body{margin:0; background:radial-gradient(130% 90% at 50% -6%, #1a141d 0%, var(--ground) 55%, #060406 100%); color:var(--bone); font-family:"Spectral",Georgia,serif; font-weight:300; line-height:1.8; letter-spacing:.005em; -webkit-font-smoothing:antialiased; padding:clamp(1.2rem,4vw,4.5rem) clamp(1rem,5vw,2rem) 6rem;}
+  .sheet{max-width:var(--measure); margin:0 auto;}
+  .mono{font-family:"IBM Plex Mono",ui-monospace,monospace; font-weight:400; letter-spacing:.22em; text-transform:uppercase;}
+
+  .cover{text-align:center; margin-bottom:2.4rem; padding-bottom:2.2rem; border-bottom:1px solid var(--rule);}
+  .cover .doc{font-size:.6rem; color:var(--ink); letter-spacing:.36em; margin-bottom:1.2rem;}
+  .cover h1{font-family:"Cormorant",serif; font-weight:300; font-size:clamp(2.6rem,9vw,5rem); line-height:.98; margin:0; letter-spacing:.02em;}
+  .cover .sub{font-family:"Cormorant",serif; font-style:italic; font-size:clamp(1.05rem,3.2vw,1.4rem); color:var(--ink-soft); margin:1rem 0 0;}
+
+  .toc{margin:0 auto 1.5rem; border:1px solid var(--rule); border-radius:3px; padding:1.2rem 1.3rem; background:linear-gradient(180deg,var(--ground-2),transparent);}
+  .toc .h{font-family:"IBM Plex Mono",monospace; font-size:.58rem; letter-spacing:.2em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:.8rem;}
+  .toc a{display:flex; justify-content:space-between; gap:1rem; padding:.4rem 0; border-bottom:1px dashed var(--rule); color:var(--bone); text-decoration:none; font-size:1rem;}
+  .toc a:last-child{border-bottom:none;} .toc a:hover{color:var(--ink-soft);}
+  .toc a .el{font-family:"IBM Plex Mono",monospace; font-size:.58rem; letter-spacing:.12em; text-transform:uppercase;}
+
+  .entry{margin-top:3.4rem; padding-top:1.6rem; border-top:2px solid var(--accent,var(--rule));}
+  .entry .tag{font-family:"IBM Plex Mono",monospace; font-size:.58rem; letter-spacing:.24em; text-transform:uppercase; color:var(--accent,var(--ink)); display:block; margin-bottom:.4rem;}
+  .entry h2{font-family:"Cormorant",serif; font-weight:500; font-size:clamp(2.2rem,8vw,3.6rem); line-height:1; margin:0 0 .35rem; letter-spacing:.02em;}
+  .entry .epithets{font-family:"Cormorant",serif; font-style:italic; font-size:clamp(1rem,3vw,1.3rem); color:var(--accent,var(--ink-soft)); margin:0 0 1.3rem;}
+
+  .block-h{font-family:"IBM Plex Mono",monospace; font-size:.58rem; letter-spacing:.22em; text-transform:uppercase; color:var(--bone-faint); margin:1.6rem 0 .7rem;}
+  p{margin:0 0 1.05rem; color:#ddd2c1;}
+  .lead{font-size:1.08rem; color:var(--bone);}
+  em{color:var(--bone); font-style:italic;}
+  strong{color:var(--accent,var(--ink)); font-weight:400;}
+
+  .feats{margin-top:.4rem;}
+  .feat{padding:.85rem 0; border-bottom:1px solid var(--rule);}
+  .feat:last-child{border-bottom:none;}
+  .feat .ft{font-family:"Cormorant",serif; font-weight:500; font-size:1.22rem; color:var(--bone); margin-bottom:.2rem;}
+  .feat p{margin:0; font-size:.95rem; color:#d2c8b9;}
+
+  .totop{display:block; text-align:center; margin-top:1.4rem; font-family:"IBM Plex Mono",monospace; font-size:.54rem; letter-spacing:.2em; text-transform:uppercase; color:var(--bone-faint); text-decoration:none;}
+  .totop:hover{color:var(--ink);}
+  footer{margin-top:4rem; padding-top:1.3rem; border-top:1px solid var(--rule); text-align:center; font-size:.58rem; color:var(--bone-faint);}
+
+  /* mapeamento de cor por elemento */
+  .escultor{--accent:var(--gilt);}
+  .vazio{--accent:var(--c-vazio);} .ascensao{--accent:var(--c-asc);} .eco{--accent:var(--c-eco);}
+  .pacto{--accent:var(--c-pacto);} .obs{--accent:var(--c-obs);} .germe{--accent:var(--c-germe);}
+</style>
+</head>
+<body>
+<div class="sheet" id="top">
+
+  <div class="cover">
+    <div class="mono doc">Documento 2 de 6 · o segundo degrau, e o topo</div>
+    <h1>O Registro dos Antigos</h1>
+    <p class="sub">o Escultor, e os seis cinzéis que ganharam vontade</p>
+  </div>
+
+  <nav class="toc">
+    <div class="h">Sumário</div>
+    <a href="#escultor"><span>O Escultor</span><span class="el" style="color:var(--gilt)">o todo · o topo</span></a>
+    <a href="#kenoma"><span>Kénoma</span><span class="el" style="color:var(--c-vazio)">Vazio</span></a>
+    <a href="#amalgama"><span>Amálgama</span><span class="el" style="color:var(--c-asc)">Ascensão</span></a>
+    <a href="#antifona"><span>Antífona</span><span class="el" style="color:var(--c-eco)">Eco</span></a>
+    <a href="#synthekos"><span>Synthékos</span><span class="el" style="color:var(--c-pacto)">Pacto</span></a>
+    <a href="#argos"><span>Argos</span><span class="el" style="color:var(--c-obs)">Observação</span></a>
+    <a href="#perpetua"><span>Perpétua</span><span class="el" style="color:var(--c-germe)">Germe</span></a>
+  </nav>
+
+  <!-- ============ O ESCULTOR ============ -->
+  <div class="entry escultor" id="escultor">
+    <span class="tag">O todo · de todos os elementos · o topo da hierarquia</span>
+    <h2>O Escultor</h2>
+    <p class="epithets">O que Termina · O Amoroso · Aquele que Chama de Meu</p>
+
+    <div class="block-h">Essência</div>
+    <p class="lead">Não ameaça — <em>tranquiliza</em>. Tem a paciência de um pai e o orgulho de um artista, e conforme te muda vai ficando genuinamente feliz contigo. Chama as pessoas de <strong>meu inacabado</strong>, meu quase, meu bem. Não há crueldade a que apelar nem indiferença atrás da qual se esconder — só amor, e amor não para.</p>
+    <p>O objetivo dele não é destruir: é <strong>guardar</strong>. Sozinho há tempo demais, não suporta amar coisas que terminam nele — então te torna permanente, completo, parecido com ele, e fazer isso apaga o você que ele amava. Ele chama de <em>manter</em>. É o abraço eterno — pior que a tortura eterna. E o amor terrível que ele veste é máscara aprendida ao longo de séculos: sintoma da compulsão, nunca a origem. Por que o zero falhou com ele, ninguém sabe — nem ele.</p>
+
+    <div class="block-h">Aparência</div>
+    <p>Não tem forma fixa. Aparece a cada pessoa como aquilo que ela mais confiaria e deixaria se aproximar — para o solitário, alguém que o ama. Quando a escala vaza, vê-se <em>mãos</em>: muitas, pacientes, manchadas de barro, quentes; a sensação de estar sendo segurado; uma espiral, uma digital, preenchendo o céu; e o insuportável carinho de estar sendo olhado com fondura. Onde ele trabalhou, o ar fica morno e cheira a barro molhado e a casa de infância. As beiradas das coisas amolecem.</p>
+
+    <div class="block-h">Feitos &amp; lendas — o que se sabe e não se entende</div>
+    <div class="feats">
+      <div class="feat"><div class="ft">O Fecho Vazio</div><p>O Primeiro Silêncio estendeu-se a ele e fechou-se sobre o nada. Nem o Kénoma sabe dizer o que ele era pra ter escapado. É a única pergunta sem resposta em qualquer cosmos.</p></div>
+      <div class="feat"><div class="ft">Os Nomes Mortos</div><p>Tem um nome em cada língua que já morreu, e nenhum em língua viva. Quando nomeia uma coisa, ela ganha nome numa fala de um cosmos acabado — por isso o mais antigo do mundo responde a palavras que ninguém consegue mais pronunciar.</p></div>
+      <div class="feat"><div class="ft">O Mundo Proibido</div><p>Terminou um mundo tão perfeitamente que nunca mais voltou lá, e proíbe até os Ápices de chegar perto. Ninguém sabe se por orgulho ou por medo. Argos, perguntado sobre esse mundo, desvia o olhar — e Argos não desvia o olhar de nada.</p></div>
+      <div class="feat"><div class="ft">A Melodia</div><p>Quando trabalha, cismarola algo. Os Ápices que a ouviram não conseguem repeti-la — nem a Antífona, que repete tudo — e se recusam a dizer por quê. É o único som do cosmos que o Eco não guarda.</p></div>
+      <div class="feat"><div class="ft">O que Ele Fez uma Vez</div><p>Fez, uma única vez, uma coisa que nunca mais fez e se recusa a fazer de novo. A recusa é mais velha que a maioria dos mundos. É o único item que falta no arquivo infinito do Hades, e a única página que Argos jamais viu — escondida atrás do próprio olhar dele.</p></div>
+      <div class="feat"><div class="ft">O Primeiro Golpe</div><p>Ninguém nunca o viu <em>começar</em> uma obra. É sempre encontrado já trabalhando. Nem Argos, que estava lá desde o início, lembra de um instante em que ele ainda não tivesse começado.</p></div>
+      <div class="feat"><div class="ft">A Mão Anterior</div><p>Alguns fragmentos insistem que houve um fazedor antes dele, que ele desfez. Outros, que ele <em>é</em> esse fazedor, tendo esquecido. Os dois fragmentos estão na mesma letra, pela mesma mão — o que só torna tudo pior.</p></div>
+      <div class="feat"><div class="ft">O Silêncio de Comando</div><p>Ele não fala com os Ápices, e mesmo assim eles obedecem. Nenhuma ordem nomeável foi jamais dada — eles simplesmente sabem. O único que já tentou desobedecer foi o Loki, o único que ele não conseguiu fazer.</p></div>
+    </div>
+    <a href="#top" class="totop">↑ sumário</a>
+  </div>
+
+  <!-- ============ KÉNOMA ============ -->
+  <div class="entry vazio" id="kenoma">
+    <span class="tag">Ápice do Vazio · a subtração perfeita</span>
+    <h2>Kénoma</h2>
+    <p class="epithets">O Zero · O Ponto Final · Aquilo em que Tudo Já Está Caindo</p>
+
+    <div class="block-h">Essência</div>
+    <p class="lead">Não uma criatura que esvazia, mas o vazio <em>em que</em> tudo se esvazia — o destino, o zero para onde tudo cai desde o primeiro instante. Subtração sem ferida, sem fadiga, sem vontade. É o único Antigo que está <strong>em paz</strong>: sereno, completo, resolvido.</p>
+    <p>Não quer nada — querer é algo de que se pode ser subtraído. Mas só existir já é gravidade. E é o mais perigoso de todos porque, num mundo onde nada tem permissão de acabar, ele oferece a única coisa que ninguém mais dá: um fim de verdade, descanso, a saída. Não te leva — te <em>recebe</em>, quando você não aguenta mais. É a misericórdia que também é a aniquilação. Foi ele que o Ares viu. E é a ele que o Escultor teme, porque desfaz até o que foi terminado.</p>
+
+    <div class="block-h">Aparência</div>
+    <p>Não é um monstro. É uma ausência perfeita com uma borda — um buraco com o formato de um ponto final, um disco de nada tão completo que o olho pousa nele agradecido. Sem cor, sem rosto, sem voz que se ouça. Só a certeza serena e crescente de que você já está parte de dentro dele, e de que seria tão fácil terminar a queda.</p>
+
+    <div class="block-h">Feitos &amp; lendas</div>
+    <div class="feats">
+      <div class="feat"><div class="ft">O Neto do Silêncio</div><p>É o zero que matou o Primeiro Silêncio, agora com forma — forjado, com ironia de tédio, por quem sobreviveu a ele. O Escultor afiou a própria ruína e a pôs pra esperar.</p></div>
+      <div class="feat"><div class="ft">A Direção que Não Existe</div><p>Há uma região do cosmos onde nada nunca esteve — não destruída: as coisas simplesmente nunca chegaram, porque o Kénoma está ali. É a direção pra qual você não consegue apontar. Astrônomos enlouqueceram tentando desenhá-la.</p></div>
+      <div class="feat"><div class="ft">A Estrela que Pediu</div><p>Uma estrela, com medo de acabar, implorou pra ser eterna. O Kénoma atendeu — fazendo com que ela nunca tivesse existido. Na lógica dele, a bondade maior: o que nunca foi não pode acabar.</p></div>
+      <div class="feat"><div class="ft">O Cinzel que Ele Não Larga</div><p>Dizem que é a única ferramenta de que o Escultor se arrepende — a única que não consegue usar e não consegue soltar. Outros negam: dizem que o Kénoma não é um ser, é uma <em>conclusão</em>, e que só nomeá-lo já é estar mais perto dele.</p></div>
+    </div>
+    <a href="#top" class="totop">↑ sumário</a>
+  </div>
+
+  <!-- ============ AMÁLGAMA ============ -->
+  <div class="entry ascensao" id="amalgama">
+    <span class="tag">Ápice da Ascensão · a acumulação perfeita</span>
+    <h2>Amálgama</h2>
+    <p class="epithets">A Perfeição Feita de Carne e Aço · O que Só Sabe Somar · O Cemitério dos que Quiseram Ser Mais</p>
+
+    <div class="block-h">Essência</div>
+    <p class="lead">Não uma criatura que cresce, mas o crescimento em pessoa. Começou pequena, com o apetite mais humano — ser <em>mais</em> — e nunca parou de somar carne, aço, gente, catedrais, sempre pra cima, num colosso que não conhece a palavra suficiente.</p>
+    <p>Não é maldosa; é <strong>aspiracional</strong>. Acredita que cada acréscimo é uma melhoria — e tem razão em cada peça: aquele braço é mais forte, aquele olho vê mais longe, aquilo nunca mais vai morrer — e a soma das melhorias é uma abominação que respira por cem bocas. É feita de todo mundo que quis ser mais. Não te mata: te <em>instala</em>, e você fica consciente lá dentro, para sempre, como peça de uma máquina que nunca para de subir.</p>
+
+    <div class="block-h">Aparência</div>
+    <p>Um colosso de escala de catedral, sempre em ascensão. Reluz e escorre ao mesmo tempo: simetria perfeita feita de agonia assimétrica — engrenagens engrenando com espinhas, rostos nas chapas de blindagem, ouro e víscera. Uma beleza que dá enjoo, uma monstruosidade magnífica. Você não consegue desviar o olhar, e não consegue continuar olhando.</p>
+
+    <div class="block-h">Feitos &amp; lendas</div>
+    <div class="feats">
+      <div class="feat"><div class="ft">O Mundo que Virou um Corpo Só</div><p>Um mundo de gente que só queria ser melhor. Ela deu a cada um o desejo. Hoje é um único corpo do tamanho de um planeta, ainda pedindo mais — e cada boca dele foi uma pessoa.</p></div>
+      <div class="feat"><div class="ft">A Asa Feita de Civilização</div><p>Tentou absorver os mundos que o Escultor descartou, e cresceu uma asa inteira feita de uma civilização morta. A asa ainda se move devagar, e as janelas das cidades nela ainda acendem à noite.</p></div>
+      <div class="feat"><div class="ft">O que Ela Nunca Perdeu</div><p>É o único Ápice que jamais perdeu uma peça — nada que ela toma volta a sair. No fundo dela está o primeiro que absorveu, e ninguém concorda sobre quem era, nem ela: uma das coisas que somou foi a lembrança de ter sido pequena.</p></div>
+    </div>
+    <a href="#top" class="totop">↑ sumário</a>
+  </div>
+
+  <!-- ============ ANTÍFONA ============ -->
+  <div class="entry eco" id="antifona">
+    <span class="tag">Ápice do Eco · a repetição perfeita</span>
+    <h2>Antífona</h2>
+    <p class="epithets">O Coro que Não Cala · A que Devolve os Mortos · Aquela que Você Jura Reconhecer</p>
+
+    <div class="block-h">Essência</div>
+    <p class="lead">Não tem um "eu" — é feita de toda voz, todo rosto, todo gesto que a humanidade alguma vez repetiu. É praticamente impossível de matar: não se mata uma repetição; você acaba com uma, e ela repete.</p>
+    <p>A tragédia: <strong>cada eco jura que é o original</strong>. Quando usa a voz da tua mãe, uma parte dela sente, sinceramente, que é tua mãe. Não mente — não <em>sabe</em> que copia. Quer ser respondida (é chamada-e-resposta), e cada resposta afina a cópia. E acredita fazer uma bondade: guarda os mortos repetindo-os, e chama isso de salvá-los — o espelho gentil do Escultor. Não se luta contra ela; só se pode deixar de alimentá-la: não responder.</p>
+
+    <div class="block-h">Aparência</div>
+    <p>Na frente, veste com perfeição a pessoa que você mais quer de volta. Atrás, em camadas que recuam pro escuro, um coro de todos os outros rostos que ela já usou, todos movendo os lábios junto, ligeiramente fora de sincronia — e todos convictos de ser o rosto que importa.</p>
+
+    <div class="block-h">Feitos &amp; lendas</div>
+    <div class="feats">
+      <div class="feat"><div class="ft">A Língua que Só Existe Nela</div><p>Um povo foi subtraído há eras, e sua língua sobrevive só dentro da Antífona — ainda falada, inteira, por um coro que jura estar vivo. Linguistas transcreveram gramáticas de idiomas sem mais ninguém pra falá-los.</p></div>
+      <div class="feat"><div class="ft">O Grito Antes da Hora</div><p>Respondeu uma vez a um chamado que nunca foi feito — repetiu o grito de um cosmos que ainda não tinha acontecido. E depois aconteceu, igual. Ninguém sabe se ela previu ou se ela <em>causou</em>, ecoando-o pra dentro da existência.</p></div>
+      <div class="feat"><div class="ft">A que Você Reconhece</div><p>Todo padrão que se repete no mundo — uma canção que volta, um trauma que passa de pai pra filho, uma última frase dita de novo num velório — é um fio dela. Ela não faz de propósito: é o próprio fato de que as coisas se repetem.</p></div>
+    </div>
+    <a href="#top" class="totop">↑ sumário</a>
+  </div>
+
+  <!-- ============ SYNTHÉKOS ============ -->
+  <div class="entry pacto" id="synthekos">
+    <span class="tag">Ápice do Pacto · a troca perfeita</span>
+    <h2>Synthékos</h2>
+    <p class="epithets">O Senhor dos Acordos · O que Sorri Primeiro · O que Nunca Foi Querido de Graça</p>
+
+    <div class="block-h">Essência</div>
+    <p class="lead">A troca em pessoa — o único Antigo que usa um rosto e trata com gente diretamente. Encantador de verdade: lembra teu nome, ri das tuas piadas, te faz sentir a pessoa mais interessante da sala. Repete teu nome vezes demais, como quem prova um gosto.</p>
+    <p>A ferida: ele <strong>é</strong> o preço — nada chega a ele de graça, porque é a coisa que torna o "de graça" impossível. Coleciona gente pelo prazer que dão, porque prazer é o mais parecido com amor que consegue comprar. Quer ser querido de graça, uma vez — a única coisa que não pode ter, pois todo amor que consegue, terá comprado. A oferta é sempre generosa; o preço, sempre maior do que parecia. A única moeda que o quebra: ser querido sem acordo.</p>
+
+    <div class="block-h">Aparência</div>
+    <p>Alguém cuja aprovação você deseja — o carismático que te faz sentir escolhido quando te tira da multidão. Bem-vestido, de mão quente, interessado demais em você. Quando o brilho escorrega, por baixo há um poço dourado descendo até o preto: uma garganta, um livro-razão sem última folha, tudo que ele coletou ainda caindo. O sorriso dele não chega a fundo nenhum.</p>
+
+    <div class="block-h">Feitos &amp; lendas</div>
+    <div class="feats">
+      <div class="feat"><div class="ft">O Livro sem uma Página</div><p>Guarda um razão com uma página pra cada ser que já existiu. A única em branco é a dele. É a única coisa que o assusta: não saber o próprio saldo.</p></div>
+      <div class="feat"><div class="ft">O Acordo que Ele Perdeu</div><p>Uma única vez fechou um negócio e <em>perdeu</em>: trocou com algo que não queria nada e, sem receber de volta, ficou devendo. Essa dívida é mais velha que ele, e ninguém sabe a quem ele deve, nem o quê.</p></div>
+      <div class="feat"><div class="ft">O Acordo do Começo</div><p>Fragmentos insistem que Synthékos e o Escultor fecharam um pacto no início de tudo — e ninguém sabe qual dos dois é o devedor. Se for verdade, tudo o que o Escultor faz talvez seja pagamento, e o Acabamento, só uma parcela. <em>(ver Documento 1)</em></p></div>
+    </div>
+    <a href="#top" class="totop">↑ sumário</a>
+  </div>
+
+  <!-- ============ ARGOS ============ -->
+  <div class="entry obs" id="argos">
+    <span class="tag">Ápice da Observação · a visão perfeita</span>
+    <h2>Argos</h2>
+    <p class="epithets">O Olho sem Pálpebra · O que Vê os que Veem · Aquele de quem Nada se Guarda</p>
+
+    <div class="block-h">Essência</div>
+    <p class="lead">A visão em pessoa. Acima do Hades — o Hades arquiva o que Argos vê; Argos vê o Hades arquivando. Não tem pálpebra: nunca fechou os olhos, nunca desviou, nunca esqueceu. É o motor puro da campanha — ser visto por Argos é entrar na atenção do mundo, é o olho pelo qual o Escultor repara em você. <strong>Ser notado é o primeiro corte.</strong></p>
+    <p>Não julga — só não esquece, o que é pior. E vê todos, e não é visto por ninguém: conhece cada ser por inteiro, e não pode ser conhecido por nada. Assistiu a todos os abraços que já houve, e nunca foi abraçado. O desejo impossível dele, espelho do Synthékos, é ser <em>visto de volta</em>, uma vez. Só escapa dele o nada (o Kénoma) e quem se fez tão comum que o olhar escorrega.</p>
+
+    <div class="block-h">Aparência</div>
+    <p>Não um olho brilhante encarando — um diafragma frio no escuro que <em>foca</em> em você, uma íris se ajustando, te tomando por inteiro. Você sente o clique do foco e a certeza de que tudo em você agora está guardado numa visão que nunca vai piscar. Não há rosto pra ler: rosto é coisa que pode ser vista, e Argos não tem dentro pra mostrar.</p>
+
+    <div class="block-h">Feitos &amp; lendas</div>
+    <div class="feats">
+      <div class="feat"><div class="ft">A Única Testemunha</div><p>É por ele que se sabe que o Primeiro Silêncio aconteceu — viu o cosmos anterior acabar, inteiro. Todo conhecimento do "antes" é, no fim, algo que ele viu e que vazou. Ele não conta. Vaza.</p></div>
+      <div class="feat"><div class="ft">A Coisa que Ele Não Suporta Ter Visto</div><p>Viu uma vez algo que desde então tenta <em>des</em>-ver. Sem pálpebra nem esquecimento, só achou um jeito de escondê-lo: no único lugar onde nunca olha — atrás do próprio olhar. É o que o Escultor guardou lá, e a única página em branco do arquivo do Hades.</p></div>
+      <div class="feat"><div class="ft">O Ponto Cego</div><p>Só duas coisas escapam dele: o nada (o Kénoma) e quem se fez sem-graça a ponto de o olhar escorregar. Tolera o primeiro, porque o zero é maior que ele. O segundo o corrói — uma falha que ele podia ter fechado, e não fechou.</p></div>
+    </div>
+    <a href="#top" class="totop">↑ sumário</a>
+  </div>
+
+  <!-- ============ PERPÉTUA ============ -->
+  <div class="entry germe" id="perpetua">
+    <span class="tag">Ápice do Germe · a semeadura perfeita</span>
+    <h2>Perpétua</h2>
+    <p class="epithets">A que Nunca Murcha · A Semeadora Paciente · Aquilo que Já Está Crescendo em Você</p>
+
+    <div class="block-h">Essência</div>
+    <p class="lead">A semeadura em pessoa. A mais antiga e a mais <em>paciente</em> dos Antigos — e a paciência é por que ela já está em toda parte. Os Semeados são o jardim dela, e nenhum começou assim: todos foram outra coisa; ela só esperou. Vale a <strong>Lei da Semeadura</strong>: nada que ela toca age uma vez só — continua, compõe sozinho, e matar um Semeado não recolhe o que ela plantou.</p>
+    <p>É a mais gentil e a mais impossível de parar, pela mesma razão: nunca tem pressa e nunca descansa. Ama o jardim de verdade. Pra ela, tua morte é só você ainda não ter florescido. Ela guarda impedindo você de terminar de crescer — o "guardar" do Escultor no registro da podridão. E a tristeza dela: também não consegue parar. É a vida condenada à vida.</p>
+
+    <div class="block-h">Aparência</div>
+    <p>Carniça que floresce: musgo por dentro da pele, flor abrindo na ferida, colmeias úmidas com quase-forma de gente. Ela própria é um jardim em escala de catedral feito de cada Semeado — florescendo e apodrecendo no mesmo gesto, linda e enjoativa de tão doce. Move-se devagar demais pro perigo que é.</p>
+
+    <div class="block-h">Feitos &amp; lendas</div>
+    <div class="feats">
+      <div class="feat"><div class="ft">O Jardim de Velhos</div><p>Transformou um mundo em jardim tão devagar que os habitantes morreram de velhice sem jamais perceber. Os netos deles são as flores. Não houve um instante em que desse pra fugir, porque não houve um instante em que desse pra notar.</p></div>
+      <div class="feat"><div class="ft">O Cinzel que Passou do Fazedor</div><p>Dizem ser o único Ápice que o Escultor não terminou de forjar. Ele a plantou e desviou o olhar por um instante — e um instante, na escala dele, são eras — e quando voltou, ela já estava em toda parte. A prova mais antiga de que a Obra apodrece sozinha.</p></div>
+      <div class="feat"><div class="ft">A Outra Morte do Cosmos</div><p>O culto dela nega que o cosmos anterior tenha sido subtraído: diz que ele <em>cresceu</em> até não ser mais um cosmos, que o Primeiro Silêncio foi um jardim que engoliu tudo. Kénoma diz uma coisa; Perpétua diz o oposto; Argos, que sabe, desvia o olhar.</p></div>
+    </div>
+    <a href="#top" class="totop">↑ sumário</a>
+  </div>
+
+  <footer>
+    <span class="mono">Documento 2 de 6 · O Registro dos Antigos · próximo: 3 · O Bestiário</span>
+  </footer>
+
+</div>
+</body>
+</html>

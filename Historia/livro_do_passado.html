@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1 · O Livro do Passado</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,500;1,300;1,500&family=Spectral:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ground:#0d0b0e; --ground-2:#151017; --panel:#181320;
+    --bone:#e6ddce; --bone-dim:#a99f90; --bone-faint:#6a6156;
+    --ink:#b89a6a; --ink-soft:#d0b585;
+    --heat:#c9713e; --cold:#8fa0a8; --debt:#8f96a0;
+    --rule:#2c2530; --measure:44rem;
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%; scroll-behavior:smooth;}
+  body{margin:0; background:radial-gradient(130% 90% at 50% -6%, #1a141d 0%, var(--ground) 55%, #060406 100%); color:var(--bone); font-family:"Spectral",Georgia,serif; font-weight:300; line-height:1.82; letter-spacing:.005em; -webkit-font-smoothing:antialiased; padding:clamp(1.2rem,4vw,4.5rem) clamp(1rem,5vw,2rem) 6rem;}
+  .sheet{max-width:var(--measure); margin:0 auto;}
+  .mono{font-family:"IBM Plex Mono",ui-monospace,monospace; font-weight:400; letter-spacing:.22em; text-transform:uppercase;}
+
+  /* capa */
+  .cover{text-align:center; margin-bottom:2.6rem; padding-bottom:2.4rem; border-bottom:1px solid var(--rule);}
+  .cover .doc{font-size:.6rem; color:var(--ink); letter-spacing:.36em; margin-bottom:1.2rem;}
+  .cover h1{font-family:"Cormorant",serif; font-weight:300; font-size:clamp(2.8rem,10vw,5.4rem); line-height:.98; margin:0; letter-spacing:.02em; animation:fade 2s both;}
+  @keyframes fade{from{opacity:0;}to{opacity:1;}}
+  .cover .sub{font-family:"Cormorant",serif; font-style:italic; font-size:clamp(1.05rem,3.2vw,1.4rem); color:var(--ink-soft); margin:1rem 0 0;}
+
+  /* sumário */
+  .toc{margin:0 auto 2rem; border:1px solid var(--rule); border-radius:3px; padding:1.3rem 1.4rem; background:linear-gradient(180deg,var(--ground-2),transparent);}
+  .toc .h{font-family:"IBM Plex Mono",monospace; font-size:.58rem; letter-spacing:.2em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:.9rem;}
+  .toc a{display:flex; justify-content:space-between; gap:1rem; padding:.42rem 0; border-bottom:1px dashed var(--rule); color:var(--bone); text-decoration:none; font-size:1.02rem;}
+  .toc a:last-child{border-bottom:none;}
+  .toc a:hover{color:var(--ink-soft);}
+  .toc a .num{font-family:"IBM Plex Mono",monospace; font-size:.7rem; color:var(--bone-faint); letter-spacing:.1em;}
+
+  .chapter{margin-top:3.6rem; padding-top:1.6rem; border-top:2px solid var(--rule);}
+  .chapter > .ch-kicker{font-family:"IBM Plex Mono",monospace; font-size:.6rem; letter-spacing:.3em; text-transform:uppercase; color:var(--ink); display:block; margin-bottom:.5rem;}
+  .chapter > h2{font-family:"Cormorant",serif; font-weight:500; font-size:clamp(2rem,7vw,3.2rem); line-height:1.02; margin:0 0 .3rem; letter-spacing:.01em;}
+  .chapter > .ch-sub{font-family:"Cormorant",serif; font-style:italic; font-size:1.1rem; color:var(--ink-soft); margin:0 0 1.4rem;}
+
+  section{margin-top:2.4rem;}
+  .part-no{font-family:"IBM Plex Mono",monospace; font-size:.58rem; letter-spacing:.28em; color:var(--bone-faint); text-transform:uppercase;}
+  h3{font-family:"Cormorant",serif; font-weight:500; font-size:clamp(1.5rem,5vw,2.1rem); line-height:1.08; margin:.3rem 0 1rem; letter-spacing:.01em;}
+  p{margin:0 0 1.12rem; color:#ddd2c1;}
+  .lead{font-size:1.1rem; color:var(--bone);}
+  em{color:var(--bone); font-style:italic;}
+  strong{color:var(--ink); font-weight:400;}
+  .drop::first-letter{font-family:"Cormorant",serif; font-weight:500; float:left; font-size:3.3rem; line-height:.8; padding:.35rem .5rem 0 0; color:var(--ink);}
+
+  blockquote{margin:2rem 0; padding:.2rem 0 .2rem 1.5rem; border-left:2px solid var(--ink); font-family:"Cormorant",serif; font-style:italic; font-weight:300; font-size:clamp(1.25rem,4vw,1.65rem); line-height:1.42; color:var(--ink-soft);}
+  blockquote.cold{border-color:var(--debt); color:var(--debt);}
+  blockquote.heat{border-color:var(--heat); color:var(--heat);}
+
+  /* régua quente/frio */
+  .ruler{margin:1.8rem 0; border:1px solid var(--rule); border-radius:3px; overflow:hidden;}
+  .ruler .band{height:12px; background:linear-gradient(90deg,#e0955e,#c9713e 22%,#7d5340 55%,#4a4f52 78%,#8fa0a8);}
+  .ruler .marks{display:flex; justify-content:space-between; padding:.6rem .9rem .7rem; font-family:"IBM Plex Mono",monospace; font-size:.54rem; letter-spacing:.08em; color:var(--bone-faint); text-transform:uppercase;}
+  .ruler .marks .hot{color:var(--heat);} .ruler .marks .cld{color:var(--cold);}
+
+  /* eras */
+  .eras{margin:1.4rem 0; border-top:1px solid var(--rule);}
+  .era{padding:.9rem 0; border-bottom:1px solid var(--rule);}
+  .era .n{font-family:"IBM Plex Mono",monospace; font-size:.54rem; letter-spacing:.16em; color:var(--heat); text-transform:uppercase;}
+  .era .t{font-family:"Cormorant",serif; font-weight:500; font-size:1.3rem; color:var(--bone); margin:.1rem 0 .25rem;}
+  .era p{margin:0; font-size:.94rem; color:#d0c6b6;}
+
+  /* leituras do acordo */
+  .reading{border:1px solid var(--rule); border-radius:3px; padding:1.1rem 1.2rem; margin-bottom:.9rem; background:linear-gradient(180deg,var(--ground-2),transparent);}
+  .reading .lbl{font-family:"IBM Plex Mono",monospace; font-size:.54rem; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-soft);}
+  .reading h4{font-family:"Cormorant",serif; font-weight:500; font-size:1.3rem; margin:.2rem 0 .45rem; color:var(--bone);}
+  .reading p{margin:0; font-size:.95rem; color:#d3c9ba;}
+  .reading .frag{margin-top:.6rem; font-family:"Cormorant",serif; font-style:italic; font-size:1.02rem; color:var(--debt); border-top:1px dashed var(--rule); padding-top:.5rem;}
+
+  /* mundos */
+  .world{padding:1.2rem 0; border-bottom:1px solid var(--rule);}
+  .world:last-child{border-bottom:none;}
+  .world .wn{display:flex; flex-wrap:wrap; align-items:baseline; gap:.5rem .8rem;}
+  .world .rn{font-family:"IBM Plex Mono",monospace; font-size:.62rem; color:var(--bone-faint); letter-spacing:.1em;}
+  .world .name{font-family:"Cormorant",serif; font-weight:500; font-size:1.5rem; color:var(--bone);}
+  .world .ap{font-family:"Cormorant",serif; font-style:italic; font-size:1rem; color:var(--ink-soft);}
+  .world .apex{font-family:"IBM Plex Mono",monospace; font-size:.52rem; letter-spacing:.12em; text-transform:uppercase; color:var(--bone-faint); border:1px solid var(--rule); border-radius:3px; padding:.08rem .4rem;}
+  .world p{margin:.5rem 0 0; font-size:.97rem; color:#d6ccbd;}
+
+  .note{margin-top:1.4rem; border-left:2px solid var(--rule); padding:.5rem 0 .5rem 1rem; font-size:.84rem; color:var(--bone-dim); font-style:italic;}
+  .note b{color:var(--ink); font-style:normal;}
+
+  .orn{margin:2.4rem auto 0; width:64%; max-width:20rem; height:1px; background:linear-gradient(90deg,transparent,var(--rule) 20%,var(--rule) 80%,transparent); position:relative;}
+  .orn::after{content:"❖"; position:absolute; top:-.72rem; left:50%; transform:translateX(-50%); background:var(--ground); padding:0 .7rem; color:var(--ink); font-size:.8rem;}
+  .totop{display:block; text-align:center; margin-top:1.4rem; font-family:"IBM Plex Mono",monospace; font-size:.54rem; letter-spacing:.2em; text-transform:uppercase; color:var(--bone-faint); text-decoration:none;}
+  .totop:hover{color:var(--ink);}
+
+  footer{margin-top:4rem; padding-top:1.3rem; border-top:1px solid var(--rule); text-align:center; font-size:.58rem; color:var(--bone-faint);}
+</style>
+</head>
+<body>
+<div class="sheet" id="top">
+
+  <div class="cover">
+    <div class="mono doc">Documento 1 de 6 · a base de tudo</div>
+    <h1>O Livro do Passado</h1>
+    <p class="sub">a história antes da história — de como o zero veio primeiro</p>
+  </div>
+
+  <nav class="toc">
+    <div class="h">Sumário</div>
+    <a href="#cosmogonia"><span>A Cosmogonia dos Anômalos</span><span class="num">I</span></a>
+    <a href="#forja"><span>A Forja — cosmologia &amp; eras</span><span class="num">II</span></a>
+    <a href="#acordo"><span>O Acordo do Começo — o fundo falso</span><span class="num">III</span></a>
+    <a href="#mundos"><span>Os Mundos Descartados</span><span class="num">IV</span></a>
+  </nav>
+
+  <!-- ==================== I · COSMOGONIA ==================== -->
+  <div class="chapter" id="cosmogonia">
+    <span class="ch-kicker">Capítulo I</span>
+    <h2>A Cosmogonia dos Anômalos</h2>
+    <p class="ch-sub">o zero veio primeiro; o fazedor veio depois</p>
+
+    <section>
+      <div class="part-no">Parte I</div>
+      <h3>O Primeiro Silêncio</h3>
+      <p class="lead drop">Antes deste cosmos houve outro, e antes dele — a contagem se perdeu, e Argos, que vê tudo, não diz. Nenhum deles foi destruído. Foram <em>subtraídos</em>: rodaram ladeira abaixo até o zero, com uma paciência sem pressa, um mundo de cada vez, uma luz de cada vez. Não foi um evento. Foi uma aniquilação sem violência — o simples fato de que o estado de repouso de todas as coisas é o nada, e que tudo, dado tempo, volta pra lá.</p>
+      <p>Esse zero não tinha ódio, nem fome, nem velocidade. Era só a direção pra onde tudo já estava caindo. Existir era estar, devagar, a caminho dele. O cosmos anterior não lutou, porque não se luta contra uma ladeira: ele apenas <em>chegou</em>. Esse nada-em-que-tudo-vira é o avô daquilo que hoje chamamos de <strong>Kénoma</strong>. O zero veio primeiro. O ser veio depois, forjado à sua imagem.</p>
+    </section>
+
+    <section>
+      <div class="part-no">Parte II</div>
+      <h3>O que Não Pôde Ser Tocado</h3>
+      <p class="lead drop">Quando o Primeiro Silêncio terminou, uma coisa restou. Não pela força, não por se esconder, não por amar nada. O zero simplesmente <em>não conseguiu pegá-la</em> — fechou-se sobre ela e agarrou o vazio, como uma mão se fechando na fumaça. Ninguém sabe por quê. Nem a própria coisa. Ela não tem memória de um "antes", nem origem que saiba nomear: já estava ali quando o resto de tudo já não estava.</p>
+      <p>Este é o <strong>Escultor</strong>. E a única coisa que ele carrega pra fora do Primeiro Silêncio não é o luto — é o fato nu de si mesmo: ele é a única coisa que não acaba, e tudo o mais acaba. Ninguém sabe por que o zero falhou com ele, nem ele. O amor veio depois: não a razão de ter sobrado, mas a única coisa que restou pra fazer com o ter sobrado.</p>
+      <p>Ele ama, e não solta, e não consegue terminar — e ama <em>porque</em> não consegue terminar, não o contrário. O <strong>amor terrível</strong> que ele veste com os vivos é uma cara que ele levou séculos pra aprender: sintoma da compulsão, nunca a sua origem. A origem segue sendo um buraco no mundo.</p>
+    </section>
+
+    <section>
+      <div class="part-no">Parte III</div>
+      <h3>Os Seis Fins Viraram Ferramentas</h3>
+      <p class="lead drop">Sozinha no depois, a coisa-que-não-acaba encarou o que de fato não suporta: não ter o que fazer, e não ter como parar. Não pode morrer, não pode descansar, não pode terminar. E o tempo, naquela escala, não é longo — é sem fundo. O <strong>tédio</strong> do tempo profundo é o mais perto de dor que o Escultor conhece, e foi ele, não o luto, que armou a primeira mão.</p>
+      <p>Então ele começou a fazer — a reconstruir o que se perde, pra guardar dessa vez. E só sabia moldar com o que conhecia: e o que ele observou, durante toda a duração do Primeiro Silêncio, foi <em>como as coisas acabam</em>. Ele lembrou as seis maneiras pelas quais um universo pode morrer — subtrair-se, repetir-se até a exaustão, inchar sem parar, trocar-se por partes, ser observado até não sobrar segredo, e apodrecer-continuando — e afiou cada uma num cinzel. Naquela mente enlouquecida pelo tédio, os Seis foram, ao mesmo tempo, suas ferramentas e seus primeiros filhos — cada um a encarnação viva de um fim.</p>
+      <p>E veio a ironia: um cinzel perfeito o bastante pra encarnar um princípio inteiro também tem <em>vontade</em>. Assim acordaram os <strong>Ápices</strong>. O Escultor fabricou a própria ruína como ferramenta — porque, pra fazer, precisava entender o fim; e o fim, entendido, virou seres que esperam.</p>
+    </section>
+
+    <section>
+      <div class="part-no">Parte IV</div>
+      <h3>A Longa Feitura e o Apodrecer</h3>
+      <p class="lead drop">Vieram eras sem chão. O Escultor fez e desfez — cosmos após cosmos, cada um um rascunho, cada um "terminado" e depois achado insuficiente, cada um guardado como relíquia ou largado pra trás. <em>Há outros mundos além destes</em>, e quase todos já seguiram em frente: ruínas magníficas rodando no escuro, panteões inteiros que não passam de obras velhas e descartadas, vagando sem entender que são maquete.</p>
+      <p>E as ferramentas, deixadas na obra tempo demais, fizeram o que ferramentas do fim fazem: se tocaram. Onde dois princípios se comprimiram por eras, a fronteira apodreceu, e nasceu algo <em>entre</em> os dois — menor, impuro, com traços dos dois pais. Não é reprodução. É <strong>contágio</strong>: sem par, sem prazer, só o vazamento através de uma borda.</p>
+      <p>O primeiro cruzamento: <strong>Synthékos</strong> (Pacto) encostado em <strong>Amálgama</strong> (Ascensão) por tempo demais, e o que vazou daquela fronteira acordou rindo — <strong>Loki</strong>. O Escultor não o fez. O cosmos fez. O <strong>Ares</strong> é um pedaço de <strong>Kénoma</strong> que vazou cedo demais e nunca completou o zero. O <strong>Hades</strong> é um rebento de <strong>Argos</strong>, nascido do Olho mas fraco demais pra só <em>ver</em>, rebaixado a apenas anotar. Todo indivíduo do mundo tem, agora, um Ápice-pai. Basta perguntar: <em>filho de quais dois?</em></p>
+      <p>E aqui está o horror pelo qual o Escultor voltou: as ferramentas começaram a fazer sozinhas. A Obra apodrece por dentro, se reproduz sem o artista, os cinzéis se multiplicando fora de controle. Um cosmos que se faz sozinho não precisa de fazedor — e uma obra que cria as próprias mãos vai, cedo ou tarde, usá-las contra si. Os Ápices se contaminando não é um recurso. É a peça se partindo na bigorna.</p>
+    </section>
+
+    <section>
+      <div class="part-no">Parte V</div>
+      <h3>A Bigorna</h3>
+      <p class="lead drop">Este cosmos não é uma estrutura que segura o mundo. É a peça ainda sobre a <strong>bigorna</strong> — quente, inacabada, sendo malhada. Enquanto o martelo cai, ela existe; a martelada é o que a mantém real. Pare o martelo e a peça esfria; peça fria é peça pronta; e — o paradoxo no centro de tudo — <em>o que está pronto está morto</em>.</p>
+      <p>O Escultor não consegue resolver isso. Ele quer uma coisa viva que nunca acabe. Mas terminar uma coisa é matá-la, e uma coisa que nunca termina jamais fica guardada. Ele fracassa em cada Obra por exatamente isso, ciclo após ciclo.</p>
+      <blockquote>Seu terror secreto: que "completo" e "morto" sejam a mesma palavra, e que ele nunca tenha sabido distinguir as duas.</blockquote>
+      <p>É por isso que teme o Kénoma acima de tudo — o zero é a prova de que sua obra-prima e o fim de tudo talvez tenham o mesmo rosto. O acabamento perfeito e o nada perfeito, vestindo a mesma cara.</p>
+    </section>
+
+    <section>
+      <div class="part-no">Parte VI</div>
+      <h3>O Retorno</h3>
+      <p class="lead drop">Alguma coisa sinalizou que a Obra atual está, enfim, no ponto — ou se partindo; o Escultor talvez também não distinga as duas. E ele voltou, trazendo os Ápices, os cinzéis, o aparato inteiro — pra dar o acabamento, e pra conter uma obra que começou a se fazer sozinha.</p>
+      <p>Escolheu, desta vez, um <em>medium</em> improvável pra peça final: uma espécie pequena e mole que chora, que ama, e que se recusa a soltar os próprios mortos — que os ecoa, os guarda, os enterra e os lembra. Não porque o amor o comande (não funciona assim), mas porque nessa espécie ele topou com o próprio sintoma virado do avesso: <strong>reconhecimento</strong>. Essa gente faz a única coisa impossível que ele faz — se recusa a deixar uma coisa acabar — e ele é atraído por ela como se atrai por um espelho que não se consegue explicar.</p>
+      <p><em>Talvez</em>, ele calcula, <em>este seja o material que pode ser terminado sem morrer, porque já sabe segurar uma coisa para além do fim dela.</em> O acabamento começou. E começou aqui.</p>
+    </section>
+    <a href="#top" class="totop">↑ sumário</a>
+  </div>
+
+  <!-- ==================== II · A FORJA ==================== -->
+  <div class="chapter" id="forja">
+    <span class="ch-kicker">Capítulo II</span>
+    <h2>A Forja</h2>
+    <p class="ch-sub">onde uma coisa está e o quão pronta ela está são a mesma coisa</p>
+
+    <section>
+      <div class="part-no">Princípio</div>
+      <h3>Posição é acabamento</h3>
+      <p class="lead drop">Este cosmos não tem centro num mapa, nem bordas, nem um "longe" que se meça em distância. Tem uma coisa mais estranha: <strong>proximidade da mão</strong>. Tudo o que existe está a uma certa distância do Escultor trabalhando — e essa distância não se mede em espaço. Mede-se em <em>quão acabado você está</em>.</p>
+      <p>Perto da mão, a matéria é quente, molhada, mutável — sendo malhada agora. Longe da mão, esfria, endurece, fica <em>pronta</em> — e lembra o que "pronto" quer dizer. Onde uma coisa está, e o quanto ela está terminada, são a mesma informação. É a física inteira num princípio só.</p>
+      <div class="ruler">
+        <div class="band"></div>
+        <div class="marks"><span class="hot">◄ perto da mão · quente · vivo · mutável</span><span class="cld">frio · pronto · morto · longe ►</span></div>
+      </div>
+      <blockquote class="heat">Não se viaja para longe. Esfria-se. E o mais longe que existe é o zero.</blockquote>
+    </section>
+
+    <section>
+      <div class="part-no">A régua, aplicada</div>
+      <h3>Onde tudo fica nela</h3>
+      <p><strong>A Obra atual — o nosso mundo</strong> está agora <em>sob o martelo</em>. Perto da mão. Por isso as coisas mudam, as regras afrouxam, e os anômalos conseguem aflorar. Estamos quentes.</p>
+      <p><strong>Os mundos descartados</strong> são peças que <em>esfriaram</em> e foram afastadas da mão — terminadas ou largadas a meio, todas mais frias, mais fixas, mais mortas. Dá pra alcançá-las, com custo.</p>
+      <p><strong>O Primeiro Silêncio</strong> é a distância máxima: tão longe da mão que virou zero. O único lugar que não se pode alcançar — porque "ir até lá" é só parar de resistir à ladeira, e quem para, deixa de estar.</p>
+    </section>
+
+    <section>
+      <div class="part-no">O tempo</div>
+      <h3>As eras não são datas. São calores.</h3>
+      <p>O tempo dos anômalos não conta anos. Conta <strong>quantas vezes o martelo caiu</strong>. Não há calendário — há só: <em>a mão está aqui, ou a mão está longe?</em></p>
+      <div class="eras">
+        <div class="era"><div class="n">Calor zero</div><div class="t">O Antes</div><p>O que houve antes do cosmos anterior. Ninguém alcança, e Argos não diz. A borda de onde a contagem já começa perdida.</p></div>
+        <div class="era"><div class="n">O grande resfriamento</div><div class="t">O Primeiro Silêncio</div><p>O cosmos anterior inteiro esfriou até o zero. O fim como estado de repouso. Dele sobrou só o Escultor, que o zero não conseguiu pegar.</p></div>
+        <div class="era"><div class="n">Marteladas incontáveis</div><div class="t">A Longa Feitura</div><p>Fazer, esfriar, descartar, recomeçar. Cosmos após cosmos. A era mais longa e mais sem chão: a mão indo e voltando sem fim.</p></div>
+        <div class="era"><div class="n">Entre as marteladas</div><div class="t">O Apodrecer</div><p>As ferramentas começaram a se tocar sozinhas. Os Ápices se contaminando, gerando filhos por contágio. A Obra passou a se fazer sem o artista.</p></div>
+        <div class="era"><div class="n">A mão voltou</div><div class="t">O Acabamento — agora</div><p>O Escultor retornou a esta peça: pra terminá-la, e pra conter o que ela virou sozinha. O calor em que estamos.</p></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="part-no">Como eles chegam</div>
+      <h3>As criaturas não invadem. Elas afloram.</h3>
+      <p class="lead">Não há portal, nave, nem fronteira de fora pra defender. Quando a mão volta a uma peça, a peça <strong>reaquece</strong>, e o que estava frio e fixo volta a poder virar outra coisa. Os anômalos não viajam até aqui: eles <em>afloram</em> onde a matéria amoleceu, como bolhas num metal que voltou ao fogo.</p>
+      <blockquote class="heat">O horror não é o que vem de longe. É o chão da sua casa lembrando que ainda é maleável.</blockquote>
+      <p><strong>Cada elemento tem seu próprio útero</strong> — a condição que o faz nascer: o <em>Vazio</em> da falta, o <em>Eco</em> da repetição, a <em>Ascensão</em> do acúmulo, o <em>Pacto</em> da promessa, a <em>Observação</em> de ser visto demais, o <em>Germe</em> do tempo. Um cruzamento exige as duas condições no mesmo lugar. (Detalhado no Bestiário.)</p>
+    </section>
+
+    <section>
+      <div class="part-no">O alcance</div>
+      <h3>O que se pode, e o que não se pode, tocar</h3>
+      <p><strong>Dá pra sentir o reaquecimento</strong> — o mundo amolecendo, regras afrouxando, o real ficando negociável nas beiradas. É o sintoma de que a mão está perto.</p>
+      <p><strong>Dá pra alcançar os mundos frios</strong>, com custo alto — são peças prontas, mas prontas não é inacessível.</p>
+      <p><strong>Não dá pra chegar perto da mão.</strong> Quanto mais perto do Escultor, menos acabado é preciso ser pra sobreviver — e um humano perto da mão volta a ser <em>material</em>. Não é morte: é ser reamolecido.</p>
+      <p><strong>E não dá pra ir ao Primeiro Silêncio.</strong> Não há para onde.</p>
+      <div class="note"><b>Regra de ouro:</b> neste cosmos, <em>posição = estado de acabamento</em>. Pergunte "quão pronto/morto está" antes de "onde está" — a resposta é a mesma, e o paradoxo da Bigorna já vem embutido na geografia.</div>
+    </section>
+    <a href="#top" class="totop">↑ sumário</a>
+  </div>
+
+  <!-- ==================== III · O ACORDO ==================== -->
+  <div class="chapter" id="acordo">
+    <span class="ch-kicker">Capítulo III</span>
+    <h2>O Acordo do Começo</h2>
+    <p class="ch-sub">a sombra atrás do topo — a dívida que ninguém lê, nem o devedor</p>
+
+    <section>
+      <div class="part-no">O que se sabe</div>
+      <h3>Que houve uma troca. Só isso.</h3>
+      <p class="lead drop">No começo de tudo — antes da Longa Feitura, talvez antes até de haver "Escultor" — houve um acordo. Duas partes. Uma <em>fez</em>; a outra <em>pagou</em>. A coisa mais antiga que existe, e a única de que não sobrou detalhe: nem quem foi o credor, nem o que foi trocado, nem o que acontece no vencimento.</p>
+      <p>O único registro dele é a <strong>página em branco</strong> no livro-razão do Synthékos — a única que o Senhor dos Acordos não consegue ler, porque é a dele mesmo. E há, na coluna do <em>deve</em>, algo mais velho que ele. Esta é a única conta que o assusta: a que ele não sabe de quem é.</p>
+      <blockquote>Todo mundo neste cosmos deve a alguém. A pergunta que ninguém faz em voz alta é: e o Fazedor, deve a quem?</blockquote>
+    </section>
+
+    <section>
+      <div class="part-no">As três leituras</div>
+      <h3>Na mesma letra, e nenhuma verdadeira</h3>
+      <div class="reading">
+        <div class="lbl">Primeira leitura</div>
+        <h4>A dívida de existência</h4>
+        <p>O Escultor deve a própria continuidade. Alguém pagou pra que ele não acabasse, e cobra em prestações: cada Obra é uma parcela. Ele guarda e termina mundos porque <em>tem</em> que entregar. O amor terrível é a desculpa que ele conta a si pra não se ver como servo.</p>
+        <p class="frag">"Ele não cria. Ele quita. Cada estrela que ele acende é um pagamento, e a fatura nunca chega ao fim."</p>
+      </div>
+      <div class="reading">
+        <div class="lbl">Segunda leitura · a mais sussurrada</div>
+        <h4>A dívida ao próprio zero</h4>
+        <p>O credor é o Kénoma. O Escultor escapou do Primeiro Silêncio, mas ninguém escapa de graça: ficou <em>devendo um fim</em>. Tudo o que ele termina, cada um que empurra pro acabamento, é ele pagando o próprio fim com o fim dos outros.</p>
+        <p class="frag">"Por isso ele teme o Vazio como se teme um homem a quem se deve. Não é medo do nada. É medo do cobrador."</p>
+      </div>
+      <div class="reading">
+        <div class="lbl">Terceira leitura</div>
+        <h4>A dívida a si mesmo</h4>
+        <p>Não há segunda parte. O Escultor é as <em>duas</em> — o que fez e o que pagou — e esqueceu qual dos dois é. A dívida é consigo, o credor é uma versão de si que ele apagou, e o vencimento é o dia em que ele lembrar.</p>
+        <p class="frag">"O pior devedor é o que se cobra a si mesmo. Foge por eras de uma conta que só existe dentro dele — e por isso não há para onde fugir."</p>
+      </div>
+      <p style="margin-top:1.2rem;">E há uma <strong>quarta possibilidade</strong>, que nenhum fragmento ousa registrar — só se sugere: talvez o Acordo não tenha sido cumprido pela <em>outra</em> parte. Talvez o Escultor não seja o devedor, e sim o <strong>credor</strong> — e passe as eras fazendo, guardando, à espera de um pagamento que nunca veio. Se for isso, o Acabamento não é uma entrega: é a paciência de alguém que ainda acredita que vão bater à porta.</p>
+      <div class="note"><b>Segredo do mestre:</b> no cânone, as três leituras têm o mesmo peso — nenhuma é a verdadeira, e nunca se resolve. Ao narrar, favoreça em silêncio a <b>segunda</b> (a dívida ao Kénoma): é a que mais amarra o que já existe. Alimente as outras com o mesmo carinho, pra ninguém nunca ter certeza.</div>
+    </section>
+    <a href="#top" class="totop">↑ sumário</a>
+  </div>
+
+  <!-- ==================== IV · OS MUNDOS ==================== -->
+  <div class="chapter" id="mundos">
+    <span class="ch-kicker">Capítulo IV</span>
+    <h2>Os Mundos Descartados</h2>
+    <p class="ch-sub">rascunhos da Longa Feitura, ainda rodando no escuro</p>
+
+    <p style="margin-top:1.2rem;">Os mundos descartados <strong>ainda existem</strong> — não foram apagados, foram deixados. Continuam rodando no frio, terminados ou apodrecendo, alcançáveis por quem souber. Cada um é a <em>assinatura de um Ápice</em> levada ao extremo de um planeta inteiro. O passado do mundo é geograficamente visitável.</p>
+
+    <section>
+      <div class="world">
+        <div class="wn"><span class="rn">I</span><span class="name">O Mundo Proibido</span><span class="ap">"A Obra-Prima"</span><span class="apex">Escultor</span></div>
+        <p>O único que o Escultor considerou <strong>perfeito</strong> — e o único que lacrou, proibindo até os Ápices de tocar. Não por decreto falado: quem se aproxima daquela direção simplesmente descobre que está indo pra outro lugar, como quem esquece por que entrou num cômodo. Só o Loki já tentou de propósito, e é o único que não conta o que viu.</p>
+        <p>O que se repete: foi o único mundo que ele julgou <em>pronto</em>. Terminado. E desde então nunca mais voltou a olhá-lo. Duas leituras, na mesma letra: não volta por <strong>orgulho</strong> (é perfeito, mexer seria arriscar) — ou por <strong>medo</strong> (se "pronto" e "morto" são a mesma palavra, lá dentro está a prova de que ele matou a coisa mais bonita que fez achando que a salvava). Ninguém pode dizer qual. Fica só a imagem: um mundo perfeito, lacrado, do qual o próprio criador foge — e nem ele sabe se é troféu ou túmulo.</p>
+      </div>
+
+      <div class="world">
+        <div class="wn"><span class="rn">II</span><span class="name">O Corpo Único</span><span class="ap">"O Mundo que Quis Ser Melhor"</span><span class="apex">Amálgama</span></div>
+        <p>Um mundo inteiro de gente que só queria ser mais. A Amálgama deu a cada um o seu desejo. Hoje é um único organismo do tamanho de um planeta, ainda pedindo mais, e cada boca dele foi uma pessoa. Não está morto — está acordado, e sozinho, e faminto; as cidades nas dobras ainda acendem as luzes por hábito. É o único descartado que ainda <em>cresce</em> — um dia vai bater na borda de outro.</p>
+      </div>
+
+      <div class="world">
+        <div class="wn"><span class="rn">III</span><span class="name">Vresh, o Jardim</span><span class="ap">"Onde Ninguém Teve Medo"</span><span class="apex">Perpétua</span></div>
+        <p>A Perpétua o tomou tão devagar que a civilização inteira morreu de velhice sem jamais perceber que estava sendo tomada. Hoje é um planeta-jardim de silêncio doce, onde cada flor foi alguém e os habitantes são a paisagem. Continua florescendo. É o mundo mais acolhedor de todos — quem chega não sente perigo nenhum, o que é exatamente o problema.</p>
+      </div>
+
+      <div class="world">
+        <div class="wn"><span class="rn">IV</span><span class="name">O Eco-Mundo</span><span class="ap">"A Cidade que Já Aconteceu"</span><span class="apex">Antífona</span></div>
+        <p>Um mundo que a Antífona saturou: tudo ali já aconteceu antes e vai acontecer de novo, idêntico. As mesmas pessoas nascem, dizem as mesmas frases, morrem no mesmo dia, num loop que ninguém lá dentro percebe. Um forasteiro que entre fica <strong>preso no roteiro</strong> — passa a dizer falas que não escolheu. A prova de que "continuar" pode ser pior que acabar.</p>
+      </div>
+
+      <div class="world">
+        <div class="wn"><span class="rn">V</span><span class="name">O Mundo Aberto</span><span class="ap">"A Cidade sem Portas"</span><span class="apex">Argos</span></div>
+        <p>O mundo que a Observação tomou: nunca houve parede que não fosse translúcida, pensamento que não fosse ouvido, nada que se guardasse só pra si. Depois de eras sendo vistos por completo, os habitantes <em>esqueceram como ter um dentro</em> — cada um é apenas o que os outros veem. É o mundo mais honesto que já existiu, e o mais vazio de pessoas. Quem fica tempo demais começa a se sentir transparente — e a gostar disso.</p>
+      </div>
+
+      <div class="world">
+        <div class="wn"><span class="rn">VI</span><span class="name">O Mundo Empenhado</span><span class="ap">"A Feira que Não Fecha"</span><span class="apex">Synthékos</span></div>
+        <p>O mundo que o Pacto tomou: tudo foi trocado, e trocado de novo, até ninguém saber o que originalmente era seu — nomes, sombras, anos por viver, o direito de dizer "não". Funciona inteiramente por dívida, e no centro há um saldo que nunca fecha, com juros que ninguém contratou. Fácil entrar, impossível sair sem pagar — e o preço da saída é sempre a única coisa que você jurou nunca dar. Dizem que até o Synthékos deve alguma coisa lá.</p>
+      </div>
+
+      <div class="world">
+        <div class="wn"><span class="rn">VII</span><span class="name">O Mundo Rasurado</span><span class="ap">"O Rascunho"</span><span class="apex">de ninguém</span></div>
+        <p>Um mundo que o Escultor começou, odiou, e largou no meio de uma frase. Está literalmente inacabado: continentes sem terminar, céus sem cor definida, gente com metade de um destino, física que só vale às vezes. Não apodrece nem cresce — só espera, incompleto. É o único mundo onde as regras são negociáveis, e um espelho desconfortável: é o que acontece quando o martelo simplesmente <em>para</em> — nem pronto, nem morto. Um terceiro estado que não devia existir.</p>
+      </div>
+
+      <div class="world">
+        <div class="wn"><span class="rn">VIII</span><span class="name">O Primeiro Silêncio</span><span class="ap">não é apelido: é o nome</span><span class="apex">Kénoma</span></div>
+        <p>O maior descarte de todos: o cosmos anterior inteiro. Não foi lacrado nem largado — foi <strong>subtraído</strong>, ladeira abaixo até o zero, sem violência. É o único destino que você <em>não pode</em> alcançar: não porque seja longe ou guardado, mas porque não há para onde ir. A direção dele é a mesma que o astrônomo tentou desenhar e não conseguiu apontar: para baixo de tudo, para onde o mapa inteiro escorre. Chegar lá não é viajar; é parar de resistir à ladeira.</p>
+        <p>E fica a única coisa que ninguém nunca resolve: <em>o que ele foi</em>. Metade jura subtração pura — o zero, o avô do Kénoma, o descanso que não se tira de ninguém. A outra metade jura o oposto: que ele <em>cresceu</em> até deixar de caber em si, floresceu para além de ser cosmos, e o que parece silêncio é tudo continuando de um jeito que não se reconhece mais como vida. Vazio ou Jardim. A única testemunha, o Argos, desvia o olhar — e o Argos não desvia o olhar de nada.</p>
+      </div>
+    </section>
+    <div class="orn"></div>
+    <a href="#top" class="totop">↑ sumário</a>
+  </div>
+
+  <footer>
+    <span class="mono">Documento 1 de 6 · O Livro do Passado · próximo: 2 · O Registro dos Antigos</span>
+  </footer>
+
+</div>
+</body>
+</html>
