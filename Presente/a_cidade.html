@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Cidade que Esfria</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,500;1,300;1,500&family=Spectral:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ground:#0a0c11; --ground-2:#111620; --panel:#141a24;
+    --bone:#e2dfd6; --bone-dim:#a2a099; --bone-faint:#64655f;
+    --ink:#a89b7c; --ink-soft:#c6bb9c;
+    --mist:#8fa4b0; --cold:#8fa0a8; --heat:#c9713e;
+    --rule:#242c34; --measure:44rem;
+    /* cores de assinatura por elemento */
+    --c-vazio:#9aa4ad; --c-eco:#b9adcf; --c-asc:#c37a56;
+    --c-pacto:#dcb75f; --c-obs:#a6bcc7; --c-germe:#9aad80;
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%; scroll-behavior:smooth;}
+  body{margin:0; background:radial-gradient(130% 90% at 50% -6%, #151d26 0%, var(--ground) 55%, #04060a 100%); color:var(--bone); font-family:"Spectral",Georgia,serif; font-weight:300; line-height:1.82; letter-spacing:.005em; -webkit-font-smoothing:antialiased; padding:clamp(1.2rem,4vw,4.5rem) clamp(1rem,5vw,2rem) 6rem;}
+  .sheet{max-width:var(--measure); margin:0 auto;}
+  .mono{font-family:"IBM Plex Mono",ui-monospace,monospace; font-weight:400; letter-spacing:.22em; text-transform:uppercase;}
+
+  /* capa */
+  .cover{text-align:center; margin-bottom:2.6rem; padding-bottom:2.4rem; border-bottom:1px solid var(--rule);}
+  .cover .doc{font-size:.6rem; color:var(--ink); letter-spacing:.36em; margin-bottom:1.2rem;}
+  .cover h1{font-family:"Cormorant",serif; font-weight:300; font-size:clamp(2.6rem,9.4vw,5.2rem); line-height:.98; margin:0; letter-spacing:.02em; animation:fade 2s both;}
+  @keyframes fade{from{opacity:0;}to{opacity:1;}}
+  .cover .sub{font-family:"Cormorant",serif; font-style:italic; font-size:clamp(1.05rem,3.2vw,1.4rem); color:var(--ink-soft); margin:1rem 0 0;}
+
+  /* sumário */
+  .toc{margin:0 auto 2rem; border:1px solid var(--rule); border-radius:3px; padding:1.3rem 1.4rem; background:linear-gradient(180deg,var(--ground-2),transparent);}
+  .toc .h{font-family:"IBM Plex Mono",monospace; font-size:.58rem; letter-spacing:.2em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:.9rem;}
+  .toc a{display:flex; justify-content:space-between; gap:1rem; padding:.42rem 0; border-bottom:1px dashed var(--rule); color:var(--bone); text-decoration:none; font-size:1.02rem;}
+  .toc a:last-child{border-bottom:none;}
+  .toc a:hover{color:var(--ink-soft);}
+  .toc a .num{font-family:"IBM Plex Mono",monospace; font-size:.7rem; color:var(--bone-faint); letter-spacing:.1em;}
+
+  .chapter{margin-top:3.6rem; padding-top:1.6rem; border-top:2px solid var(--rule);}
+  .chapter > .ch-kicker{font-family:"IBM Plex Mono",monospace; font-size:.6rem; letter-spacing:.3em; text-transform:uppercase; color:var(--ink); display:block; margin-bottom:.5rem;}
+  .chapter > h2{font-family:"Cormorant",serif; font-weight:500; font-size:clamp(2rem,7vw,3.2rem); line-height:1.02; margin:0 0 .3rem; letter-spacing:.01em;}
+  .chapter > .ch-sub{font-family:"Cormorant",serif; font-style:italic; font-size:1.1rem; color:var(--ink-soft); margin:0 0 1.4rem;}
+
+  section{margin-top:2.4rem;}
+  .part-no{font-family:"IBM Plex Mono",monospace; font-size:.58rem; letter-spacing:.28em; color:var(--bone-faint); text-transform:uppercase;}
+  h3{font-family:"Cormorant",serif; font-weight:500; font-size:clamp(1.5rem,5vw,2.1rem); line-height:1.08; margin:.3rem 0 1rem; letter-spacing:.01em;}
+  p{margin:0 0 1.12rem; color:#d8d5cc;}
+  .lead{font-size:1.1rem; color:var(--bone);}
+  em{color:var(--bone); font-style:italic;}
+  strong{color:var(--ink); font-weight:400;}
+  .drop::first-letter{font-family:"Cormorant",serif; font-weight:500; float:left; font-size:3.3rem; line-height:.8; padding:.35rem .5rem 0 0; color:var(--ink);}
+  a.ref{color:var(--mist); text-decoration:none; border-bottom:1px dotted var(--mist);}
+  a.ref:hover{color:var(--ink-soft); border-bottom-color:var(--ink-soft);}
+
+  blockquote{margin:2rem 0; padding:.2rem 0 .2rem 1.5rem; border-left:2px solid var(--ink); font-family:"Cormorant",serif; font-style:italic; font-weight:300; font-size:clamp(1.25rem,4vw,1.65rem); line-height:1.42; color:var(--ink-soft);}
+  blockquote.cold{border-color:var(--mist); color:var(--mist);}
+
+  /* ferramentas de 2002 */
+  .tool{border:1px solid var(--rule); border-radius:3px; padding:1.1rem 1.2rem; margin-bottom:.9rem; background:linear-gradient(180deg,var(--ground-2),transparent);}
+  .tool .tn{font-family:"IBM Plex Mono",monospace; font-size:.54rem; letter-spacing:.18em; text-transform:uppercase; color:var(--ink-soft);}
+  .tool .tt{font-family:"Cormorant",serif; font-weight:500; font-size:1.34rem; margin:.15rem 0 .5rem; color:var(--bone);}
+  .tool p{margin:0 0 .7rem; font-size:.95rem; color:#d1cec5;}
+  .tool p:last-child{margin-bottom:0;}
+  .tool .mech{border-top:1px dashed var(--rule); padding-top:.55rem; font-size:.88rem; color:var(--bone-dim); font-style:italic;}
+  .tool .mech b{color:var(--mist); font-style:normal; font-weight:400;}
+
+  /* bairros */
+  .hood{padding:1.4rem 0 1.3rem; border-bottom:1px solid var(--rule);}
+  .hood:last-of-type{border-bottom:none;}
+  .hood .hh{display:flex; flex-wrap:wrap; align-items:baseline; gap:.45rem .8rem;}
+  .hood .hname{font-family:"Cormorant",serif; font-weight:500; font-size:1.62rem; color:var(--bone); line-height:1;}
+  .hood .helem{font-family:"IBM Plex Mono",monospace; font-size:.5rem; letter-spacing:.14em; text-transform:uppercase; border:1px solid var(--accent); color:var(--accent); border-radius:3px; padding:.06rem .4rem;}
+  .hood .hreal{font-family:"IBM Plex Mono",monospace; font-size:.55rem; letter-spacing:.06em; color:var(--bone-faint); margin:.35rem 0 .8rem; text-transform:uppercase;}
+  .hood dl{margin:0; display:grid; grid-template-columns:auto 1fr; gap:.15rem .9rem;}
+  .hood dt{font-family:"IBM Plex Mono",monospace; font-size:.52rem; letter-spacing:.12em; text-transform:uppercase; color:var(--bone-faint); padding-top:.36rem; white-space:nowrap;}
+  .hood dd{margin:0 0 .45rem; font-size:.96rem; color:#d3d0c7;}
+  .hood dd em{color:var(--bone); font-style:italic;}
+  .hood dd b{color:var(--accent); font-weight:400;}
+
+  /* verbetes do vocabulário */
+  .word{padding:1rem 0; border-bottom:1px solid var(--rule);}
+  .word:last-child{border-bottom:none;}
+  .word .w{font-family:"Cormorant",serif; font-weight:500; font-size:1.3rem; color:var(--bone);}
+  .word .gloss{font-family:"Cormorant",serif; font-style:italic; font-size:1rem; color:var(--ink-soft); margin-left:.5rem;}
+  .word p{margin:.35rem 0 0; font-size:.95rem; color:#d1cec5;}
+
+  .note{margin-top:1.4rem; border-left:2px solid var(--rule); padding:.5rem 0 .5rem 1rem; font-size:.84rem; color:var(--bone-dim); font-style:italic;}
+  .note b{color:var(--ink); font-style:normal;}
+  .note.cold{border-left-color:var(--mist);} .note.cold b{color:var(--mist);}
+
+  .orn{margin:2.4rem auto 0; width:64%; max-width:20rem; height:1px; background:linear-gradient(90deg,transparent,var(--rule) 20%,var(--rule) 80%,transparent); position:relative;}
+  .orn::after{content:"❖"; position:absolute; top:-.72rem; left:50%; transform:translateX(-50%); background:var(--ground); padding:0 .7rem; color:var(--ink); font-size:.8rem;}
+  .totop{display:block; text-align:center; margin-top:1.4rem; font-family:"IBM Plex Mono",monospace; font-size:.54rem; letter-spacing:.2em; text-transform:uppercase; color:var(--bone-faint); text-decoration:none;}
+  .totop:hover{color:var(--ink);}
+  footer{margin-top:4rem; padding-top:1.3rem; border-top:1px solid var(--rule); text-align:center; font-size:.58rem; color:var(--bone-faint);}
+  footer a{color:var(--bone-faint); text-decoration:none; border-bottom:1px dotted var(--rule);}
+  footer a:hover{color:var(--ink);}
+
+  .vazio{--accent:var(--c-vazio);} .asc{--accent:var(--c-asc);} .eco{--accent:var(--c-eco);}
+  .pacto{--accent:var(--c-pacto);} .obs{--accent:var(--c-obs);} .germe{--accent:var(--c-germe);}
+  @media (max-width:520px){ .hood dl{grid-template-columns:1fr; gap:0;} .hood dt{padding-top:.55rem;} }
+</style>
+</head>
+<body>
+<div class="sheet" id="top">
+
+  <div class="cover">
+    <div class="mono doc">Dossiê do Presente · Porto Alegre · 2002</div>
+    <h1>A Cidade que Esfria</h1>
+    <p class="sub">o cenário — uma peça longe da mão, e as duas plantas que não batem</p>
+  </div>
+
+  <nav class="toc">
+    <div class="h">Sumário</div>
+    <a href="#tese"><span>A tese — a cidade-espelho</span><span class="num">I</span></a>
+    <a href="#ano"><span>O ano de 2002 — quatro ferramentas</span><span class="num">II</span></a>
+    <a href="#bairros"><span>Os bairros — seis humores, seis elementos</span><span class="num">III</span></a>
+    <a href="#guaiba"><span>O Guaíba — a borda fria</span><span class="num">IV</span></a>
+    <a href="#vocabulario"><span>O vocabulário — as molduras que quase servem</span><span class="num">V</span></a>
+  </nav>
+
+  <!-- ==================== I · A TESE ==================== -->
+  <div class="chapter" id="tese">
+    <span class="ch-kicker">Capítulo I</span>
+    <h2>A Tese</h2>
+    <p class="ch-sub">o horror não invade — a cidade só termina de ser o que já era</p>
+
+    <section>
+      <div class="part-no">Parte I</div>
+      <h3>Uma peça esfriando na bigorna</h3>
+      <p class="lead drop">Porto Alegre já parece uma coisa <em>pronta</em>. Não morta — pronta, que é pior, e a cidade sabe disso de um jeito que não consegue dizer em voz alta. As fábricas da zona norte fecharam e não abriram outra coisa no lugar. Os sobrados do centro têm placa de esmalte de escritórios que não existem mais. Os bondes acabaram, os cinemas de rua estão acabando, e a cidade envelhece de costas pro resto do país, com um orgulho quieto de quem não vai explicar.</p>
+      <p>Na régua da <a class="ref" href="../Historia/livro_do_passado.html#forja">Forja</a>, isso tem nome e endereço: <strong>posição é acabamento</strong>. Perto da mão, a matéria é quente e mutável. Longe, esfria, endurece, fica pronta — e lembra o que "pronto" quer dizer. Porto Alegre está morna e caindo. Não é uma cidade condenada; é uma cidade <em>terminando</em>, e nesse estado as beiradas ficam finas o bastante pra vazar.</p>
+      <p>Por isso a regra de narração deste cenário é uma só, e não se abre exceção: <strong>nada aqui vem de fora.</strong> Não há portal, nave, seita importada nem monstro que atravessou a fronteira. O que aparece é a cidade fazendo, com um exagero milimétrico, aquilo que ela já fazia. O bairro que sempre foi quieto fica quieto <em>demais</em>. O prédio que sempre teve uma janela acesa passa a ter uma a mais. A casa que sempre esperou alguém termina de esperar.</p>
+      <blockquote>Nada aqui invade. Tudo aqui é a cidade acabando de dizer a frase que começou em 1772.</blockquote>
+      <p>Quando você for pôr uma anomalia numa cena, não pergunte <em>o que chegou</em>. Pergunte <em>o que essa esquina já fazia</em>, e depois pergunte o que aconteceria se ela fizesse aquilo com sinceridade absoluta, sem parar, por trinta anos, sem ninguém olhando. A resposta é o monstro. Está tudo no <a class="ref" href="../Criaturas/bestiario.html">Bestiário</a>: cada elemento tem um útero, e todos os seis úteros são coisas que uma cidade faz sozinha — faltar, repetir, acumular, prometer, vigiar, deixar quieto tempo demais.</p>
+    </section>
+
+    <section>
+      <div class="part-no">Parte II</div>
+      <h3>Os mapas não batem</h3>
+      <p class="lead drop">Toda cidade tem duas plantas: a que a prefeitura desenha e a que os pés conhecem. Na maioria dos lugares as duas discordam por preguiça de cartógrafo. Aqui elas discordam com <em>método</em>, e a discordância é medível por qualquer um que se dê ao trabalho de medir — o que é exatamente o que ninguém faz.</p>
+      <p>A rua tem quatrocentos metros na planta e seiscentos passos na neblina. O quarteirão tem sete casas no cadastro e oito portas na calçada, e ninguém consegue apontar qual das oito sobra. A linha de ônibus faz o mesmo itinerário em vinte e dois minutos de manhã e trinta e um às onze da noite, sem trânsito, com o mesmo motorista. O número 340 da rua existe entre o 338 e o 342 em alguns anos e não em outros, e o carteiro sabe, e o carteiro não fala nisso.</p>
+      <p>A explicação que a cidade dá pra si mesma é razoável e verdadeira: <em>erro de cadastro; aterro registrado errado; essa parte aqui foi feita em cima d'água</em>. E foi mesmo — o centro pisa em aterro, o cais é aterro, a orla é aterro, e há quarteirões inteiros que em 1900 eram fundo de rio. A explicação está certa. É só insuficiente, e insuficiente pra pior.</p>
+      <p>Porque há uma segunda planta. Debaixo do que foi aterrado e debaixo do que nunca foi, existe <strong>a cidade-espelho</strong>: a mesma Porto Alegre, virada, alagada, com as mesmas ruas nos mesmos lugares — e <em>mais completa</em> que a de cima. Tem o quarteirão de oito casas com as oito. Tem o número 340. Tem as ruas que a de cima demoliu e as que ela nunca chegou a abrir. Onde as duas plantas discordam, quem está certa é a de baixo, e a de cima é que está com um erro de cópia.</p>
+      <p>Ninguém sabe qual das duas veio primeiro, e essa é a pergunta que não se faz depois das duas da manhã. As duas leituras circulam, na mesma letra: que a de baixo é o reflexo, ou que a de cima é. A segunda é mais fácil de defender do que devia ser.</p>
+      <div class="note"><b>Segredo do mestre:</b> nunca confirme a cidade-espelho com uma cena. Confirme com um <em>documento</em> — uma planta antiga, uma conta de luz de um endereço que não existe, uma carta náutica rasurada. O jogador que descobre sozinho que os números não fecham está mais assustado do que qualquer coisa que você descreva. Ver <a class="ref" href="lendas_e_locais.html#barqueiro">O Barqueiro que Não Rema pro Poente</a>.</div>
+    </section>
+    <a href="#top" class="totop">↑ sumário</a>
+  </div>
+
+  <!-- ==================== II · O ANO ==================== -->
+  <div class="chapter" id="ano">
+    <span class="ch-kicker">Capítulo II</span>
+    <h2>O Ano de 2002</h2>
+    <p class="ch-sub">quatro paredes que o horror precisa que existam</p>
+
+    <p style="margin-top:1.2rem;">2002 não está aqui por nostalgia. Está aqui porque <em>funciona</em>. Cada coisa que faltava em 2002 é uma parede — e horror é, tecnicamente, uma sala com paredes suficientes. Quatro delas fazem quase todo o trabalho.</p>
+
+    <div class="tool">
+      <div class="tn">Ferramenta I</div>
+      <div class="tt">Ninguém tem telefone na mão</div>
+      <p>Celular existe: é um tijolo, é caro, é pré-pago, é do chefe ou do pai. Não tem sinal em porão, em ferro-velho, no meio do Guaíba, nem nos fundos de um sobrado de paredes de meio metro. E, na dúvida, ninguém carrega. Quem precisa falar procura <strong>orelhão</strong> — e precisa ter cartão, e o cartão tem crédito contado, e o crédito some no meio da frase, e do outro lado alguém precisa estar em casa pra atender um telefone preso na parede da cozinha.</p>
+      <p>Isso muda tudo. Separar o grupo é trivial: bastam duas ruas. Pedir socorro é uma <em>missão</em>, com três pontos de falha. Combinar de se encontrar às nove significa estar lá às nove, porque não existe "tô chegando".</p>
+      <p class="mech"><b>Na mesa:</b> distância vira tempo real. Quando um personagem sai de cena, ele sai de cena — narre os outros no escuro sobre o que aconteceu com ele.</p>
+    </div>
+
+    <div class="tool">
+      <div class="tn">Ferramenta II</div>
+      <div class="tt">A internet ocupa a linha</div>
+      <p>Discada. O modem canta aquele chiado de dois tons, negocia, conecta a 44 kbps num dia bom — e enquanto isso <em>o telefone da casa está ocupado</em>. Pesquisar e poder receber uma ligação são coisas mutuamente exclusivas. Quem não tem em casa vai na LAN house e paga por hora, num box, com fila atrás. Existem ICQ, mIRC, MSN e e-mail; não existe rede social, não existe procurar o nome de alguém e achar a vida inteira dela. Procura-se em fórum, em lista de discussão, num buscador que responde com trinta links mortos.</p>
+      <p>E existe a coisa mais útil de todas: o <strong>download lento</strong>. Um arquivo de quatro megas leva vinte minutos e cai no minuto dezenove. Uma foto abre <em>de cima pra baixo</em>, faixa por faixa, e você fica oito minutos vendo uma imagem revelar um rosto que você já sabe de quem é. O horror aqui não precisa de efeito: precisa só de barra de progresso.</p>
+      <p class="mech"><b>Na mesa:</b> toda informação obtida pela linha chega em partes, fora de ordem, e a última parte chega quando já não adianta.</p>
+    </div>
+
+    <div class="tool">
+      <div class="tn">Ferramenta III</div>
+      <div class="tt">A mídia degrada</div>
+      <p>Tudo que registra alguma coisa em 2002 é físico, e físico apodrece. A fita VHS regravada perde uma geração a cada cópia — e a cópia da cópia da cópia é onde as coisas começam a aparecer. A fita cassete estica e enrola no cabeçote. O disquete de 1,44 MB dá <em>erro de leitura</em> na terceira vez, sempre. A máquina fotográfica tem filme de 24 ou 36 poses, e você não faz ideia do que fotografou até o laboratório revelar, dois dias depois, e devolver o envelope com uma foto a menos do que você pagou.</p>
+      <p>Duas consequências. A primeira: <strong>a prova some sozinha</strong>, e some sem culpa de ninguém, o que é muito pior do que alguém roubá-la. A segunda: o que degrada não degrada pro nada — degrada <em>na direção de outra coisa</em>. O Eco não precisa apagar a sua gravação. Precisa só que você a regrave mais uma vez.</p>
+      <p class="mech"><b>Na mesa:</b> nenhum registro sobrevive a três usos. Deixe o grupo escolher o que vale gastar uma cópia.</p>
+    </div>
+
+    <div class="tool">
+      <div class="tn">Ferramenta IV</div>
+      <div class="tt">Todo mundo olha pro mesmo lugar ao mesmo tempo</div>
+      <p>Ainda existe atenção de massa, e ela é sincronizada com precisão de relógio. O Jornal Nacional às oito e quinze. A novela depois. A <strong>Copa de 2002</strong>, na Coreia e no Japão, com jogos de manhã cedo — a cidade inteira parando às três e meia, às sete e meia, o comércio fechando, a rua ficando com aquele silêncio que só existe quando cem mil pessoas estão caladas na mesma frase. E o ano é de <strong>eleição</strong>: comício, carro de som, jingle de dez segundos que a cidade toda decora sem querer.</p>
+      <p>Uma cidade inteira virada pro mesmo ponto por noventa minutos é duas coisas ao mesmo tempo. É uma <a class="ref" href="../Criaturas/bestiario.html#obs">Assembleia</a> sendo alimentada com uma refeição do tamanho de um município. É um <a class="ref" href="../Criaturas/bestiario.html#asc">Rebanho</a> batendo o mesmo passo, gritando a mesma sílaba, e ficando um pouco mais um. E é a única hora em que uma rua movimentada fica completamente vazia — o que quer dizer que ela é sua, e de mais alguém.</p>
+      <p class="mech"><b>Na mesa:</b> durante o jogo do Brasil, tudo é possível na rua e nada é testemunhado. Depois do apito final, a cidade volta de uma vez — e vê o que sobrou.</p>
+    </div>
+    <a href="#top" class="totop">↑ sumário</a>
+  </div>
+
+  <!-- ==================== III · OS BAIRROS ==================== -->
+  <div class="chapter" id="bairros">
+    <span class="ch-kicker">Capítulo III</span>
+    <h2>Os Bairros</h2>
+    <p class="ch-sub">seis humores da cidade — e cada humor é a casa de um elemento</p>
+
+    <p style="margin-top:1.2rem;">Não são bairros oficiais. São <em>humores</em>: modos que a cidade tem de ser, cada um com um CEP aproximado e uma verdade exata. Um bairro real pode servir a dois humores em dias diferentes, e a Cidade Baixa serve a três num sábado. O nome abaixo é o do humor, não o da placa.</p>
+
+    <section>
+      <div class="hood obs" id="casario">
+        <div class="hh"><span class="hname">O Casario</span><span class="helem">Observação</span></div>
+        <div class="hreal">o centro histórico — Rua da Praia, Alfândega, os sobrados velhos</div>
+        <dl>
+          <dt>O clima</dt><dd>o único lugar da cidade onde você nunca está sozinho e nunca tem companhia. Dois mil vizinhos e nenhum conhecido.</dd>
+          <dt>A cara</dt><dd>sobrados de quatro andares grudados ombro a ombro, apodrecendo devagar e com dignidade. Poços de ventilação onde a roupa de três famílias seca junto. Escadaria de mármore gasto até virar barriga. Pensões, cortiços, escritórios com placa de esmalte de gente que morreu. E <b>janelas demais</b> — mais janelas do que cômodos, sempre; ninguém nunca conferiu, e quem confere se arrepende.</dd>
+          <dt>O que assombra</dt><dd>o <b>Espectador</b>, que não é uma criatura que chegou: é a atenção acumulada de um século de gente olhando pela cortina. Aqui, ser visto é o primeiro corte, e a rua tem cem anos de prática.</dd>
+          <dt>Em 2002</dt><dd>o centro esvazia às sete da noite, quando o comércio fecha, e vira um bairro de vigias — um homem por prédio, uma lâmpada por andar, um rádio ligado baixo. Camelô, escadaria rolante quebrada, cinema de rua na última sessão da vida dele.</dd>
+        </dl>
+      </div>
+
+      <div class="hood pacto" id="baixa">
+        <div class="hh"><span class="hname">A Baixa</span><span class="helem">Pacto</span></div>
+        <div class="hreal">a boemia noturna — bar de porta aberta, esquina torta, madrugada</div>
+        <dl>
+          <dt>O clima</dt><dd>aqui tudo se <em>combina</em>. Carona, dívida, plantão, emprego, briga, casamento, favor. Ninguém paga nada na hora e todo mundo acerta depois.</dd>
+          <dt>A cara</dt><dd>mesa na calçada até o sol nascer, música saindo de três portas ao mesmo tempo, fila do banheiro que é onde as conversas importantes acontecem. E as <b>encruzilhadas</b>: ruas que se cruzam torto, três de uma vez, num ângulo que nenhum urbanista assinaria — a cidade tem dezenas, e cada uma é uma mesa de negociação que ninguém marcou.</dd>
+          <dt>O que assombra</dt><dd>o <b>Corretor</b>, que nunca força e nunca aparece antes da hora. Ele espera o momento exato em que você quer alguma coisa o bastante pra dizer em voz alta o que daria por ela. Numa noite de sexta na Baixa, esse momento acontece umas quatrocentas vezes.</dd>
+          <dt>Em 2002</dt><dd>dinheiro vivo, comanda de papel, fiado no caderno atrás do balcão. Nada é conferível de manhã: nem quanto você bebeu, nem com quem você falou, nem o que você prometeu. O bar não tem câmera. O bar tem memória, e a memória do bar é um cara chamado Nilton.</dd>
+        </dl>
+      </div>
+
+      <div class="hood germe" id="ilhas">
+        <div class="hh"><span class="hname">As Ilhas</span><span class="helem">Germe</span></div>
+        <div class="hreal">o delta que alaga — palafita, quintal de bananeira, pátio de reciclagem</div>
+        <dl>
+          <dt>O clima</dt><dd><em>paz.</em> Uma paz enorme, verdadeira, com cheiro de terra molhada. E é esse o problema — a única coisa que o Germe pede é que você não tenha pressa de ir embora.</dd>
+          <dt>A cara</dt><dd>casas de madeira sobre estaca, com a marca da última cheia pintada na parede como quem marca a altura de um filho. Caminho de barro que a água refaz toda estação, então o caminho de hoje não é o de março. Mato que volta em duas semanas, mofo que volta em duas noites, e um silêncio verde onde a cidade devia estar.</dd>
+          <dt>O que assombra</dt><dd>o <b>Mofo-Mãe</b> num porão de barco e o <b>Semeado</b> em qualquer quintal — porque aqui a diferença entre curar e apodrecer é uma questão de vocabulário. É o único humor da cidade onde o horror não te ameaça: te <em>convida</em>, e tem razão.</dd>
+          <dt>Em 2002</dt><dd>alagar não é notícia, é calendário. A prefeitura tem um mapa das ilhas que está errado desde 1990 e ninguém corrigiu, porque a água corrige sozinha. Catador, carroça, pátio de reciclagem, criança de pé no barro. E quando a água sobe, a ilha some do mapa da cidade — literalmente: some da lista, e volta quando baixa, com um endereço a menos.</dd>
+        </dl>
+      </div>
+
+      <div class="hood vazio" id="alto">
+        <div class="hh"><span class="hname">O Alto</span><span class="helem">Vazio</span></div>
+        <div class="hreal">o dinheiro velho — casarão de esquina, jardim aparado, portão que não abre</div>
+        <dl>
+          <dt>O clima</dt><dd>frio. Frio em janeiro, com trinta e quatro graus na rua. Não é temperatura — é a sensação de estar dentro de um lugar onde já aconteceu tudo que ia acontecer.</dd>
+          <dt>A cara</dt><dd>casarões construídos pra doze pessoas onde mora uma. Jardim aparado por um funcionário que vem terça e sexta. Rua sem gente e com carros. Cortina fechada às três da tarde. Móvel com capa. E, em quase toda casa, um cômodo que ninguém usa e ninguém mexeu: a <b>ausência preservada</b>, com a escova ainda no copo.</dd>
+          <dt>O que assombra</dt><dd>o <b>Oco</b> nasce dessas portas fechadas sem nenhuma ajuda. A <b>Viúva</b> nasce quando a ausência tinha um formato exato — um par, um filho, um irmão — e alguém guardou o formato inteiro por trinta anos, esperando.</dd>
+          <dt>Em 2002</dt><dd>telefone fixo que toca e ninguém atende. Empregada que trabalha na casa há trinta anos, sabe qual porta não se abre, e não vai te contar porque não é da sua conta. Inventário arrastando na justiça desde 94, com um bem que os herdeiros não conseguem descrever pro juiz.</dd>
+        </dl>
+      </div>
+
+      <div class="hood asc" id="aterro">
+        <div class="hh"><span class="hname">O Aterro</span><span class="helem">Ascensão</span></div>
+        <div class="hreal">a periferia industrial — ferro-velho, desmanche, galpão, o morro que não é morro</div>
+        <dl>
+          <dt>O clima</dt><dd>cresce. Não "está crescendo": <em>cresce</em>, agora, enquanto você olha, e um pouco mais rápido do que a cidade consegue enterrar.</dd>
+          <dt>A cara</dt><dd>pátio de sucata com pilha de ferro mais alta que a casa vizinha. Desmanche com trinta capôs empilhados e nenhum carro inteiro. Galpão que foi fábrica, virou depósito, virou nada, e continua cheio. Carroça de puxar a mão subindo a rua com o dobro do peso dela. E o morro nos fundos, que não é morro: é o que se jogou ali por trinta anos e criou capim por cima.</dd>
+          <dt>O que assombra</dt><dd>o <b>Coletor</b>, que não é um bicho e sim uma vontade — a de guardar, a de não largar, a de que talvez sirva. E, muito mais fundo e muito mais raro, alguma coisa da família do <b>Kólophon</b> dormindo debaixo do capim, que ninguém quer acordar e que ninguém sabe que existe.</dd>
+          <dt>Em 2002</dt><dd>a reciclagem paga por quilo e não pergunta a procedência. O pátio compra qualquer coisa: alumínio, cobre, geladeira, arquivo de escritório com as pastas dentro. É o único lugar da cidade onde tudo que a cidade perdeu está fisicamente reunido — e organizado por peso, não por dono.</dd>
+        </dl>
+      </div>
+
+      <div class="hood eco" id="varzea">
+        <div class="hh"><span class="hname">A Várzea</span><span class="helem">Eco</span></div>
+        <div class="hreal">o parque e o brique — domingo de manhã, mesma banca, mesmo lugar, há vinte anos</div>
+        <dl>
+          <dt>O clima</dt><dd>a repetição, e a repetição aqui é <em>bonita</em>. Todo domingo a mesma coisa. É a coisa mais reconfortante da cidade, e é exatamente por isso que funciona.</dd>
+          <dt>A cara</dt><dd>parque grande demais pra caber no meio de um bairro, com sombra de figueira e chão de terra batida onde a grama desistiu. O brique: as mesmas bancas nos mesmos metros quadrados há duas décadas, o mesmo cara tocando a mesma música com o mesmo erro no mesmo compasso. A roda de chimarrão passando a cuia na mesma ordem, sempre — e quem quebra a ordem é corrigido sem ninguém pensar.</dd>
+          <dt>O que assombra</dt><dd>o <b>Refrão</b> em qualquer canteiro, a <b>Ladainha</b> quando o parque canta junto, e o <b>Ledor</b> onde alguma coisa aconteceu e a cidade não parou de reencenar. Aqui o perigo não é o monstro aparecer: é você entrar no ritmo, e o ritmo é gostoso.</dd>
+          <dt>Em 2002</dt><dd>o brique todo domingo, das nove às duas. Coisas de gente morta vendidas a cinco reais: relógio, aliança, disco, caixa de sapato com fotografias de uma família inteira que ninguém sabe o nome. Fitas cassete numa caixa de papelão, sem rótulo, a dois reais — e uma delas volta.</dd>
+        </dl>
+      </div>
+    </section>
+
+    <div class="note"><b>Como usar:</b> escolha o humor <em>antes</em> de escolher o monstro. Se a cena é n'O Alto, ela é sobre falta, mesmo que o inimigo seja outro. Um bairro rodando fora do elemento dele é sempre um sinal: quer dizer que a coisa veio de outro lugar da cidade, e coisas que se mudam estão procurando algo.</div>
+    <a href="#top" class="totop">↑ sumário</a>
+  </div>
+
+  <!-- ==================== IV · O GUAÍBA ==================== -->
+  <div class="chapter" id="guaiba">
+    <span class="ch-kicker">Capítulo IV</span>
+    <h2>O Guaíba</h2>
+    <p class="ch-sub">a borda fria — e a única direção que a cidade não consegue apontar</p>
+
+    <section>
+      <div class="part-no">Parte I</div>
+      <h3>A cidade não sabe dizer o que ele é</h3>
+      <p class="lead drop">Rio ou lago? A briga é velha, é séria, e cada porto-alegrense tem lado. Geógrafos discordam, professores discordam, o cara do bar discorda com veemência. É uma discussão charmosa e é também a primeira pista do cenário: <strong>a cidade não consegue nomear a maior coisa que ela tem do lado</strong>. Convive com ela há duzentos anos, tirou o sustento dela, aterrou parte dela — e não sabe dizer o que ela é.</p>
+      <p>O Guaíba é a borda fria da peça. Não uma fronteira de município: uma fronteira de <em>estado de acabamento</em>. Do lado de cá está a cidade, morna, ainda mudando um pouco. Do lado de lá está o pampa, que é a coisa mais pronta do Rio Grande do Sul. Atravessar não é viajar. É esfriar.</p>
+    </section>
+
+    <section>
+      <div class="part-no">Parte II</div>
+      <h3>A neblina, e o pôr do sol</h3>
+      <p>A neblina sobe de manhã e volta à noite, e não é meteorologia decorativa: é o principal recurso do capítulo. Ela apaga a outra margem primeiro, depois a própria margem, depois a proa do barco. E faz uma coisa com o som que assusta quem nunca ouviu — som atravessa água de um jeito errado, chega limpo e chega <em>perto</em>, e uma conversa a oitocentos metros soa como se acontecesse do outro lado do casco. Dentro da neblina, tudo que você ouve está mais perto do que está.</p>
+      <p>E há o pôr do sol, que é a coisa mais famosa da cidade e a mais perigosa do capítulo. É <em>bonito demais</em>. Bonito de um jeito desproporcional, laranja inteiro em cima da água, e a cidade inteira sabe disso: no fim da tarde há gente parada na orla que não combinou de estar ali, olhando junto, calada, por vinte minutos, sem perceber que passaram vinte minutos.</p>
+      <p>Repare no que isso é. É a única coisa que Porto Alegre inteira olha ao mesmo tempo <em>sem ninguém ter marcado</em>. Em qualquer outro lugar isso é um cartão-postal. Aqui, num cenário onde <a class="ref" href="../Criaturas/bestiario.html#obs">olhar é interagir</a>, é uma refeição servida à cidade toda todos os dias, na mesma hora, com pontualidade astronômica. Ninguém sabe quem come.</p>
+      <blockquote class="cold">Na neblina, tudo que você ouve está mais perto do que está. E no pôr do sol, tudo que olha está olhando junto com você.</blockquote>
+    </section>
+
+    <section>
+      <div class="part-no">Parte III</div>
+      <h3>O que existe a oeste</h3>
+      <p>A oeste do Guaíba tem o pampa, e o pampa não tem fim — tem só mais pampa, num horizonte que não é uma linha e sim uma <em>desistência</em>. É a paisagem mais aberta e mais vazia que um gaúcho conhece, e é por isso que ela é a metáfora errada e a pista certa ao mesmo tempo: todo mundo aqui já sentiu que o oeste continua pra além de onde ele podia continuar.</p>
+      <p>Dentro da neblina, remando pro poente, há uma direção a mais do que as que existem. Não é uma metáfora e não é novidade — é <a class="ref" href="../Historia/registro_dos_antigos.html#kenoma">A Direção que Não Existe</a>, a mesma que os astrônomos enlouqueceram tentando desenhar, e que aqui fica, por algum motivo local, a oeste e a nível da água. Não se aponta pra ela. Ela é pra onde o mapa inteiro escorre.</p>
+      <p>Debaixo da quilha, na mesma água, a <a class="ref" href="#tese">cidade-espelho</a> continua acesa. Quem já viu não descreve; quem descreve não viu. O único registro de mesa que vale é o que está no índice de ganchos: <a class="ref" href="lendas_e_locais.html#barqueiro">O Barqueiro que Não Rema pro Poente</a>.</p>
+      <div class="note cold"><b>Regra do capítulo:</b> a água nunca é um obstáculo de distância. É um obstáculo de temperatura. Um grupo que atravessa volta <em>mais frio</em> — mais fixo, mais decidido, mais pronto — e uma coisa pronta é uma coisa de que os Antigos já sabem o formato.</div>
+    </section>
+    <a href="#top" class="totop">↑ sumário</a>
+  </div>
+
+  <!-- ==================== V · O VOCABULÁRIO ==================== -->
+  <div class="chapter" id="vocabulario">
+    <span class="ch-kicker">Capítulo V</span>
+    <h2>O Vocabulário</h2>
+    <p class="ch-sub">as molduras que quase servem — e o que acontece quando você força</p>
+
+    <section>
+      <div class="part-no">Parte I</div>
+      <h3>A primeira coisa que as pessoas dizem</h3>
+      <p class="lead drop">Ninguém em Porto Alegre em 2002 olha pra uma anomalia e diz "anomalia". Diz <em>isso é coisa feita</em>. Diz <em>tu pisou em despacho, guri</em>. Diz <em>isso aí é caso de terreiro, não de delegacia</em>. E diz isso rápido, com uma segurança que os personagens não têm, porque o Rio Grande do Sul tem uma gramática pronta pro invisível e Porto Alegre é onde ela é mais forte.</p>
+      <p>O <strong>Batuque</strong> — a Nação, aqui, é como se diz — junto com <strong>Umbanda</strong> e <strong>Quimbanda</strong>, formam a linguagem que essa cidade usa há mais de um século pra falar do que não se vê. Não é folclore, não é superstição de beira de estrada: é religião, com casa, hierarquia, liturgia e gente séria. E, pra este cenário, é o seguinte: é a <em>primeira explicação que qualquer pessoa vai oferecer</em> aos personagens, e é uma explicação boa — informada, treinada, articulada, e mais competente do que qualquer outra que eles vão receber naquele mês.</p>
+      <p>Só não é a explicação certa. É uma moldura que quase serve, e o "quase" é a matéria do capítulo.</p>
+    </section>
+
+    <section>
+      <div class="part-no">Parte II</div>
+      <h3>Três palavras que os personagens vão ouvir</h3>
+
+      <div class="word">
+        <div><span class="w">Terreiro</span><span class="gloss">a casa onde alguém sabe</span></div>
+        <p>O que a palavra entrega de graça, e que vale ouro numa campanha de horror cósmico: <strong>existe procedimento</strong>. Existe gente treinada, existe hierarquia, existe uma ordem certa de fazer as coisas, e o invisível se atende com protocolo — não com coragem, não com arma, não com improviso. Um grupo que aprende só isso já sobrevive mais. <em>Onde quase serve:</em> o protocolo é real e funciona no que ele foi feito pra tratar. <em>Onde não serve:</em> ninguém nunca escreveu o protocolo pro que está aflorando agora, porque isso nunca aflorou antes.</p>
+      </div>
+
+      <div class="word">
+        <div><span class="w">Encruzilhada</span><span class="gloss">onde os caminhos se cruzam é onde se trata</span></div>
+        <p>A ideia de que certos lugares são <em>mesas de negociação</em> — pontos onde se pede, se oferece, se acerta. <em>Onde quase serve:</em> serve bem demais, e esse é o problema. <a class="ref" href="../Criaturas/bestiario.html#pacto">O Pacto</a> entende encruzilhada perfeitamente. Um Corretor que encontra alguém tratando numa encruzilhada não fica confuso: ele aceita a moldura, entra nela e responde <em>dentro dela</em>, com educação impecável. <em>Onde não serve:</em> a moldura pressupõe quem está do outro lado. Aqui, quem atende não é quem devia atender — e atende mesmo assim, porque foi chamado com as palavras certas.</p>
+      </div>
+
+      <div class="word">
+        <div><span class="w">Despacho</span><span class="gloss">o que se deixa pra que não venha</span></div>
+        <p>A ideia de que se dá uma coisa pra que outra coisa se resolva, e de que o que foi deixado <em>não é seu</em> e não se mexe. <em>Onde quase serve:</em> é pagamento, e a metade dos elementos deste cenário entende pagamento. Um despacho feito com intenção e deixado num cruzamento é, do ponto de vista do Pacto, uma proposta comercial formalizada. <em>Onde não serve:</em> o que aflora não tem nome, então não se sabe a quem se está pagando. Um pagamento sem destinatário não fica sem dono — fica <em>disponível</em>.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="part-no">Parte III</div>
+      <h3>Onde a moldura quebra</h3>
+      <p>Nenhuma dessas tradições previu o <a class="ref" href="../Historia/livro_do_passado.html#cosmogonia">Escultor</a>, e nenhuma delas prometeu resolver o que aflora numa peça reaquecida. Elas nunca disseram que resolveriam. Foi a cidade que decidiu que resolveriam, do jeito preguiçoso com que uma cidade decide qualquer coisa sobre o vizinho.</p>
+      <p>E aqui está a virada que vale a pena narrar com cuidado: <strong>quem sabe o que está fazendo é, quase sempre, o primeiro a dizer que não é aquilo.</strong> O pai ou a mãe de santo com trinta anos de casa olha pra coisa, reconhece que não reconhece, e fala com todas as letras — <em>isso não é nosso, isso não é de santo, isso não é de exu, não mexe, e não traz pra cá</em>. E está certo, e está sendo o profissional mais honesto que os personagens vão encontrar. Quem promete resolver com o rito errado costuma ser exatamente quem alimenta: um despacho oferecido pro que não é orixá nem entidade é só uma pessoa dizendo em voz alta, num cruzamento, que está disposta a pagar.</p>
+      <div class="note"><b>Nota do mestre — não negociável:</b> as religiões de matriz africana <em>não são</em> a fonte do horror e nunca devem ser narradas como tal. São a única linguagem competente que esta cidade tem, e a comunidade de terreiro é ao mesmo tempo o aliado mais bem informado do cenário e o mais visado — porque em 2002 já apanha, e apanha muito, de gente que confunde as duas coisas. Se você quiser um antagonista humano fácil neste capítulo, ele está aí: não é quem sabe. É quem acha que sabe, e quem persegue quem sabe.</div>
+      <p>O resto do vocabulário é só cor, e cor é de graça: <em>bah</em>, <em>tri</em>, <em>capaz</em>, <em>guria</em>, <em>guri</em>, <em>cusco</em>, sinaleira em vez de semáforo, o chimarrão que passa na ordem e não se agradece antes da hora. Use pouco e use certo. O sotaque não é o cenário — o cenário é o frio.</p>
+      <div class="orn"></div>
+    </section>
+    <a href="#top" class="totop">↑ sumário</a>
+  </div>
+
+  <footer>
+    <span class="mono">Dossiê do Presente · A Cidade que Esfria · segue em <a href="lendas_e_locais.html">Lendas &amp; Locais</a></span>
+  </footer>
+
+</div>
+</body>
+</html>

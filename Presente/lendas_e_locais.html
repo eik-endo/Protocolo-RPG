@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lendas &amp; Locais</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,500;1,300;1,500&family=Spectral:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ground:#0a0c11; --ground-2:#111620; --panel:#141a24;
+    --bone:#e2dfd6; --bone-dim:#a2a099; --bone-faint:#64655f;
+    --ink:#a89b7c; --ink-soft:#c6bb9c;
+    --mist:#8fa4b0; --cold:#8fa0a8;
+    --rule:#242c34; --measure:45rem;
+    --c-vazio:#9aa4ad; --c-eco:#b9adcf; --c-asc:#c37a56;
+    --c-pacto:#dcb75f; --c-obs:#a6bcc7; --c-germe:#9aad80;
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%; scroll-behavior:smooth;}
+  body{margin:0; background:radial-gradient(130% 90% at 50% -6%, #151d26 0%, var(--ground) 55%, #04060a 100%); color:var(--bone); font-family:"Spectral",Georgia,serif; font-weight:300; line-height:1.74; letter-spacing:.005em; -webkit-font-smoothing:antialiased; padding:clamp(1.2rem,4vw,4rem) clamp(1rem,5vw,2rem) 6rem;}
+  .sheet{max-width:var(--measure); margin:0 auto;}
+  .mono{font-family:"IBM Plex Mono",ui-monospace,monospace; font-weight:400; letter-spacing:.2em; text-transform:uppercase;}
+
+  .cover{text-align:center; margin-bottom:2rem; padding-bottom:2rem; border-bottom:1px solid var(--rule);}
+  .cover .doc{font-size:.6rem; color:var(--ink); letter-spacing:.36em; margin-bottom:1.1rem;}
+  .cover h1{font-family:"Cormorant",serif; font-weight:300; font-size:clamp(2.6rem,9vw,5rem); line-height:.98; margin:0; letter-spacing:.02em;}
+  .cover .sub{font-family:"Cormorant",serif; font-style:italic; font-size:clamp(1.05rem,3.2vw,1.4rem); color:var(--ink-soft); margin:1rem 0 0;}
+
+  .legend{margin:0 auto 1.2rem; border:1px solid var(--rule); border-radius:3px; padding:1.1rem 1.3rem; background:linear-gradient(180deg,var(--ground-2),transparent); font-size:.88rem; color:var(--bone-dim);}
+  .legend b{color:var(--bone);} .legend .mist{color:var(--mist);}
+  .legend p{margin:0 0 .5rem;} .legend p:last-child{margin-bottom:0;}
+
+  .toc{margin:0 auto 1.5rem; border:1px solid var(--rule); border-radius:3px; padding:1.2rem 1.3rem;}
+  .toc .h{font-family:"IBM Plex Mono",monospace; font-size:.58rem; letter-spacing:.2em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:.8rem;}
+  .toc a{display:flex; justify-content:space-between; gap:1rem; padding:.4rem 0; border-bottom:1px dashed var(--rule); color:var(--bone); text-decoration:none; font-size:1rem;}
+  .toc a:last-child{border-bottom:none;} .toc a:hover{color:var(--ink-soft);}
+  .toc a .el{font-family:"IBM Plex Mono",monospace; font-size:.56rem; letter-spacing:.12em; text-transform:uppercase; white-space:nowrap;}
+
+  .hook{margin-top:2.8rem; padding-top:1.4rem; border-top:2px solid var(--accent,var(--rule));}
+  .hook .hk{font-family:"IBM Plex Mono",monospace; font-size:.56rem; letter-spacing:.24em; text-transform:uppercase; color:var(--accent,var(--ink)); display:block; margin-bottom:.35rem;}
+  .hook h2{font-family:"Cormorant",serif; font-weight:500; font-size:clamp(1.7rem,5.6vw,2.5rem); line-height:1.04; margin:0 0 .3rem; letter-spacing:.01em;}
+  .hook .meta{font-family:"IBM Plex Mono",monospace; font-size:.55rem; letter-spacing:.08em; color:var(--bone-faint); text-transform:uppercase; margin:0 0 1rem;}
+  .hook .meta b{color:var(--accent); font-weight:400;}
+
+  .hook dl{margin:0; display:grid; grid-template-columns:auto 1fr; gap:.2rem 1rem;}
+  .hook dt{font-family:"IBM Plex Mono",monospace; font-size:.52rem; letter-spacing:.12em; text-transform:uppercase; color:var(--bone-faint); padding-top:.38rem; white-space:nowrap;}
+  .hook dd{margin:0 0 .55rem; font-size:.97rem; color:#d3d0c7;}
+  .hook dd em{color:var(--bone); font-style:italic;}
+  .hook dd.truth{color:#ded9cd;}
+  .hook dd.rule{color:var(--accent); font-family:"Cormorant",serif; font-size:1.14rem; line-height:1.44;}
+  .hook dd.rule strong{color:var(--bone); font-weight:500;}
+  .hook dd.canon{font-size:.8rem; color:var(--bone-faint); font-style:italic;}
+
+  a.ref{color:var(--mist); text-decoration:none; border-bottom:1px dotted var(--mist);}
+  a.ref:hover{color:var(--ink-soft); border-bottom-color:var(--ink-soft);}
+
+  .note{margin-top:1.6rem; border-left:2px solid var(--rule); padding:.5rem 0 .5rem 1rem; font-size:.84rem; color:var(--bone-dim); font-style:italic;}
+  .note b{color:var(--ink); font-style:normal;}
+  .note.cold{border-left-color:var(--mist);} .note.cold b{color:var(--mist);}
+
+  .close{margin-top:3.4rem; padding-top:1.6rem; border-top:2px solid var(--rule);}
+  .close h2{font-family:"Cormorant",serif; font-weight:500; font-size:clamp(1.6rem,5vw,2.2rem); margin:0 0 .8rem;}
+  .close p{margin:0 0 1rem; font-size:.96rem; color:#d3d0c7;}
+
+  .totop{display:block; text-align:center; margin-top:1.2rem; font-family:"IBM Plex Mono",monospace; font-size:.54rem; letter-spacing:.2em; text-transform:uppercase; color:var(--bone-faint); text-decoration:none;}
+  .totop:hover{color:var(--ink);}
+  footer{margin-top:3.6rem; padding-top:1.3rem; border-top:1px solid var(--rule); text-align:center; font-size:.58rem; color:var(--bone-faint);}
+  footer a{color:var(--bone-faint); text-decoration:none; border-bottom:1px dotted var(--rule);}
+  footer a:hover{color:var(--ink);}
+
+  .vazio{--accent:var(--c-vazio);} .asc{--accent:var(--c-asc);} .eco{--accent:var(--c-eco);}
+  .pacto{--accent:var(--c-pacto);} .obs{--accent:var(--c-obs);} .germe{--accent:var(--c-germe);}
+  @media (max-width:520px){ .hook dl{grid-template-columns:1fr; gap:0;} .hook dt{padding-top:.6rem;} }
+</style>
+</head>
+<body>
+<div class="sheet" id="top">
+
+  <div class="cover">
+    <div class="mono doc">Dossiê do Presente · índice de ganchos</div>
+    <h1>Lendas &amp; Locais</h1>
+    <p class="sub">oito coisas que se contam em Porto Alegre — e o que elas são</p>
+  </div>
+
+  <div class="legend">
+    <p><b>Formato.</b> <span class="mist">O achado</span> é a isca — um objeto físico que cabe na mão de um jogador. <span class="mist">O que se acha</span> é a lenda como a cidade conta, e é a única parte que se narra em voz alta. <span class="mist">A verdade</span> é uma linha, e é só do mestre. <span class="mist">A regra de sobrevivência</span> é o que se descobre tarde demais — entregue-a por um NPC assustado, nunca por você.</p>
+    <p><b>Fonte única.</b> Onde um gancho toca cânone já escrito, ele <em>aponta</em> e não repete. Siga o link: a versão que vale é sempre a do <a class="ref" href="../Historia/livro_do_passado.html">Livro do Passado</a>, do <a class="ref" href="../Historia/registro_dos_antigos.html">Registro dos Antigos</a> ou do <a class="ref" href="../Criaturas/bestiario.html">Bestiário</a>.</p>
+    <p><b>Cenário.</b> Os bairros, o ano e o Guaíba estão em <a class="ref" href="a_cidade.html">A Cidade que Esfria</a>.</p>
+  </div>
+
+  <nav class="toc">
+    <div class="h">Os ganchos</div>
+    <a href="#barqueiro"><span>O Barqueiro que Não Rema pro Poente</span><span class="el" style="color:var(--c-vazio)">Guaíba · Vazio</span></a>
+    <a href="#zelador"><span>O Zelador que Contava as Janelas</span><span class="el" style="color:var(--c-obs)">Casario · Observação</span></a>
+    <a href="#guardanapo"><span>O Guardanapo com o Contrato</span><span class="el" style="color:var(--c-pacto)">Baixa · Pacto</span></a>
+    <a href="#enchente"><span>A Enchente que Não Devolveu os Corpos</span><span class="el" style="color:var(--c-germe)">Ilhas · Germe</span></a>
+    <a href="#casa"><span>A Casa que Espera</span><span class="el" style="color:var(--c-vazio)">Alto · Vazio</span></a>
+    <a href="#ferrovelho"><span>O Ferro-Velho que Cresce</span><span class="el" style="color:var(--c-asc)">Aterro · Ascensão</span></a>
+    <a href="#fita"><span>A Fita do Brique</span><span class="el" style="color:var(--c-eco)">Várzea · Eco</span></a>
+    <a href="#foto"><span>A Foto da Multidão</span><span class="el" style="color:var(--c-obs)">Casario · Observação</span></a>
+  </nav>
+
+  <!-- ============ O BARQUEIRO ============ -->
+  <div class="hook vazio" id="barqueiro">
+    <span class="hk">Guaíba · Vazio · a borda fria</span>
+    <h2>O Barqueiro que Não Rema pro Poente</h2>
+    <p class="meta">Elemento <b>Vazio</b> · toca <b>Kénoma</b> · dificuldade: fatal, e sem luta</p>
+    <dl>
+      <dt>O achado</dt><dd>uma carta náutica do Guaíba, dobrada em quatro até rachar na dobra, com a margem oeste <em>rasurada</em> a caneta — não riscada: rasurada, com aquele cuidado de quem corrige um erro de impressão. No verso, a lápis, com letra firme: <em>"não é ali."</em></dd>
+      <dt>O que se acha</dt><dd>que tem um barqueiro velho que faz travessia na neblina por dinheiro nenhum e nunca cobra errado. Que ele leva pra qualquer ponto do Guaíba menos pro poente, e que se você insistir ele para de remar, te olha, e volta — com você dentro, se você tiver sorte.</dd>
+      <dt>A verdade</dt><dd class="truth">ele não é barqueiro e não é velho: é o último que voltou. E o que ele se recusa a remar em direção a é <a class="ref" href="../Historia/registro_dos_antigos.html#kenoma">A Direção que Não Existe</a>, que por algum motivo local fica, aqui, a oeste e a nível da água — e debaixo da quilha a <a class="ref" href="a_cidade.html#tese">cidade-espelho</a> continua acesa, com as janelas que a de cima não tem.</dd>
+      <dt>A regra</dt><dd class="rule">Não remar pro poente na neblina. E se aparecer gente nas janelas submersas — e vai aparecer, e vão parecer contentes de te ver — <strong>não acene de volta.</strong></dd>
+      <dt>Cânone</dt><dd class="canon">A Direção que Não Existe é do <a class="ref" href="../Historia/registro_dos_antigos.html#kenoma">Registro dos Antigos</a>; não a reexplique em mesa. A cidade-espelho é de <a class="ref" href="a_cidade.html#tese">A Cidade que Esfria</a>, cap. I.</dd>
+    </dl>
+    <a href="#top" class="totop">↑ ganchos</a>
+  </div>
+
+  <!-- ============ O ZELADOR ============ -->
+  <div class="hook obs" id="zelador">
+    <span class="hk">O Casario · Observação · o centro à noite</span>
+    <h2>O Zelador que Contava as Janelas</h2>
+    <p class="meta">Elemento <b>Observação</b> · toca <b>O Espectador</b> · dificuldade: lenta, cumulativa</p>
+    <dl>
+      <dt>O achado</dt><dd>um caderno de capa dura, tipo livro de ponto, três anos de datas numa coluna e um número em cada linha. Os números sobem devagar demais pra ser erro e devagar demais pra ser mudança de bairro. Na última página preenchida, o número está circulado duas vezes, e ao lado dele, com a caneta furando o papel: <em>"não bate. contei três vezes."</em></dd>
+      <dt>O que se acha</dt><dd>que o zelador do prédio da esquina contava as janelas acesas do quarteirão toda noite, sempre da mesma sacada, sempre à mesma hora, porque gostava de saber quem tinha chegado em casa. Que foi ficando esquisito. Que sumiu num domingo, sem levar mala, e que a família não deu queixa porque a família não existia.</dd>
+      <dt>A verdade</dt><dd class="truth">o <a class="ref" href="../Criaturas/bestiario.html#obs">Espectador</a> não chegou naquele quarteirão: foi <em>contado</em> até nascer. Três anos de atenção fixa criaram raiz, e desde então há toda noite uma janela acesa a mais do que existem janelas — a que ninguém consegue localizar. É dessa que ele olha, e é dessa que ele passou a olhar pro quarto do zelador.</dd>
+      <dt>A regra</dt><dd class="rule">Não contar as janelas. Não olhar duas vezes pra mesma fachada. E, se você já contou e o número não bateu, <strong>não acenda a sua luz</strong> — a que sobra procura a que responde.</dd>
+    </dl>
+    <a href="#top" class="totop">↑ ganchos</a>
+  </div>
+
+  <!-- ============ O GUARDANAPO ============ -->
+  <div class="hook pacto" id="guardanapo">
+    <span class="hk">A Baixa · Pacto · sexta, três da manhã</span>
+    <h2>O Guardanapo com o Contrato</h2>
+    <p class="meta">Elemento <b>Pacto</b> · toca <b>O Corretor</b> · dificuldade: nenhuma até vencer</p>
+    <dl>
+      <dt>O achado</dt><dd>um guardanapo de bar, engordurado e amassado, com três linhas escritas a caneta esferográfica e duas assinaturas embaixo. As três linhas são generosas e claras. Uma das assinaturas é sua — é a sua letra, é o seu jeito de fechar o "o" — e você não lembra desse bar.</dd>
+      <dt>O que se acha</dt><dd>que na Baixa tem um cara que resolve. Não é agiota, não é advogado, não é polícia; é um cara. Que ele nunca cobra na hora e nunca aparece antes de você precisar. Que todo mundo conhece alguém que conhece, e que ninguém sabe o nome dele — só que ele repete o <em>teu</em>.</dd>
+      <dt>A verdade</dt><dd class="truth">o <a class="ref" href="../Criaturas/bestiario.html#pacto">Corretor</a> não redige contrato: ele <em>aceita</em> o que você já ofereceu em voz alta, e a Baixa é uma cidade inteira de gente oferecendo coisas em voz alta às três da manhã. O guardanapo não é a proposta. É o recibo. E está vencendo.</dd>
+      <dt>A regra</dt><dd class="rule">Não assinar nada num bar. Não apertar a mão de quem sorriu primeiro. E nunca, nunca dizer <strong>"eu topo"</strong> — nem de brincadeira, nem repetindo a fala de outra pessoa, nem pra encerrar a conversa.</dd>
+    </dl>
+    <a href="#top" class="totop">↑ ganchos</a>
+  </div>
+
+  <!-- ============ A ENCHENTE ============ -->
+  <div class="hook germe" id="enchente">
+    <span class="hk">As Ilhas · Germe · o quintal depois que a água baixa</span>
+    <h2>A Enchente que Não Devolveu os Corpos</h2>
+    <p class="meta">Elemento <b>Germe</b> · toca <b>Perpétua</b> · dificuldade: só se vence indo embora</p>
+    <dl>
+      <dt>O achado</dt><dd>um recorte de jornal de 1997 — cheia do Jacuí, cinco desaparecidos de uma mesma família — grampeado num cartaz de "procura-se" que alguém plastificou e pregou num poste da ilha. O recorte está amarelo e quebradiço. O plástico está limpo, sem risco, sem amarelar. Foi feito este ano.</dd>
+      <dt>O que se acha</dt><dd>que uma família inteira sumiu na cheia e que nunca acharam nenhum dos cinco, o que na ilha é estranho — a água devolve, é o que a água faz. Que a mãe até hoje repõe o cartaz. Que ninguém, em cinco anos, viu a mãe.</dd>
+      <dt>A verdade</dt><dd class="truth">eles não foram levados. Foram <em>plantados</em>: o quintal é um canteiro de <a class="ref" href="../Historia/registro_dos_antigos.html#perpetua">Perpétua</a>, no registro da Lei da Semeadura, e o que cresce ali cresce sozinho desde então. A mãe floresceu primeiro e continua ali — o cartaz novo é o pedido dela ainda sendo feito, do único jeito que sobrou.</dd>
+      <dt>A regra</dt><dd class="rule">Não comer o que cresce ali, nem a fruta, nem por educação. Não dormir na ilha. E se as pernas ficarem pesadas na volta — e vão ficar — <strong>não sentar pra descansar.</strong></dd>
+      <dt>Cânone</dt><dd class="canon">A lenda do jardim de Perpétua está inteira no <a class="ref" href="../Historia/registro_dos_antigos.html#perpetua">Registro dos Antigos</a> e o mundo dela no <a class="ref" href="../Historia/livro_do_passado.html#w-vresh">Livro do Passado</a>. Isto aqui é um quintal, não um planeta — não a reconte, só deixe rimar.</dd>
+    </dl>
+    <a href="#top" class="totop">↑ ganchos</a>
+  </div>
+
+  <!-- ============ A CASA ============ -->
+  <div class="hook vazio" id="casa">
+    <span class="hk">O Alto · Vazio · o casarão que não vende</span>
+    <h2>A Casa que Espera</h2>
+    <p class="meta">Elemento <b>Vazio</b> · toca <b>A Viúva</b> e <b>O Oco</b> · dificuldade: alta se você ficar</p>
+    <dl>
+      <dt>O achado</dt><dd>um inventário datilografado de 1994, três vias, carbono. Bens de um espólio, listados em ordem, com valor ao lado. Entre <em>"cristaleira, jacarandá"</em> e <em>"jogo de jantar, 12 peças"</em>, na mesma lista, na mesma fonte, na mesma coluna e sem valor atribuído, o nome completo de uma pessoa.</dd>
+      <dt>O que se acha</dt><dd>que aquele casarão está à venda há oito anos e nunca vendeu, mesmo com o preço caindo todo ano. Que quem passa a noite lá dorme <em>muito bem</em>, melhor do que dorme em casa. E que uma corretora dormiu lá uma vez, acordou às cinco da manhã e pediu demissão por telefone, sem explicar, ainda de dentro da casa.</dd>
+      <dt>A verdade</dt><dd class="truth">a <a class="ref" href="../Criaturas/bestiario.html#vazio">Viúva</a> não mora na casa: <em>é</em> a casa. Há ali um lugar com o formato exato de uma pessoa, vago desde 94 e mantido intacto, e a casa passa cada visita testando o encaixe. Ela não te quer morto. Te quer sendo quem faltou — e vai te aparando até caber.</dd>
+      <dt>A regra</dt><dd class="rule">Não passar a noite. Não sentar na poltrona que está virada pra porta. E <strong>não ocupar o lugar do ausente</strong> — nem pra tirar uma foto, nem pra mostrar como ficaria, nem por dois segundos.</dd>
+    </dl>
+    <a href="#top" class="totop">↑ ganchos</a>
+  </div>
+
+  <!-- ============ O FERRO-VELHO ============ -->
+  <div class="hook asc" id="ferrovelho">
+    <span class="hk">O Aterro · Ascensão · o pátio que compra tudo</span>
+    <h2>O Ferro-Velho que Cresce</h2>
+    <p class="meta">Elemento <b>Ascensão</b> · toca <b>O Coletor</b> · dificuldade: entrar é fácil</p>
+    <dl>
+      <dt>O achado</dt><dd>um livro-caixa de pátio de sucata, duas colunas, entrada e saída, letra de dono. As entradas continuam até a última página. As saídas param em março e nunca mais recomeçam. E o caderno não fecha: a soma dá um valor diferente cada vez que alguém confere, sempre pra mais, e nunca o mesmo erro duas vezes.</dd>
+      <dt>O que se acha</dt><dd>que no pátio do seu Ari tem tudo que a cidade já perdeu. Que se sumiu alguma coisa tua, é ali — bicicleta, aliança, o arquivo do escritório que fechou, a porta da tua casa antiga. E que tem gente que entra pra procurar e sai no dia seguinte com a impressão sincera de ter passado uma hora lá dentro.</dd>
+      <dt>A verdade</dt><dd class="truth">o <a class="ref" href="../Criaturas/bestiario.html#asc">Coletor</a> saiu do quarto e tomou o quarteirão. O pátio virou um <em>Ápeiron</em> — um sem-borda: maior por dentro do que por fora, com corredores que são mais longos na volta do que na ida. Ele guarda tudo, guarda bem, e a única coisa que não sabe fazer é devolver.</dd>
+      <dt>A regra</dt><dd class="rule">Não entrar pra procurar o que você perdeu — é exatamente esse o convite. E se entrar, <strong>não sair carregando</strong> nada: nem achado, nem comprado, nem o que era seu de origem.</dd>
+    </dl>
+    <a href="#top" class="totop">↑ ganchos</a>
+  </div>
+
+  <!-- ============ A FITA ============ -->
+  <div class="hook eco" id="fita">
+    <span class="hk">A Várzea · Eco · domingo de manhã no brique</span>
+    <h2>A Fita do Brique</h2>
+    <p class="meta">Elemento <b>Eco</b> · toca <b>Antífona</b> · dificuldade: você vence não respondendo</p>
+    <dl>
+      <dt>O achado</dt><dd>uma fita cassete sem capa, com a etiqueta escrita a caneta: <em>LADO A</em>. Só isso. Nenhum nome, nenhuma data, nenhum lado B escrito. Está numa caixa de papelão com outras trinta, a dois reais. Você já comprou essa fita antes — não é a mesma caixa, não é a mesma banca, e é a mesma fita.</dd>
+      <dt>O que se acha</dt><dd>que tem uma fita que roda no brique de domingo em domingo, que sempre volta pra alguma banca por conta própria, e que quem escuta reconhece uma voz. Cada pessoa reconhece uma voz diferente, e cada uma acha que as outras estão exagerando.</dd>
+      <dt>A verdade</dt><dd class="truth">é um fio de <a class="ref" href="../Historia/registro_dos_antigos.html#antifona">Antífona</a> caído numa cidade que repete um domingo há vinte anos. A fita não guarda uma voz: a fita <em>pede resposta</em> — é chamada-e-resposta, é o que ela é — e cada resposta afina a cópia mais um pouco. A quarta vez já usa o seu nome.</dd>
+      <dt>A regra</dt><dd class="rule">Não tocar até o fim. Não rebobinar pra conferir se ouviu direito. E <strong>não responder à voz que você reconhecer</strong> — nem em voz alta, nem chorando, nem com o nome dela.</dd>
+      <dt>Cânone</dt><dd class="canon">Como a Antífona funciona — por que cada eco jura ser o original, por que só se vence não alimentando — está no <a class="ref" href="../Historia/registro_dos_antigos.html#antifona">Registro dos Antigos</a>. A versão doméstica e coletiva dela é a <a class="ref" href="../Criaturas/bestiario.html#eco">Ladainha</a>.</dd>
+    </dl>
+    <a href="#top" class="totop">↑ ganchos</a>
+  </div>
+
+  <!-- ============ A FOTO ============ -->
+  <div class="hook obs" id="foto">
+    <span class="hk">O Casario · Observação · gancho secundário</span>
+    <h2>A Foto da Multidão</h2>
+    <p class="meta">Elemento <b>Observação</b> · toca <b>A Assembleia</b> · dificuldade: cresce com a atenção</p>
+    <dl>
+      <dt>O achado</dt><dd>uma foto 10×15, preto e branco, de uma multidão numa praça. Sem data, sem legenda, sem carimbo de laboratório. No verso, a lápis, uma contagem: <em>47</em> — riscada e reescrita quatro vezes, sempre pra mais, e a última tentativa com a letra bem pior que a primeira.</dd>
+      <dt>O que se acha</dt><dd>que é registro de um comício antigo na Alfândega. Que tem gente que se achou nela — gente nascida depois. E que ninguém devia estar naquela praça naquele dia, porque o dia que a foto mostra, pela sombra e pelas roupas, não bate com nenhum comício que houve.</dd>
+      <dt>A verdade</dt><dd class="truth">é uma <a class="ref" href="../Criaturas/bestiario.html#obs">Assembleia</a> ainda pequena — um <em>argivo</em> de bolso, um filhote do olhar que cabe num envelope. A cada vez que alguém olha, mais um rosto na foto está virado pra fora. A conta no verso não é do fotógrafo contando quem apareceu: é de quem olhou antes, contando quantos já estavam virados.</dd>
+      <dt>A regra</dt><dd class="rule">Não olhar duas vezes. Não mostrar pra mais ninguém — cada olhar novo alimenta. E <strong>não se procurar na foto</strong>: se você se achar, você achou.</dd>
+    </dl>
+    <a href="#top" class="totop">↑ ganchos</a>
+  </div>
+
+  <!-- ============ FECHAMENTO ============ -->
+  <div class="close">
+    <h2>Como usar este índice</h2>
+    <p>Cada gancho é um objeto, não uma aventura. Ponha o achado na mesa — dentro de uma caixa de sapato do brique, no bolso de um casaco comprado usado, grampeado num processo, embrulhando um sanduíche — e não explique nada. A lenda os personagens vão ouvir de terceiros, em três versões que não batem entre si, e é isso que você narra em voz alta. A verdade fica com você e não é dita nunca; ela só aparece como consequência.</p>
+    <p>A regra de sobrevivência tem uma única forma correta de ser entregue: por um NPC que tem medo e que não quer falar sobre isso. Nunca por você, nunca completa, e de preferência tarde — a regra que chega antes da tentação é só um aviso; a regra que chega depois é horror.</p>
+    <div class="note cold"><b>Fonte única:</b> nenhum destes ganchos reescreve cânone. Quando um deles toca uma lenda que já existe — a Direção que Não Existe, o jardim de Perpétua, a Antífona —, ele referencia pelo nome e aponta pro documento onde ela está escrita por extenso. Se você precisar de mais detalhe do que a linha oferece, o detalhe está lá, e é o único que vale.</div>
+    <a href="#top" class="totop">↑ ganchos</a>
+  </div>
+
+  <footer>
+    <span class="mono">Dossiê do Presente · Lendas &amp; Locais · cenário em <a href="a_cidade.html">A Cidade que Esfria</a></span>
+  </footer>
+
+</div>
+</body>
+</html>

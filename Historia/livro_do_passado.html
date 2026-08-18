@@ -49,6 +49,8 @@
   em{color:var(--bone); font-style:italic;}
   strong{color:var(--ink); font-weight:400;}
   .drop::first-letter{font-family:"Cormorant",serif; font-weight:500; float:left; font-size:3.3rem; line-height:.8; padding:.35rem .5rem 0 0; color:var(--ink);}
+  a.ref{color:var(--ink-soft); text-decoration:none; border-bottom:1px dotted currentColor;}
+  a.ref:hover{color:var(--bone);}
 
   blockquote{margin:2rem 0; padding:.2rem 0 .2rem 1.5rem; border-left:2px solid var(--ink); font-family:"Cormorant",serif; font-style:italic; font-weight:300; font-size:clamp(1.25rem,4vw,1.65rem); line-height:1.42; color:var(--ink-soft);}
   blockquote.cold{border-color:var(--debt); color:var(--debt);}
@@ -278,45 +280,45 @@
     <p style="margin-top:1.2rem;">Os mundos descartados <strong>ainda existem</strong> — não foram apagados, foram deixados. Continuam rodando no frio, terminados ou apodrecendo, alcançáveis por quem souber. Cada um é a <em>assinatura de um Ápice</em> levada ao extremo de um planeta inteiro. O passado do mundo é geograficamente visitável.</p>
 
     <section>
-      <div class="world">
+      <div class="world" id="w-proibido">
         <div class="wn"><span class="rn">I</span><span class="name">O Mundo Proibido</span><span class="ap">"A Obra-Prima"</span><span class="apex">Escultor</span></div>
         <p>O único que o Escultor considerou <strong>perfeito</strong> — e o único que lacrou, proibindo até os Ápices de tocar. Não por decreto falado: quem se aproxima daquela direção simplesmente descobre que está indo pra outro lugar, como quem esquece por que entrou num cômodo. Só o Loki já tentou de propósito, e é o único que não conta o que viu.</p>
         <p>O que se repete: foi o único mundo que ele julgou <em>pronto</em>. Terminado. E desde então nunca mais voltou a olhá-lo. Duas leituras, na mesma letra: não volta por <strong>orgulho</strong> (é perfeito, mexer seria arriscar) — ou por <strong>medo</strong> (se "pronto" e "morto" são a mesma palavra, lá dentro está a prova de que ele matou a coisa mais bonita que fez achando que a salvava). Ninguém pode dizer qual. Fica só a imagem: um mundo perfeito, lacrado, do qual o próprio criador foge — e nem ele sabe se é troféu ou túmulo.</p>
       </div>
 
-      <div class="world">
+      <div class="world" id="w-corpo-unico">
         <div class="wn"><span class="rn">II</span><span class="name">O Corpo Único</span><span class="ap">"O Mundo que Quis Ser Melhor"</span><span class="apex">Amálgama</span></div>
         <p>Um mundo inteiro de gente que só queria ser mais. A Amálgama deu a cada um o seu desejo. Hoje é um único organismo do tamanho de um planeta, ainda pedindo mais, e cada boca dele foi uma pessoa. Não está morto — está acordado, e sozinho, e faminto; as cidades nas dobras ainda acendem as luzes por hábito. É o único descartado que ainda <em>cresce</em> — um dia vai bater na borda de outro.</p>
       </div>
 
-      <div class="world">
+      <div class="world" id="w-vresh">
         <div class="wn"><span class="rn">III</span><span class="name">Vresh, o Jardim</span><span class="ap">"Onde Ninguém Teve Medo"</span><span class="apex">Perpétua</span></div>
         <p>A Perpétua o tomou tão devagar que a civilização inteira morreu de velhice sem jamais perceber que estava sendo tomada. Hoje é um planeta-jardim de silêncio doce, onde cada flor foi alguém e os habitantes são a paisagem. Continua florescendo. É o mundo mais acolhedor de todos — quem chega não sente perigo nenhum, o que é exatamente o problema.</p>
       </div>
 
-      <div class="world">
+      <div class="world" id="w-eco-mundo">
         <div class="wn"><span class="rn">IV</span><span class="name">O Eco-Mundo</span><span class="ap">"A Cidade que Já Aconteceu"</span><span class="apex">Antífona</span></div>
         <p>Um mundo que a Antífona saturou: tudo ali já aconteceu antes e vai acontecer de novo, idêntico. As mesmas pessoas nascem, dizem as mesmas frases, morrem no mesmo dia, num loop que ninguém lá dentro percebe. Um forasteiro que entre fica <strong>preso no roteiro</strong> — passa a dizer falas que não escolheu. A prova de que "continuar" pode ser pior que acabar.</p>
       </div>
 
-      <div class="world">
+      <div class="world" id="w-aberto">
         <div class="wn"><span class="rn">V</span><span class="name">O Mundo Aberto</span><span class="ap">"A Cidade sem Portas"</span><span class="apex">Argos</span></div>
         <p>O mundo que a Observação tomou: nunca houve parede que não fosse translúcida, pensamento que não fosse ouvido, nada que se guardasse só pra si. Depois de eras sendo vistos por completo, os habitantes <em>esqueceram como ter um dentro</em> — cada um é apenas o que os outros veem. É o mundo mais honesto que já existiu, e o mais vazio de pessoas. Quem fica tempo demais começa a se sentir transparente — e a gostar disso.</p>
       </div>
 
-      <div class="world">
+      <div class="world" id="w-empenhado">
         <div class="wn"><span class="rn">VI</span><span class="name">O Mundo Empenhado</span><span class="ap">"A Feira que Não Fecha"</span><span class="apex">Synthékos</span></div>
         <p>O mundo que o Pacto tomou: tudo foi trocado, e trocado de novo, até ninguém saber o que originalmente era seu — nomes, sombras, anos por viver, o direito de dizer "não". Funciona inteiramente por dívida, e no centro há um saldo que nunca fecha, com juros que ninguém contratou. Fácil entrar, impossível sair sem pagar — e o preço da saída é sempre a única coisa que você jurou nunca dar. Dizem que até o Synthékos deve alguma coisa lá.</p>
       </div>
 
-      <div class="world">
+      <div class="world" id="w-rasurado">
         <div class="wn"><span class="rn">VII</span><span class="name">O Mundo Rasurado</span><span class="ap">"O Rascunho"</span><span class="apex">de ninguém</span></div>
         <p>Um mundo que o Escultor começou, odiou, e largou no meio de uma frase. Está literalmente inacabado: continentes sem terminar, céus sem cor definida, gente com metade de um destino, física que só vale às vezes. Não apodrece nem cresce — só espera, incompleto. É o único mundo onde as regras são negociáveis, e um espelho desconfortável: é o que acontece quando o martelo simplesmente <em>para</em> — nem pronto, nem morto. Um terceiro estado que não devia existir.</p>
       </div>
 
-      <div class="world">
+      <div class="world" id="w-silencio">
         <div class="wn"><span class="rn">VIII</span><span class="name">O Primeiro Silêncio</span><span class="ap">não é apelido: é o nome</span><span class="apex">Kénoma</span></div>
-        <p>O maior descarte de todos: o cosmos anterior inteiro. Não foi lacrado nem largado — foi <strong>subtraído</strong>, ladeira abaixo até o zero, sem violência. É o único destino que você <em>não pode</em> alcançar: não porque seja longe ou guardado, mas porque não há para onde ir. A direção dele é a mesma que o astrônomo tentou desenhar e não conseguiu apontar: para baixo de tudo, para onde o mapa inteiro escorre. Chegar lá não é viajar; é parar de resistir à ladeira.</p>
+        <p>O maior descarte de todos: o cosmos anterior inteiro. Não foi lacrado nem largado — foi <strong>subtraído</strong>, ladeira abaixo até o zero, sem violência. É o único destino que você <em>não pode</em> alcançar: não porque seja longe ou guardado, mas porque não há para onde ir. A direção dele é <a class="ref" href="registro_dos_antigos.html#kenoma">A Direção que Não Existe</a>, a que o astrônomo tentou desenhar e não conseguiu apontar: para baixo de tudo, para onde o mapa inteiro escorre. Chegar lá não é viajar; é parar de resistir à ladeira.</p>
         <p>E fica a única coisa que ninguém nunca resolve: <em>o que ele foi</em>. Metade jura subtração pura — o zero, o avô do Kénoma, o descanso que não se tira de ninguém. A outra metade jura o oposto: que ele <em>cresceu</em> até deixar de caber em si, floresceu para além de ser cosmos, e o que parece silêncio é tudo continuando de um jeito que não se reconhece mais como vida. Vazio ou Jardim. A única testemunha, o Argos, desvia o olhar — e o Argos não desvia o olhar de nada.</p>
       </div>
     </section>
