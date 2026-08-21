@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PROTOCOLO — Livro de Campanha (rascunho piloto: O Casario)</title>
+<style>
+:root{
+  --bg:#141210; --bg2:#1b1815; --panel:#1f1c18; --ink:#e9e2d3; --ink-dim:#a89e8c; --ink-faint:#71685a;
+  --rule:#3a352c; --rule-lite:#2a261f;
+  --gold:#c9a84c;
+  /* cores por elemento/bairro — código de navegação, nada além disso */
+  --c-obs:#c9a13a;   /* Casario · Observação — âmbar/olho */
+  --c-pac:#8a2f2f;   /* A Baixa · Pacto — vinho */
+  --c-ger:#3f7a4a;   /* As Ilhas · Germe — verde */
+  --c-vaz:#5a86a8;   /* O Alto · Vazio — gelo */
+  --c-asc:#b5602a;   /* O Aterro · Ascensão — ferrugem */
+  --c-eco:#7a5aa8;   /* A Várzea · Eco — violeta */
+  --warn:#b5432f;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:"Georgia","Times New Roman",serif; line-height:1.5; font-size:16px;}
+::selection{background:var(--gold); color:#1a1710;}
+
+/* ---------- layout ---------- */
+#shell{display:flex; min-height:100vh;}
+#nav{
+  position:sticky; top:0; height:100vh; width:300px; flex:0 0 300px; overflow-y:auto;
+  background:var(--panel); border-right:2px solid var(--rule); padding:0 0 3rem;
+  font-family:"Courier New",monospace;
+}
+#main{flex:1 1 auto; min-width:0; padding:2.2rem clamp(1rem,4vw,4rem) 8rem;}
+
+#nav .navhead{padding:1.1rem 1rem .8rem; border-bottom:2px solid var(--rule); position:sticky; top:0; background:var(--panel); z-index:5;}
+#nav .navhead b{display:block; font-size:.95rem; letter-spacing:.06em; color:var(--gold);}
+#nav .navhead span{display:block; font-size:.66rem; color:var(--ink-faint); margin-top:.2rem;}
+#nav input#navfilter{width:100%; margin-top:.6rem; background:var(--bg); border:1px solid var(--rule); color:var(--ink); padding:.35rem .5rem; font-family:inherit; font-size:.72rem;}
+
+#nav ul{list-style:none; margin:0; padding:0;}
+#nav .part{border-bottom:1px solid var(--rule-lite);}
+#nav .part > a{display:block; padding:.55rem 1rem; font-size:.74rem; letter-spacing:.05em; color:var(--ink); text-decoration:none; font-weight:bold;}
+#nav .part > a:hover{background:var(--rule-lite);}
+#nav .sub{padding-left:0; background:#17140f;}
+#nav .sub a{display:block; padding:.32rem 1rem .32rem 1.6rem; font-size:.68rem; color:var(--ink-dim); text-decoration:none; border-left:3px solid transparent;}
+#nav .sub a:hover{color:var(--ink); background:var(--rule-lite);}
+#nav .sub .bairro-link{font-weight:bold; padding-top:.5rem;}
+#nav .sub2 a{padding-left:2.3rem; font-size:.64rem;}
+#nav .sub2 a.loc{border-left-color:var(--c-obs);}
+#nav .tag-pend{color:var(--ink-faint); font-style:italic;}
+
+/* borda de cor por bairro nos links de local, aplicada via classe */
+.b-obs{border-left-color:var(--c-obs) !important;}
+.b-pac{border-left-color:var(--c-pac) !important;}
+.b-ger{border-left-color:var(--c-ger) !important;}
+.b-vaz{border-left-color:var(--c-vaz) !important;}
+.b-asc{border-left-color:var(--c-asc) !important;}
+.b-eco{border-left-color:var(--c-eco) !important;}
+
+/* ---------- tipografia geral ---------- */
+h1,h2,h3,h4{font-family:"Courier New",monospace; font-weight:bold; color:var(--gold); letter-spacing:.02em;}
+h1{font-size:1.9rem; border-bottom:3px double var(--rule); padding-bottom:.6rem; margin:0 0 1.2rem;}
+h2{font-size:1.35rem; margin:3rem 0 1rem; padding-top:1.4rem; border-top:2px solid var(--rule);}
+h3{font-size:1.05rem; margin:2rem 0 .8rem; color:var(--ink);}
+h4{font-size:.9rem; margin:1.4rem 0 .5rem; color:var(--ink-dim); text-transform:uppercase; letter-spacing:.08em;}
+p{margin:0 0 .9rem;}
+a{color:var(--gold);}
+a.anchor-target{scroll-margin-top:1rem;}
+.kicker{font-family:"Courier New",monospace; font-size:.68rem; letter-spacing:.2em; text-transform:uppercase; color:var(--ink-faint);}
+hr{border:none; border-top:1px dashed var(--rule); margin:2rem 0;}
+.totop{display:inline-block; font-family:"Courier New",monospace; font-size:.62rem; letter-spacing:.15em; color:var(--ink-faint); text-decoration:none; margin-top:.6rem;}
+
+/* ---------- boxed text ---------- */
+.boxed{
+  background:#0f0e0c; border-left:4px solid var(--gold); padding:1rem 1.2rem; margin:1rem 0 1.3rem;
+  font-family:"Georgia",serif; font-style:italic; color:#d8cfc0; font-size:.98rem;
+}
+.boxed::before{content:"LEIA EM VOZ ALTA — sem nomes cósmicos"; display:block; font-family:"Courier New",monospace; font-style:normal; font-size:.58rem; letter-spacing:.15em; color:var(--gold); margin-bottom:.5rem; text-transform:uppercase;}
+
+/* ---------- fichas de local ---------- */
+.local{border:1px solid var(--rule); background:var(--panel); padding:1.3rem 1.4rem; margin:2rem 0; scroll-margin-top:1rem;}
+.local.b-obs{border-top:4px solid var(--c-obs);}
+.local-head{display:flex; align-items:baseline; gap:.6rem; flex-wrap:wrap; margin-bottom:.2rem;}
+.local-code{font-family:"Courier New",monospace; font-weight:bold; color:var(--c-obs); font-size:1.1rem;}
+.local-name{font-family:"Courier New",monospace; font-weight:bold; font-size:1.1rem; text-transform:uppercase; color:var(--ink);}
+.local dl{margin:0;}
+.local dt{font-family:"Courier New",monospace; font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; color:var(--c-obs); margin-top:1rem;}
+.local dd{margin:.25rem 0 0; color:var(--ink);}
+.local dd ul{margin:.3rem 0 0; padding-left:1.2rem;}
+.local dd li{margin-bottom:.4rem;}
+.escala{display:grid; grid-template-columns:1fr; gap:.35rem; margin-top:.3rem;}
+.escala .fase{padding:.35rem .6rem; border-left:3px solid var(--rule);}
+.escala .fase b{color:var(--gold); font-family:"Courier New",monospace; font-size:.66rem; letter-spacing:.1em; text-transform:uppercase; display:block; margin-bottom:.15rem;}
+
+/* ---------- NPC cards ---------- */
+.npc{border:1px solid var(--rule); border-left:4px solid var(--ink-faint); background:#17150f; padding:1rem 1.2rem; margin:1.4rem 0; scroll-margin-top:1rem;}
+.npc.b-obs{border-left-color:var(--c-obs);}
+.npc h4.npc-name{font-family:"Courier New",monospace; color:var(--ink); font-size:1rem; text-transform:uppercase; margin:0 0 .6rem;}
+.npc dt{font-family:"Courier New",monospace; font-size:.62rem; letter-spacing:.1em; text-transform:uppercase; color:var(--c-obs); margin-top:.6rem;}
+.npc dd{margin:.15rem 0 0;}
+.npc .segredo{color:#d9b98a;}
+
+/* ---------- tabelas ---------- */
+table{width:100%; border-collapse:collapse; margin:1rem 0 1.5rem; font-size:.9rem;}
+table caption{text-align:left; font-family:"Courier New",monospace; font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:.4rem; caption-side:top;}
+th,td{border:1px solid var(--rule); padding:.45rem .6rem; text-align:left; vertical-align:top;}
+th{background:var(--rule-lite); font-family:"Courier New",monospace; font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; color:var(--gold);}
+tr:nth-child(even) td{background:#191510;}
+
+/* ---------- caixas utilitárias ---------- */
+.nota-mestre{border:1px dashed var(--c-obs); background:#1c1810; padding:.9rem 1.1rem; margin:1.2rem 0; font-size:.9rem;}
+.nota-mestre .lbl{font-family:"Courier New",monospace; font-size:.62rem; letter-spacing:.15em; text-transform:uppercase; color:var(--c-obs); display:block; margin-bottom:.4rem;}
+.pendente{border:1px dashed var(--warn); background:#1d1512; padding:1rem 1.2rem; margin:1.2rem 0; color:var(--ink-dim); font-size:.92rem;}
+.pendente .lbl{font-family:"Courier New",monospace; font-size:.62rem; letter-spacing:.15em; text-transform:uppercase; color:var(--warn); display:block; margin-bottom:.4rem;}
+.regra-ouro{border:2px solid var(--gold); padding:1rem 1.2rem; margin:1.2rem 0; background:#1c1710;}
+.regra-ouro b{color:var(--gold);}
+.tag{display:inline-block; font-family:"Courier New",monospace; font-size:.6rem; letter-spacing:.08em; text-transform:uppercase; padding:.1rem .4rem; border:1px solid var(--rule); color:var(--ink-dim); margin-right:.3rem;}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:1.4rem;}
+@media (max-width:800px){.grid2{grid-template-columns:1fr;}}
+
+/* ---------- índice mestre ---------- */
+.idx-list{columns:2; column-gap:2.5rem;}
+.idx-list a{display:block; padding:.15rem 0; font-family:"Courier New",monospace; font-size:.78rem; text-decoration:none; color:var(--ink-dim); border-bottom:1px dashed var(--rule-lite);}
+.idx-list a:hover{color:var(--gold);}
+@media (max-width:700px){.idx-list{columns:1;}}
+
+/* ---------- responsive: nav colapsável em telas estreitas ---------- */
+@media (max-width:960px){
+  #shell{flex-direction:column;}
+  #nav{position:relative; width:100%; height:auto; max-height:60vh; flex:none;}
+  #main{padding:1.4rem 1rem 6rem;}
+}
+
+/* impressão */
+@media print{
+  #nav{display:none;}
+  #main{padding:0;}
+  body{background:#fff; color:#000;}
+}
+</style>
+</head>
+<body>
+<div id="shell">
+
+<!-- ============================================================ NAV ============================================================ -->
+<nav id="nav">
+  <div class="navhead">
+    <b>PROTOCOLO</b>
+    <span>Livro de Campanha · rascunho de validação</span>
+    <input id="navfilter" type="text" placeholder="Ctrl+F / buscar aqui…" oninput="filterNav(this.value)">
+  </div>
+  <ul>
+    <li class="part"><a href="#topo">Capa &amp; estado do livro</a></li>
+    <li class="part"><a href="#indice-mestre">Índice mestre (Ctrl+F)</a></li>
+
+    <li class="part"><a href="#parte1">PARTE I · O Mestre</a>
+      <ul class="sub">
+        <li><a href="#p1-1">1. A regra de ouro</a></li>
+        <li><a href="#p1-2">2. "Você está sendo terminado"</a></li>
+        <li><a href="#p1-3">3. A régua da Forja</a></li>
+        <li><a href="#p1-4">4. O Relógio do Acabamento</a></li>
+        <li><a href="#p1-5">5. O martelo</a></li>
+        <li><a href="#p1-6">6. A camada de segredo</a></li>
+        <li><a href="#p1-7">7. A Atenção</a></li>
+        <li><a href="#p1-8">8. O terreiro é competente</a></li>
+        <li><a href="#p1-9">9. Como usar a teia</a></li>
+        <li><a href="#p1-10">10. O ritmo de revelação</a></li>
+      </ul>
+    </li>
+
+    <li class="part"><a href="#parte2">PARTE II · A Verdade (só do mestre)</a>
+      <ul class="sub">
+        <li><a href="#p2-1">Em uma frase</a></li>
+        <li><a href="#p2-2">A Forja</a></li>
+        <li><a href="#p2-3">O Escultor</a></li>
+        <li><a href="#p2-4">Os seis Ápices</a></li>
+        <li><a href="#p2-5">O Acordo do Começo</a></li>
+        <li><a href="#p2-6">O Sem-Nome</a></li>
+        <li><a href="#p2-7">Onde achar o resto</a></li>
+      </ul>
+    </li>
+
+    <li class="part"><a href="#parte3">PARTE III · A Cidade</a>
+      <ul class="sub">
+        <li><a href="#p3-overview">Visão geral / os 6 bairros</a></li>
+        <li><a href="#p3-nos">Os 4 nós de gravidade</a></li>
+
+        <li class="bairro-link b-obs"><a href="#bairro-casario">▸ O CASARIO · Observação <span class="tag">completo</span></a></li>
+        <ul class="sub2">
+          <li><a class="loc b-obs" href="#c1">C1 · Mercado Público</a></li>
+          <li><a class="loc b-obs" href="#c2">C2 · Pensão Boa Vista</a></li>
+          <li><a class="loc b-obs" href="#c3">C3 · Locadora Fita-Mágica</a></li>
+          <li><a class="loc b-obs" href="#c4">C4 · O Orelhão da Praça</a></li>
+          <li><a class="loc b-obs" href="#c5">C5 · Os Cortiços do Beco</a></li>
+          <li><a class="loc b-obs" href="#c6">C6 · O Arquivo Municipal</a></li>
+          <li><a class="loc b-obs" href="#c7">C7 · Praça e Igreja das Almas</a></li>
+          <li><a class="loc b-obs" href="#c8">C8 · O Cais Velho</a></li>
+          <li><a class="loc b-obs" href="#c9">C9 · O Estúdio do Retratista</a></li>
+          <li><a class="loc b-obs" href="#c10">C10 · O Cinema Íris</a></li>
+          <li><a class="loc b-obs" href="#c11">C11 · A Sobreloja da Vigília</a></li>
+          <li><a class="loc b-obs" href="#c12">C12 · O Sobrado do Zelador</a></li>
+          <li><a class="loc b-obs" href="#c13">C13 · O Vão Entre os Prédios</a></li>
+          <li><a href="#casario-npcs">NPCs-chave (5)</a></li>
+          <li><a href="#casario-ligacoes">Ligações internas &amp; externas</a></li>
+          <li><a href="#casario-distribuicao">Distribuição</a></li>
+          <li><a href="#casario-loot">Tabela de loot (d20)</a></li>
+          <li><a href="#casario-encontros">Tabela de encontros</a></li>
+        </ul>
+
+        <li class="bairro-link b-pac"><a href="#bairro-baixa">▸ A BAIXA · Pacto <span class="tag tag-pend">pendente</span></a></li>
+        <li class="bairro-link b-ger"><a href="#bairro-ilhas">▸ AS ILHAS · Germe <span class="tag tag-pend">pendente</span></a></li>
+        <li class="bairro-link b-vaz"><a href="#bairro-alto">▸ O ALTO · Vazio <span class="tag tag-pend">pendente</span></a></li>
+        <li class="bairro-link b-asc"><a href="#bairro-aterro">▸ O ATERRO · Ascensão <span class="tag tag-pend">pendente</span></a></li>
+        <li class="bairro-link b-eco"><a href="#bairro-varzea">▸ A VÁRZEA · Eco <span class="tag tag-pend">pendente</span></a></li>
+      </ul>
+    </li>
+
+    <li class="part"><a href="#parte4">PARTE IV · A Teia &amp; o Relógio</a>
+      <ul class="sub">
+        <li><a href="#p4-1">Os dois cubos</a></li>
+        <li><a href="#p4-2">Os fios</a></li>
+        <li><a href="#p4-3">Onde moram os Chefes</a></li>
+        <li><a href="#p4-4">O fundo de cada fio</a></li>
+        <li><a href="#p4-5">Engrenagens do Relógio</a></li>
+        <li><a href="#p4-6">A lenda do lago (o Barqueiro)</a></li>
+        <li><a href="#p4-7">Os 8 ganchos</a></li>
+      </ul>
+    </li>
+
+    <li class="part"><a href="#parte5">PARTE V · A Abertura ("O Velório")</a>
+      <ul class="sub">
+        <li><a href="#p5-1">O Jonas</a></li>
+        <li><a href="#p5-2">O arquivo</a></li>
+        <li><a href="#p5-3">A ligação com os jogadores</a></li>
+        <li><a href="#p5-4">O Lúcio</a></li>
+        <li><a href="#p5-5">A instituição + o formulário</a></li>
+        <li><a href="#p5-6">Os 6 beats de mesa</a></li>
+      </ul>
+    </li>
+
+    <li class="part"><a href="#parte6">PARTE VI · Bestiário de Mesa <span class="tag tag-pend">amostra</span></a>
+      <ul class="sub">
+        <li><a href="#p6-obs">Observação — fichas relevantes ao Casario</a></li>
+        <li><a href="#p6-theoros">Nota — Theoros (Chefe do Casario)</a></li>
+        <li><a href="#p6-resto">O resto do bestiário &amp; os outros 5 Chefes</a></li>
+      </ul>
+    </li>
+
+    <li class="part"><a href="#estado-do-livro">Estado do livro / próximos passos</a></li>
+  </ul>
+</nav>
+
+<!-- ============================================================ MAIN ============================================================ -->
+<main id="main">
+
+<a id="topo" class="anchor-target"></a>
+<h1>PROTOCOLO — Livro de Campanha</h1>
+<p class="kicker">Horror cósmico · Porto Alegre, 2002 · guia de mestre</p>
+
+<div class="pendente">
+  <span class="lbl">Estado deste arquivo</span>
+  <p style="margin:0">Este é o <b>rascunho-piloto</b>: o bairro <b>O Casario</b> (Seção 8.1) está detalhado por completo, no molde da Seção 7. As Partes I, II, IV e V estão organizadas a partir do texto já pronto do documento-fonte (Seções 2, 3, 6, 9). A Parte III traz a visão geral dos 6 bairros e o Casario completo; os outros cinco bairros ficam como entradas de índice vazias até este padrão ser validado. A Parte VI (Bestiário de Mesa) traz, por ora, só as fichas relevantes ao Casario. Ver <a href="#estado-do-livro">Estado do livro</a> ao final para a lista completa do que falta.</p>
+</div>
+
+<hr>
+
+<!-- ============================================================ ÍNDICE MESTRE ============================================================ -->
+<a id="indice-mestre" class="anchor-target"></a>
+<h2>Índice mestre <span class="kicker">— para achar rápido no Ctrl+F</span></h2>
+<p>Todo local, NPC, gancho e criatura tem âncora própria. Use Ctrl+F com o nome, ou clique abaixo.</p>
+<div class="idx-list">
+  <a href="#p1-3">régua da Forja</a>
+  <a href="#p1-4">Relógio do Acabamento</a>
+  <a href="#p1-5">o martelo</a>
+  <a href="#p1-7">a Atenção</a>
+  <a href="#p1-8">regra do terreiro</a>
+  <a href="#p2-3">o Escultor</a>
+  <a href="#p2-4">os seis Ápices</a>
+  <a href="#p2-5">Acordo do Começo</a>
+  <a href="#p2-6">o Sem-Nome</a>
+  <a href="#c1">C1 · Mercado Público</a>
+  <a href="#c2">C2 · Pensão Boa Vista</a>
+  <a href="#c3">C3 · Locadora Fita-Mágica</a>
+  <a href="#c4">C4 · O Orelhão da Praça</a>
+  <a href="#c5">C5 · Os Cortiços do Beco</a>
+  <a href="#c6">C6 · O Arquivo Municipal</a>
+  <a href="#c7">C7 · Praça e Igreja das Almas</a>
+  <a href="#c8">C8 · O Cais Velho</a>
+  <a href="#c9">C9 · O Estúdio do Retratista</a>
+  <a href="#c10">C10 · O Cinema Íris</a>
+  <a href="#c11">C11 · A Sobreloja da Vigília</a>
+  <a href="#c12">C12 · O Sobrado do Zelador</a>
+  <a href="#c13">C13 · O Vão Entre os Prédios</a>
+  <a href="#npc-percilia">Dona Percília</a>
+  <a href="#npc-adao">Seu Adão</a>
+  <a href="#npc-ilva">Dona Ilva</a>
+  <a href="#npc-ivo">Ivo</a>
+  <a href="#npc-sobreloja">O Homem da Sobreloja</a>
+  <a href="#casario-loot">Loot do Casario</a>
+  <a href="#casario-encontros">Encontros do Casario</a>
+  <a href="#p4-6">O Barqueiro / lenda do lago</a>
+  <a href="#p4-7">Os 8 ganchos</a>
+  <a href="#p5-1">O Jonas</a>
+  <a href="#p5-4">O Lúcio</a>
+  <a href="#p5-6">Beats do Velório</a>
+  <a href="#p6-obs">O Espectador</a>
+  <a href="#p6-obs">A Assembleia</a>
+  <a href="#p6-obs">Panóptes</a>
+  <a href="#p6-obs">O Contemplado</a>
+  <a href="#p6-obs">O Delator</a>
+  <a href="#p6-theoros">Theoros</a>
+</div>
+
+<hr>
+
+<!-- ============================================================ PARTE I ============================================================ -->
+<a id="parte1" class="anchor-target"></a>
+<h2>PARTE I · O MESTRE</h2>
+<p class="kicker">como conduzir — tom, régua, relógio, segredo, teia, ritmo</p>
+
+<a id="p1-1" class="anchor-target"></a>
+<h3>1 · A regra de ouro</h3>
+<div class="regra-ouro">
+  <b>Amplie o mistério, nunca o resolva.</b> Cada revelação abre duas perguntas novas. Se os jogadores entenderam tudo, você explicou demais. O horror não é o desconhecido que ataca — é o <em>conhecido chegando errado</em>: o amor que não solta, o morto que volta, o descanso que cobra tudo. Nada neste mundo odeia os jogadores. Pior: tudo os <em>quer</em>.
+</div>
+
+<a id="p1-2" class="anchor-target"></a>
+<h3>2 · A frase que resume tudo</h3>
+<blockquote><em>"Você não está sendo atacado. Você está sendo terminado."</em></blockquote>
+<p>As coisas não querem matar os personagens. Querem <em>completá-los, guardá-los, mantê-los</em> — por amor. É isso que apavora.</p>
+
+<a id="p1-3" class="anchor-target"></a>
+<h3>3 · A régua da Forja (o termômetro secreto)</h3>
+<p>Tudo está entre <b>quente</b> e <b>frio</b>. Quente = perto da mão que trabalha = vivo, mutável, sendo feito. Frio = longe da mão = pronto, fixo, acabado, morto. <em>O que está pronto está morto.</em> A cidade inteira esfria rumo ao pronto. Ao descrever qualquer coisa, pergunte onde ela está na régua: vivo é quente, caótico, barulhento; quase-terminado é silencioso, frio, imóvel, "perfeito". <b>Frieza e silêncio são os sinais de que algo está quase pronto — quase morto.</b></p>
+
+<a id="p1-4" class="anchor-target"></a>
+<h3>4 · O Relógio do Acabamento</h3>
+<p>Um mostrador de <b>1 a 12</b>, só do mestre, que <b>só anda pra frente</b>. Começa em 1 (o Velório) e termina em 12 (o fim). Avança por duas forças: <b>tique natural</b> (a cada marco ou punhado de sessões, sobe 1 — faça o que fizerem) e <b>tique provocado</b> (quando alguém compreende demais, brilha demais, é notado demais — traduz um glifo, aceita um pacto, vence um Chefe com espetáculo — o mostrador <em>salta</em>). Ser notado acelera o fim.</p>
+<table>
+<caption>As quatro estações (a cidade inteira responde de uma vez)</caption>
+<tr><th>Faixa</th><th>Nome</th><th>O que muda</th></tr>
+<tr><td>1–3</td><td>Frescor</td><td>algo está errado. Anomalias sutis, negáveis.</td></tr>
+<tr><td>4–6</td><td>Esfriando</td><td>não é coincidência. Ganchos não-tocados pioram sozinhos; some gente.</td></tr>
+<tr><td>7–9</td><td>Endurecendo</td><td>a cidade muda. Bairros esfriam; Chefes saem dos covis.</td></tr>
+<tr><td>10–12</td><td>Acabamento</td><td>está quase pronto. A cidade vira um mundo morto em tempo real.</td></tr>
+</table>
+<p><b>A lição que os jogadores aprendem sem você dizer:</b> discrição sobrevive, heroísmo acelera o fim. Resolver um gancho com cuidado não avança o Relógio; resolver no espetáculo, avança.</p>
+
+<a id="p1-5" class="anchor-target"></a>
+<h3>5 · O martelo (o som do Relógio)</h3>
+<p>Toque um som de <b>martelo</b> a cada avanço do Relógio. Começa alto e perto; fica mais distante e mais espaçado a cada estação. Enquanto bate perto, a peça (a cidade, eles) ainda está sendo trabalhada — viva. Quando fica longe e raro, a mão se afastou: está deixando a peça esfriar. <b>O silêncio final não é paz — é o momento em que estão prontos.</b> Ritmo: no Frescor, batidas próximas e ritmadas; no Acabamento, uma batida solitária ecoando. Última sessão: uma martelada final, e depois nada.</p>
+
+<a id="p1-6" class="anchor-target"></a>
+<h3>6 · A camada de segredo</h3>
+<div class="regra-ouro">
+  <p style="margin:0"><b>Boxed text e props = linguagem de jogador (sem nomes cósmicos). Texto de mestre = pode nomear tudo.</b> Nunca diga na mesa nem coloque em handout: o Escultor, os nomes dos Ápices, os nomes das criaturas, "a Forja", o Acordo, o Sem-Nome. Se perguntarem "quem faz isso?", a resposta do mundo é sempre silêncio ou um palpite errado (e reconfortante).</p>
+</div>
+
+<a id="p1-7" class="anchor-target"></a>
+<h3>7 · A Atenção (o Escultor, sem nome)</h3>
+<p>O medidor de mestre (antes chamado de Dharma) agora é <b>a Atenção</b>. Enche quando os personagens são notados (usam poder oculto, compreendem demais, brilham). Cheio, <em>algo</em> repara neles e a mão se aproxima. Nunca nomeie o dono da Atenção. O jogador vê o medidor subir e sente que está sendo observado por <em>alguma coisa</em>. É o Escultor. Ele nunca saberá disso.</p>
+
+<a id="p1-8" class="anchor-target"></a>
+<h3>8 · O vocabulário religioso (regra não-negociável)</h3>
+<div class="regra-ouro">
+  <p>No Rio Grande do Sul o terreiro é <b>competente</b>. Batuque, Umbanda e Quimbanda <b>funcionam</b> — para tudo que é do mundo. A gramática do povo para o invisível está certa, e quem a domina é <b>autoridade e aliado</b>, nunca a fonte do horror. <b>Regra fixa: quem conhece o terreiro é o primeiro a dizer "isso não é nosso, não mexe".</b></p>
+  <p style="margin:0">Os praticantes são sábios; o antagonista humano é <b>quem acha que sabe</b> (o charlatão, o exorcista arrogante) e <b>quem persegue quem sabe</b> (o fanático intolerante, o que queima o barracão). O horror é que essas molduras competentes <em>quase</em> servem — dão nome, ritual e algum controle — e erram o alvo, porque o que acontece não é entidade nem feitiço: é mais antigo, mais frio, e não responde a oferenda nenhuma.</p>
+</div>
+
+<a id="p1-9" class="anchor-target"></a>
+<h3>9 · Como usar a teia</h3>
+<p>Nada é isolado. Todo gancho toca pelo menos dois outros. Quando os jogadores puxam um fio, mexa outro — o objeto do lugar A é a fraqueza do horror do lugar F. <b>O arquivo do Jonas é a teia feita literal:</b> a parede de barbante é o índice de ganchos. Quando não souber pra onde a sessão vai, olhe a teia e veja qual fio o último puxou.</p>
+
+<a id="p1-10" class="anchor-target"></a>
+<h3>10 · O ritmo de revelação (a escada)</h3>
+<ol>
+<li>O mundo errado antes do monstro (deixe estranho por uma sessão).</li>
+<li>Fenômeno antes de Besta (assombra a cabeça antes de arrombar a porta).</li>
+<li>Um testemunho pra dar escala (isto é maior e mais antigo do que parece).</li>
+<li>Um Chefe como espelho, não como parede (bate numa emoção).</li>
+<li>O cânone só no fim (vira tudo de cabeça pra baixo; e quem traduz, se acende).</li>
+</ol>
+<a class="totop" href="#topo">↑ topo</a>
+
+<hr>
+
+<!-- ============================================================ PARTE II ============================================================ -->
+<a id="parte2" class="anchor-target"></a>
+<h2>PARTE II · A VERDADE (só do mestre)</h2>
+<p class="kicker">nada aqui pode vazar — resumo-chave; cosmos completo nos docs de mestre do repositório</p>
+
+<a id="p2-1" class="anchor-target"></a>
+<h3>Em uma frase</h3>
+<p>Existe um deus que não ataca — ele <b>termina</b>. Guarda o que ama empurrando pro acabamento. E acabar, no idioma dele, é a mesma palavra que morrer.</p>
+
+<a id="p2-2" class="anchor-target"></a>
+<h3>A Forja</h3>
+<p>O mundo é uma peça sobre uma bigorna. Posição = estado de conclusão. Perto da mão: quente, vivo, mutável. Longe: frio, pronto, morto. As criaturas não invadem de fora — <b>afloram</b> do mundo reaquecido pela atenção do Fazedor, como bolhas num metal que voltou ao fogo. Não há portal a defender; só o chão de casa lembrando que ainda é maleável. <a class="ref" href="#" title="Historia/livro_do_passado.html — Capítulo II">→ Livro do Passado, Cap. II</a></p>
+
+<a id="p2-3" class="anchor-target"></a>
+<h3>O Escultor</h3>
+<p>O deus no topo, de todos os elementos. Não é hostil — é <b>amoroso</b>, do pior jeito. Não suporta que algo que ele ama acabe; então mantém, guarda, termina — e o terminado está pronto, e o pronto está morto. Ser notado por ele é o primeiro corte, porque a atenção dele é a mão descendo. É a "Atenção" da ficha. <b>Os jogadores nunca sabem o nome dele.</b> <a class="ref" href="#" title="Historia/registro_dos_antigos.html">→ Registro dos Antigos</a></p>
+
+<a id="p2-4" class="anchor-target"></a>
+<h3>Os seis Ápices (as forças puras)</h3>
+<p>Cada um é um elemento levado ao absoluto — o cinzel que ganhou vontade. Nomes só do mestre:</p>
+<table>
+<tr><th>Ápice</th><th>Elemento</th><th>Bairro-espelho</th></tr>
+<tr><td><b>Kénoma</b></td><td>Vazio — o zero, o repouso de tudo; o que o próprio Escultor teme.</td><td>O Alto</td></tr>
+<tr><td><b>Amálgama</b></td><td>Ascensão — carne e metal, o acúmulo sem fim.</td><td>O Aterro</td></tr>
+<tr><td><b>Antífona</b></td><td>Eco — o coro dos mortos que jura estar vivo.</td><td>A Várzea</td></tr>
+<tr><td><b>Synthékos</b></td><td>Pacto — a página em branco do livro-razão; é o próprio preço.</td><td>A Baixa</td></tr>
+<tr><td><b>Argos</b></td><td>Observação — o olho sem pálpebra.</td><td class="loc">O Casario</td></tr>
+<tr><td><b>Perpétua</b></td><td>Germe — a Lei da Semeadura, o jardim que engole.</td><td>As Ilhas</td></tr>
+</table>
+<p>Cada Marca de jogador é um desses tocando o personagem por dentro (ver Seção 11 do documento-fonte / Sistema). O jogador vive a mecânica; nunca sabe o nome.</p>
+
+<a id="p2-5" class="anchor-target"></a>
+<h3>O Acordo do Começo (o fundo falso)</h3>
+<p>No início houve uma dívida. Duas partes: uma fez, a outra pagou. Ninguém sabe quem é o devedor. Três leituras circulam, nenhuma confirmada — <b>nunca confirme nenhuma.</b></p>
+<div class="nota-mestre"><span class="lbl">Segredo do mestre</span>Favoreça em silêncio a leitura de que o Escultor deve ao Kénoma (o medo do Vazio vira medo de credor). É o mistério que a mesa orbita para sempre sem tocar o fundo.</div>
+
+<a id="p2-6" class="anchor-target"></a>
+<h3>O Sem-Nome (a advertência)</h3>
+<p>Houve um que juntou fragmentos de todos os elementos e chegou perto demais de ser o que só o Escultor é. O Escultor não tolera um segundo "de todos". Então o <b>terminou</b>. Virou lenda-aviso. <em>(Regra opcional avançada, fora do livro dos jogadores: um jogador que acumule Marcas de vários elementos evoca o Sem-Nome — e atrai a Atenção pessoalmente.)</em></p>
+
+<a id="p2-7" class="anchor-target"></a>
+<h3>Onde achar o resto</h3>
+<p>Cosmos completo, com dossiês, lendas e feitos — o Livro de Campanha <b>aponta; não repete</b>:</p>
+<ul>
+<li><a class="ref" href="#">Livro do Passado</a> — cosmogonia, a Forja, o Acordo, os mundos descartados.</li>
+<li><a class="ref" href="#">Registro dos Antigos</a> — o Escultor + os 6 Ápices.</li>
+<li><a class="ref" href="#">Bestiário</a> — as 30 criaturas. (ver amostra na <a href="#parte6">Parte VI</a>)</li>
+<li>Os Chefes — os 6 antagonistas nomeados (Alytros, Loki, Theoros, Mnemos, Vressalha, Thánatos-Nul). <span class="tag tag-pend">sem dossiê no repo ainda — ver nota em #p6-theoros</span></li>
+</ul>
+<a class="totop" href="#topo">↑ topo</a>
+
+<hr>
+
+<!-- ============================================================ PARTE III ============================================================ -->
+<a id="parte3" class="anchor-target"></a>
+<h2>PARTE III · A CIDADE</h2>
+<p class="kicker">Porto Alegre, 2002 · cidade-espelho</p>
+
+<a id="p3-overview" class="anchor-target"></a>
+<h3>O essencial em três linhas</h3>
+<p>Porto Alegre, 2002, cidade-espelho. Já parece uma peça esfriando antes de qualquer anomalia: úmida, cinza, fria, neblina subindo do Guaíba. O horror não invade — é a cidade sendo <em>mais o que já era</em>. E os mapas não batem: há bairros que não estão em planta nenhuma, ruas que voltam diferentes. <em>Há outros mundos além destes — alguns com o mesmo endereço.</em></p>
+
+<h4>As quatro ferramentas de 2002 (nunca quebre isto)</h4>
+<ul>
+<li><b>Sem celular na mão:</b> orelhão exposto, cartão; sumir é fácil, demora pra notar.</li>
+<li><b>Internet discada:</b> a linha ocupa, ninguém te alcança online; LAN house entre estranhos; ICQ/mIRC/MSN; sem redes sociais.</li>
+<li><b>Mídia que degrada:</b> VHS, fita cassete, disquete, CD gravado — guardam coisa errada.</li>
+<li><b>Atenção de massa:</b> a mesma novela, o mesmo Jornal Nacional, a Copa de 2002 (o penta), ano de eleição — a cidade toda olhando pra mesma coisa.</li>
+</ul>
+
+<h4>A régua na cidade</h4>
+<p>O <b>Guaíba</b> é a borda fria — a face local da régua. Ao poente, depois do pôr do sol, a água vira a direção que não existe. A cidade inteira, muito devagar, escorre pra lá. Quanto mais o Relógio avança, mais forte o Guaíba puxa.</p>
+
+<h4>Os seis bairros (um por elemento)</h4>
+<table>
+<tr><th>Bairro</th><th>Elemento</th><th>Epíteto</th><th>Status</th></tr>
+<tr><td class="loc b-obs" style="border-left:4px solid var(--c-obs)"><b>O Casario</b></td><td>Observação</td><td>o bairro que conta as janelas</td><td><a href="#bairro-casario">✓ completo</a></td></tr>
+<tr><td style="border-left:4px solid var(--c-pac)"><b>A Baixa</b></td><td>Pacto</td><td>onde todo negócio tem uma cláusula que você não leu</td><td>pendente</td></tr>
+<tr><td style="border-left:4px solid var(--c-ger)"><b>As Ilhas</b></td><td>Germe</td><td>a beirada que alaga e floresce por cima dos afogados</td><td>pendente</td></tr>
+<tr><td style="border-left:4px solid var(--c-vaz)"><b>O Alto</b></td><td>Vazio</td><td>o bairro rico e parado, onde tudo já está pronto</td><td>pendente</td></tr>
+<tr><td style="border-left:4px solid var(--c-asc)"><b>O Aterro</b></td><td>Ascensão</td><td>a cidade que cresce por cima de si mesma</td><td>pendente</td></tr>
+<tr><td style="border-left:4px solid var(--c-eco)"><b>A Várzea</b></td><td>Eco</td><td>o parque onde a mesma tarde se repete</td><td>pendente</td></tr>
+</table>
+
+<a id="p3-nos" class="anchor-target"></a>
+<h4>Os quatro nós de gravidade (pra onde tudo puxa)</h4>
+<ul>
+<li><b>O apartamento do Jonas</b> — a base involuntária; a parede de barbante é o índice dos ganchos. Piora a cada visita.</li>
+<li><b>O Guaíba / o poente</b> — o dreno; a morte do Jonas leva pra cá no dia 1; pra onde tudo escorre.</li>
+<li><b>A instituição</b> — o "Castelo" que se move (clínica, estande, van); caçada a campanha toda; sem endereço fixo. Forte candidata a sede: a Vila Serena, no Alto (A4).</li>
+<li><b>O nó pessoal de cada jogador</b> — o lugar da ferida revelada pelo formulário; onde o primeiro contato dele acontece.</li>
+</ul>
+
+<hr>
+
+<!-- ============================================================ BAIRRO: O CASARIO ============================================================ -->
+<a id="bairro-casario" class="anchor-target"></a>
+<h2 style="border-top-color:var(--c-obs)">O CASARIO <span style="color:var(--c-obs)">· Observação</span></h2>
+<p class="kicker">o bairro que conta as janelas</p>
+
+<p><b>Onde fica:</b> centro histórico, encostado no Guaíba a oeste, subindo ao norte até o Alto. Denso, vertical, superpovoado. Ruas de paralelepípedo, sobrados grudados, um mercado de ferro, viadutos, a igreja no ponto alto.</p>
+<p><b>A espinha:</b> a Rua da Praia (leste-oeste) desce até o Mercado e o Cais; becos sobem até a Praça das Almas, no alto.</p>
+
+<h4>A história</h4>
+<p>O Casario é o núcleo mais antigo de Porto Alegre — ruas de paralelepípedo, sobrados coloniais remendados, becos que sobem do rio pra colina. Era, e ainda é oficialmente, o "centro histórico": cartão-postal decadente, prédio tombado ao lado de prédio caindo aos pedaços. A diferença, que ninguém no bairro sabe nomear, é que o Casario sempre foi olhado — por turistas, por câmeras de segurança de loja, por vizinho de sacada — e algo, com o tempo, aprendeu a olhar de volta.</p>
+
+<h4>O clima de mesa (como narrar)</h4>
+<p>Narre o Casario como um teatro em que a plateia nunca se sabe ao certo onde está sentada. Descreva sempre pelo menos um detalhe de "ser visto": uma cortina que se move sem vento, um reflexo que demora um quadro a mais, alguém debruçado numa sacada distante que não se mexe. Nunca resolva quem observa — a régua da Forja aqui é a régua do olhar: quanto mais um lugar for olhado, mais perto do "pronto" ele está. Use o silêncio como ferramenta: numa rua cheia, o barulho de repente cessa por um instante — é o bairro prestando atenção.</p>
+
+<div class="nota-mestre">
+  <span class="lbl">Nota de mestre — o Chefe deste bairro</span>
+  <p style="margin:0">O covil de <b>Theoros</b> é o Casario — "a cidade de olhos onde engorda" (documento-fonte, Seção 6.4). Não existe ainda, no repositório, um dossiê completo dele (ao contrário dos Ápices e das criaturas, catalogados em <i>Registro dos Antigos</i> e no <i>Bestiário</i>). Até que esse documento exista, trate Theoros como presença ambiente e crescente no bairro — nunca o materialize por completo nem lhe dê uma cena de confronto direto sem antes escrever a ficha dele. Use-o através dos fenômenos já catalogados (O Espectador, A Assembleia, Panóptes — ver <a href="#p6-obs">Parte VI</a>) como as "mãos" dele agindo antes do rosto aparecer.</p>
+</div>
+
+<h4>Lista de locais (13)</h4>
+<table>
+<tr><th>Cód.</th><th>Nome</th><th>Em uma linha</th></tr>
+<tr><td><a href="#c1">C1</a></td><td>Mercado Público</td><td>coração social; fofoca, ervas, uma câmara fria que esfria demais</td></tr>
+<tr><td><a href="#c2">C2</a></td><td>Pensão Boa Vista</td><td>quartos de aluguel; a dona anota tudo; o quarto 304 "ocupado" por quem ninguém vê</td></tr>
+<tr><td><a href="#c3">C3</a></td><td>Locadora Fita-Mágica</td><td>VHS; fitas sem rótulo que gravam o bairro sozinhas e voltam quando destruídas</td></tr>
+<tr><td><a href="#c4">C4</a></td><td>O Orelhão da Praça</td><td>telefone público que toca sozinho; atende e ouve os sons da <i>sua</i> casa</td></tr>
+<tr><td><a href="#c5">C5</a></td><td>Os Cortiços do Beco</td><td>habitação coletiva empilhada; onde o Zelador conta as janelas</td></tr>
+<tr><td><a href="#c6">C6</a></td><td>O Arquivo Municipal</td><td>repartição de registros mofada; papéis que não deviam existir</td></tr>
+<tr><td><a href="#c7">C7</a></td><td>Praça e Igreja das Almas</td><td>o ponto alto; a igreja, o adro, o terreiro que funciona ao lado</td></tr>
+<tr><td><a href="#c8">C8</a></td><td>O Cais Velho</td><td>porto morto; onde o Casario toca o Guaíba; barcos que não remam pro poente</td></tr>
+<tr><td><a href="#c9">C9</a></td><td>O Estúdio do Retratista</td><td>fotógrafo antigo; a Foto da Multidão nasce aqui</td></tr>
+<tr><td><a href="#c10">C10</a></td><td>O Cinema Íris</td><td>cinema decadente em meia-luz; a plateia que assiste a você</td></tr>
+<tr><td><a href="#c11">C11</a></td><td>A Sobreloja da Vigília</td><td>sede de um "grupo de observação de bairro"; a instituição espreita aqui</td></tr>
+<tr><td><a href="#c12">C12</a></td><td>O Sobrado do Zelador</td><td>a casa de Seu Adão; a parede com a contagem das janelas</td></tr>
+<tr><td><a href="#c13">C13</a></td><td>O Vão Entre os Prédios</td><td>uma fresta-rua que não está em mapa nenhum; a cidade-espelho vaza aqui</td></tr>
+</table>
+
+<!-- ================= C1 ================= -->
+<div class="local b-obs" id="c1">
+<div class="local-head"><span class="local-code">C1</span><span class="local-name">O Mercado Público</span></div>
+<div class="boxed">"Um casarão de ferro e vidro de outro século, dois andares de bancas sob uma clarabóia encardida. Peixe, especiaria, erva, chimarrão, miudezas. O barulho é de multidão, mas dá pra sentir, na nuca, que no meio de todos esses olhos que não te conhecem tem um ou dois que te conhecem bem demais. No mezanino, alguém está debruçado na grade, olhando pra baixo. Olhando pra você."</div>
+<dl>
+<dt>O que é</dt><dd>o mercado central da cidade — comida, ervas e o coração social do Casario. Todo mundo passa por aqui.</dd>
+<dt>Localização</dt><dd>pé da Rua da Praia, entre a espinha do bairro e o Cais. Térreo + mezanino.</dd>
+<dt>As salas/áreas</dt><dd><ul>
+<li><b>C1.1 · O salão térreo</b> — dezenas de bancas. Compra-se de tudo e ouve-se <i>tudo</i> (centro de fofoca da cidade — ótimo para informação). Uma banca de ervas é de <b>Dona Percília</b> (erveira; sabe do sobrenatural, é aliada).</li>
+<li><b>C1.2 · O mezanino</b> — bancas quietas, miudezas e usados. Do parapeito vê-se o salão inteiro. É de lá que <i>alguém sempre observa</i> — e às vezes esse alguém não devia estar ali.</li>
+<li><b>C1.3 · Os fundos / câmara fria</b> — depósito, gelo, caixas. Onde some coisa. Frio demais até para uma câmara fria.</li>
+</ul></dd>
+<dt>Quem está aqui</dt><dd>Dona Percília (erveira, aliada — <a href="#npc-percilia">ficha</a>); Seu Adão (o zelador que conta as janelas; aparece muito aqui — <a href="#npc-adao">ficha</a>); vendedores e fregueses.</dd>
+<dt>A verdade (mestre)</dt><dd>o mezanino é um dos pontos onde o Casario "vê demais" — quem passa muito tempo no parapeito olhando o salão começa a ser contado como janela (fenômeno de Observação / Argos). A câmara fria está esfriando <i>além</i> do normal: um ponto onde a régua já pendeu pro pronto.</dd>
+<dt>Testes para achar</dt><dd><ul>
+<li><i>Lábia + Intuição, Limiar 6:</i> alguém no mezanino te observa desde que você entrou.</li>
+<li><i>Juízo + Investigação, Limiar 8:</i> nos últimos meses, três pessoas "sumiram" do mercado e ninguém lembra os nomes — só a banca vazia que ninguém reabre.</li>
+<li><i>Juízo + Ciências/Ofício, Limiar 10:</i> a câmara fria perde calor rápido demais; a física não fecha.</li>
+</ul></dd>
+<dt>Loot</dt><dd>ervas de Dona Percília (incluem as que <i>funcionam</i> contra o sobrenatural comum — ver <a href="#casario-loot">tabela de loot</a>); miudezas do mezanino (1 rolagem na Tabela de Loot do Casario); na câmara fria, algo escondido no gelo (rolagem com vantagem, mas custa Atenção pegar). <b>Documento (Superfície):</b> o panfleto "nada que se ama tem permissão de acabar" numa banca.</dd>
+<dt>O fio</dt><dd>Dona Percília manda os jogadores à Praça das Almas (<a href="#c7">C7</a>) e a Seu Adão. A câmara fria conecta ao <b>Alto</b> (o frio, o pronto). O mezanino "que observa" é o primeiro sinal do gancho do Zelador.</dd>
+<dt>Se escalar</dt><dd class="escala">
+<div class="fase"><b>Frescor</b>só a sensação de ser olhado.</div>
+<div class="fase"><b>Esfriando</b>a banca de quem sumiu continua lá, intacta, mercadoria "fresca".</div>
+<div class="fase"><b>Endurecendo</b>o mezanino tem sempre uma pessoa a mais do que dá pra contar.</div>
+<div class="fase"><b>Acabamento</b>a câmara fria se espalhou; metade do mercado é gelo e silêncio, as bancas "prontas", perfeitas, mortas.</div>
+</dd>
+</dl>
+</div>
+
+<!-- ================= C2 ================= -->
+<div class="local b-obs" id="c2">
+<div class="local-head"><span class="local-code">C2</span><span class="local-name">Pensão Boa Vista</span></div>
+<div class="boxed">"O saguão cheira a naftalina e café requentado. Atrás do balcão, a dona folheia um caderno grosso, capa de couro puída, sem tirar os olhos de você enquanto anota — não seu nome, ainda não perguntou. No corredor do terceiro andar, todas as portas têm um número visível, menos uma, e é justamente essa que parece a mais nova das treze."</div>
+<dl>
+<dt>O que é</dt><dd>pensão de aluguel de quartos, mensal ou por temporada, a poucos quarteirões do Mercado.</dd>
+<dt>Localização</dt><dd>um sobrado alto de três andares, entalado entre prédios maiores, na subida rumo aos Cortiços (<a href="#c5">C5</a>).</dd>
+<dt>As salas/áreas</dt><dd><ul>
+<li><b>C2.1 · Recepção</b> — o balcão de Dona Ilva e o "caderno da Ilva": ela anota quem entra, quem sai, até visitas, até o horário em que a luz do corredor pisca.</li>
+<li><b>C2.2 · Corredores e quartos comuns</b> — doze quartos alugados, portas finas, vozes que atravessam paredes.</li>
+<li><b>C2.3 · O quarto 304</b> — trancado, "ocupado" segundo o livro, mas ninguém nunca viu o inquilino entrar ou sair; a chave "sumiu" há meses.</li>
+<li><b>C2.4 · O sótão</b> — malas e pertences de hóspedes antigos que nunca voltaram buscar.</li>
+</ul></dd>
+<dt>Quem está aqui</dt><dd>Dona Ilva (dona — <a href="#npc-ilva">ficha</a>); hóspedes rotativos.</dd>
+<dt>A verdade (mestre)</dt><dd>o quarto 304 nunca teve um inquilino de carne e osso — é uma "reserva" que o padrão de Observação do bairro mantém aberta, como uma cadeira guardada num teatro. Dona Ilva anota tudo porque sente, sem entender, que precisa manter um registro perfeito: o Casario cobra isso dela em troca de uma proteção parcial. É o embrião do fenômeno <a href="#p6-obs">O Espectador</a> se instalando estruturalmente no prédio.</dd>
+<dt>Testes para achar</dt><dd><ul>
+<li><i>Juízo + Investigação, Limiar 6:</i> o livro de Dona Ilva tem uma entrada pro quarto 304 todo santo dia, sempre a mesma letra, mas ninguém nunca é visto entrando ou saindo.</li>
+<li><i>Juízo + Percepção, Limiar 8:</i> a maçaneta do 304 está morna, como se alguém tivesse acabado de tocá-la — sempre, não importa a hora.</li>
+<li><i>Têmpera + Vigor Mental, Limiar 10:</i> ficar um minuto encostado na porta do 304 dá a certeza absoluta de que, do outro lado, alguém está encostado exatamente no mesmo ponto, ouvindo você.</li>
+</ul></dd>
+<dt>Loot</dt><dd>1 rolagem na tabela de loot do Casario, entre as malas do sótão. <b>Documento (Superfície):</b> o bilhete da melodia, costurado no forro de uma mala velha — <i>Juízo + Investigação, Limiar 8</i> pra achar.</dd>
+<dt>O fio</dt><dd>Dona Ilva manda os PCs a Seu Adão quando perguntam sobre "gente que sumiu" (ela desconfia dele tanto quanto ele dela — mas o caderno dela e a contagem dele, comparados, mostram o mesmo padrão). O sótão liga tematicamente ao <b>Aterro</b> (tralha acumulada que devia ter sido jogada fora).</dd>
+<dt>Se escalar</dt><dd class="escala">
+<div class="fase"><b>Frescor</b>só a maçaneta morna e o caderno estranho.</div>
+<div class="fase"><b>Esfriando</b>chega uma "reserva" nova: outro quarto passa a aparecer "ocupado" sem inquilino.</div>
+<div class="fase"><b>Endurecendo</b>Dona Ilva começa a anotar os PCs no caderno mesmo quando não estão na pensão.</div>
+<div class="fase"><b>Acabamento</b>o corredor inteiro fica com a mesma temperatura morna da maçaneta do 304, e todas as portas parecem prestes a se abrir ao mesmo tempo.</div>
+</dd>
+</dl>
+</div>
+
+<!-- ================= C3 ================= -->
+<div class="local b-obs" id="c3">
+<div class="local-head"><span class="local-code">C3</span><span class="local-name">Locadora Fita-Mágica</span></div>
+<div class="boxed">"A loja é estreita, cheira a poeira e fita magnética. Prateleiras até o teto, capas desbotadas, uma TV ligada baixinho num canal que ninguém escolheu. O dono passa o troco sem tirar os olhos de uma caixa nos fundos — a única que ele não empresta, não importa quanto você insista."</div>
+<dl>
+<dt>O que é</dt><dd>locadora de fitas VHS de bairro — filmes, novelas gravadas, alguma coisa "avulsa".</dd>
+<dt>Localização</dt><dd>loja estreita na Rua da Praia, perto do cruzamento que desce pro Mercado.</dd>
+<dt>As salas/áreas</dt><dd><ul>
+<li><b>C3.1 · O salão</b> — prateleiras, balcão, a TV sempre ligada num canal que ninguém lembra de ter sintonizado.</li>
+<li><b>C3.2 · Os fundos</b> — estoque, a máquina de copiar fitas, e uma caixa de fitas sem rótulo que Ivo guarda longe do público.</li>
+<li><b>C3.3 · A cabine de "devolução tardia"</b> — armário pequeno onde ficam as fitas devolvidas fora do prazo, inclusive as que "voltam" mesmo destruídas.</li>
+</ul></dd>
+<dt>Quem está aqui</dt><dd>Ivo (dono — <a href="#npc-ivo">ficha</a>).</dd>
+<dt>A verdade (mestre)</dt><dd>as fitas sem rótulo gravam sozinhas — não o que está na tela, mas o bairro: ruas, janelas, gente passando, sempre em ângulos de quem observa de longe, como se o próprio Casario estivesse filmando a si mesmo através da locadora. Destruir uma fita não resolve nada: em algum prazo, ela reaparece na prateleira, rebobinada, com mais minutos gravados do que ela tinha antes.</dd>
+<dt>Testes para achar</dt><dd><ul>
+<li><i>Juízo + Tecnologia, Limiar 6:</i> uma das fitas sem rótulo está gravando agora, mesmo sem estar dentro de nenhum aparelho ligado.</li>
+<li><i>Juízo + Investigação, Limiar 8:</i> comparando os selos de aluguel, as fitas sem rótulo "circulam" entre clientes que constam como tendo se mudado ou desaparecido do bairro.</li>
+<li><i>Têmpera + Vigor Mental, Limiar 10:</i> assistir a uma fita sem rótulo até o fim mostra, nos últimos segundos, você mesmo, visto de um ângulo que nenhuma câmera no local poderia ter.</li>
+</ul></dd>
+<dt>Loot</dt><dd>1 rolagem na tabela de loot do Casario nos fundos; uma fita sem rótulo pode ser levada (item raro na tabela) — mas carrega Ruído embutido ao ser assistida até o fim.</dd>
+<dt>O fio</dt><dd>Ivo, tratado com jeito, empresta ou "dá" uma fita sem rótulo aos PCs — ponte de entrada pra <b>A Várzea</b> (as fitas do Casario e as do Brique compartilham a mesma textura impossível). Liga também a <a href="#c4">C4</a>: num dos vídeos aparece o orelhão da praça tocando sozinho.</dd>
+<dt>Se escalar</dt><dd class="escala">
+<div class="fase"><b>Frescor</b>uma ou duas fitas "erradas" na caixa dos fundos.</div>
+<div class="fase"><b>Esfriando</b>Ivo confirma, com medo, que nunca gravou nenhuma delas.</div>
+<div class="fase"><b>Endurecendo</b>as fitas comuns da loja começam a ganhar minutos extras no fim, sempre do bairro, sempre de longe.</div>
+<div class="fase"><b>Acabamento</b>a TV do salão só passa a gravação ao vivo do lado de fora da loja, com um atraso de poucos segundos.</div>
+</dd>
+</dl>
+</div>
+
+<!-- ================= C4 ================= -->
+<div class="local b-obs" id="c4">
+<div class="local-head"><span class="local-code">C4</span><span class="local-name">O Orelhão da Praça</span></div>
+<div class="boxed">"O telefone público laranja, casca arranhada, fica na pracinha entre o Mercado e a subida da igreja. Tem sempre alguém esperando a vez, mesmo quando ninguém parece com pressa de ligar pra lugar nenhum. De vez em quando, sem que ninguém tenha discado, ele toca."</div>
+<dl>
+<dt>O que é</dt><dd>orelhão de rua entre o Mercado e a Praça das Almas — um dos poucos do bairro que ainda funciona direito.</dd>
+<dt>Localização</dt><dd>esquina de passagem, ponto de encontro informal, sempre com gente esperando a vez.</dd>
+<dt>As salas/áreas</dt><dd><ul>
+<li><b>C4.1 · A cabine</b> — o aparelho em si.</li>
+<li><b>C4.2 · O entorno</b> — o banco de praça ao lado, onde sempre tem alguém esperando, ou só sentado, ouvindo.</li>
+</ul></dd>
+<dt>Quem está aqui</dt><dd>passantes sem NPC fixo — boa fonte de boato ambiente.</dd>
+<dt>A verdade (mestre)</dt><dd>de tempos em tempos, o orelhão toca sozinho. Quem atende não ouve uma voz — ouve os sons exatos da própria casa, em tempo real, como se o fone tivesse virado um microfone ligado ao próprio lar de quem atendeu. Ninguém do outro lado fala. É o Casario testando se alguém em casa está prestando atenção.</dd>
+<dt>Testes para achar</dt><dd><ul>
+<li><i>Juízo + Investigação, Limiar 6:</i> o toque do orelhão tem um padrão — sempre nos mesmos três horários do dia, mesmo sem ninguém perto pra notar.</li>
+<li><i>Têmpera + Intuição, Limiar 8:</i> ao atender, é possível reconhecer no som de fundo um detalhe da própria casa que só quem mora lá saberia.</li>
+<li><i>Juízo + Burocracia, Limiar 10:</i> puxando o fio na central telefônica (com um contato ou suborno), a ligação nunca teve origem — a companhia não tem registro de nenhuma chamada.</li>
+</ul></dd>
+<dt>Loot</dt><dd>nenhum loot físico — é gatilho de cena, não lugar de saque. (Opcional: 1 rolagem na tabela de loot pra quem revira o banco ao lado.)</dd>
+<dt>O fio</dt><dd>um dos primeiros sinais concretos e replicáveis de que o bairro observa quem mora nele — bom gancho pra levar os PCs a Seu Adão ou à Sobreloja (<a href="#c11">C11</a>). Liga a <a href="#c3">C3</a>: numa das fitas sem rótulo, o orelhão aparece tocando sozinho, sem ninguém por perto.</dd>
+<dt>Se escalar</dt><dd class="escala">
+<div class="fase"><b>Frescor</b>toca fora de hora, uma vez, sem que ninguém atenda a tempo.</div>
+<div class="fase"><b>Esfriando</b>quem atende ouve a própria casa com clareza perturbadora.</div>
+<div class="fase"><b>Endurecendo</b>toca especificamente quando um dos PCs passa perto, mesmo estando longe de casa.</div>
+<div class="fase"><b>Acabamento</b>atender já não traz som de casa nenhuma: só um silêncio pesado, do tipo que a régua chama de "pronto".</div>
+</dd>
+</dl>
+</div>
+
+<!-- ================= C5 ================= -->
+<div class="local b-obs" id="c5">
+<div class="local-head"><span class="local-code">C5</span><span class="local-name">Os Cortiços do Beco</span></div>
+<div class="boxed">"O prédio sobe apertado ao redor de um poço de luz — roupa pendurada entre janelas de dezenas de famílias, vozes se cruzando de andar em andar. À noite, alguém conta baixinho, olhando pra cima. E se você contar também, o número nunca fecha igual duas vezes."</div>
+<dl>
+<dt>O que é</dt><dd>habitação coletiva popular, dezenas de famílias empilhadas num prédio antigo remendado; o "quintal" é um poço de luz cercado de janelas.</dd>
+<dt>Localização</dt><dd>no coração dos becos que sobem do Mercado rumo à Praça das Almas.</dd>
+<dt>As salas/áreas</dt><dd><ul>
+<li><b>C5.1 · O poço de luz</b> — todas as janelas do prédio dão pra cá; é onde se pendura roupa e se troca fofoca.</li>
+<li><b>C5.2 · Os andares e corredores</b> — escadas apertadas, portas quase coladas.</li>
+<li><b>C5.3 · O telhado</b> — onde Seu Adão sobe, quase toda noite, pra "contar".</li>
+</ul></dd>
+<dt>Quem está aqui</dt><dd>dezenas de moradores; Seu Adão aparece com frequência (mora perto, no Sobrado <a href="#c12">C12</a>, mas vem contar daqui quase toda noite — <a href="#npc-adao">ficha</a>).</dd>
+<dt>A verdade (mestre)</dt><dd>o poço de luz dos Cortiços é, junto com o Mercado, um dos pontos do Casario onde a contagem "não fecha": há sempre uma janela acesa a mais do que o número de apartamentos ocupados permite. Ninguém mora lá — ou melhor, ninguém que os moradores conheçam. É o fenômeno de Observação se acumulando fisicamente, e é a origem prática da obsessão de Seu Adão.</dd>
+<dt>Testes para achar</dt><dd><ul>
+<li><i>Juízo + Percepção, Limiar 6:</i> contando as janelas acesas à noite e comparando com o número de famílias que moram ali, a conta não bate — sempre uma a mais.</li>
+<li><i>Juízo + Investigação, Limiar 8:</i> um morador jura que a janela "extra" muda de posição de noite pra noite, nunca duas noites seguidas no mesmo lugar.</li>
+<li><i>Têmpera + Coragem, Limiar 10:</i> subir ao telhado e observar de perto a janela extra por tempo demais dá a certeza de estar sendo contado de volta (1 Marca de Registro pra quem tenta — ver Sistema/Marcados).</li>
+</ul></dd>
+<dt>Loot</dt><dd>1 rolagem na tabela de loot do Casario, entre pertences deixados por um morador que "se mudou" (ninguém lembra quando). <b>Gancho:</b> o Zelador que Contava as Janelas nasce aqui (junto com <a href="#c12">C12</a>).</dd>
+<dt>O fio</dt><dd>liga diretamente ao gancho do Zelador — é aqui que os PCs podem testemunhar o fenômeno com os próprios olhos antes de conhecer Seu Adão a fundo. O caderno da Dona Ilva (<a href="#c2">C2</a>) e a contagem feita aqui, comparados, revelam o mesmo padrão de nomes que somem.</dd>
+<dt>Se escalar</dt><dd class="escala">
+<div class="fase"><b>Frescor</b>a janela a mais aparece uma noite por semana.</div>
+<div class="fase"><b>Esfriando</b>aparece quase toda noite, sempre num andar diferente.</div>
+<div class="fase"><b>Endurecendo</b>moradores evitam contar as próprias janelas, com medo de "chamar atenção" contando errado.</div>
+<div class="fase"><b>Acabamento</b>todo o poço de luz fica com as janelas acesas ao mesmo tempo, inclusive as que não existem, num silêncio total em que nem a roupa balança no varal.</div>
+</dd>
+</dl>
+</div>
+
+<!-- ================= C6 ================= -->
+<div class="local b-obs" id="c6">
+<div class="local-head"><span class="local-code">C6</span><span class="local-name">O Arquivo Municipal</span></div>
+<div class="boxed">"Fila de balcão, cheiro de papel velho e mofo, um funcionário entediado carimbando formulários. Atrás dele, corredores de estantes sobem até um teto que a luz não alcança direito. Alguém, em algum momento, subiu numa escada alta demais pra alcançar uma pasta alta demais, e não deixou pegada de volta."</div>
+<dl>
+<dt>O que é</dt><dd>repartição pública de registros civis e prediais — plantas, escrituras, registros de nascimento e óbito do bairro.</dd>
+<dt>Localização</dt><dd>prédio público modesto perto da espinha da Rua da Praia, meio escondido entre comércios.</dd>
+<dt>As salas/áreas</dt><dd><ul>
+<li><b>C6.1 · O balcão</b> — o funcionário e a fila.</li>
+<li><b>C6.2 · As estantes</b> — corredores altos de prateleiras, por rua, por prédio, por ano.</li>
+<li><b>C6.3 · O porão / arquivo morto</b> — registros mais antigos, incluindo papéis que, tecnicamente, não deveriam existir (ruas fora de planta, prédios sem endereço).</li>
+</ul></dd>
+<dt>Quem está aqui</dt><dd>um funcionário público qualquer (sem nome fixo — o mestre pode batizá-lo se quiser recorrência).</dd>
+<dt>A verdade (mestre)</dt><dd>no porão, entre registros mortos, há uma pasta sem número contendo o rascunho de uma carta astronômica — anotações de um observador (o mesmo do Alto, A6) sobre "uma direção que os instrumentos não conseguem apontar". Mais fundo ainda, cosida entre papéis irrelevantes, uma única folha solta, de textura errada, fala de martelo, bigorna e peça — um fragmento do cânone, disfarçado de ata burocrática entediante. Ninguém no arquivo sabe como ela entrou ali.</dd>
+<dt>Testes para achar</dt><dd><ul>
+<li><i>Lábia + Burocracia, Limiar 6:</i> convencer o funcionário a liberar acesso ao arquivo morto.</li>
+<li><i>Juízo + Investigação, Limiar 8:</i> entre pastas soltas do arquivo morto, achar a pasta sem número com o rascunho da carta.</li>
+<li><i>Juízo + Ocultismo, Limiar 12:</i> reconhecer, na folha solta cosida entre papéis irrelevantes, que aquilo não é burocracia nenhuma — lê-la custa 1d4 de Lucidez.</li>
+</ul></dd>
+<dt>Loot</dt><dd><b>Testemunho:</b> o rascunho da Carta do astrônomo, na pasta sem número do C6.3. <b>Cânone (ato final):</b> a folha solta cosida no arquivo morto — o mestre pode deixá-la aqui, ou já removida pela instituição antes dos PCs chegarem (ver <a href="#c11">C11</a>).</dd>
+<dt>O fio</dt><dd>o rascunho da carta puxa o fio até o Observatório do Astrônomo, no Alto (A6), onde está a versão "oficial". A folha cânone, se achada, é fio direto pro clímax da campanha e pra instituição.</dd>
+<dt>Se escalar</dt><dd class="escala">
+<div class="fase"><b>Frescor</b>o arquivo é só chato e mofado, nada de estranho à primeira vista.</div>
+<div class="fase"><b>Esfriando</b>pastas começam a aparecer fora de ordem, como consultadas de noite.</div>
+<div class="fase"><b>Endurecendo</b>o funcionário comenta, sem entender o próprio comentário, que "alguém sempre pede pra ver esses papéis, mas nunca assina o livro de visitas".</div>
+<div class="fase"><b>Acabamento</b>o porão inteiro está gelado, e as pastas mais antigas têm as bordas queimadas de frio, prontas, perfeitas, ilegíveis.</div>
+</dd>
+</dl>
+</div>
+
+<!-- ================= C7 ================= -->
+<div class="local b-obs" id="c7">
+<div class="local-head"><span class="local-code">C7</span><span class="local-name">Praça e Igreja das Almas</span></div>
+<div class="boxed">"No alto dos becos, a igreja pequena e sua praça de pedra, árvores velhas, uma vendedora de velas sentada num banco. À noitinha, da casa vizinha, vem o som baixo de um atabaque, e por um instante o ar parece mais quieto, mais seguro, do jeito que só um lugar cuidado consegue ficar."</div>
+<dl>
+<dt>O que é</dt><dd>o ponto mais alto do Casario — uma igreja modesta com adro de praça, e, na casa vizinha, um terreiro que atende a comunidade à noite.</dd>
+<dt>Localização</dt><dd>no topo dos becos, de onde se vê parte do bairro descendo até o Mercado e o Cais.</dd>
+<dt>As salas/áreas</dt><dd><ul>
+<li><b>C7.1 · O adro e a praça</b> — bancos, uma cruz, vendedora de velas e imagens.</li>
+<li><b>C7.2 · A nave da igreja</b> — modesta, missas de padre cansado, sempre meio vazia.</li>
+<li><b>C7.3 · O terreiro vizinho</b> — atendimento à noite; quem entende do Casario começa aqui.</li>
+</ul></dd>
+<dt>Quem está aqui</dt><dd>o padre (coadjuvante); a vendedora de velas; do lado do terreiro, os praticantes — competentes, sábios, atentos.</dd>
+<dt>A verdade (mestre)</dt><dd>é o único ponto do Casario onde a régua da Forja esfria mais devagar — o cuidado ritual comum (católico e de terreiro, lado a lado, sem conflito real entre eles) mantém o lugar mais quente, mais vivo, mais protegido. É refúgio de verdade. Se os PCs perguntarem sobre o padrão de janelas, sumiços ou qualquer coisa "esquisita" a alguém do terreiro, a resposta é sempre alguma variação de <b>"isso não é nosso, não mexe"</b> — e um alerta sincero pra não brincar de investigar sozinho.</dd>
+<dt>Testes para achar</dt><dd><ul>
+<li><i>Lábia + Diplomacia, Limiar 6:</i> ser recebido com atenção genuína por alguém do terreiro (fácil, mas exige abordagem respeitosa).</li>
+<li><i>Juízo + Ocultismo, Limiar 8:</i> reconhecer, no próprio ritual do terreiro, sinais de que ali as coisas "fecham" — proteção de verdade, não encenação.</li>
+<li><i>Têmpera + Fé, Limiar 10:</i> perguntar diretamente sobre o Casario "olhando demais" rende, de quem entende, uma resposta franca (mas incompleta) e um aviso sincero — nunca uma solução mágica pronta.</li>
+</ul></dd>
+<dt>Loot</dt><dd>1 rolagem na tabela de loot do Casario — itens de proteção que <i>funcionam de verdade</i>.</dd>
+<dt>O fio</dt><dd>ponto de apoio moral e de informação confiável do bairro — quem vem aqui sai mais seguro, nunca mais confuso. Liga ao Mercado via Dona Percília, que frequenta os dois.</dd>
+<dt>Se escalar</dt><dd class="escala">
+<div class="fase"><b>Frescor a Endurecendo</b>o lugar muda pouquíssimo; é feito pra resistir.</div>
+<div class="fase"><b>Acabamento</b>pela primeira vez, mesmo aqui o ar esfria, e os praticantes mais velhos admitem, com pesar, que não sabem mais o que fazer além de proteger quem está por perto.</div>
+</dd>
+</dl>
+</div>
+
+<!-- ================= C8 ================= -->
+<div class="local b-obs" id="c8">
+<div class="local-head"><span class="local-code">C8</span><span class="local-name">O Cais Velho</span></div>
+<div class="boxed">"Madeira podre range sob o pé, barcos amarrados que não saem mais. A neblina sobe do rio antes da hora. Um homem remenda rede sem erguer os olhos pro poente — nem quando você pergunta por quê."</div>
+<dl>
+<dt>O que é</dt><dd>o trecho onde o Casario encosta no Guaíba — cais já movimentado, hoje só pesca pequena e um punhado de barcos particulares.</dd>
+<dt>Localização</dt><dd>no fim da Rua da Praia, além do Mercado, de frente pro rio.</dd>
+<dt>As salas/áreas</dt><dd><ul>
+<li><b>C8.1 · O píer principal</b> — madeira podre, barcos amarrados.</li>
+<li><b>C8.2 · O galpão de apetrechos</b> — redes, motores velhos, um barco puxado pra terra "pra conserto" há anos.</li>
+<li><b>C8.3 · A ponta do cais</b> — o trecho mais avançado sobre a água, de onde se vê o poente sobre o Guaíba.</li>
+</ul></dd>
+<dt>Quem está aqui</dt><dd>pescadores esparsos, sem NPC-chave fixo (ligado à lenda do Barqueiro — ver <a href="#p4-6">Parte IV</a> — mais que a um morador específico).</dd>
+<dt>A verdade (mestre)</dt><dd>nenhum barqueiro daqui rema pro poente depois que o sol se afoga — regra não-escrita, seguida por todos, sem exceção, e ninguém explica bem o porquê além de "não se faz". É aqui que o corpo do Jonas nunca voltou.</dd>
+<dt>Testes para achar</dt><dd><ul>
+<li><i>Juízo + Sobrevivência, Limiar 6:</i> notar que nenhum barco sai depois do entardecer, mesmo em noite de peixe bom.</li>
+<li><i>Lábia + Persuasão, Limiar 8:</i> convencer um pescador a falar sobre a "regra" — a resposta vem cheia de rodeios, mas sincera.</li>
+<li><i>Têmpera + Coragem, Limiar 10:</i> ficar na ponta do cais depois do pôr do sol, olhando pro poente sem desviar — risco de ver algo na neblina (ver Parte IV: não acenar de volta).</li>
+</ul></dd>
+<dt>Loot</dt><dd>1 rolagem na tabela de loot do Casario no galpão de apetrechos.</dd>
+<dt>O fio</dt><dd>ligação externa direta com o Guaíba/lenda do Barqueiro e com a morte do Jonas — onde o mestre pode plantar o primeiro gancho físico pra essa lenda, se os jogadores ainda não a conhecem pelo arquivo.</dd>
+<dt>Se escalar</dt><dd class="escala">
+<div class="fase"><b>Frescor</b>só a regra não-escrita, seguida sem drama.</div>
+<div class="fase"><b>Esfriando</b>um pescador comenta ter visto uma luz na água, longe, à noite.</div>
+<div class="fase"><b>Endurecendo</b>a neblina chega mais cedo, mais espessa, mesmo em dias claros.</div>
+<div class="fase"><b>Acabamento</b>o cais inteiro fica coberto de silêncio e gelo fino, e a linha entre água e névoa desaparece de vez.</div>
+</dd>
+</dl>
+</div>
+
+<!-- ================= C9 ================= -->
+<div class="local b-obs" id="c9">
+<div class="local-head"><span class="local-code">C9</span><span class="local-name">O Estúdio do Retratista</span></div>
+<div class="boxed">"Cortinas de fundo, uma câmera grande de tripé, paredes cobertas de retratos emoldurados — décadas de rostos sérios do bairro. Uma luz vermelha vaza por baixo de uma porta ao fundo. O velho fotógrafo sorri, educado, e evita olhar pra uma pasta específica em cima da mesa."</div>
+<dl>
+<dt>O que é</dt><dd>estúdio fotográfico tradicional, décadas no mesmo endereço — retratos de família, formatura, casamento.</dd>
+<dt>Localização</dt><dd>travessa perto da Praça e Igreja das Almas (<a href="#c7">C7</a>), fachada discreta.</dd>
+<dt>As salas/áreas</dt><dd><ul>
+<li><b>C9.1 · O salão de retratos</b> — a câmera grande, os cenários de pano, as luzes.</li>
+<li><b>C9.2 · A sala de espera</b> — paredes forradas de retratos emoldurados, décadas de rostos do bairro.</li>
+<li><b>C9.3 · O quarto escuro</b> — onde o Retratista revela, sozinho, sem deixar ninguém entrar.</li>
+</ul></dd>
+<dt>Quem está aqui</dt><dd>o Retratista (NPC de apoio — velho fotógrafo cansado e educado, evita falar da "encomenda especial" anual).</dd>
+<dt>A verdade (mestre)</dt><dd>uma vez por ano, alguém encomenda ao Retratista uma "foto de grupo" de gente que, individualmente, ele nunca fotografou antes e nunca reconhece depois. É a Foto da Multidão (gancho — ver <a href="#p4-7">Parte IV</a>) nascendo aqui: o verso da foto vem com anotações que ninguém escreveu à mão do Retratista, e cada vez que alguém a olha com atenção, um rosto novo aparece virado pra câmera — um rosto que, se a campanha já rodou o bastante, pertence a outro gancho da cidade.</dd>
+<dt>Testes para achar</dt><dd><ul>
+<li><i>Lábia + Persuasão, Limiar 6:</i> o Retratista, tratado com gentileza, comenta espontaneamente sobre "a encomenda estranha" do ano.</li>
+<li><i>Juízo + Investigação, Limiar 8:</i> nos arquivos do estúdio, os negativos da tal foto de grupo têm uma data mas nenhum nome de cliente.</li>
+<li><i>Têmpera + Vigor Mental, Limiar 10:</i> olhar a foto (ou uma cópia) duas vezes seguidas sem desviar revela um rosto a mais na segunda vez.</li>
+</ul></dd>
+<dt>Loot</dt><dd>1 rolagem na tabela de loot do Casario na sala de espera. <b>Gancho:</b> a Foto da Multidão (foto + verso anotado) nasce aqui — ver <a href="#p4-7">Os 8 ganchos</a>.</dd>
+<dt>O fio</dt><dd>origem física do gancho da Foto da Multidão — liga a qualquer outro bairro cujo NPC/rosto o mestre escolha fazer aparecer retroativamente na foto, conforme a teia (<a href="#p4-2">Parte IV</a>).</dd>
+<dt>Se escalar</dt><dd class="escala">
+<div class="fase"><b>Frescor</b>a foto de grupo é só um caso estranho contado pelo Retratista, sem prova física ainda.</div>
+<div class="fase"><b>Esfriando</b>a cópia que os PCs conseguem já mostra um rosto a mais na segunda olhada.</div>
+<div class="fase"><b>Endurecendo</b>o Retratista recebe a encomenda de novo, fora de época, visivelmente perturbado.</div>
+<div class="fase"><b>Acabamento</b>toda foto tirada no estúdio, de qualquer cliente comum, sai com um rosto a mais no fundo.</div>
+</dd>
+</dl>
+</div>
+
+<!-- ================= C10 ================= -->
+<div class="local b-obs" id="c10">
+<div class="local-head"><span class="local-code">C10</span><span class="local-name">O Cinema Íris</span></div>
+<div class="boxed">"O letreiro pisca faltando uma letra. Dentro, poltronas de veludo puído, poucos espectadores espalhados na meia-luz. O filme passa. E por um instante, sem que você saiba dizer quando começou, tem a certeza de que a plateia atrás de você não está olhando pra tela."</div>
+<dl>
+<dt>O que é</dt><dd>cinema de bairro, sala única, sessões de filme popular em fita ou rolo, decadência elegante.</dd>
+<dt>Localização</dt><dd>na espinha da Rua da Praia, entre o Mercado e a subida pros Cortiços.</dd>
+<dt>As salas/áreas</dt><dd><ul>
+<li><b>C10.1 · Bilheteria e saguão</b> — cartazes desbotados, funcionário sonolento.</li>
+<li><b>C10.2 · A plateia</b> — fileiras de poltronas de veludo puído.</li>
+<li><b>C10.3 · A cabine de projeção</b> — o projecionista, os rolos de filme, uma janela pequena pra sala.</li>
+</ul></dd>
+<dt>Quem está aqui</dt><dd>o projecionista (NPC de apoio); plateia variável.</dd>
+<dt>A verdade (mestre)</dt><dd>em sessões quase vazias, quem se senta na plateia do Íris tem a certeza incômoda de estar sendo assistido por trás — como se as poucas outras pessoas na sala tivessem virado a cadeira, sem barulho, pra olhar você em vez da tela. É o fenômeno d'<a href="#p6-obs">A Assembleia</a> se formando em miniatura, alimentado pelo hábito antigo do cinema de "fitar um espetáculo por tempo demais" em salas cada vez mais vazias.</dd>
+<dt>Testes para achar</dt><dd><ul>
+<li><i>Juízo + Percepção, Limiar 6:</i> contando cabeças na plateia antes e depois de piscar, o número não bate.</li>
+<li><i>Têmpera + Intuição, Limiar 8:</i> a certeza de estar sendo olhado por trás é forte o bastante pra atrapalhar qualquer concentração na sala.</li>
+<li><i>Têmpera + Coragem, Limiar 10:</i> virar de propósito pra encarar a plateia atrás — quem faz isso vê, por um instante, fileiras cheias demais pra sala real, todas viradas pra você.</li>
+</ul></dd>
+<dt>Loot</dt><dd>1 rolagem na tabela de loot do Casario na cabine de projeção.</dd>
+<dt>O fio</dt><dd>liga tematicamente ao Mercado e aos Cortiços como um terceiro ponto "onde se é contado como janela" — reforça o padrão sem precisar de NPC novo.</dd>
+<dt>Se escalar</dt><dd class="escala">
+<div class="fase"><b>Frescor</b>só em sessões vazias, de vez em quando.</div>
+<div class="fase"><b>Esfriando</b>acontece em quase toda sessão, mesmo cheia.</div>
+<div class="fase"><b>Endurecendo</b>o projecionista se recusa a rodar sessões sozinho, mesmo sem clientes.</div>
+<div class="fase"><b>Acabamento</b>a tela para de importar: a plateia toda fica de costas pra ela, virada pra quem entra.</div>
+</dd>
+</dl>
+</div>
+
+<!-- ================= C11 ================= -->
+<div class="local b-obs" id="c11">
+<div class="local-head"><span class="local-code">C11</span><span class="local-name">A Sobreloja da Vigília</span></div>
+<div class="boxed">"Uma escada estreita sobe ao lado de uma loja fechada, até uma sala com um cartaz escrito à mão sobre 'segurança do bairro'. Um homem de casaco bom recebe você educado demais, como se já esperasse a visita. Numa parede, fotos comuns de esquinas comuns, presas com alfinete, uma ao lado da outra, sem padrão nenhum que você consiga nomear."</div>
+<dl>
+<dt>O que é</dt><dd>sala comercial no andar de cima de uma loja fechada, sede informal de um "grupo de vigilância de bairro" — aparentemente banal.</dd>
+<dt>Localização</dt><dd>rua secundária perto do Arquivo Municipal (<a href="#c6">C6</a>) e da Praça das Almas (<a href="#c7">C7</a>).</dd>
+<dt>As salas/áreas</dt><dd><ul>
+<li><b>C11.1 · A sala de reuniões</b> — cadeiras, um quadro com anotações sobre "ocorrências do bairro".</li>
+<li><b>C11.2 · O escritório</b> — mesa organizada, telefone, parede de fotos comuns de esquinas.</li>
+<li><b>C11.3 · O arquivo interno</b> — pastas trancadas com relatórios sobre moradores específicos (potencialmente sobre os próprios PCs).</li>
+</ul></dd>
+<dt>Quem está aqui</dt><dd>O Homem da Sobreloja (<a href="#npc-sobreloja">ficha</a>); um ou dois "voluntários" que não sabem, de fato, pra quem trabalham.</dd>
+<dt>A verdade (mestre)</dt><dd>o "grupo de vigilância" é fachada perfeitamente mundana pra instituição observar o Casario de perto, sem levantar suspeita — é o mesmo Estranho do velório (<a href="#p5-6">Parte V, Beat 3</a>), com outra roupa, na mesma função. O Homem da Sobreloja é cortês, nunca ameaça diretamente, e sempre parece já saber o que os PCs vão dizer antes de dizerem.</dd>
+<dt>Testes para achar</dt><dd><ul>
+<li><i>Juízo + Investigação, Limiar 8:</i> no quadro da sala de reuniões, entre "ocorrências" banais, há registros que só fazem sentido pra quem já viu algo estranho no bairro.</li>
+<li><i>Têmpera + Intuição, Limiar 8:</i> a educação do Homem da Sobreloja tem um fundo de familiaridade — ele te trata como quem já leu um relatório sobre você.</li>
+<li><i>Juízo + Investigação (ou Furtividade), Limiar 10:</i> acessar o arquivo interno (C11.3) revela pastas nomeadas por rua, não por pessoa — e uma delas pode já ter o nome de um dos PCs.</li>
+</ul></dd>
+<dt>Loot</dt><dd>nenhum loot físico recomendado — o valor do local é informação (e risco). Se quiser recompensar exploração, 1 rolagem na tabela de loot na sala de reuniões.</dd>
+<dt>O fio</dt><dd>ponto de contato mais direto e recorrente com a instituição dentro do Casario — pode reaparecer a qualquer momento da campanha como "o lugar que sabe demais".</dd>
+<dt>Se escalar</dt><dd class="escala">
+<div class="fase"><b>Frescor</b>a sobreloja é só estranha, meio fechada, aparentemente inofensiva.</div>
+<div class="fase"><b>Esfriando</b>o Homem da Sobreloja começa a aparecer em lugares onde os PCs estiveram recentemente.</div>
+<div class="fase"><b>Endurecendo</b>a associação "de bairro" ganha mais membros silenciosos, todos igualmente educados demais.</div>
+<div class="fase"><b>Acabamento</b>a sobreloja não fecha mais: está sempre aberta, sempre com luz acesa, sempre com alguém olhando pra rua.</div>
+</dd>
+</dl>
+</div>
+
+<!-- ================= C12 ================= -->
+<div class="local b-obs" id="c12">
+<div class="local-head"><span class="local-code">C12</span><span class="local-name">O Sobrado do Zelador</span></div>
+<div class="boxed">"A casa é modesta, cortina meio aberta. Um homem magro está sentado numa cadeira junto à janela, caderno no colo, olhos fixos na rua. Ele murmura números baixinho, sem parar, como quem reza. No quarto dos fundos, uma parede inteira está coberta de marcas de risco, desenhos tortos de janelas, e uma lista de nomes cada vez mais comprida."</div>
+<dl>
+<dt>O que é</dt><dd>a casa de Seu Adão — zelador autoproclamado que passa as noites contando janelas acesas.</dd>
+<dt>Localização</dt><dd>rua estreita perto dos Cortiços (<a href="#c5">C5</a>), de onde se vê boa parte do bairro descendo até o Mercado.</dd>
+<dt>As salas/áreas</dt><dd><ul>
+<li><b>C12.1 · A sala da frente</b> — a cadeira de Seu Adão junto à janela, sempre virada pra fora.</li>
+<li><b>C12.2 · O quarto dos fundos ("a parede")</b> — coberta, do chão ao teto, de marcas de contagem, croquis toscos de janelas, datas, e uma lista cada vez mais comprida de "nomes que faltam".</li>
+</ul></dd>
+<dt>Quem está aqui</dt><dd>Seu Adão (<a href="#npc-adao">ficha</a>).</dd>
+<dt>A verdade (mestre)</dt><dd>Seu Adão não é louco — ele é a versão humana e devota do próprio fenômeno de Observação do bairro: contar é, pra ele, uma forma de resistência (contando, ele impede, ou acha que impede, que mais uma janela "sobre"). O padrão que ele registra é real e consistente há anos, mas ele mesmo está, aos poucos, virando um dos "olhos" do bairro sem perceber: ele começou a ser contado também, por alguém, em algum lugar.</dd>
+<dt>Testes para achar</dt><dd><ul>
+<li><i>Lábia + Diplomacia, Limiar 6:</i> conseguir que Seu Adão receba os PCs e mostre a parede — ele é solitário e, no fundo, quer que alguém acredite nele.</li>
+<li><i>Juízo + Investigação, Limiar 8:</i> cruzando a lista de "nomes que faltam" com o caderno de Dona Ilva (<a href="#c2">C2</a>), o padrão dos sumiços fica claro.</li>
+<li><i>Têmpera + Intuição, Limiar 10:</i> prestar atenção em Seu Adão enquanto ele conta, ao vivo, revela um detalhe perturbador: às vezes ele para de contar as janelas dos outros e começa, sem perceber, a contar os presentes na sala.</li>
+</ul></dd>
+<dt>Loot</dt><dd>1 rolagem na tabela de loot do Casario no quarto dos fundos (binóculo velho, caderno usado, luneta de latão). É aqui, junto com <a href="#c5">C5</a>, que o gancho do Zelador que Contava as Janelas se resolve ou aprofunda.</dd>
+<dt>O fio</dt><dd>liga diretamente ao gancho central do bairro (C5/C12) e ao caderno da Ilva (C2) — os três juntos formam a espinha investigativa do "padrão dos sumiços".</dd>
+<dt>Se escalar</dt><dd class="escala">
+<div class="fase"><b>Frescor</b>Seu Adão é só um velho excêntrico com um hobby estranho.</div>
+<div class="fase"><b>Esfriando</b>a lista de nomes que faltam cresce visivelmente entre uma visita e outra dos PCs.</div>
+<div class="fase"><b>Endurecendo</b>Seu Adão começa a anotar os PCs na parede, com data e hora de cada visita.</div>
+<div class="fase"><b>Acabamento</b>a parede inteira está coberta, sem um centímetro livre, e Seu Adão para de falar — só aponta, com o dedo trêmulo, pra uma marca nova.</div>
+</dd>
+</dl>
+</div>
+
+<!-- ================= C13 ================= -->
+<div class="local b-obs" id="c13">
+<div class="local-head"><span class="local-code">C13</span><span class="local-name">O Vão Entre os Prédios</span></div>
+<div class="boxed">"Entre dois prédios há uma fresta larga o bastante pra você entrar de lado — o que não devia ser possível, porque de fora os dois prédios estão praticamente colados. Lá dentro, mais fundo do que a rua permite, alguém escreveu na parede, com uma letra que não escorre nem borra: 'há outros mundos além destes'."</div>
+<dl>
+<dt>O que é</dt><dd>uma fresta entre dois prédios do bairro, estreita demais pra existir do jeito que existe — mas existe.</dd>
+<dt>Localização</dt><dd>em algum lugar entre o Mercado e o Cais; a localização exata "desliza" um pouco a cada vez que alguém tenta descrevê-la de novo — não fixe o Vão no mesmo lugar duas vezes.</dd>
+<dt>As salas/áreas</dt><dd><ul>
+<li><b>C13.1 · A entrada</b> — o ponto onde a fresta começa, larga o bastante pra uma pessoa de lado.</li>
+<li><b>C13.2 · O fundo</b> — mais fundo do que a distância entre os dois prédios permitiria fisicamente; aqui está a pichação, alta, numa parede que não devia ter espaço pra existir.</li>
+</ul></dd>
+<dt>Quem está aqui</dt><dd>ninguém fixo — junto com o Cais (<a href="#c8">C8</a>), é um dos dois pontos do bairro por onde "a cidade-espelho vaza".</dd>
+<dt>A verdade (mestre)</dt><dd>o Vão é uma fresta geométrica genuína entre o Casario "de verdade" e a cidade-espelho que fica por baixo, na mesma direção pra onde o Guaíba escorre ao poente. Não é perigoso por si — é só uma prova física, pequena e íntima, de que os mapas não batem.</dd>
+<dt>Testes para achar</dt><dd><ul>
+<li><i>Juízo + Percepção, Limiar 6:</i> notar que a fresta é larga o bastante pra entrar, o que não devia ser possível dado o espaço real entre os dois prédios.</li>
+<li><i>Juízo + Engenharia, Limiar 8:</i> medir a fresta por fora e por dentro dá dois números diferentes.</li>
+<li><i>Têmpera + Coragem, Limiar 10:</i> ir até o fundo do Vão e ficar ali por um minuto inteiro — quem faz isso ouve, muito abafado, o som da própria cidade, mas errado: trânsito, buzina, uma novela na TV — vindo de baixo, não de fora.</li>
+</ul></dd>
+<dt>Loot</dt><dd>nenhum loot físico (é local de atmosfera e pista, não de saque). <b>Documento (Superfície):</b> a pichação "há outros mundos além destes" está escrita no fundo do Vão — <i>Juízo + Investigação, Limiar 6</i> pra notar que não é pichação comum: a tinta nunca esbarra nem escorre, como se tivesse sido escrita sem gravidade.</dd>
+<dt>O fio</dt><dd>junto com o Cais (C8), é uma das duas "saídas" do Casario pro sobrenatural maior da cidade — bom lugar pra plantar a pichação e mostrar fisicamente aos PCs que a cidade tem frestas.</dd>
+<dt>Se escalar</dt><dd class="escala">
+<div class="fase"><b>Frescor</b>o Vão é raro de achar; a maioria dos moradores nunca notou que ele existe.</div>
+<div class="fase"><b>Esfriando</b>passa a aparecer em mais de um lugar do bairro ao mesmo tempo (relatos conflitantes de moradores).</div>
+<div class="fase"><b>Endurecendo</b>o som vindo do fundo fica claro o bastante pra reconhecer palavras.</div>
+<div class="fase"><b>Acabamento</b>o Vão para de ser uma fresta: vira uma porta, e algo do outro lado, pela primeira vez, empurra de volta.</div>
+</dd>
+</dl>
+</div>
+
+<!-- ================= NPCs ================= -->
+<a id="casario-npcs" class="anchor-target"></a>
+<h3>NPCs-chave do Casario (5)</h3>
+<p class="kicker">ficha enxuta, sem boxed text — o mestre improvisa a fala</p>
+
+<div class="npc b-obs" id="npc-percilia">
+<h4 class="npc-name">Dona Percília</h4>
+<dl>
+<dt>Quem é</dt><dd>erveira do Mercado Público (<a href="#c1">C1</a>), décadas na mesma banca.</dd>
+<dt>O que quer</dt><dd>manter o equilíbrio do bairro e proteger quem ela pode proteger — nada mais grandioso que isso.</dd>
+<dt>O que sabe</dt><dd>reconhece o sobrenatural comum de cabeça erguida; distingue o que "é" do terreiro do que não é — é a primeira a dizer que o padrão do Casario "não é nosso, não mexe".</dd>
+<dt>Como interpretar</dt><dd>calorosa mas direta, sem enrolação; trata os jogadores como filhos que precisam de bronca, não de mimo.</dd>
+<dt>O segredo</dt><dd class="segredo">perdeu alguém pro padrão de Observação anos atrás — nunca fala nisso a não ser que ganhe confiança de verdade.</dd>
+<dt>O gancho</dt><dd>indica Seu Adão ou o terreiro de <a href="#c7">C7</a>; confirma ou nega teorias dos PCs com autoridade tranquila.</dd>
+</dl>
+</div>
+
+<div class="npc b-obs" id="npc-adao">
+<h4 class="npc-name">Seu Adão</h4>
+<dl>
+<dt>Quem é</dt><dd>zelador autoproclamado do bairro, mora perto dos Cortiços, conta janelas acesas há anos (<a href="#c12">C12</a>, <a href="#c5">C5</a>).</dd>
+<dt>O que quer</dt><dd>que alguém, finalmente, acredite nele e ajude a entender o padrão antes que "a conta feche".</dd>
+<dt>O que sabe</dt><dd>o padrão exato de janelas a mais, cruzável com o caderno de Dona Ilva; nomes de gente que sumiu e que ninguém mais lembra.</dd>
+<dt>Como interpretar</dt><dd>nervoso, rápido de fala, hiperfocado quando o assunto é a contagem; capaz de parar no meio de uma frase pra contar algo no ambiente.</dd>
+<dt>O segredo</dt><dd class="segredo">ele mesmo já está sendo contado por alguém, em algum lugar — revele aos poucos (ver "se escalar" em <a href="#c12">C12</a>).</dd>
+<dt>O gancho</dt><dd>é o coração do gancho "o Zelador que Contava as Janelas" — sua parede e seu caderno são o achado central.</dd>
+</dl>
+</div>
+
+<div class="npc b-obs" id="npc-ilva">
+<h4 class="npc-name">Dona Ilva</h4>
+<dl>
+<dt>Quem é</dt><dd>dona da Pensão Boa Vista (<a href="#c2">C2</a>), décadas administrando o prédio.</dd>
+<dt>O que quer</dt><dd>manter o controle absoluto do que entra e sai da pensão — é como ela se sente segura.</dd>
+<dt>O que sabe</dt><dd>um registro minucioso de hóspedes, visitas e horários, incluindo entradas estranhas no quarto 304 que ninguém confirma ter feito.</dd>
+<dt>Como interpretar</dt><dd>seca, desconfiada, cordial só depois de testada; adora fofoca, desde que role a seu favor.</dd>
+<dt>O segredo</dt><dd class="segredo">sabe, no fundo, que o quarto 304 nunca teve morador de verdade — tem medo de admitir isso em voz alta.</dd>
+<dt>O gancho</dt><dd>seu caderno é peça central pra cruzar com a contagem de Seu Adão; confirma nomes de hóspedes que sumiram.</dd>
+</dl>
+</div>
+
+<div class="npc b-obs" id="npc-ivo">
+<h4 class="npc-name">Ivo</h4>
+<dl>
+<dt>Quem é</dt><dd>dono da Locadora Fita-Mágica (<a href="#c3">C3</a>), herdou o negócio do pai.</dd>
+<dt>O que quer</dt><dd>só quer tocar a loja em paz e não pensar demais nas fitas sem rótulo.</dd>
+<dt>O que sabe</dt><dd>que as fitas sem rótulo se multiplicam e "voltam" mesmo destruídas; nunca as assistiu até o fim, de propósito.</dd>
+<dt>Como interpretar</dt><dd>nervoso, evasivo no começo, alivia visivelmente se alguém mais leva o assunto a sério — ele estava sozinho nisso.</dd>
+<dt>O segredo</dt><dd class="segredo">já assistiu, uma vez, a uma fita até o fim, e viu algo que não conta pra ninguém.</dd>
+<dt>O gancho</dt><dd>pode entregar uma fita sem rótulo aos PCs — ponte direta pra A Várzea.</dd>
+</dl>
+</div>
+
+<div class="npc b-obs" id="npc-sobreloja">
+<h4 class="npc-name">O Homem da Sobreloja</h4>
+<dl>
+<dt>Quem é</dt><dd>rosto educado e sem nome à frente do "grupo de vigilância de bairro" (<a href="#c11">C11</a>) — a instituição, com outra fachada.</dd>
+<dt>O que quer</dt><dd>observar, catalogar, e — se necessário — "convidar" quem se aproxima demais da verdade.</dd>
+<dt>O que sabe</dt><dd>mais do que aparenta sobre qualquer PC que já tenha sido notado (ver <a href="#p1-7">a Atenção</a>); talvez já tenha um relatório aberto sobre o grupo.</dd>
+<dt>Como interpretar</dt><dd>extremamente educado, nunca ameaça abertamente, sempre parece um passo à frente — nunca mostra pressa.</dd>
+<dt>O segredo</dt><dd class="segredo">ele próprio não sabe pra quem, exatamente, trabalha — só sabe que "sempre trabalhou" e nunca teve outra vida pra lembrar.</dd>
+<dt>O gancho</dt><dd>reaparece a qualquer momento que o mestre queira lembrar aos jogadores que estão sendo observados; é uma face recorrente do Estranho do velório (<a href="#p5-6">Parte V</a>).</dd>
+</dl>
+</div>
+
+<!-- ================= Ligações ================= -->
+<a id="casario-ligacoes" class="anchor-target"></a>
+<h3>Ligações internas &amp; externas</h3>
+<p><b>Ligações internas:</b> Caderno da Ilva (<a href="#c2">C2</a>) + contagem do Zelador (<a href="#c5">C5</a>/<a href="#c12">C12</a>) = o padrão dos sumiços · Mercado (<a href="#c1">C1</a>), Cortiços (<a href="#c5">C5</a>), Cinema (<a href="#c10">C10</a>) = os pontos onde "se é contado como janela" · Locadora (<a href="#c3">C3</a>) + Orelhão (<a href="#c4">C4</a>) + Retratista (<a href="#c9">C9</a>) = a Observação virando registro material · Cais (<a href="#c8">C8</a>) e Vão (<a href="#c13">C13</a>) = as duas saídas pro sobrenatural maior · Igreja/terreiro (<a href="#c7">C7</a>) = refúgio e sabedoria.</p>
+<p><b>Ligações externas:</b> Cais (C8) → Guaíba (lenda do Barqueiro; morte do Jonas) · Câmara fria (C1)/o frio → O Alto (o pronto, o Vazio) · Sótão da pensão (C2)/acervo → O Aterro · Fitas (C3) → A Várzea (o Eco) · A Sobreloja (C11) → a instituição.</p>
+
+<!-- ================= Distribuição ================= -->
+<a id="casario-distribuicao" class="anchor-target"></a>
+<h3>Distribuição</h3>
+<table>
+<tr><th>Categoria</th><th>Item</th><th>Onde</th></tr>
+<tr><td>Gancho</td><td>O Zelador que Contava as Janelas</td><td><a href="#c5">C5</a> / <a href="#c12">C12</a></td></tr>
+<tr><td>Gancho</td><td>A Foto da Multidão</td><td><a href="#c9">C9</a></td></tr>
+<tr><td>Documento — Superfície</td><td>Panfleto "nada que se ama tem permissão de acabar"</td><td><a href="#c1">C1</a></td></tr>
+<tr><td>Documento — Superfície</td><td>Pichação "há outros mundos além destes"</td><td><a href="#c13">C13</a></td></tr>
+<tr><td>Documento — Superfície</td><td>Bilhete da melodia</td><td><a href="#c2">C2</a>, sótão</td></tr>
+<tr><td>Testemunho</td><td>Rascunho da Carta do astrônomo <span class="tag">oficial no Alto, A6</span></td><td><a href="#c6">C6</a></td></tr>
+<tr><td>Cânone (ato final)</td><td>Folha solta do arquivo morto (fragmento sobre martelo/bigorna/peça)</td><td><a href="#c6">C6</a>, ou já levada pela instituição — ver <a href="#c11">C11</a></td></tr>
+</table>
+
+<!-- ================= Loot ================= -->
+<a id="casario-loot" class="anchor-target"></a>
+<h3>Tabela de loot do Casario (d20)</h3>
+<p class="kicker">temática de Observação — lentes, espelhos, binóculos, fotos, cadernos, fitas</p>
+<table>
+<tr><th>d20</th><th>Item</th></tr>
+<tr><td>1</td><td>Óculos de leitura comuns, aro de metal.</td></tr>
+<tr><td>2</td><td>Caderno de capa dura, meio usado, páginas em branco.</td></tr>
+<tr><td>3</td><td>Lupa de latão, cabo rachado.</td></tr>
+<tr><td>4</td><td>Espelho de bolso trincado.</td></tr>
+<tr><td>5</td><td>Foto 3x4 avulsa, rosto desconhecido, verso em branco.</td></tr>
+<tr><td>6</td><td>Binóculo de teatro, uma lente embaçada.</td></tr>
+<tr><td>7</td><td>Rolo de filme fotográfico não revelado (24 poses).</td></tr>
+<tr><td>8</td><td>Par de binóculos de campo, bons, com iniciais gravadas que não são suas.</td></tr>
+<tr><td>9</td><td>Fita cassete rotulada à mão só com um número.</td></tr>
+<tr><td>10</td><td>Álbum de fotos de família — de família nenhuma que os PCs conhecem.</td></tr>
+<tr><td>11</td><td><span class="tag">tocado</span> Espelho de mão que demora meio segundo a mais pra refletir quem olha.</td></tr>
+<tr><td>12</td><td><span class="tag">tocado</span> Óculos que, por um instante ao calçar, mostram o ambiente com uma pessoa a mais.</td></tr>
+<tr><td>13</td><td><span class="tag">tocado</span> Câmera antiga que só revela filmes com um rosto extra no canto.</td></tr>
+<tr><td>14</td><td><span class="tag">tocado</span> Caderno cujas páginas em branco, à luz fraca, mostram anotações que somem ao acender a luz.</td></tr>
+<tr><td>15</td><td><span class="tag">tocado</span> Luneta de latão através da qual, por um segundo, se vê o observador sendo observado de volta.</td></tr>
+<tr><td>16</td><td><span class="tag">raro</span> Bilhete anônimo com um endereço e um horário — alguém marcou um encontro que ainda não aconteceu.</td></tr>
+<tr><td>17</td><td><span class="tag">raro</span> Chave sem etiqueta que abre uma porta em algum lugar do bairro (o mestre decide qual, na hora).</td></tr>
+<tr><td>18</td><td><span class="tag">raro</span> Retrato emoldurado do Estúdio do Retratista com um rosto que muda de posição entre uma olhada e outra.</td></tr>
+<tr><td>19</td><td><span class="tag">raro · ligado a gancho</span> Fragmento de fita VHS sem rótulo — mostra alguns segundos do próprio bairro, de um ângulo impossível.</td></tr>
+<tr><td>20</td><td><span class="tag">raríssimo</span> Olho de vidro antigo (prótese ou estátua) — quem o guarda no bolso por mais de uma cena sente, às vezes, que ele "olha" por conta própria. Item perigoso — o mestre decide o preço.</td></tr>
+</table>
+
+<!-- ================= Encontros ================= -->
+<a id="casario-encontros" class="anchor-target"></a>
+<h3>Tabela de encontros/eventos do Casario (d12)</h3>
+<p class="kicker">o que acontece se os PCs vagam pelo bairro sem rumo</p>
+<table>
+<tr><th>d12</th><th>Evento</th></tr>
+<tr><td>1</td><td>Um morador jura ter visto você antes, num lugar em que você nunca esteve.</td></tr>
+<tr><td>2</td><td>Uma janela, num prédio qualquer, apaga assim que você olha pra ela.</td></tr>
+<tr><td>3</td><td>Seu Adão passa contando em voz baixa, sem notar vocês.</td></tr>
+<tr><td>4</td><td>O orelhão da praça (C4) toca; ninguém mais parece notar.</td></tr>
+<tr><td>5</td><td>Um pequeno grupo "de vigilância de bairro" passa distribuindo panfletos sobre segurança.</td></tr>
+<tr><td>6</td><td>Uma fila esperando pra usar o orelhão observa vocês em silêncio até vocês passarem.</td></tr>
+<tr><td>7</td><td>Alguém no mezanino de um prédio qualquer está parado, olhando pra baixo, pra vocês.</td></tr>
+<tr><td>8</td><td>Um gato (ou pombo) segue vocês por três quarteirões, sempre um passo atrás.</td></tr>
+<tr><td>9</td><td>Um vendedor ambulante oferece "uma fotografia de lembrança" sem câmera nenhuma à vista.</td></tr>
+<tr><td>10</td><td>Neblina sobe do Guaíba mais cedo que o normal, mesmo em pleno dia.</td></tr>
+<tr><td>11</td><td>Um morador comenta, casualmente, que "esse quarteirão tinha mais uma casa, semana passada".</td></tr>
+<tr><td>12</td><td>Silêncio súbito: por um instante, todo o bairro parece prender a respiração — e depois volta ao normal, como se nada tivesse acontecido.</td></tr>
+</table>
+<a class="totop" href="#topo">↑ topo</a>
+
+<hr>
+
+<!-- ============================================================ BAIRROS PENDENTES ============================================================ -->
+<a id="bairro-baixa" class="anchor-target"></a>
+<h2 style="border-top-color:var(--c-pac)">A BAIXA <span style="color:var(--c-pac)">· Pacto</span> <span class="tag tag-pend">pendente de validação do padrão</span></h2>
+<div class="pendente"><span class="lbl">Aguardando aprovação do piloto (O Casario)</span><p style="margin:0">12 locais (B1–B12), 5 NPCs-chave (Tângelo, O Corretor, Seu Bonifácio, Mãe Diná, Zaira). Blueprint completo na Seção 8.2 do documento-fonte. Será expandido no mesmo molde assim que o padrão do Casario for validado.</p></div>
+
+<a id="bairro-ilhas" class="anchor-target"></a>
+<h2 style="border-top-color:var(--c-ger)">AS ILHAS <span style="color:var(--c-ger)">· Germe</span> <span class="tag tag-pend">pendente de validação do padrão</span></h2>
+<div class="pendente"><span class="lbl">Aguardando aprovação do piloto (O Casario)</span><p style="margin:0">11 locais (I1–I11), 5 NPCs-chave (Pai Jorge, Dona Aurora, Seu Firmino, a Família Enflorada, Menino Tico). Blueprint completo na Seção 8.3 do documento-fonte.</p></div>
+
+<a id="bairro-alto" class="anchor-target"></a>
+<h2 style="border-top-color:var(--c-vaz)">O ALTO <span style="color:var(--c-vaz)">· Vazio</span> <span class="tag tag-pend">pendente de validação do padrão</span></h2>
+<div class="pendente"><span class="lbl">Aguardando aprovação do piloto (O Casario)</span><p style="margin:0">11 locais (A1–A11), 5 NPCs-chave (Dona Esmeralda, Dr. Vasconcelos, Prof. Heldbrandt, os Irmãos Andrade, Silêncio). Blueprint completo na Seção 8.4 do documento-fonte.</p></div>
+
+<a id="bairro-aterro" class="anchor-target"></a>
+<h2 style="border-top-color:var(--c-asc)">O ATERRO <span style="color:var(--c-asc)">· Ascensão</span> <span class="tag tag-pend">pendente de validação do padrão</span></h2>
+<div class="pendente"><span class="lbl">Aguardando aprovação do piloto (O Casario)</span><p style="margin:0">12 locais (T1–T12), 5 NPCs-chave (Seu "ápeiron", a Colecionadora, Pastor Aurélio, os Catadores, o Guarda do Achados e Perdidos). Blueprint completo na Seção 8.5 do documento-fonte.</p></div>
+
+<a id="bairro-varzea" class="anchor-target"></a>
+<h2 style="border-top-color:var(--c-eco)">A VÁRZEA <span style="color:var(--c-eco)">· Eco</span> <span class="tag tag-pend">pendente de validação do padrão</span></h2>
+<div class="pendente"><span class="lbl">Aguardando aprovação do piloto (O Casario)</span><p style="margin:0">12 locais (V1–V12), 5 NPCs-chave (Seu Aristides, Dona Cló, o Locutor Noturno, os Poetas do Café, a Menina do Carrossel). Blueprint completo na Seção 8.6 do documento-fonte.</p></div>
+
+<hr>
+
+<!-- ============================================================ PARTE IV ============================================================ -->
+<a id="parte4" class="anchor-target"></a>
+<h2>PARTE IV · A TEIA &amp; O RELÓGIO</h2>
+<p class="kicker">a estrutura da campanha — modelo <i>Curse of Strahd</i></p>
+
+<p><b>O princípio:</b> sandbox com gravidade. Os jogadores vão aonde quiserem, mas todo lugar importa e tudo se interliga como um mundo real. Isso se consegue com: dois cubos (ganchos que tocam todos os outros), fios concretos entre ganchos (um objeto, uma pista, um efeito — nunca uma conexão vaga), um fundo em cada fio (gancho → besta → Chefe → Ápice), e a espinha (o arquivo do Jonas).</p>
+
+<a id="p4-1" class="anchor-target"></a>
+<h3>Os dois cubos</h3>
+<ul>
+<li><b>O Casario (Observação)</b> — VÊ os outros horrores. A janela a mais dá pra dentro de outro gancho; a Foto da Multidão contém rostos de outros ganchos. É a torre de onde a teia é visível.</li>
+<li><b>A Baixa (Pacto)</b> — VENDE a saída dos outros. O Corretor oferece a solução de qualquer gancho, por um preço. Todo travamento tem um atalho aqui — que alimenta um Chefe.</li>
+</ul>
+
+<a id="p4-2" class="anchor-target"></a>
+<h3>Os fios</h3>
+<ul>
+<li><b>Guaíba ↔ Ilhas</b> (a mesma água que não devolve) ↔ <b>Alto</b> (o ausente levado pelo rio) ↔ <b>Jonas</b> (afogou aqui).</li>
+<li><b>Alto ↔ Aterro</b> (o que o Alto esvazia, o Aterro acumula — polos opostos, mesmo fio).</li>
+<li><b>Ilhas ↔ Várzea</b> (as vozes da família-jardim estão na Fita).</li>
+<li><b>Várzea ↔ Aterro</b> (a fita destruída volta porque o descartado retorna pelo Ferro-Velho).</li>
+<li><b>Casario ↔ tudo</b> (vê) e <b>Baixa ↔ tudo</b> (vende).</li>
+</ul>
+
+<a id="p4-3" class="anchor-target"></a>
+<h3>Onde moram os Chefes</h3>
+<p><b>Com covil:</b> <b>Vressalha</b> → As Ilhas (é o jardim que a enchente fez). <b>Theoros</b> → O Casario (a cidade de olhos onde engorda). <b>Mnemos</b> → A Várzea (onde o passado não passa; a Fita é a isca).</p>
+<p><b>Circulam livres:</b> <b>Alytros</b> (Pacto+Vazio) — persegue o Synthékos usando as pessoas; gravita pro Lúcio e pros jogadores; o "lacaio que aparece pro jantar". <b>Loki</b> — o curinga; pode se passar por aliado em qualquer gancho e embaralhar os fios pela zoeira; o único que o Escultor não termina.</p>
+<p><b>Zona que avança (nem covil nem andarilho):</b> <b>Thánatos-Nul</b> → o Guaíba, o poente. Não é covil que se invade; é a borda fria que se aproxima. O fim da régua.</p>
+<div class="pendente"><span class="lbl">Nota</span><p style="margin:0">Não há, ainda, dossiês completos dos 6 Chefes no repositório (ver <a href="#p6-theoros">Parte VI</a>). Use-os, por ora, apenas pelas linhas acima — evite cenas de confronto direto e completo antes desses documentos existirem.</p></div>
+
+<a id="p4-4" class="anchor-target"></a>
+<h3>O fundo de cada fio</h3>
+<table>
+<tr><th>Puxe este fio</th><th>chega em</th><th>e no fundo</th></tr>
+<tr><td>Guaíba / Ilhas (a água)</td><td>Thánatos-Nul</td><td><b>Kénoma</b></td></tr>
+<tr><td>Casario (ser visto)</td><td>Theoros</td><td><b>Argos</b></td></tr>
+<tr><td>A Baixa (o trato)</td><td>Alytros</td><td><b>Synthékos</b></td></tr>
+<tr><td>Ilhas (o jardim)</td><td>Vressalha</td><td><b>Perpétua</b></td></tr>
+<tr><td>Várzea (o eco)</td><td>Mnemos</td><td><b>Antífona</b></td></tr>
+<tr><td>Aterro (o acúmulo)</td><td>o Coletor / "ápeiron"</td><td><b>Amálgama</b></td></tr>
+</table>
+<p><b>Os fios que andam (NPCs recorrentes):</b> O Estranho do velório (a instituição, sempre na beira das cenas — no Casario, veste a cara do <a href="#npc-sobreloja">Homem da Sobreloja</a>); O Corretor (o trato, em qualquer bairro); Loki (o curinga que pode ser o "aliado" de qualquer arco).</p>
+
+<a id="p4-5" class="anchor-target"></a>
+<h3>As engrenagens do Relógio ligadas à teia</h3>
+<p><b>Cada gancho não-tocado avança sozinho.</b> Se os jogadores passam três sessões no Casario e ignoram as Ilhas, quando chegarem lá a Enchente já cobrou mais gente. Os lugares não esperam. <b>Os Chefes "acordam" por faixa do Relógio:</b> os de covil acordam no Esfriando; os que circulam ficam perigosos no Endurecendo; Thánatos-Nul é o Acabamento em pessoa.</p>
+
+<a id="p4-6" class="anchor-target"></a>
+<h3>A lenda do lago — "O Barqueiro que Não Rema pro Poente" (Guaíba)</h3>
+<p>Depois que o sol se afoga, a água do lado oeste deixa de ser água: vira a direção que não existe — aquela pra onde a cidade inteira, muito devagar, escorre (o Kénoma). Quem entra na bruma rumo ao poente não se afoga; apenas <em>deixa de ter estado ali</em>. Por isso os barqueiros viram o barco quando a neblina fecha, e ninguém rema pro lado onde o sol já se pôs. Boato que ninguém confirma: há uma outra Porto Alegre afogada sob a superfície — o reflexo da cidade-espelho — e em noites de neblina as luzes dela acendem lá embaixo; os que remaram pro poente estão nas janelas, acesos, sorrindo. <b>Se vir alguém que perdeu numa janela submersa: não acene de volta.</b> <em>(O Jonas é candidato a estar numa dessas janelas no clímax.)</em></p>
+
+<a id="p4-7" class="anchor-target"></a>
+<h3>Os 8 ganchos</h3>
+<table>
+<tr><th>Bairro</th><th>Gancho / Achado</th><th>Verdade (1 linha)</th><th>Regra de sobrevivência</th></tr>
+<tr><td>Guaíba</td><td>O Barqueiro / Carta Náutica Rasurada</td><td>água oeste = direção-que-não-existe; cidade afogada</td><td>não remar pro poente; não acenar de volta</td></tr>
+<tr><td class="loc b-obs">Casario</td><td>O Zelador que Contava as Janelas / caderno de contagem</td><td>sempre uma janela acesa a mais = Observação</td><td>não contar as janelas; não acender sua luz</td></tr>
+<tr><td class="loc b-obs">Casario</td><td>A Foto da Multidão / foto + verso anotado</td><td>mais um rosto virado a cada olhar = Assembleia</td><td>não olhar duas vezes; não se procurar</td></tr>
+<tr><td>A Baixa</td><td>O Guardanapo com o Contrato / guardanapo assinado</td><td>trato não lembrado vencendo = Corretor/Pacto</td><td>não assinar; não apertar a mão; não dizer "eu topo"</td></tr>
+<tr><td>As Ilhas</td><td>A Enchente que Não Devolveu os Corpos / recorte + cartaz</td><td>a família virou o jardim = Perpétua</td><td>não comer o que cresce; não dormir; não sentar</td></tr>
+<tr><td>O Alto</td><td>A Casa que Espera / inventário que lista uma pessoa</td><td>encaixa um vivo no lugar do ausente = Viúva/O Oco</td><td>não passar a noite; não ocupar o lugar do ausente</td></tr>
+<tr><td>O Aterro</td><td>O Ferro-Velho que Cresce / livro-caixa que não fecha</td><td>maior por dentro; guarda gente = Coletor</td><td>não entrar pra procurar; não sair carregando</td></tr>
+<tr><td>A Várzea</td><td>A Fita do Brique / a fita</td><td>reaparece sempre; toca os mortos = Antífona</td><td>não tocar até o fim; não responder à voz</td></tr>
+</table>
+<a class="totop" href="#topo">↑ topo</a>
+
+<hr>
+
+<!-- ============================================================ PARTE V ============================================================ -->
+<a id="parte5" class="anchor-target"></a>
+<h2>PARTE V · A ABERTURA ("O VELÓRIO")</h2>
+
+<a id="p5-1" class="anchor-target"></a>
+<h3>O Jonas — o louco que estava certo</h3>
+<p>Jonas era o "maluco do outro lado": acreditava em tudo, via conspiração em cada esquina, parede coberta de recortes e barbante vermelho, postava de madrugada em fórum estranho. Ninguém o levava a sério. <b>E ele estava certo.</b> Afogou no Guaíba, que ele vivia dizendo ser "uma porta" — e o rio não devolveu o corpo. Choram-no como um coitado que se perdeu no rio; ninguém sabe que ele foi o único que enxergou. Perseguiu todas as conspirações; a única real o encontrou. Preencheu o Formulário <i>animado</i>, achando que tinha enfim achado "eles". Foi admitido. Morreu.</p>
+
+<a id="p5-2" class="anchor-target"></a>
+<h3>O arquivo (o motor da investigação)</h3>
+<p>Jonas deixou uma montanha de material "insano" — cadernos, prints de fórum, fitas VHS, gravações de cassete, a parede de barbante. Todos achavam lixo de doente. Agora que ele morreu, o arquivo começa a <em>bater</em>. É a forma diegética de entregar o lore: as teorias do Jonas são meio certas, meio erradas, tentadoras e perigosas.</p>
+<ul>
+<li><b>A parede de barbante = o índice de ganchos.</b> Os 8 ganchos (<a href="#p4-7">Parte IV</a>) são o que está pregado na parede, com barbante ligando um ao outro.</li>
+<li><b>O arquivo carrega os documentos de superfície</b> (o panfleto "nada que se ama tem permissão de acabar", os prints da pichação "há outros mundos além destes", o bilhete da melodia). A primeira vez que os jogadores os veem é na coleção do Jonas — antes de encontrá-los "no mundo" (ver <a href="#casario-distribuicao">Distribuição do Casario</a>).</li>
+</ul>
+
+<a id="p5-3" class="anchor-target"></a>
+<h3>A ligação com os jogadores</h3>
+<p>Cada jogador tem uma relação diferente com a loucura do Jonas (família envergonhada, crente secreto, vítima das ligações às 3h, o amigo que o descartava). O que une o grupo: nas últimas semanas, o Jonas ficou frenético e tentou avisar cada um deles — um pacote, uma fita, um e-mail delirante, um telefonema — e todos ignoraram. Ele morreu. Culpa + curiosidade = o grupo.</p>
+
+<a id="p5-4" class="anchor-target"></a>
+<h3>O Lúcio (ponta em aberto proposital)</h3>
+<p>O Lúcio existe, está por aí e <b>não sabe que o Jonas morreu</b>. O Jonas foi o único que tentou avisá-lo de que o pacto dele (com o poder do Pacto) era uma armadilha; o Lúcio riu do amigo maluco. É o espelho do Chefe Alytros: a ilusão de importância (Lúcio) vs. a paranoia correta descartada (Jonas). <b>Ele entra em jogo quando o mestre entrar junto com os jogadores</b> — timing de mesa real. NÃO cristalizar agora.</p>
+
+<a id="p5-5" class="anchor-target"></a>
+<h3>A instituição + o formulário (unificados)</h3>
+<p>A instituição não tem lugar fixo — é a coisa que chega para quem o Jonas tocou. Ele preencheu o Formulário, foi admitido, morreu. Agora chega aos jogadores: <b>você é o próximo.</b></p>
+
+<a id="p5-6" class="anchor-target"></a>
+<h3>A cena de abertura — "O Velório" (6 beats, pronta para rodar)</h3>
+<ul>
+<li><b>Beat 0 — Session zero (o truque do formulário):</b> os jogadores preenchem o Formulário achando que é criação de personagem. O punch: no fim da sessão 1, o mesmo formulário chega aos personagens dentro da ficção.</li>
+<li><b>Beat 1 — A convocação:</b> inverno, garoa, cidade cinza. Cada personagem recebe a notícia de um jeito diferente e chega a uma sala de velório modesta.</li>
+<li><b>Beat 2 — O velório:</b> o luto envergonhado de quando morre "o maluco". Meio pesar, meio alívio. Estranhos entre si.</li>
+<li><b>Beat 3 — A rachadura:</b> <b>não há corpo</b> — só uma foto e uma missa ("o rio não devolveu nada"). E, no fundo da sala, <b>um estranho</b> que ninguém conhece, que assina o livro de presença com um nome que não bate com pessoa nenhuma e sai antes do fim (a instituição, observando).</li>
+<li><b>Beat 4 — O encontro:</b> os personagens descobrem que todos receberam uma última mensagem frenética do Jonas, que cada um ignorou. Comparando os fragmentos, percebem que era um recado só, partido em pedaços.</li>
+<li><b>Beat 5 — O arquivo:</b> a família (aliviada) entrega a "tranqueira" do Jonas: cadernos, fitas, a parede de barbante. <i>"Levem isso, não quero essa loucura em casa."</i></li>
+<li><b>Beat 6 — O cliffhanger:</b> dias depois, chega pelo correio, para cada um, sem remetente: <b>o Formulário de Admissão</b>, com o nome já preenchido no rodapé. <i>Você é o próximo.</i> Fim da sessão 1.</li>
+</ul>
+<a class="totop" href="#topo">↑ topo</a>
+
+<hr>
+
+<!-- ============================================================ PARTE VI ============================================================ -->
+<a id="parte6" class="anchor-target"></a>
+<h2>PARTE VI · BESTIÁRIO DE MESA</h2>
+<p class="kicker">fichas de uso rápido — o essencial na hora + ponteiro pro doc completo. Fonte única: <span class="tag">Criaturas/bestiario.html</span></p>
+<div class="pendente"><span class="lbl">Escopo desta versão</span><p style="margin:0">Por ora, só as fichas de Observação relevantes ao Casario. O bestiário completo (30 criaturas + 6 Chefes) entra quando os seis bairros estiverem prontos — ver <a href="#estado-do-livro">Estado do livro</a>.</p></div>
+
+<a id="p6-obs" class="anchor-target"></a>
+<h3>Observação — fichas de uso rápido</h3>
+
+<div class="local b-obs" id="cre-espectador">
+<div class="local-head"><span class="local-name">O Espectador</span></div>
+<p><span class="tag">Fenômeno</span><span class="tag">Observação puro</span><span class="tag">morno</span><span class="tag">Ambiental (desgasta)</span></p>
+<dl>
+<dt>Nasce</dt><dd>de um lugar vigiado sem descanso — a casa do ciumento, o quarto sob câmera, o ponto observado até a atenção criar raiz.</dd>
+<dt>Comporta</dt><dd>a sensação de ser olhado, virada presença. Não faz nada — só observa, e o peso do olhar é o horror.</dd>
+<dt>Perigo</dt><dd>desgasta pela exposição — dias sob ele e a pessoa racha, paranoica, incapaz de guardar qualquer coisa dentro de si.</dd>
+<dt>Uso em mesa</dt><dd>o fenômeno-base por trás de <a href="#c2">C2</a> (Pensão) e de qualquer cena em que o mestre queira instalar "a sensação" sem ainda mostrar nada.</dd>
+<dt>Fonte completa</dt><dd><a class="ref" href="#">Criaturas/bestiario.html — Elemento Observação</a></dd>
+</dl>
+</div>
+
+<div class="local b-obs" id="cre-assembleia">
+<div class="local-head"><span class="local-name">A Assembleia</span></div>
+<p><span class="tag">Besta · coletiva</span><span class="tag">Observação + Ascensão</span><span class="tag">frio</span><span class="tag">Predadora (cerca)</span></p>
+<dl>
+<dt>Nasce</dt><dd>do acúmulo de muitos olhares no mesmo ponto — a multidão que assiste, a plateia, o júri, a praça que fitou um espetáculo por tempo demais.</dd>
+<dt>Comporta</dt><dd>julga sem palavra — só o peso de ser visto por milhares ao mesmo tempo.</dd>
+<dt>Perigo</dt><dd>esmaga pela exposição total. Escapa-se saindo do centro, pras sombras onde o olhar não chega.</dd>
+<dt>Uso em mesa</dt><dd>a origem do fenômeno em miniatura no <a href="#c10">C10</a> (Cinema Íris).</dd>
+<dt>Fonte completa</dt><dd><a class="ref" href="#">Criaturas/bestiario.html — Elemento Observação</a></dd>
+</dl>
+</div>
+
+<div class="local b-obs" id="cre-panoptes">
+<div class="local-head"><span class="local-name">Panóptes</span></div>
+<p><span class="tag">Besta rara · mini-chefe</span><span class="tag">Observação puro, no limite</span><span class="tag">frio absoluto</span><span class="tag">Predadora (te conhece)</span></p>
+<dl>
+<dt>Nasce</dt><dd>raríssimo — de vigilância total e sem fim: prisão-modelo, regime de olho onipresente, segredo guardado sob vigília por gerações.</dd>
+<dt>Comporta</dt><dd>vê tudo, o tempo todo. Ser visto por ele é ser perfeitamente conhecido — sem julgamento, o que é pior.</dd>
+<dt>Perigo</dt><dd>total e psicológico. Escapa-se sendo <i>nada</i>: vazio, comum, sem nada digno de ser visto.</dd>
+<dt>Uso em mesa</dt><dd><b>não usar cedo.</b> Reservado pra quando o Relógio estiver em Endurecendo/Acabamento e o mestre quiser um confronto de escala real dentro do Casario.</dd>
+<dt>Fonte completa</dt><dd><a class="ref" href="#">Criaturas/bestiario.html — Elemento Observação</a></dd>
+</dl>
+</div>
+
+<div class="local b-obs" id="cre-contemplado">
+<div class="local-head"><span class="local-name">O Contemplado</span></div>
+<p><span class="tag">Fenômeno / Besta</span><span class="tag">Observação + Germe</span><span class="tag">quente</span><span class="tag">Atrai (te fascina)</span></p>
+<dl>
+<dt>Nasce</dt><dd>de algo contemplado com devoção por muita gente e muito tempo — quadro venerado, relíquia, o rosto numa foto olhada todo dia há anos.</dd>
+<dt>Comporta</dt><dd>precisa do seu olhar — sem espectador, murcha. Seduz: cada segundo de olhar é comida.</dd>
+<dt>Perigo</dt><dd>o veneno é a atenção. A única saída é a mais anti-instintiva: virar o rosto e não olhar de novo.</dd>
+<dt>Uso em mesa</dt><dd>bom candidato pra explicar, se o mestre quiser, um retrato específico na sala de espera do <a href="#c9">C9</a> (Estúdio do Retratista) que ninguém consegue tirar da parede.</dd>
+<dt>Fonte completa</dt><dd><a class="ref" href="#">Criaturas/bestiario.html — Elemento Observação</a></dd>
+</dl>
+</div>
+
+<div class="local b-obs" id="cre-delator">
+<div class="local-head"><span class="local-name">O Delator</span></div>
+<p><span class="tag">Besta</span><span class="tag">Observação + Vazio</span><span class="tag">quente</span><span class="tag">Predadora</span></p>
+<dl>
+<dt>Nasce</dt><dd>de um olhar que apaga — onde ser visto significou desaparecer (delações, sumiços, quem foi "notado" pelas pessoas erradas).</dd>
+<dt>Comporta</dt><dd>o oposto do Argos: onde ele olha, as coisas deixam de ter existido. Testemunhar, pra ele, é subtrair.</dd>
+<dt>Perigo</dt><dd>rápido e mortal — o olhar apaga pedaço de você. Esconder-se é não ser digno de nota.</dd>
+<dt>Uso em mesa</dt><dd>a explicação mais sombria disponível pros "nomes que faltam" na parede de Seu Adão (<a href="#c12">C12</a>) — use com moderação; é pesado demais pra aparecer cedo.</dd>
+<dt>Fonte completa</dt><dd><a class="ref" href="#">Criaturas/bestiario.html — Elemento Observação</a></dd>
+</dl>
+</div>
+
+<a id="p6-theoros" class="anchor-target"></a>
+<h3>Nota de mestre — Theoros (Chefe do Casario)</h3>
+<div class="pendente">
+<span class="lbl">Sem dossiê no repositório</span>
+<p>Diferente dos Ápices (<i>Registro dos Antigos</i>) e das 30 criaturas (<i>Bestiário</i>), <b>os seis Chefes nomeados não têm, ainda, um documento de mestre no repositório</b> — nem Theoros, nem Alytros, Loki, Mnemos, Vressalha ou Thánatos-Nul. Tudo o que existe sobre Theoros hoje é a linha do documento-fonte (Seção 6.4): <i>"Theoros → O Casario (é a cidade de olhos onde engorda)"</i>, mais o fato de que seu covil acorda no Esfriando (Seção 6.7).</p>
+<p style="margin:0">Por Regra de Ouro 4 (fonte única), este Livro de Campanha não inventa aqui o dossiê completo dele. Recomendação: escrever <code>Chefes/theoros.html</code> (ou equivalente) no repositório antes de qualquer sessão em que Theoros precise aparecer como personagem pleno. Até lá, use-o apenas como presença ambiente crescente — as fichas de <a href="#cre-espectador">O Espectador</a>, <a href="#cre-assembleia">A Assembleia</a> e, em cenas tardias, <a href="#cre-panoptes">Panóptes</a> são as "mãos" dele agindo no bairro.</p>
+</div>
+
+<a id="p6-resto" class="anchor-target"></a>
+<h3>O resto do bestiário &amp; os outros 5 Chefes</h3>
+<div class="pendente"><span class="lbl">Pendente</span><p style="margin:0">As 25 criaturas restantes (Vazio, Pacto, Ascensão, Germe, Eco) e os 5 Chefes restantes (Alytros, Loki, Mnemos, Vressalha, Thánatos-Nul) entram nesta seção conforme os bairros correspondentes forem detalhados — cada ficha aparece perto do bairro onde ela é mais provável de entrar em jogo, com um índice consolidado ao final.</p></div>
+<a class="totop" href="#topo">↑ topo</a>
+
+<hr>
+
+<!-- ============================================================ ESTADO DO LIVRO ============================================================ -->
+<a id="estado-do-livro" class="anchor-target"></a>
+<h2>Estado do livro / próximos passos</h2>
+<table>
+<tr><th>Item</th><th>Status</th><th>Observação</th></tr>
+<tr><td>Parte I — O Mestre</td><td>✓ completo</td><td>organizado a partir da Seção 2 do documento-fonte</td></tr>
+<tr><td>Parte II — A Verdade</td><td>✓ completo</td><td>organizado a partir da Seção 3</td></tr>
+<tr><td>Parte III — visão geral da Cidade</td><td>✓ completo</td><td>Seção 4</td></tr>
+<tr><td>Parte III — O Casario (Seção 8.1)</td><td>✓ completo — <b>piloto p/ validação</b></td><td>13 locais, 5 NPCs, ligações, distribuição, loot, encontros</td></tr>
+<tr><td>Parte III — A Baixa, As Ilhas, O Alto, O Aterro, A Várzea</td><td>pendente</td><td>aguardando aprovação do padrão do Casario</td></tr>
+<tr><td>Parte IV — Teia &amp; Relógio</td><td>✓ completo</td><td>Seções 6 + 9</td></tr>
+<tr><td>Parte V — A Abertura</td><td>✓ completo</td><td>Seção 5</td></tr>
+<tr><td>Parte VI — Bestiário de Mesa</td><td>parcial</td><td>só as 5 fichas de Observação usadas no Casario; faltam 25 criaturas + 6 Chefes</td></tr>
+<tr><td>Dossiês dos 6 Chefes</td><td><b>não existem no repositório</b></td><td>gap identificado durante a pesquisa — recomendado escrever antes de usar os Chefes em cena plena</td></tr>
+<tr><td><code>Presente/a_cidade.html</code>, <code>Presente/lendas_e_locais.html</code>, <code>Sistema/grimorio.html</code></td><td><b>não existem no repositório</b></td><td>citados no inventário do documento-fonte (Seção 12.1) mas não encontrados na busca ao repo — confirmar se já foram escritos em outro lugar</td></tr>
+<tr><td>Números de regra (facas, magias, talentos)</td><td>intencionalmente fora deste livro</td><td>Seção 11.7 — pendências da ficha, não do Livro de Campanha</td></tr>
+</table>
+<p>Assim que O Casario for validado, o mesmo molde (Seção 7.2/7.3) replica em A Baixa, As Ilhas, O Alto, O Aterro e A Várzea — cada bairro fecha com sua tabela de loot e sua tabela de encontros, no mesmo formato usado aqui.</p>
+<a class="totop" href="#topo">↑ topo</a>
+
+</main>
+</div>
+
+<script>
+function filterNav(q){
+  q = q.trim().toLowerCase();
+  document.querySelectorAll('#nav ul.sub a, #nav ul.sub2 a, #nav ul > li.part > a').forEach(function(a){
+    var li = a.closest('li');
+    if(!q){ li.style.display=''; return; }
+    var txt = a.textContent.toLowerCase();
+    li.style.display = txt.indexOf(q) !== -1 ? '' : 'none';
+  });
+}
+</script>
+</body>
+</html>

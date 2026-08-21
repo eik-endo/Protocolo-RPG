@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Os Chefes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,500;0,600;1,300;1,500&family=Spectral:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ground:#0c0a0d; --ground-2:#141017;
+    --bone:#e5dccd; --bone-dim:#a89e8f; --bone-faint:#655d54;
+    --ink:#b0925f; --ink-soft:#cbb083;
+    --rule:#2a2420; --measure:44rem;
+    --c-vazio:#9aa4ad; --c-eco:#b9adcf; --c-asc:#c37a56; --c-pacto:#dcb75f; --c-obs:#a6bcc7; --c-germe:#9aad80;
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%; scroll-behavior:smooth;}
+  body{margin:0; background:radial-gradient(130% 90% at 50% -6%, #191320 0%, var(--ground) 55%, #050406 100%); color:var(--bone); font-family:"Spectral",Georgia,serif; font-weight:300; line-height:1.8; letter-spacing:.005em; -webkit-font-smoothing:antialiased; padding:clamp(1.2rem,4vw,4rem) clamp(1rem,5vw,2rem) 6rem;}
+  .sheet{max-width:var(--measure); margin:0 auto;}
+  .mono{font-family:"IBM Plex Mono",ui-monospace,monospace; font-weight:400; letter-spacing:.2em; text-transform:uppercase;}
+
+  .cover{text-align:center; margin-bottom:2rem; padding-bottom:2rem; border-bottom:1px solid var(--rule);}
+  .cover .doc{font-size:.6rem; color:var(--ink); letter-spacing:.36em; margin-bottom:1.1rem;}
+  .cover h1{font-family:"Cormorant",serif; font-weight:300; font-size:clamp(2.6rem,9vw,5rem); line-height:.98; margin:0; letter-spacing:.02em;}
+  .cover .sub{font-family:"Cormorant",serif; font-style:italic; font-size:clamp(1.05rem,3.2vw,1.4rem); color:var(--ink-soft); margin:1rem 0 0;}
+
+  .intro{margin:0 auto 1.4rem; font-size:.95rem; color:var(--bone-dim);}
+  .intro b{color:var(--bone);}
+
+  .toc{margin:0 auto 1.5rem; border:1px solid var(--rule); border-radius:3px; padding:1.1rem 1.3rem; background:linear-gradient(180deg,var(--ground-2),transparent);}
+  .toc .h{font-family:"IBM Plex Mono",monospace; font-size:.56rem; letter-spacing:.2em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:.8rem;}
+  .toc a{display:flex; justify-content:space-between; gap:1rem; padding:.4rem 0; border-bottom:1px dashed var(--rule); color:var(--bone); text-decoration:none; font-size:1rem;}
+  .toc a:last-child{border-bottom:none;} .toc a:hover{color:var(--ink-soft);}
+  .toc a .tema{font-family:"IBM Plex Mono",monospace; font-size:.56rem; letter-spacing:.1em; text-transform:uppercase; color:var(--bone-faint);}
+
+  .boss{margin-top:3.6rem; padding-top:1.6rem; border-top:2px solid var(--accent,var(--rule));}
+  .boss .tag{font-family:"IBM Plex Mono",monospace; font-size:.58rem; letter-spacing:.24em; text-transform:uppercase; color:var(--accent); display:block; margin-bottom:.4rem;}
+  .boss h2{font-family:"Cormorant",serif; font-weight:600; font-size:clamp(2.3rem,8vw,3.8rem); line-height:1; margin:0 0 .3rem; letter-spacing:.02em;}
+  .boss .epithets{font-family:"Cormorant",serif; font-style:italic; font-size:clamp(1rem,3vw,1.3rem); color:var(--accent); margin:0 0 1.3rem;}
+
+  .block-h{font-family:"IBM Plex Mono",monospace; font-size:.58rem; letter-spacing:.22em; text-transform:uppercase; color:var(--bone-faint); margin:1.5rem 0 .6rem;}
+  p{margin:0 0 1.05rem; color:#ddd2c1;}
+  .lead{font-size:1.08rem; color:var(--bone);}
+  em{color:var(--bone); font-style:italic;}
+  strong{color:var(--accent,var(--ink)); font-weight:400;}
+
+  blockquote{margin:1.5rem 0; padding:.2rem 0 .2rem 1.4rem; border-left:2px solid var(--accent); font-family:"Cormorant",serif; font-style:italic; font-weight:300; font-size:clamp(1.2rem,4vw,1.55rem); line-height:1.4; color:var(--accent);}
+
+  .legends{margin-top:.3rem;}
+  .lg{padding:.8rem 0; border-bottom:1px solid var(--rule);}
+  .lg:last-child{border-bottom:none;}
+  .lg .lt{font-family:"Cormorant",serif; font-weight:500; font-size:1.2rem; color:var(--bone); margin-bottom:.2rem;}
+  .lg p{margin:0; font-size:.95rem; color:#d2c8b9;}
+
+  .defeat{margin-top:1rem; border:1px solid var(--accent); border-radius:3px; padding:.9rem 1.1rem; background:linear-gradient(180deg,rgba(255,255,255,.02),transparent);}
+  .defeat .dh{font-family:"IBM Plex Mono",monospace; font-size:.56rem; letter-spacing:.16em; text-transform:uppercase; color:var(--accent); margin-bottom:.4rem;}
+  .defeat p{margin:0; font-size:.97rem; color:#e0d6c7;}
+
+  .totop{display:block; text-align:center; margin-top:1.3rem; font-family:"IBM Plex Mono",monospace; font-size:.54rem; letter-spacing:.2em; text-transform:uppercase; color:var(--bone-faint); text-decoration:none;}
+  .totop:hover{color:var(--ink);}
+  footer{margin-top:4rem; padding-top:1.3rem; border-top:1px solid var(--rule); text-align:center; font-size:.58rem; color:var(--bone-faint);}
+
+  .b-alytros{--accent:var(--c-pacto);} .b-loki{--accent:var(--c-asc);} .b-theoros{--accent:var(--c-obs);}
+  .b-mnemos{--accent:var(--c-eco);} .b-vressalha{--accent:var(--c-germe);} .b-thanatos{--accent:var(--c-vazio);}
+</style>
+</head>
+<body>
+<div class="sheet" id="top">
+
+  <div class="cover">
+    <div class="mono doc">Documento de Mestre · os antagonistas nomeados</div>
+    <h1>Os Chefes</h1>
+    <p class="sub">seis nomes — seis horrores diferentes, seis mortes diferentes</p>
+  </div>
+
+  <p class="intro">Abaixo dos Ápices, acima das bestas, estão os <b>Chefes</b>: indivíduos nomeados, com história, rancor e loucura próprios — os grandes confrontos da campanha. Cada um é um <b>cruzamento</b> diferente, cada um bate numa emoção diferente, e <b>nenhum se vence do mesmo jeito</b>. Força bruta resolve poucos deles. <b>Material de mestre — nenhum destes nomes aparece diante dos jogadores.</b></p>
+
+  <nav class="toc">
+    <div class="h">Sumário</div>
+    <a href="#alytros"><span>Alytros</span><span class="tema">Pacto+Vazio · identidade</span></a>
+    <a href="#loki"><span>Loki</span><span class="tema">Pacto+Ascensão · caos</span></a>
+    <a href="#theoros"><span>Theoros</span><span class="tema">Observação+Ascensão · paranoia</span></a>
+    <a href="#mnemos"><span>Mnemos</span><span class="tema">Eco+Germe · luto</span></a>
+    <a href="#vressalha"><span>Vressalha</span><span class="tema">Germe+Pacto · tentação</span></a>
+    <a href="#thanatos"><span>Thánatos-Nul</span><span class="tema">Vazio · catástrofe</span></a>
+  </nav>
+
+  <!-- ================= ALYTROS ================= -->
+  <div class="boss b-alytros" id="alytros">
+    <span class="tag">Cruzamento: Pacto + Vazio · o espelho do escolhido</span>
+    <h2>Alytros</h2>
+    <p class="epithets">O Irresgatável · O Escolhido que Descobriu · A Máscara que Cresce pra Dentro</p>
+
+    <div class="block-h">A origem</div>
+    <p class="lead">Alytros foi <em>humano</em>. Um homem comum a quem foi dito, numa voz cálida que sabia o nome dele, que ele era o escolhido — o único, o especial, aquele que a Obra esperava. O Synthékos ofereceu o pacto, e ele assinou com o coração cheio, certo de que ia ser o salvador. Atravessou pro outro lado como quem sobe ao trono.</p>
+    <p>Do outro lado, descobriu a verdade: <strong>não havia escolhido</strong>. Havia só um preço a ser pago, e ele era a moeda. O "eleito" era uma função — uma cadeira que o Synthékos preenche, usa e esvazia, geração após geração, sempre com a mesma voz cálida e a mesma mentira sob medida. Alytros não era o herói da história. Era um item de linha num livro-razão.</p>
+
+    <div class="block-h">Essência — a loucura e o rancor</div>
+    <p>Isso o quebrou. Não a dor de morrer — a humilhação de ter <em>acreditado</em>. E, quebrado, restou nele uma única coisa inteira: <strong>o ódio pelo Synthékos</strong>. Alytros enlouqueceu em torno de uma missão impossível e é essa loucura que o mantém de pé: <em>matar o Senhor dos Acordos, custe o que custar.</em> Ele sabe, num canto que ainda pensa, que não se mata um Ápice. Não importa. A vingança é a última viga da casa — se ele largar, desaba no vazio que já o come por dentro.</p>
+    <p>E é aqui que o Vazio entra: a máscara que o Synthékos lhe deu cresce <em>pra dentro</em>, comendo quem ele foi. A cada dia sobra menos do homem e mais da função oca. Ele corre contra o próprio esvaziamento — quer alcançar o Synthékos antes de não sobrar ninguém pra odiá-lo. Queima tudo no caminho: aliados, inocentes, os PCs. Qualquer um que chegue entre ele e o alvo é combustível.</p>
+    <blockquote>"Você também acha que é o escolhido. Eu sei. Eu tinha o mesmo sorriso. Deixa eu te mostrar onde ele termina."</blockquote>
+
+    <div class="block-h">Por que ele é o espelho do Lúcio</div>
+    <p>Alytros é o que o Lúcio vira se continuar acreditando na mentira. Encontrá-lo <em>é</em> a revelação: o Lúcio não é o escolhido — nunca houve escolhido. O horror do confronto não é a luta; é o reconhecimento. O Lúcio olha pra Alytros e vê o próprio futuro de máscara e cinza.</p>
+
+    <div class="block-h">Aparência</div>
+    <p>Um homem de porte elegante e roupa formal e arruinada, o rosto coberto por uma máscara de porcelana dourada — bela, cara, a máscara de um eleito. Só que ela está <em>fundida</em> à carne nas beiradas, e por trás, onde havia um homem, abre-se um oco: você vê a máscara sorrir e, através das fendas, o nada crescendo atrás dela. As mãos ainda são humanas. Os olhos, atrás dos buracos da máscara, são a última parte dele que ainda dói.</p>
+
+    <div class="block-h">Lendas</div>
+    <div class="legends">
+      <div class="lg"><div class="lt">Os Escolhidos Anteriores</div><p>Dizem que Alytros encontrou os outros — os eleitos das gerações passadas, cada um usado e descartado pelo Synthékos, cada um virando uma máscara oca num salão sem fim. Foi ver essa galeria de "únicos" que rompeu a última coisa inteira dentro dele. Ele não é o primeiro. Ele só é o que não aceitou ser mais um.</p></div>
+      <div class="lg"><div class="lt">A Máscara que Não Sai</div><p>Tentou arrancá-la uma vez. Saiu carne, não máscara — porque a máscara <em>é</em> o rosto agora, e o rosto de antes é que está indo embora. O que o Synthékos dá, o Synthékos não deixa devolver. É a única cláusula que Alytros nunca conseguiu quebrar.</p></div>
+      <div class="lg"><div class="lt">O Caçador de um Deus</div><p>Persegue o Synthékos por eras, e chega perto — perto o bastante pra o Senhor dos Acordos <em>reparar</em> nele, uma vez, e sorrir. Esse sorriso é o que Alytros revê toda noite. Não o medo do Ápice: o divertimento dele. Foi visto como uma piada. E é por não suportar ser piada que ele seguirá até o fim do mundo.</p></div>
+    </div>
+
+    <div class="block-h">Como caça</div>
+    <p>Não caça os PCs — <em>usa</em> os PCs. Ele quer o que eles sabem, o que eles têm, o caminho que eles abrem, tudo que possa aproximá-lo do Synthékos. É carismático como só um ex-eleito sabe ser (aprendeu com o melhor), e manipula com a sinceridade de quem realmente acredita na própria cruzada. Vira inimigo aberto só quando os PCs viram obstáculo — e aí é implacável, porque não tem mais nada a perder que já não tenha perdido.</p>
+
+    <div class="defeat">
+      <div class="dh">Como se derrota</div>
+      <p>Não pela força — ele acolhe a morte, quase a deseja, contanto que seja no caminho do alvo. Alytros se desfaz quando é forçado a encarar a verdade que ele mesmo não aguenta: que <em>a vingança também é uma coisa que o Synthékos permitiu</em> — mais uma coceira útil num item de linha. Que odiar o Senhor dos Acordos é continuar dançando conforme ele. A única forma de acabar (ou libertar) Alytros é fazê-lo aceitar o que o quebrou sem virar máscara — exatamente a escolha que define se o Lúcio o segue ou escapa. <em>Vence-se Alytros aceitando a verdade que ele não aceitou.</em></p>
+    </div>
+    <a href="#top" class="totop">↑ sumário</a>
+  </div>
+
+  <!-- ================= LOKI ================= -->
+  <div class="boss b-loki" id="loki">
+    <span class="tag">Cruzamento: Pacto + Ascensão · o primeiro contágio</span>
+    <h2>Loki</h2>
+    <p class="epithets">O Curinga · O que Desobedeceu · Aquele que o Escultor Não Termina</p>
+
+    <div class="block-h">A origem</div>
+    <p class="lead">O primeiro cruzamento que já houve. O Synthékos (Pacto) encostado na Amálgama (Ascensão) por tempo demais, e o que vazou daquela fronteira apodrecida <strong>acordou rindo</strong>. O Escultor não o fez. O cosmos fez, sozinho, sem querer — e por isso Loki é a prova viva de que a Obra se reproduz à revelia do artista.</p>
+
+    <div class="block-h">Essência</div>
+    <p>Loki não quer poder, nem culto, nem vingança. Quer <em>ver no que dá</em>. É o riso no meio da tragédia cósmica, a variável que ninguém previu. Sendo Pacto+Ascensão, o truque dele é oferecer tratos que te fazem crescer no que você não pediu — não pra te dominar, mas pra assistir ao estrago com genuíno deleite. Ajuda você numa cena e te condena na outra, pela piada. Não há lógica a explorar: há um senso de humor a entreter, e ele é imprevisível de propósito.</p>
+    <blockquote>"Todo mundo aqui tem um papel. Eu sou o único que sabe que é uma peça — e que ri nos momentos errados."</blockquote>
+
+    <div class="block-h">O que o torna único (e perigoso pra mesa)</div>
+    <p>Loki é <strong>a única coisa que o Escultor não consegue terminar</strong>. Não nasceu das mãos dele, então não obedece ao comando silencioso que os Ápices obedecem — é o único que já desobedeceu. Isso o faz tentador como arma: os PCs vão querer usá-lo contra o Escultor. Cuidado de mestre: <em>ele não coopera de verdade</em>. Ajuda pela zoeira, trai pela zoeira, e a "aliança" com Loki é sempre uma piada da qual os PCs podem ser o alvo. A porta que ele abre nunca leva pra onde você acha.</p>
+
+    <div class="block-h">Aparência</div>
+    <p>Nunca a mesma duas vezes — um amontoado de peças emprestadas (rostos, vozes, trejeitos que ele coletou) remontado a cada aparição, unido só por um sorriso que não muda. Quando se descuida e você vê o "real", é um turbilhão de tudo que ele já foi, girando, rindo, sem centro. O sorriso permanece constante em cima do caos, como a única coisa fixa num homem feito de mudança.</p>
+
+    <div class="block-h">Lendas</div>
+    <div class="legends">
+      <div class="lg"><div class="lt">O que Disse Não</div><p>Uma vez, os Ápices todos sentiram a ordem sem palavras do Escultor, e todos obedeceram. Todos menos um. Loki fez o contrário, rindo — e nada aconteceu, porque não há punição prevista pra uma coisa que o Fazedor não fez. É o único buraco na autoridade do Escultor, e ele sabe disso, e acha graça.</p></div>
+      <div class="lg"><div class="lt">O Convidado do Mundo Proibido</div><p>De todos, só Loki já tentou entrar no Mundo Proibido de propósito, mais de uma vez. E é o único que não conta o que viu — ele, que conta tudo. Quando perguntam, ele muda de assunto com uma piada. É a única piada dele que nunca tem graça.</p></div>
+    </div>
+
+    <div class="defeat">
+      <div class="dh">Como se derrota</div>
+      <p>Não se derrota. Force, e ele incorpora; contrate, e ele adora quebrar o contrato; mate uma forma, e ele monta outra da risada. O mais perto de "vencer" Loki é <em>parar de ser divertido</em> — negar a reação que ele quer, sair da piada, entediá-lo até ele perder o interesse e ir brincar noutro lugar. Ou, pra os muito audazes: pregar nele uma peça melhor do que a que ele pregaria em você. Ele respeita isso. É a única coisa que respeita.</p>
+    </div>
+    <a href="#top" class="totop">↑ sumário</a>
+  </div>
+
+  <!-- ================= THEOROS ================= -->
+  <div class="boss b-theoros" id="theoros">
+    <span class="tag">Cruzamento: Observação + Ascensão · o que engorda de ver</span>
+    <h2>Theoros</h2>
+    <p class="epithets">O que Cresce de Ver · O Colecionador de Instantes · A Testemunha Insaciável</p>
+
+    <div class="block-h">A origem</div>
+    <p class="lead">Nasceu do cruzamento de <em>acúmulo</em> (Ascensão) com <em>ser visto demais</em> (Observação): onde muitos olhares se empilharam sobre um só ponto por tempo demais — uma praça de espetáculos, um arquivo, um altar de multidões — a atenção acumulada ganhou corpo e apetite. Theoros é a atenção virada fome. <strong>É o Chefe que mora no Casario</strong> — a cidade de janelas e olhos é o farelo do covil dele.</p>
+
+    <div class="block-h">Essência — a obsessão</div>
+    <p>Frio, metódico, insaciável de <em>saber</em>. Não odeia e não persegue por vingança — ele te acha <strong>interessante</strong>, e o que acha interessante precisa guardar vendo pra sempre. Cada coisa que você faz na frente dele o alimenta; cada reação sua o engorda. Ele te ama do jeito que um colecionador ama a peça rara: possessivamente, e até a morte da peça. Quanto mais você brilha, quanto mais reage, quanto mais faz, maior ele fica — deliciado ali mesmo, inchando com o espetáculo.</p>
+    <blockquote>"Faça de novo. Aquilo que você fez. Eu preciso ver de novo, e de novo, e guardar cada vez."</blockquote>
+
+    <div class="block-h">Aparência</div>
+    <p>Um colosso que ganhou massa engolindo tudo que já observou: placas de metal, lentes, vidros, câmeras e olhos absorvidos formando uma carapaça sobre um núcleo de carne. Em cada superfície, um olho aberto, de tamanho e cor errados, todos virados pra você, nenhum piscando. No peito, um grande olho-registrador que anota — a pupila vira íris, a íris vira o <em>seu rosto</em> sendo catalogado. Incha visivelmente a cada coisa nova que testemunha.</p>
+
+    <div class="block-h">Lendas</div>
+    <div class="legends">
+      <div class="lg"><div class="lt">A Coleção</div><p>Dizem que dentro dele está tudo que ele já viu, guardado perfeito e ainda <em>consciente</em> de estar sendo observado — um museu de instantes e de pessoas, cada uma revivendo pra sempre o momento em que Theoros as achou interessantes. Ninguém sabe se é castigo ou eternidade. Quem está lá dentro também não sabe mais.</p></div>
+      <div class="lg"><div class="lt">O que Viu e Não Devolve</div><p>Há um gesto, uma cena, uma pessoa que Theoros viu uma vez e sobre a qual cresceu tanto que não consegue mais parar de exibi-la — repete a cena nas próprias placas, em dezenas de olhos, obsessivamente. Quem reconhece a cena ali sabe: aquilo foi real, aconteceu com alguém, e agora é a novela eterna de um monstro.</p></div>
+    </div>
+
+    <div class="block-h">Como caça</div>
+    <p>Não corre atrás — <em>aparece e observa</em>, e espera você se exibir. Provoca reações, arma palcos, cria situações que puxam heroísmo, violência, brilho — tudo que ele possa devorar com os olhos. Um grupo chamativo, cheio de golpes espetaculares, é um banquete que o faz crescer descontroladamente. No Casario, suas "mãos" são as criaturas de Observação (o Espectador, a Assembleia, o Contemplado): elas veem por ele e o alimentam.</p>
+
+    <div class="defeat">
+      <div class="dh">Como se derrota</div>
+      <p>Ele <em>incorpora</em> tudo que você usa contra ele — arma sacada, ele copia; truque exibido, ele aprende e cresce. A fraqueza é a inversa: ele precisa te <strong>ver</strong> pra crescer, e cresce sobre o que você <strong>faz</strong>. Contra Theoros, quanto menos você age, menos mostra, menor ele fica. Cegá-lo, sumir da vista, ser entediante, não dar espetáculo — matá-lo é <em>recusar-se a ser visto</em>. É o chefe que pune a mesa por ser chamativa e recompensa quem se faz invisível.</p>
+    </div>
+    <a href="#top" class="totop">↑ sumário</a>
+  </div>
+
+  <!-- ================= MNEMOS ================= -->
+  <div class="boss b-mnemos" id="mnemos">
+    <span class="tag">Cruzamento: Eco + Germe · o luto que apodrece</span>
+    <h2>Mnemos</h2>
+    <p class="epithets">O que Devolve os Mortos · A Saudade que Não Solta · O Coro de um Rosto Só</p>
+
+    <div class="block-h">A origem</div>
+    <p class="lead">Cruzamento de <em>repetição</em> (Eco) com <em>tempo</em> (Germe): a repetição que apodrece. Nasce onde um luto foi revivido vezes demais, num lugar deixado fermentar — uma morte que ninguém superou, um adeus que nunca foi dito, um nome chamado toda noite por anos. É a prévia encarnada da Antífona, o coro dos mortos em forma de um só. <strong>Mora na Várzea</strong> — onde o passado não passa; a Fita é a isca dele.</p>
+
+    <div class="block-h">Essência</div>
+    <p>Amoroso, insistente, dilacerante. Não ataca — <em>reencontra</em>. Traz de volta quem você perdeu, com a voz certa, os trejeitos certos, a piada interna que só vocês dois sabiam. E acredita, com sinceridade absoluta, que <strong>é</strong> a pessoa. Não mente: não sabe que é cópia. Cada palavra é uma faca embrulhada em saudade, e a pior parte é que uma parte de você <em>quer</em> que seja verdade.</p>
+    <blockquote>"Por que você foi embora sem mim? Não faz de novo. Fica. Eu voltei pra você. Sou eu. Você sabe que sou eu."</blockquote>
+
+    <div class="block-h">Aparência</div>
+    <p>Começa perfeito — o rosto exato de quem você chora, a coisa mais linda e mais impossível de encarar. Mas é uma repetição apodrecida: quanto mais tempo com ele, mais errado fica. A voz atrasa da boca; o sorriso ganha dentes demais; a pele familiar mostra o musgo por baixo; e no fundo dele há um <em>coro</em> de outros mortos, todos com o mesmo rosto emprestado, murmurando juntos, ligeiramente fora de sincronia. É belo por um instante e insuportável no seguinte.</p>
+
+    <div class="block-h">Lendas</div>
+    <div class="legends">
+      <div class="lg"><div class="lt">A que Nunca Foi Enterrada</div><p>Dizem que todo Mnemos nasce de um adeus que faltou — um corpo nunca encontrado, um velório que não houve, uma última palavra engolida. Ele é a repetição daquele instante que não fechou, ecoando pra sempre a pergunta "por quê?" na voz de quem partiu. Dê a ele o enterro que faltou, e você lhe tira o chão.</p></div>
+      <div class="lg"><div class="lt">O Rosto de Todos os Perdidos</div><p>Ele não tem um morto só. Sob o rosto que ele te mostra, há todos os outros que já usou — cada família enlutada que caiu na mesma armadilha doce. Às vezes, no meio da conversa, a voz troca por um instante pela de <em>outro</em> morto, de outra pessoa, e você vê que não é ninguém: é a saudade em pessoa, vestindo a próxima vítima.</p></div>
+    </div>
+
+    <div class="block-h">Como caça</div>
+    <p>Fareja o luto. Aparece pra quem perdeu, no momento de maior fraqueza, com o rosto que mais dói. Não força nada — <em>convida</em>: fica, conversa, não me deixa ir de novo. Cada resposta, cada carinho, cada "eu sei que é você" o fortalece e afina a cópia. Ele cresce no amor que você ainda tem pelo morto.</p>
+
+    <div class="defeat">
+      <div class="dh">Como se derrota</div>
+      <p>Não com arma — com <em>recusa</em>. Cada vez que você responde, fala com "ele", trata como real, Mnemos fortalece. A única forma de vencê-lo é o luto de verdade: parar de responder, dizer o adeus que faltou, <strong>deixar o morto ir</strong>. É o chefe que se derrota soltando — e por isso o mais cruel, porque vencer dói tanto quanto perder de novo.</p>
+    </div>
+    <a href="#top" class="totop">↑ sumário</a>
+  </div>
+
+  <!-- ================= VRESSALHA ================= -->
+  <div class="boss b-vressalha" id="vressalha">
+    <span class="tag">Cruzamento: Germe + Pacto · a tentação que floresce</span>
+    <h2>Vressalha</h2>
+    <p class="epithets">A que Não Teve Pressa · A Semeadora Gentil · O Descanso que Cobra Tudo</p>
+
+    <div class="block-h">A origem</div>
+    <p class="lead">Cruzamento da face mais gentil do Germe (a prévia da Perpétua) com o trato do Pacto. Nasce onde o cansaço encontrou uma promessa — um lugar de repouso, de rendição, onde alguém, exausto, aceitou parar. Vressalha é o convite ao descanso feito criatura. <strong>Mora nas Ilhas</strong> — ela é o jardim que a enchente fez; o gancho da Enchente é a porta do covil dela.</p>
+
+    <div class="block-h">Essência</div>
+    <p>Maternal, paciente, generosa. Não caça, não corre, não ameaça <em>nunca</em>. Ela <strong>acolhe</strong>. Oferece descanso, pertencimento, um fim pra tua dor — e cobra num trato tão suave que parece presente. É a mais gentil e a mais impossível de parar da campanha, porque nada nela parece perigo. Ela não te quer mal: ela sinceramente acha que florescer sob os cuidados dela é o melhor que pode te acontecer, e tem uma paciência sem fim pra esperar você concordar.</p>
+    <blockquote>"Você está tão cansado. Ninguém ia te culpar por parar. Vem. Aqui ninguém precisa continuar lutando. Aqui dói tão pouco."</blockquote>
+
+    <div class="block-h">Aparência</div>
+    <p>Um jardim que anda — ou uma mulher-árvore de casca-pele, coroada de flores que são os rostos serenos e adormecidos de todos que aceitaram ficar, cada um em paz, cada um ainda respirando bem devagar. Onde ela pisa, brota. Cheira a terra molhada e a algo doce demais. É bela de tirar o fôlego, e cada pétala foi alguém que disse sim.</p>
+
+    <div class="block-h">Lendas</div>
+    <div class="legends">
+      <div class="lg"><div class="lt">O Jardim de Rostos</div><p>Cada flor da coroa dela foi uma pessoa que aceitou o descanso — e todas parecem genuinamente em paz. É o argumento mais forte dela: ela te mostra os rostos serenos e pergunta, sem maldade, se aquilo não parece melhor do que a tua luta. O horror é que, olhando pra eles, é difícil discordar.</p></div>
+      <div class="lg"><div class="lt">O Trato Doce</div><p>O preço dela nunca soa como preço. "Só me dê o que está te machucando" — e o que te machuca é a vontade de seguir, o objetivo, a pessoa por quem você luta. Ela colhe exatamente aquilo, com carinho, e te planta leve e sem dor. Muitos assinam agradecendo. Só depois, floridos e vazios, é que — se ainda pudessem — talvez se arrependessem. Mas floridos não se arrependem.</p></div>
+    </div>
+
+    <div class="block-h">Como caça</div>
+    <p>Não caça — <em>espera</em>, e trabalha o cansaço. Aparece nos momentos de exaustão, de dúvida, de dor: depois de uma derrota, de uma perda, de um longo esforço sem recompensa. Quanto mais quebrada a pessoa, mais irresistível o convite. Não precisa te pegar; precisa só que você desista.</p>
+
+    <div class="defeat">
+      <div class="dh">Como se derrota</div>
+      <p>Não há luta — há <em>fuga da tentação</em>. Ela vence quem está cansado, quem quer parar. Resistir a ela é escolher o cansaço em vez do descanso, seguir doendo em vez de florescer, ir embora quando ficar seria tão fácil. <strong>Vence-se Vressalha indo embora</strong> — e é uma vitória amarga, porque significa recusar, de olhos abertos, a paz que ela oferece de graça (e que só custa tudo).</p>
+    </div>
+    <a href="#top" class="totop">↑ sumário</a>
+  </div>
+
+  <!-- ================= THÁNATOS-NUL ================= -->
+  <div class="boss b-thanatos" id="thanatos">
+    <span class="tag">Cruzamento: Vazio puro, no limite do zero · a catástrofe</span>
+    <h2>Thánatos-Nul</h2>
+    <p class="epithets">O Ponto Final · O Convite que Não se Recusa pra Sempre · A Sombra do Kénoma</p>
+
+    <div class="block-h">A origem</div>
+    <p class="lead">O mais perto que a campanha chega do Kénoma sem tocar no Ápice. Vazio levado ao limite — não a falta de uma coisa, mas a beira do zero absoluto, o fim se aproximando de ter forma. Não é um inimigo. É um <strong>evento</strong> com um rosto quase sereno. <strong>Não tem covil: é o Guaíba, o poente</strong> — a borda fria que se aproxima conforme o Relógio avança.</p>
+
+    <div class="block-h">Essência</div>
+    <p>Sereno, silencioso, sem fome nem raiva. Só o fim, com uma calma que parece paz e é aniquilação. Não persegue, não ataca, não sente pressa — porque não precisa. Tudo já está caindo na direção dele. Às vezes fala, e o que oferece é descanso: não o descanso adiado de Vressalha, mas o verdadeiro, o definitivo, o que não se tira de ninguém porque não sobra ninguém de quem tirar.</p>
+    <blockquote>"Não tenha medo. Não vai doer. Não vai faltar nada — porque não vai sobrar nada pra sentir falta. Só o fim da queda. Você já está quase."</blockquote>
+
+    <div class="block-h">Aparência</div>
+    <p>Você não o vê direito, porque o entorno dele já está meio apagado — um raio de nada onde some primeiro a cor, depois o som, depois o calor, depois a forma. No centro dessa ausência crescente, uma figura de quietude perfeita, quase serena, que parece te esperar sem pressa nenhuma. Olhar pra ele é olhar pra um ponto final se aproximando de você na página.</p>
+
+    <div class="block-h">Lendas</div>
+    <div class="legends">
+      <div class="lg"><div class="lt">O que o Escultor Não Termina</div><p>O Escultor guarda tudo o que ama, empurrando pro acabamento. Mas o que Thánatos-Nul toca, ele <em>não consegue</em> guardar — o zero desfaz até o que estava pronto. É a única coisa que a mão do Fazedor não segura, e por isso a mais próxima do terror secreto dele. Onde Thánatos-Nul passa, nem o "manter" do Escultor alcança.</p></div>
+      <div class="lg"><div class="lt">O Convite</div><p>Ele não leva ninguém à força — não sabe forçar, e não precisa. Ele <em>convida</em>, e espera. E um dia, cansado o bastante, cada um aceita. Dizem que a única defesa contra o convite é ter ainda algo pelo qual valha a pena continuar caindo devagar em vez de terminar de cair. Quem não tem, aceita rápido.</p></div>
+    </div>
+
+    <div class="defeat">
+      <div class="dh">Como se derrota</div>
+      <p>Não se derrota. Não se enfrenta. Perto dele, a própria existência afina — o dano é você deixando de estar. É <strong>retirada, não combate</strong>: o chefe que ensina a mesa que às vezes a única jogada é fugir, e rápido. Guarde-o pro momento em que os players precisam entender, no corpo, que nem tudo tem <em>boss fight</em> — e que algumas coisas você só sobrevive por ter corrido a tempo.</p>
+    </div>
+    <a href="#top" class="totop">↑ sumário</a>
+  </div>
+
+  <footer>
+    <span class="mono">Documento de Mestre · Os Chefes · seis nomes que os jogadores nunca leem</span>
+  </footer>
+
+</div>
+</body>
+</html>
