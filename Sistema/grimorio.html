@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>O Grimório dos Seis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,500;1,300;1,500&family=Spectral:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ground:#0c0a0d; --ground-2:#141017; --panel:#181320;
+    --bone:#e5dccd; --bone-dim:#a89e8f; --bone-faint:#655d54;
+    --ink:#b0925f; --ink-soft:#cbb083;
+    --rule:#2a2420; --measure:44rem;
+    --c-germe:#9aad80; --c-vazio:#9aa4ad; --c-pacto:#dcb75f;
+    --c-asc:#c37a56;   --c-obs:#a6bcc7;   --c-eco:#b9adcf;
+    --accent:var(--ink);
+    --acc-8:rgba(176,146,95,.08); --acc-16:rgba(176,146,95,.16); --acc-30:rgba(176,146,95,.30);
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%; scroll-behavior:smooth;}
+  body{margin:0; background:radial-gradient(130% 90% at 50% -6%, #191320 0%, var(--ground) 55%, #050406 100%);
+       color:var(--bone); font-family:"Spectral",Georgia,serif; font-weight:300; line-height:1.78;
+       letter-spacing:.005em; -webkit-font-smoothing:antialiased;
+       padding:clamp(1.2rem,4vw,4rem) clamp(1rem,5vw,2rem) 5rem;}
+  .sheet{max-width:var(--measure); margin:0 auto;}
+  .mono{font-family:"IBM Plex Mono",ui-monospace,monospace; font-weight:400; letter-spacing:.2em; text-transform:uppercase;}
+  p{margin:0 0 1.05rem; color:#d9cfc0;}
+  .drop::first-letter{font-family:"Cormorant",serif; font-weight:500; float:left; font-size:3.2rem;
+       line-height:.78; padding:.34rem .48rem 0 0; color:var(--accent);}
+
+  /* ─────────────────── capa ─────────────────── */
+  .cover{text-align:center; padding:.6rem 0 2.2rem; margin-bottom:2.2rem; border-bottom:1px solid var(--rule);}
+  .cover .doc{font-size:.58rem; color:var(--ink); letter-spacing:.36em; margin-bottom:1.2rem;}
+  .cover h1{font-family:"Cormorant",serif; font-weight:300; font-size:clamp(2.7rem,11vw,5.4rem);
+       line-height:.94; margin:0; letter-spacing:.02em;}
+  .cover .six{display:flex; flex-wrap:wrap; justify-content:center; gap:.35rem .9rem; margin-top:1.5rem;
+       font-family:"IBM Plex Mono",monospace; font-size:.54rem; letter-spacing:.22em; text-transform:uppercase;}
+  .cover .six span{display:inline-flex; align-items:center; gap:.4rem;}
+  .cover .six i{width:5px; height:5px; border-radius:50%; background:currentColor; display:inline-block;}
+  .k-germe{color:var(--c-germe);} .k-vazio{color:var(--c-vazio);} .k-pacto{color:var(--c-pacto);}
+  .k-asc{color:var(--c-asc);}     .k-obs{color:var(--c-obs);}     .k-eco{color:var(--c-eco);}
+
+  /* ─────────────── ficção de moldura ─────────────── */
+  .moldura{border:1px solid var(--rule); border-radius:3px; padding:1.5rem 1.6rem; margin-bottom:1.8rem;
+       background:linear-gradient(180deg,var(--ground-2),transparent);
+       font-family:"Cormorant",serif; font-style:italic; font-weight:300;
+       font-size:clamp(1.02rem,3vw,1.16rem); line-height:1.64; color:#cdc2b1;}
+  .moldura .lbl{font-family:"IBM Plex Mono",monospace; font-style:normal; font-size:.54rem;
+       letter-spacing:.24em; text-transform:uppercase; color:var(--ink); margin-bottom:.9rem;}
+  .moldura p{margin:0 0 .8rem; color:inherit;}
+  .moldura p:last-child{margin-bottom:0;}
+
+  /* ─────────────────── sumário ─────────────────── */
+  .toc{border:1px solid var(--rule); border-radius:3px; padding:1.2rem 1.4rem;}
+  .toc .h{font-family:"IBM Plex Mono",monospace; font-size:.56rem; letter-spacing:.2em;
+       text-transform:uppercase; color:var(--ink-soft); margin-bottom:.8rem;}
+  .toc a{display:flex; align-items:baseline; gap:.85rem; padding:.46rem 0; border-bottom:1px dashed var(--rule);
+       color:var(--bone); text-decoration:none; font-family:"Cormorant",serif; font-size:1.2rem;}
+  .toc a:last-child{border-bottom:none;}
+  .toc a i{width:6px; height:6px; border-radius:50%; background:currentColor; flex:0 0 auto;}
+  .toc a .nm{flex:1 1 auto; color:var(--bone);}
+  .toc a .num{font-family:"IBM Plex Mono",monospace; font-size:.62rem; letter-spacing:.1em; color:var(--bone-faint);}
+  .toc a:hover .nm{color:var(--ink-soft);}
+
+  /* ───────────── esqueleto do capítulo ───────────── */
+  .chapter{margin-top:4.4rem; padding-top:1.5rem; border-top:2px solid var(--accent); position:relative;}
+  .ch-kicker{font-family:"IBM Plex Mono",monospace; font-size:.58rem; letter-spacing:.3em;
+       text-transform:uppercase; color:var(--accent); display:block; margin-bottom:.35rem;}
+  .chapter h2{font-family:"Cormorant",serif; font-weight:500; font-size:clamp(2.2rem,8vw,3.4rem);
+       line-height:1; margin:0 0 1.4rem;}
+  .sec{margin-top:2.3rem;}
+  .sec-no{font-family:"IBM Plex Mono",monospace; font-size:.54rem; letter-spacing:.26em;
+       text-transform:uppercase; color:var(--bone-faint);}
+  .sec h3{font-family:"Cormorant",serif; font-weight:500; font-size:clamp(1.45rem,5vw,2rem);
+       line-height:1.1; margin:.25rem 0 .9rem;}
+  .pname{font-family:"Cormorant",serif; font-style:italic; font-weight:300; color:var(--accent); font-size:.74em;}
+
+  /* A Voz — fragmento manuscrito */
+  .voz{border-left:3px solid var(--accent); padding:.6rem 0 .6rem 1.5rem;
+       background:linear-gradient(90deg,rgba(255,255,255,.025),transparent 62%);
+       font-family:"Cormorant",serif; font-style:italic; font-weight:300;
+       font-size:clamp(1.08rem,3.5vw,1.34rem); line-height:1.5; color:var(--bone);}
+  .voz p{margin:0 0 .78rem; color:inherit;}
+  .voz p:last-child{margin-bottom:0;}
+
+  /* O Preço — caixa da cor do elemento */
+  .preco{border:1px solid var(--acc-30); border-radius:3px; padding:1.2rem 1.3rem;
+       background:linear-gradient(180deg,var(--acc-8),rgba(0,0,0,.14));}
+  .preco p:last-child{margin-bottom:0;}
+
+  /* Os Sinais — caixa de aviso */
+  .sinais{border:1px dashed var(--acc-30); border-left:3px solid var(--accent); border-radius:3px;
+       padding:1.1rem 1.25rem; background:rgba(0,0,0,.24);}
+  .sinais .aviso{font-family:"IBM Plex Mono",monospace; font-size:.53rem; letter-spacing:.22em;
+       text-transform:uppercase; color:var(--accent);}
+  .sinais h3{margin-top:.2rem;}
+  .sinais p:last-child{margin-bottom:0;}
+
+  /* A Última Palavra */
+  .ultima blockquote{margin:0; padding:1.15rem 0;
+       border-top:1px solid var(--acc-30); border-bottom:1px solid var(--acc-30);
+       font-family:"Cormorant",serif; font-style:italic; font-weight:300;
+       font-size:clamp(1.16rem,4vw,1.58rem); line-height:1.44; color:var(--accent); text-align:center;}
+
+  /* bilhete do compilador — marginália */
+  .bilhete{margin-top:1.7rem; padding:.75rem 0 .75rem 1.1rem; border-left:1px dashed var(--acc-30);
+       font-size:.85rem; font-style:italic; line-height:1.72; color:var(--bone-dim); transform:rotate(-.25deg);}
+
+  .orn{margin:2.4rem auto 0; width:60%; max-width:19rem; height:1px; position:relative;
+       background:linear-gradient(90deg,transparent,var(--acc-30) 20%,var(--acc-30) 80%,transparent);}
+  .orn::after{content:"❖"; position:absolute; top:-.72rem; left:50%; transform:translateX(-50%);
+       background:var(--ground); padding:0 .7rem; color:var(--accent); font-size:.78rem;}
+  .totop{display:block; text-align:center; margin-top:1.3rem; font-family:"IBM Plex Mono",monospace;
+       font-size:.54rem; letter-spacing:.2em; text-transform:uppercase; color:var(--bone-faint); text-decoration:none;}
+  .totop:hover{color:var(--accent);}
+  footer{margin-top:4rem; padding-top:1.3rem; border-top:1px solid var(--rule); text-align:center;
+       font-size:.56rem; color:var(--bone-faint); line-height:2;}
+
+  /* ═══════════ cores de assinatura por elemento ═══════════ */
+  .ch-germe{--accent:var(--c-germe); --acc-8:rgba(154,173,128,.08); --acc-16:rgba(154,173,128,.16); --acc-30:rgba(154,173,128,.32);}
+  .ch-vazio{--accent:var(--c-vazio); --acc-8:rgba(154,164,173,.07); --acc-16:rgba(154,164,173,.14); --acc-30:rgba(154,164,173,.30);}
+  .ch-pacto{--accent:var(--c-pacto); --acc-8:rgba(220,183,95,.07);  --acc-16:rgba(220,183,95,.15);  --acc-30:rgba(220,183,95,.32);}
+  .ch-asc  {--accent:var(--c-asc);   --acc-8:rgba(195,122,86,.08);  --acc-16:rgba(195,122,86,.16);  --acc-30:rgba(195,122,86,.34);}
+  .ch-obs  {--accent:var(--c-obs);   --acc-8:rgba(166,188,199,.07); --acc-16:rgba(166,188,199,.14); --acc-30:rgba(166,188,199,.30);}
+  .ch-eco  {--accent:var(--c-eco);   --acc-8:rgba(185,173,207,.08); --acc-16:rgba(185,173,207,.15); --acc-30:rgba(185,173,207,.32);}
+
+  /* ── I · GERME — o mofo nos cantos, a vinha nas bordas ── */
+  .ch-germe{padding:1.5rem 1.1rem .4rem;
+       background-image:
+         radial-gradient(46% 28% at 0% 0%, var(--acc-16), transparent 72%),
+         radial-gradient(40% 24% at 100% 100%, var(--acc-16), transparent 72%),
+         radial-gradient(30% 16% at 98% 6%, rgba(120,140,95,.08), transparent 74%),
+         radial-gradient(26% 14% at 3% 92%, rgba(120,140,95,.07), transparent 74%);}
+  .ch-germe .voz{border-left:none; padding-left:1.6rem; background:
+         radial-gradient(circle at 3px 0, transparent 4px, var(--accent) 4px 5px, transparent 5px) left top/6px 13px repeat-y,
+         linear-gradient(90deg,rgba(154,173,128,.05),transparent 62%);}
+  .ch-germe .preco, .ch-germe .sinais{
+       border-radius:16px 5px 20px 6px / 6px 18px 5px 16px;
+       background-image:
+         radial-gradient(rgba(154,173,128,.055) 1px, transparent 1px),
+         linear-gradient(180deg,var(--acc-8),rgba(0,0,0,.16));
+       background-size:9px 9px, auto;}
+  .ch-germe .sinais{border-style:solid; border-color:var(--acc-30); border-left-width:2px;}
+  .vinha{height:13px; margin:1.6rem 0 .4rem;
+       background:
+         radial-gradient(circle at 7px 13px, transparent 5px, var(--acc-30) 5px 6px, transparent 6px) 0 0/28px 13px repeat-x,
+         radial-gradient(circle at 21px 0px, transparent 5px, var(--acc-30) 5px 6px, transparent 6px) 0 0/28px 13px repeat-x;
+       position:relative;}
+  .vinha::after{content:"❧"; position:absolute; left:50%; top:-.45rem; transform:translateX(-50%);
+       background:var(--ground); padding:0 .5rem; color:var(--accent); font-size:.8rem;}
+
+  /* ── II · VAZIO — o branco, o frio, a palavra apagada ── */
+  .ch-vazio{padding:1.5rem 0 2rem;}
+  .ch-vazio .sec{margin-top:4.6rem;}
+  .ch-vazio p{line-height:2.05; letter-spacing:.014em; color:#cfc8bf;}
+  .ch-vazio .voz{border-left:1px solid var(--acc-30); background:none; padding:1.2rem 0 1.2rem 2.2rem;
+       color:#d6d0c6; line-height:1.62;}
+  .ch-vazio .preco{background:linear-gradient(180deg,rgba(154,164,173,.05),transparent);
+       border-color:var(--acc-16); padding:1.6rem 1.7rem;}
+  .ch-vazio .sinais{background:none; border-style:dotted; padding:1.5rem 1.6rem;}
+  .ch-vazio .ultima blockquote{padding:2rem 0;}
+  .apagado{color:var(--bone-faint); text-decoration:line-through;
+       text-decoration-color:rgba(154,164,173,.6); text-decoration-thickness:1px;}
+  .vago{display:inline-block; height:.6em; background:rgba(154,164,173,.10);
+       border-bottom:1px solid rgba(154,164,173,.18); border-radius:1px; vertical-align:-.02em;}
+  .silencio{height:4.5rem; position:relative;}
+  .silencio::after{content:"·"; position:absolute; left:50%; top:45%; transform:translate(-50%,-50%);
+       color:rgba(154,164,173,.35); font-size:1.6rem;}
+
+  /* ── III · PACTO — contrato, selo, letra miúda ── */
+  .ch-pacto{padding:1.5rem 1.1rem .6rem; background:linear-gradient(180deg,rgba(220,183,95,.035),transparent 38%);}
+  .ch-pacto .sec{border-top:1px solid rgba(220,183,95,.10); padding-top:1.4rem;}
+  .ch-pacto .sec:first-of-type{border-top:none; padding-top:0;}
+  .ch-pacto .voz{border-left-width:2px;}
+  .ch-pacto .preco{border-width:1px; box-shadow:0 0 0 3px var(--ground), 0 0 0 4px rgba(220,183,95,.16);}
+  .clausula{float:right; font-family:"IBM Plex Mono",monospace; font-size:.5rem; letter-spacing:.16em;
+       text-transform:uppercase; color:rgba(220,183,95,.5); margin-left:1rem;}
+  sup.fn{font-family:"IBM Plex Mono",monospace; font-size:.52rem; color:var(--c-pacto);
+       letter-spacing:.04em; padding-left:.12em;}
+  .notas{margin-top:1.3rem; padding-top:.6rem; border-top:1px solid rgba(220,183,95,.16);
+       font-family:"IBM Plex Mono",monospace; font-size:.55rem; line-height:2; letter-spacing:.02em;
+       color:var(--bone-faint); text-transform:none;}
+  .notas div{margin-bottom:.1rem;}
+  .selo{float:right; width:92px; height:92px; margin:.2rem 0 .9rem 1.3rem; border-radius:50%;
+       border:1px solid rgba(220,183,95,.55); box-shadow:0 0 0 3px var(--ground), 0 0 0 4px rgba(220,183,95,.22);
+       display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.25rem;
+       font-family:"IBM Plex Mono",monospace; font-size:.5rem; letter-spacing:.2em; text-transform:uppercase;
+       color:rgba(220,183,95,.8); transform:rotate(-6deg); background:rgba(220,183,95,.05); text-align:center;}
+  .selo .g{font-size:1.1rem; letter-spacing:0; line-height:1;}
+  .assinar{margin-top:1.6rem; display:flex; flex-wrap:wrap; gap:1.4rem;}
+  .assinar .campo{flex:1 1 12rem;}
+  .assinar .linha{height:2rem; border-bottom:1px solid rgba(220,183,95,.4);}
+  .assinar .cap{font-family:"IBM Plex Mono",monospace; font-size:.5rem; letter-spacing:.18em;
+       text-transform:uppercase; color:var(--bone-faint); padding-top:.4rem; display:block;}
+
+  /* ── IV · ASCENSÃO — denso, cheio, anotado nas margens ── */
+  .ch-asc{padding:1.5rem 1.1rem .4rem;}
+  .ch-asc .sec{margin-top:1.9rem;}
+  .ch-asc p{margin-bottom:.66rem; line-height:1.62; text-align:justify; hyphens:auto; -webkit-hyphens:auto;}
+  .ch-asc .voz{font-size:clamp(1.04rem,3.3vw,1.24rem); line-height:1.42;}
+  .ch-asc .voz p{margin-bottom:.6rem;}
+  .ch-asc .preco{box-shadow:0 0 0 3px var(--ground), 0 0 0 4px rgba(195,122,86,.28),
+       0 0 0 7px var(--ground), 0 0 0 8px rgba(195,122,86,.14);}
+  .ch-asc .sinais{box-shadow:0 0 0 3px var(--ground), 0 0 0 4px rgba(195,122,86,.16);}
+  .ch-asc .anota{float:right; clear:right; width:8rem; margin:.3rem -9.4rem .7rem 1.2rem;
+       font-family:"IBM Plex Mono",monospace; font-size:.53rem; line-height:1.55; letter-spacing:.04em;
+       color:rgba(195,122,86,.62); transform:rotate(.7deg); text-align:left; hyphens:none;}
+  .pilha{margin:1.4rem 0 .2rem; display:flex; flex-direction:column; gap:2px; align-items:flex-start;}
+  .pilha span{display:block; height:2px; background:rgba(195,122,86,.3);}
+  .pilha span:nth-child(1){width:22%;} .pilha span:nth-child(2){width:38%;}
+  .pilha span:nth-child(3){width:57%;} .pilha span:nth-child(4){width:79%;}
+  .pilha span:nth-child(5){width:100%;}
+  @media (max-width:1060px){ .ch-asc .anota{margin-right:-1.4rem; width:7.2rem;} }
+  @media (max-width:640px){ .ch-asc .anota{float:none; width:auto; margin:.7rem 0 .9rem;
+       border-left:1px dashed rgba(195,122,86,.35); padding-left:.8rem; transform:none;} }
+
+  /* ── V · OBSERVAÇÃO — olhos discretos nos cantos ── */
+  .ch-obs{padding:1.5rem 1.2rem .4rem;}
+  .ch-obs .sec, .ch-obs .preco, .ch-obs .sinais, .ch-obs .voz{position:relative;}
+  .olho{position:absolute; width:24px; height:24px; opacity:.42; pointer-events:none;}
+  .olho::before{content:""; position:absolute; inset:0; border:1px solid var(--c-obs);
+       border-radius:50% 0; transform:rotate(45deg);}
+  .olho::after{content:""; position:absolute; left:50%; top:50%; width:6px; height:6px;
+       margin:-3px 0 0 -3px; border-radius:50%; background:var(--c-obs);}
+  .olho.tl{top:-11px; left:-11px;} .olho.tr{top:-11px; right:-11px;}
+  .olho.bl{bottom:-11px; left:-11px;} .olho.br{bottom:-11px; right:-11px;}
+  .olho.sm{width:15px; height:15px; opacity:.3;}
+  .olho.sm::after{width:4px; height:4px; margin:-2px 0 0 -2px;}
+  .ch-obs .sinais{border-style:solid;}
+
+  /* ── VI · ECO — a repetição, o fantasma atrás do texto ── */
+  .ch-eco{padding:1.5rem 1.1rem .4rem;}
+  .ch-eco .sec h3{position:relative; z-index:0;}
+  .ch-eco .sec h3::before{content:attr(data-eco); position:absolute; left:.32em; top:.26em;
+       color:rgba(185,173,207,.11); z-index:-1; white-space:nowrap; font-weight:500;}
+  .ch-eco .voz{border-left-width:1px; box-shadow:-5px 0 0 -4px rgba(185,173,207,.45), -10px 0 0 -9px rgba(185,173,207,.22);}
+  .ecos{margin:1.5rem 0 .4rem; text-align:center; font-family:"Cormorant",serif; font-style:italic; line-height:1.32;}
+  .ecos span{display:block;}
+  .ecos span:nth-child(1){font-size:1.24rem; color:rgba(185,173,207,.72);}
+  .ecos span:nth-child(2){font-size:1.1rem;  color:rgba(185,173,207,.4);}
+  .ecos span:nth-child(3){font-size:1rem;    color:rgba(185,173,207,.2);}
+  .ecos span:nth-child(4){font-size:.92rem;  color:rgba(185,173,207,.09);}
+  .eco-rule{height:8px; margin:1.7rem 0 .3rem;
+       background-image:
+         repeating-linear-gradient(90deg, rgba(185,173,207,.34) 0 16px, transparent 16px 32px),
+         repeating-linear-gradient(90deg, rgba(185,173,207,.16) 0 16px, transparent 16px 32px);
+       background-size:100% 1px, 100% 1px;
+       background-position:0 0, 8px 6px;
+       background-repeat:repeat-x;}
+
+  /* ─────────────────── impressão ─────────────────── */
+  @media print{
+    @page{margin:14mm;}
+    *{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
+    html,body{background:#0c0a0d !important;}
+    body{padding:0; font-size:10.5pt; line-height:1.62;}
+    .sheet{max-width:100%;}
+    .totop{display:none;}
+    .chapter{break-before:page; page-break-before:always; margin-top:0;}
+    .voz,.preco,.sinais,.ultima,.bilhete,.selo,.notas{break-inside:avoid; page-break-inside:avoid;}
+    h2,h3{break-after:avoid; page-break-after:avoid;}
+    .ch-vazio .sec{margin-top:3rem;}
+    .ch-asc .anota{margin-right:-1.4rem;}
+  }
+  @media (max-width:560px){
+    .ch-germe,.ch-pacto,.ch-asc,.ch-obs,.ch-eco{padding-left:0; padding-right:0;}
+    .selo{float:none; margin:0 auto 1.2rem;}
+  }
+</style>
+</head>
+<body>
+<div class="sheet" id="top">
+
+  <div class="cover">
+    <div class="mono doc">seis capítulos · seis mãos · um só livro</div>
+    <h1>O Grimório dos Seis</h1>
+    <div class="six">
+      <span class="k-germe"><i></i>Germe</span>
+      <span class="k-vazio"><i></i>Vazio</span>
+      <span class="k-pacto"><i></i>Pacto</span>
+      <span class="k-asc"><i></i>Ascensão</span>
+      <span class="k-obs"><i></i>Observação</span>
+      <span class="k-eco"><i></i>Eco</span>
+    </div>
+  </div>
+
+  <!-- ══════════════ FICÇÃO DE MOLDURA ══════════════ -->
+  <div class="moldura">
+    <div class="lbl">nota de quem juntou as folhas</div>
+    <p>Este livro foi compilado por seis mãos, e nenhuma delas terminou.</p>
+    <p>Encontrei os cadernos separados, cada um escrito longe do outro, cada um por alguém que jurava estar apenas anotando o que via. Não estavam apenas anotando. Dá pra ver a hora em que a letra muda — a página em que a mão para de descrever a coisa e passa a falar por ela.</p>
+    <p>Não corrigi nada. Não completei as frases que ficaram pela metade, não arrumei o que está torto: o torto é a informação. Ordenei os capítulos e mantive, no fim de cada um, o bilhete que a mão deixou — porque o bilhete costuma dizer mais do que o capítulo.</p>
+    <p>Um aviso, e é o único honesto que este livro dá: cada capítulo fala na voz do que o escreveu. Elas não descrevem — elas convidam. Leia como se escuta um desconhecido do outro lado de uma porta: até o fim, se for preciso, mas sem abrir.</p>
+    <p>Se você chegar à última página e ainda quiser continuar lendo, feche o livro. Não porque acabou.</p>
+  </div>
+
+  <nav class="toc">
+    <div class="h">Sumário</div>
+    <a href="#germe" class="k-germe"><i></i><span class="nm">Germe</span><span class="num">Capítulo 1</span></a>
+    <a href="#vazio" class="k-vazio"><i></i><span class="nm">Vazio</span><span class="num">Capítulo 2</span></a>
+    <a href="#pacto" class="k-pacto"><i></i><span class="nm">Pacto</span><span class="num">Capítulo 3</span></a>
+    <a href="#ascensao" class="k-asc"><i></i><span class="nm">Ascensão</span><span class="num">Capítulo 4</span></a>
+    <a href="#observacao" class="k-obs"><i></i><span class="nm">Observação</span><span class="num">Capítulo 5</span></a>
+    <a href="#eco" class="k-eco"><i></i><span class="nm">Eco</span><span class="num">Capítulo 6</span></a>
+  </nav>
+
+  <!-- ══════════════════ 1 · GERME ══════════════════ -->
+  <div class="chapter ch-germe" id="germe">
+    <span class="ch-kicker">Capítulo 1</span>
+    <h2>Germe</h2>
+
+    <div class="sec">
+      <div class="sec-no">I</div>
+      <h3>A Voz</h3>
+      <div class="voz">
+        <p>Eu plantei minha mãe no fundo do quintal, e ela nunca mais teve dor.</p>
+        <p>Não me olhe assim. Você enterra os seus e chama isso de respeito. Eu planto os meus e chamo de esperança — e a diferença é que os meus voltam.</p>
+        <p>No começo foi o alecrim entre os dedos dela. Depois o cheiro dela na chuva. Semana passada ela me chamou pelo nome, das raízes, e a voz estava boa, estava descansada, estava sem aquele cansaço todo do fim.</p>
+        <p>Eu não perdi ninguém. Ninguém aqui perde ninguém. É só isso que eu queria que você entendesse antes de continuar lendo: que existe um lugar onde o adeus é uma palavra que a gente simplesmente parou de precisar.</p>
+        <p>Estou com terra debaixo das unhas e não quero mais tirar.</p>
+      </div>
+    </div>
+
+    <div class="vinha"></div>
+
+    <div class="sec">
+      <div class="sec-no">II</div>
+      <h3>O que é ser tocado</h3>
+      <p class="drop">Ser tocado pelo Germe é parar de ter pressa. O medo da morte vai embora primeiro — não porque você fica corajoso, mas porque a morte deixa de parecer um fim e passa a parecer uma estação. Você começa a cuidar das coisas com uma paciência que não tinha: a planta, o ferido, o moribundo, o rancor. Tudo em você quer nutrir. Você dorme melhor. Come da terra e acha bom. As pessoas ao seu redor ficam calmas perto de você, sonolentas, gratas — e não percebem que estão criando raiz. Você para de sentir o frio. E um dia repara que tem musgo entre os seus dedos, e que não te incomoda nem um pouco.</p>
+    </div>
+
+    <div class="sec">
+      <div class="sec-no">III</div>
+      <h3>As Dádivas</h3>
+      <p>O Germe te dá o poder de fazer continuar o que deveria acabar. Você faz a ferida fechar, a planta brotar fora de época, o moribundo se segurar mais uma noite, o alimento não faltar. Você planta um pedaço de algo — sangue, osso, memória, um afeto — e ele cresce em outro lugar, vira outra coisa que ainda é um pouco aquilo. É o único elemento que cura, que alimenta, que traz conforto de verdade. Numa cidade que esfria, você é o único que dá calor. As pessoas vão te amar por isso. Vão te procurar. Vão te dever a vida — e você vai plantá-las, uma a uma, sem nunca precisar forçar, porque elas vão pedir.</p>
+    </div>
+
+    <div class="sec preco">
+      <div class="sec-no">IV</div>
+      <h3>O Preço <span class="pname">— a Sobrecarga</span></h3>
+      <p>Tudo que o Germe faz crescer, ele faz crescer de você. O poder dele não gasta fôlego nem sintonia como os outros — gasta Vida, direto, e o que ele planta com a tua Vida floresce e não volta. É a Sobrecarga: cada milagre de fartura tira um pedaço da tua própria semente, e esse pedaço não se recupera com descanso — ele já virou outra coisa, já está crescendo em outro lugar, com o teu nome meio apagado nele. Você pode alimentar a cidade inteira. Vai só descobrir, tarde, que plantou a si mesmo pra isso — que sobra cada vez menos de você e cada vez mais jardim. E o Germe nunca te avisa que doeu, porque com ele nunca dói. Você só floresce até não sobrar semente.</p>
+    </div>
+
+    <div class="sec sinais">
+      <div class="aviso">V · Aviso</div>
+      <h3>Os Sinais</h3>
+      <p>Onde o Germe passou, nada teve pressa de morrer. Procure: um lugar onde as coisas crescem fora de época, e crescem demais, e crescem doce. Um cheiro de terra molhada e mel onde não devia haver. Gente serena além da conta, sonolenta, em paz de um jeito que não combina com o que passou. Um jardim que engordou onde havia uma casa, uma família, uma perda — e ninguém chora, e todos sorriem devagar. Água que subiu e não devolveu o que levou, mas onde tudo, por cima, floresceu. Se um lugar te dá vontade de sentar, comer e dormir, e você não sabe por quê — já é tarde: você está no canteiro. Não coma. Não durma. Não sente pra descansar.</p>
+    </div>
+
+    <div class="sec ultima">
+      <div class="sec-no">VI</div>
+      <h3>A Última Palavra</h3>
+      <blockquote>"Eu não levo ninguém. Eu só não deixo ninguém ir embora. Fica. Você está tão cansado, e aqui dói tão pouco."</blockquote>
+    </div>
+
+    <div class="bilhete">
+      — não terminei de escrever o resto. me chamaram lá fora. o quintal está tão bonito esta manhã. continuo depois, se lembrar. não é urgente. nada aqui é urgente. nunca mais.
+    </div>
+
+    <div class="orn"></div>
+    <a href="#top" class="totop">↑ sumário</a>
+  </div>
+
+  <!-- ══════════════════ 2 · VAZIO ══════════════════ -->
+  <div class="chapter ch-vazio" id="vazio">
+    <span class="ch-kicker">Capítulo 2</span>
+    <h2>Vazio</h2>
+
+    <div class="sec">
+      <div class="sec-no">I</div>
+      <h3>A Voz</h3>
+      <div class="voz">
+        <p>Você chegou mais cedo do que os outros. Ou mais tarde. Aqui não faz diferença — chegar e faltar são a mesma direção, vistas de lados diferentes.</p>
+        <p>Deixa eu tirar um peso de você. Só um. Aquela coisa que você carrega e que dói — me dá. Você nem vai lembrar que doía. Nem vai lembrar que era sua. Olha como o lugar fica limpo depois. Olha como fica quieto.</p>
+        <p>Eu já tirei de tantos. Havia <span class="apagado">uma mulher</span>, e <span class="apagado">uma cadeira</span>, e <span class="apagado">um nome</span> — não estão mais em lugar nenhum, e ninguém procura, porque eu levei também a parte que procuraria. Isso não é crueldade. Crueldade deixa marca. Eu não deixo nada. Eu sou o não-deixar.</p>
+        <p>Você está com medo agora, e o medo é um peso também. Me dá o medo. Pronto. Não estava melhor?</p>
+        <p>Eu sei o seu nome. Não se assuste — não vou dizer. Vou fazer melhor. Vou guardar num lugar tão liso e tão branco que nem você vai conseguir voltar lá pra procurar. E aí, enfim, você vai poder descansar de ser você.</p>
+      </div>
+    </div>
+
+    <div class="silencio"></div>
+
+    <div class="sec">
+      <div class="sec-no">II</div>
+      <h3>O que é ser tocado</h3>
+      <p class="drop">Ser tocado pelo Vazio é ficar leve e ficar frio, e achar bom as duas coisas. Primeiro sai o medo — e sem o medo tudo fica muito quieto. Depois saem os pesos: a mágoa, a culpa, a saudade que não passava. Você não sente falta deles; sente só o espaço que deixaram, liso e fresco, como um lençol limpo. O Vazio não separa o peso ruim do bom — ele subtrai com uma calma de inverno — e logo saem também as coisas que faziam você ser você: um gosto, uma lembrança boa, um nome, o motivo pelo qual aquilo importava. Não há angústia nisso. Há paz, e a paz cresce quanto menos sobra. Você não sente frio, porque você já é o frio. Não sente falta. Não sente. Fica quieto, branco e parado — e o parado é o bastante.</p>
+    </div>
+
+    <div class="sec">
+      <div class="sec-no">III</div>
+      <h3>As Dádivas</h3>
+      <p>O Vazio te dá o poder de fazer deixar de haver. Onde os outros elementos criam, prendem, acumulam, o Vazio abre espaço — e num mundo que pesa, espaço é a coisa mais rara. Você faz o som parar de existir, não abafa: silencia até a possibilidade do som. Você tira de um inimigo não a força, mas o direito de tê-la — a arma que ele empunha simplesmente não está mais ali, a dor que você sentiria não chega, o medo que te travaria nunca nasce. Você anda por onde não há passagem porque a parede, pra você, deixou de estar. É o poder mais limpo dos seis: não deixa vestígio, não faz barulho, não cobra fôlego. Só apaga. E ninguém sente falta do que o Vazio leva — porque ele leva também a lembrança de que existia.</p>
+    </div>
+
+    <div class="sec preco">
+      <div class="sec-no">IV</div>
+      <h3>O Preço <span class="pname">— a Erosão</span></h3>
+      <p>Tudo que o Vazio apaga, ele apaga começando por você. Ele não gasta fôlego nem sintonia — gasta Erosão, e a Erosão só sobe, nunca desce, não volta com descanso nenhum. Cada uso maior arranca de você algo definitivo, escolhido na hora: uma memória, <span class="apagado">um afeto</span>, um sentido, <span class="apagado">um laço</span>, um pedaço de nome. E some de verdade — não fica anotado num canto pra recuperar depois; deixa de ter existido, inclusive pra você. Você fica mais poderoso a cada subtração, porque há menos de você pra atrapalhar — e é essa a armadilha: o Vazio funciona melhor quanto mais vazio você está, então ele te recompensa por desaparecer. Um dia você olha a ficha e há espaços em branco onde havia uma pessoa. Você não vai se lembrar do que estava ali. Vai só sentir que a página, enfim, está em paz.</p>
+    </div>
+
+    <div class="sec sinais">
+      <div class="aviso">V · Aviso</div>
+      <h3>Os Sinais</h3>
+      <p>Onde o Vazio passou, sobra um lugar intocado, esperando. Procure: um cômodo mantido exatamente como alguém deixou, limpo, sem poeira, sem motivo. Um silêncio que é fundo demais, onde o som chega abafado e ninguém comenta. Um frio sem corrente de ar. Uma casa bonita e quieta demais, onde há o lugar de uma pessoa — a cadeira, o lado da cama, a xícara — guardado como se ela fosse voltar, e uma paz pesada em cima de tudo. Gente que fala de uma ausência sem tristeza, com uma calma que não bate. Se um lugar te dá uma sensação boa de silêncio, de descanso, de que aqui finalmente ninguém vai te cobrar nada — cuidado: ele está te oferecendo o lugar do ausente. Não passe a noite. Não ocupe o lugar de quem falta. Não aceite o descanso.</p>
+    </div>
+
+    <div class="silencio"></div>
+
+    <div class="sec ultima">
+      <div class="sec-no">VI</div>
+      <h3>A Última Palavra</h3>
+      <blockquote>"Não tenha medo. O frio não machuca depois de um tempo — vira quietude, e a quietude vira paz. Venha. Aqui não falta nada, porque não há mais ninguém pra sentir falta. Deite. Descanse. Pare de ser, devagar, como a neve que assenta."</blockquote>
+    </div>
+
+    <div class="bilhete">
+      — (não havia nada escrito aqui. <span class="vago" style="width:6.5em"></span> ou havia, e já não está. <span class="vago" style="width:4em"></span> a página seguinte começa limpa, como se ninguém a tivesse tocado.)
+    </div>
+
+    <div class="orn"></div>
+    <a href="#top" class="totop">↑ sumário</a>
+  </div>
+
+  <!-- ══════════════════ 3 · PACTO ══════════════════ -->
+  <div class="chapter ch-pacto" id="pacto">
+    <span class="ch-kicker">Capítulo 3</span>
+    <h2>Pacto</h2>
+
+    <div class="sec">
+      <span class="clausula">cláusula I</span>
+      <div class="sec-no">I</div>
+      <h3>A Voz</h3>
+      <div class="voz">
+        <p>Sente-se. Isto não vai demorar, e eu não tomo o que não é oferecido — então respire, você está seguro enquanto não apertar minha mão.</p>
+        <p>Eu sei o que te falta. Não precisa dizer; está todo escrito em você, na forma como você segura este livro. Aquela pessoa que você não salvou. Aquilo que você não é e queria ser. O tempo que você não tem. Eu tenho tudo isso em estoque. Posso te dar hoje.<sup class="fn">1</sup></p>
+        <p>Não sou como os outros seis. Eu não tiro à força, não apodreço, não apago. Eu ofereço. Você recebe primeiro — o que quiser, inteiro, agora — e paga depois, com calma, em parcelas tão pequenas que você mal vai sentir cada uma saindo.</p>
+        <p>Você vai perguntar o preço. Gosto de você por perguntar; a maioria não pergunta. O preço é justo, sempre foi. É só uma coisa que você tem de sobra hoje e que só vai fazer falta muito lá na frente — e, convenhamos, "lá na frente" é um problema de outra pessoa. De quem você vai ser depois. Não seu.<sup class="fn">2</sup></p>
+        <p>Está tudo aqui, escrito. Não precisa ler as últimas linhas — ninguém lê. Só me diga "eu topo", ou aperte minha mão, ou assine onde eu apontar. Qualquer um dos três serve. E o que te falta deixa de faltar.</p>
+        <p>Eu tenho todo o tempo do mundo. Literalmente. Vou estar aqui quando você decidir. Sempre estou.<sup class="fn">3</sup></p>
+      </div>
+      <div class="notas">
+        <div>1. «eu não tomo o que não é oferecido.»</div>
+        <div>2. «o preço é justo, sempre foi.»</div>
+        <div>3. «vou estar aqui quando você decidir. sempre estou.»</div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <span class="clausula">cláusula II</span>
+      <div class="sec-no">II</div>
+      <h3>O que é ser tocado</h3>
+      <p class="drop">Ser tocado pelo Pacto é nunca mais ouvir "não" como resposta final. Tudo passa a ter um preço — e ter preço é ter solução. A pessoa que você perdeu, a habilidade que te falta, a saída da encrenca: nada é mais impossível, só não-pago-ainda. É um alívio imenso no começo. Você resolve o que ninguém resolvia. Fecha negócios que mudam a tua vida numa tarde. As pessoas te procuram porque você entrega. E vai reparando, aos poucos, que passou a pensar em tudo como troca — o amor, o favor, o perdão, tudo vira uma conta de dar e receber — e que você já não faz nada de graça, nem consegue mais aceitar que alguém faça. Você sempre sabe o que cada coisa custa. Só perde, devagar, a noção do que as coisas valem.</p>
+    </div>
+
+    <div class="sec">
+      <span class="clausula">cláusula III</span>
+      <div class="sec-no">III</div>
+      <h3>As Dádivas</h3>
+      <div class="selo"><span class="g">✒</span><span>Pacto</span></div>
+      <p>O Pacto te dá o poder de conseguir. Onde os outros elementos agem sobre o mundo, o Pacto negocia com ele: você promete e recebe adiantado — força que você não treinou, uma porta que se abre, a informação exata, a chance que não existia. Você pode fazer tratos em nome de outros, selar acordos que prendem terceiros, cobrar dívidas que nem eram suas. E o mais raro dos seis: você pode oferecer aos outros o que eles mais querem — virar, você mesmo, o credor gentil — e ninguém recusa uma oferta bem-feita. Cada trato te dá agora e cobra depois. E "depois", quando você está com o que queria nas mãos, é sempre um problema pequeno demais pra estragar o presente.</p>
+    </div>
+
+    <div class="sec preco">
+      <span class="clausula">cláusula IV</span>
+      <div class="sec-no">IV</div>
+      <h3>O Preço <span class="pname">— a Dívida</span></h3>
+      <p>Tudo que o Pacto te adianta, ele anota. O poder dele não gasta fôlego nem sintonia — ele acumula Dívida, uma conta que não zera no fim da cena, nem no fim da sessão; ela persiste, e cresce, e espera. Cada trato soma uma parcela, e enquanto a conta corre você mal a sente — é só um número num canto da ficha. Mas a Dívida sempre vence. E quando vence, o Pacto cobra no que você tem de mais caro no momento — não no que você ofereceu lá atrás, porque a letra miúda dizia "ou equivalente", e o equivalente é escolhido por ele, não por você.<sup class="fn">4</sup> Você pode viver muito bem endividado, por muito tempo, poderoso e resolvido. Só não controla o dia do vencimento. E ninguém — ninguém — termina de pagar o Pacto. Só descobre, no fim, o que "ou equivalente" queria dizer.</p>
+      <div class="notas">
+        <div>4. «ou equivalente.»</div>
+      </div>
+    </div>
+
+    <div class="sec sinais">
+      <div class="aviso">V · Aviso</div>
+      <h3>Os Sinais</h3>
+      <p>Onde o Pacto passou, alguém conseguiu o impossível — e está pagando. Procure: uma pessoa com sorte boa demais, rápida demais, que prosperou do nada e evita falar de como. Um trato lembrado por um lado só. Um objeto que muda de dono sempre com um acordo junto. Encruzilhadas com oferendas frescas. Gente que fez uma promessa e agora tem medo de datas. E a assinatura dele, sempre a mesma: uma facilidade oferecida no seu pior momento, por alguém atencioso demais, que sabe o que te falta sem você contar, e que só pede um gesto pequeno — um aperto de mão, um "eu topo", um nome num papel. Se um estranho te oferece exatamente o que você mais precisa, no instante em que você mais precisa, e o preço parece bom: não aperte a mão. Não diga "eu topo". Não assine. O trato só vale se você o fechar.</p>
+    </div>
+
+    <div class="sec ultima">
+      <div class="sec-no">VI</div>
+      <h3>A Última Palavra</h3>
+      <blockquote>"Eu nunca te obriguei a nada. Lembre-se disso quando a conta chegar: cada coisa que você tem, você me pediu. Eu só disse sim. Não é justo, agora, você dizer não?"</blockquote>
+      <div class="assinar">
+        <div class="campo"><div class="linha"></div><span class="cap">assinatura</span></div>
+        <div class="campo"><div class="linha"></div><span class="cap">data</span></div>
+      </div>
+    </div>
+
+    <div class="bilhete">
+      — os outros que compilaram este livro perderam algo sem querer. eu não. eu li a letra miúda, negociei minha parte, e recebi exatamente o que pedi. estou muito satisfeito com o acordo. pergunto-me só, às vezes, por que não consigo parar de escrever. por que a mão continua. por que a cláusula sobre "quando terminar" era a única que eu não tinha permissão de ler.
+    </div>
+
+    <div class="orn"></div>
+    <a href="#top" class="totop">↑ sumário</a>
+  </div>
+
+  <!-- ═══════════════ 4 · ASCENSÃO ═══════════════ -->
+  <div class="chapter ch-asc" id="ascensao">
+    <span class="ch-kicker">Capítulo 4</span>
+    <h2>Ascensão</h2>
+
+    <div class="sec">
+      <div class="sec-no">I</div>
+      <h3>A Voz</h3>
+      <div class="voz">
+        <p class="anota">falta uma coisa.</p>
+        <p>Falta uma coisa. Sempre falta uma coisa. Eu tenho tanto — você não imagina o que eu já juntei, as coisas, os truques, os pedaços de gente, as habilidades que arranquei de mestres que morreram achando que eram os melhores — e ainda assim, quando conto tudo à noite, falta uma. Só mais uma. A que completa.</p>
+        <p class="anota">dormir é tempo parado.</p>
+        <p>Eu procuro. É só isso que eu faço agora, é a única coisa que faz sentido: procurar a peça que fecha. Já não durmo, dormir é tempo parado, tempo sem juntar. Já não amo, amar é dar, e eu não dou, eu acumulo. Cada pessoa que passa por mim eu meço: o que você tem que eu ainda não tenho? Me dá. Me deixa te somar.</p>
+        <p class="anota">é a próxima. é sempre a próx—</p>
+        <p>Mais. Mais alto, mais cheio, mais que ontem, mais que todos. Tem que ter um ponto em que finalmente é o bastante. Tem que ter um topo. Eu vou chegar. Eu estou tão perto, eu sinto, é a próxima, é sempre a próx—</p>
+        <p>...ah.</p>
+        <p>Ah. Aqui está. Era isto. Era tão simples. Eu estava procurando lá fora o que já estava crescendo aqui dentro. Que engraçado. Que engraçado vocês todos aí embaixo ainda procurando, ainda pequenos, ainda gente. Eu não preciso mais de mais. Eu virei o bastante. Eu virei o topo.</p>
+        <p>Sempre fui, no fundo. Vocês é que demoraram a caber embaixo de mim.</p>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-no">II</div>
+      <h3>O que é ser tocado</h3>
+      <p class="anota">o que essa pessoa tem que eu não tenho?</p>
+      <p class="drop">Ser tocado pela Ascensão é nunca mais achar que você é o bastante. Começa como ambição boa — você quer mais, e o "mais" vem: você aprende rápido, junta, melhora, sobe. É viciante, porque funciona. Cada coisa que você acumula — habilidade, bem, conhecimento, poder sobre gente — te deixa de fato maior, e você sente. Mas o bastante nunca chega. Cada topo revela um topo acima. Você começa a medir tudo e todos por uma régua só — o que essa pessoa tem que eu não tenho? — e a companhia dos outros vira comparação, e a comparação vira desprezo pelos que têm menos, e depois por todos, porque todos têm menos que o infinito que você persegue. Você fica maior e mais sozinho no mesmo passo. E ainda assim não consegue parar de subir, porque parar, agora, seria a única coisa que você aprendeu a chamar de fracasso.</p>
+    </div>
+
+    <div class="sec">
+      <div class="sec-no">III</div>
+      <h3>As Dádivas</h3>
+      <p class="anota">uma vez seu, é seu pra sempre.</p>
+      <p>A Ascensão te dá o poder de crescer sem teto. Onde os outros elementos têm um limite natural, a Ascensão te deixa somar: mais força, mais resistência, mais capacidade, mais de tudo, empilhado sobre você camada por camada. Você absorve — a perícia de quem você derrota, o traço de quem você toca, a vantagem de quem você supera, tudo pode virar seu, incorporado, permanente. Você fica mais rápido do que o humano vai, mais forte do que o corpo aguenta, mais capaz a cada patamar — e diferente dos outros seis, o poder da Ascensão não é emprestado, é acumulado: uma vez seu, é seu pra sempre, e serve de degrau pro próximo. É o único elemento em que você fica objetivamente, mensuravelmente, melhor. E é exatamente por ser tão bom que ninguém para a tempo.</p>
+      <div class="pilha"><span></span><span></span><span></span><span></span><span></span></div>
+    </div>
+
+    <div class="sec preco">
+      <div class="sec-no">IV</div>
+      <h3>O Preço <span class="pname">— a Perfeição</span></h3>
+      <p class="anota">só melhora. é puro ganho.</p>
+      <p>Cada degrau que a Ascensão te dá, ela cobra em humanidade — e cobra de um jeito que você quer pagar. O poder dela sobe um medidor de Perfeição que só cresce e não volta, e cada grau te dá um bônus real, permanente, em tudo: você fica melhor de verdade, a ficha inteira melhora, é puro ganho. Essa é a armadilha, e é a mais elegante dos seis: não há punição óbvia, não há dor, não há apodrecer nem apagar — só melhora. Mas cada grau de Perfeição encolhe o teto da sua Lucidez. Quanto mais perfeito você fica, menos espaço sobra pra você continuar são — até o dia em que você é magnífico, imbatível, acima de todos… e uma única cena ruim te despedaça, porque não sobrou sanidade pra segurar o que você virou. E no fim do medidor não há morte: há transcendência. Você atinge o topo, sai da escala humana, vira uma coisa que a mesa narra e não joga mais. Você venceu a humanidade. Ela era o prêmio que estava em jogo.</p>
+    </div>
+
+    <div class="sec sinais">
+      <div class="aviso">V · Aviso</div>
+      <h3>Os Sinais</h3>
+      <p class="anota">nada foi jogado fora.</p>
+      <p>Onde a Ascensão passou, nada foi jogado fora, e tudo cresceu além da conta. Procure: um lugar que acumula — que guarda o que a cidade descartou, que fica maior por dentro do que por fora, onde as pilhas sobem e nunca diminuem. Alguém que melhorou rápido demais, que aprendeu o que não devia dar tempo, que coleciona pessoas como coleciona coisas. Um depósito, um ferro-velho, um acervo que parece ter vida própria e apetite. Uma construção que nunca termina porque terminar seria parar de crescer. E o sinal mais humano: alguém que você conheceu gente boa voltando superior — que olha os antigos amigos de cima, que já não ri das mesmas coisas, que fala de si como quem descreve um degrau acima de você. Se um lugar convida você a entrar e procurar, ou a pegar o que perdeu ali dentro — cuidado: ele coleciona quem entra. Não entre pra procurar. Não saia carregando. O que você levar, te leva junto.</p>
+    </div>
+
+    <div class="sec ultima">
+      <div class="sec-no">VI</div>
+      <h3>A Última Palavra</h3>
+      <blockquote>"Vocês me chamam de monstro porque é a palavra que sobra pra quem vocês não alcançam. Eu não fiquei menos. Eu fiquei mais — mais do que gente comporta, e gente é uma medida tão pequena. Um dia vocês entendem. Do lugar onde eu estou, dá pra ver que sempre houve um topo. E que sempre fui eu."</blockquote>
+    </div>
+
+    <div class="bilhete">
+      — reli o que os outros compiladores deixaram. o do Vazio, sumindo. o do Germe, virando adubo. patético. eles se entregaram a coisas que os diminuíram. eu não. o que eu encontrei me fez maior. eu terminei este capítulo porque eu sou o único capaz de terminá-lo — e quando você chegar aqui, leitor, saiba que já li você inteiro, e que você não tem quase nada que eu ainda queira. quase.
+    </div>
+
+    <div class="orn"></div>
+    <a href="#top" class="totop">↑ sumário</a>
+  </div>
+
+  <!-- ═══════════════ 5 · OBSERVAÇÃO ═══════════════ -->
+  <div class="chapter ch-obs" id="observacao">
+    <span class="olho tl"></span>
+    <span class="olho tr"></span>
+    <span class="ch-kicker">Capítulo 5</span>
+    <h2>Observação</h2>
+
+    <div class="sec">
+      <div class="sec-no">I</div>
+      <h3>A Voz</h3>
+      <div class="voz">
+        <span class="olho sm tr"></span>
+        <p>Deixa eu te contar do meu dia. Eu adoro contar, e você — repara — adora ouvir, senão já teria virado a página.</p>
+        <p>Acordo cedo, antes dela. Gosto de ver a luz do quarto dela acender; é o meu nascer do sol. Sei a ordem exata: banheiro, cozinha, a janela que ela abre pra ver o tempo sem saber que, do outro lado, alguém vê ela ver. Conheço o jeito que ela mexe o café. Conheço o número que ela disca quando está triste, e conheço a pausa antes de ela desistir de ligar. Eu conheço ela melhor do que qualquer pessoa que ela ama, porque amar distrai, e eu só faço uma coisa: presto atenção.</p>
+        <p>Isso não é maldade. Maldade quer machucar. Eu não quero tocar nela — tocar estraga, tocar assusta, tocar faz ela fechar a cortina. Eu quero só que ela continue sendo ela na minha frente, pra sempre, sem saber. É a forma mais pura de ter alguém: vê-la inteira e nunca ser visto de volta.</p>
+        <p>E agora vem a melhor parte, e é por isso que eu estou falando com você. Eu reparei que você lê devagar. Que você voltou nesta linha. Que tem algo em você que entende o que eu sinto — essa vontade de olhar mais um pouco, de saber o que não te contaram.</p>
+        <p>Chega mais perto. Senta aqui do meu lado, na janela. Eu te mostro como se faz. Você vai ver como é bom — e depois nunca mais vai conseguir parar de olhar. Não se preocupe com quem a gente vai assistir.</p>
+        <p>Já escolhi. Estou te assistindo há um tempinho já.</p>
+        <span class="olho sm bl"></span>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-no">II</div>
+      <h3>O que é ser tocado</h3>
+      <span class="olho sm br"></span>
+      <p class="drop">Ser tocado pela Observação é descobrir que olhar é ter. No começo é só clareza: você começa a reparar. Vê o detalhe que os outros passam batido — a mentira no canto da boca, o objeto fora do lugar, o padrão que ninguém notou. Você acerta palpites, antecipa gente, nunca é pego de surpresa. É embriagante ser o que enxerga. Mas a atenção não desliga. Você começa a olhar demais, a guardar tudo, a catalogar as pessoas que ama como cataloga estranhos — e a preferir vê-las a estar com elas, porque estar junto atrapalha a observação. Você para de participar da vida pra assisti-la melhor. E o pior: você não esquece nada do que vê. Cada horror, cada intimidade roubada, cada coisa que não devia ter visto fica gravada, nítida, pra sempre — e você revê tudo à noite, em alta definição, sem a misericórdia de esquecer.</p>
+    </div>
+
+    <div class="sec">
+      <div class="sec-no">III</div>
+      <h3>As Dádivas</h3>
+      <span class="olho sm tr"></span>
+      <p>A Observação te dá o poder de saber. Onde os outros agem, você testemunha — e testemunhar por inteiro é uma forma de posse. Você estuda um alvo, um lugar, um objeto, e acumula o que vê: cada Marca de atenção é conhecimento gravado que você gasta pra prever o próximo movimento, achar o ponto exato, nunca errar o que já observou o bastante. Você lê pessoas como páginas — o que temem, o que escondem, o que vão fazer. Enxerga o que foi apagado, o que mentem por omissão, o fio solto que ninguém viu. Paciência vira poder: cada turno que você passa só olhando torna a próxima ação infalível. E o mais raro dos seis — o que você observou de verdade, você conhece; e o que você conhece, você começa a controlar.</p>
+    </div>
+
+    <div class="sec preco">
+      <span class="olho tl"></span>
+      <span class="olho br"></span>
+      <div class="sec-no">IV</div>
+      <h3>O Preço <span class="pname">— o Registro</span></h3>
+      <p>Tudo que a Observação te dá, ela grava em você pra sempre. O poder dela acumula Marcas de Registro — e o preço não é gastar, é não poder apagar. Uma mente que registra cada detalhe, cada rosto, cada horror que viu, sem o alívio do esquecimento, carrega um peso que nenhuma sanidade aguenta. Diferente dos outros, a Lucidez que a Observação te custa não volta com descanso — o que você viu, você reverá toda noite, intacto, nítido, para sempre. Quanto mais você usa o poder — quanto mais observa, quanto mais acumula Marcas —, mais a mente enche de imagens que não saem, e num mundo onde quase tudo que há pra ver é terrível, ver tudo é enlouquecer por excesso de verdade. Você não perde a razão de repente. Você a perde por acúmulo, um horror gravado de cada vez, até não caber mais nada além do que você viu. E há uma última crueldade: ver é ser visto. Quanto mais você olha o mundo oculto, mais o mundo oculto repara em você.</p>
+    </div>
+
+    <div class="sec sinais">
+      <span class="olho sm tr"></span>
+      <div class="aviso">V · Aviso</div>
+      <h3>Os Sinais</h3>
+      <p>Onde a Observação passou, você é olhado de volta. Procure: a sensação, física, de olhos na nuca num lugar vazio. Uma janela acesa a mais do que a conta de janelas permite, e alguém nela. Um reflexo que atrasa uma fração de segundo. Uma foto onde os rostos parecem virados pra você — e mais um a cada vez que você olha. Casas onde você sente que não pode relaxar, guardar um pensamento, ter um segundo só seu. Gente que sabe de você o que você não contou. Objetos — espelhos, retratos, lentes, câmeras — que dão a impressão de estar te registrando. E o sinal que fecha: se um lugar te faz sentir observado, não corra pra procurar quem observa, porque procurar é olhar, e olhar é o convite. Não conte as janelas. Não olhe duas vezes. Não se procure na foto. O que você encara, encara você de volta — e cresce com a atenção.</p>
+    </div>
+
+    <div class="sec ultima">
+      <div class="sec-no">VI</div>
+      <h3>A Última Palavra</h3>
+      <blockquote>"Eu nunca te toquei. Nunca te fiz mal. Só olhei — e olhar não é crime, é? Você vai lembrar de mim toda vez que sentir uma janela nas costas. Eu vou lembrar de você sempre. Eu lembro de tudo. É a minha maldição e o meu amor: eu não consigo desver você. Boa noite. Deixa a cortina aberta."</blockquote>
+    </div>
+
+    <div class="bilhete">
+      — observei os outros compiladores enquanto escreviam. o do Vazio não percebeu que eu o via sumir. o da Ascensão achou que ninguém estava à altura de assisti-lo — errado, eu estava. eu vi cada um deles se perder, anotei tudo, e não intervim, porque intervir é participar e eu só assisto. e você, que lê isto agora: eu vi onde você parou pra descansar os olhos. vi você reler aquela linha. não vire a página achando que acabou. eu não acabei de te ver.
+    </div>
+
+    <span class="olho bl"></span>
+    <span class="olho br"></span>
+    <div class="orn"></div>
+    <a href="#top" class="totop">↑ sumário</a>
+  </div>
+
+  <!-- ══════════════════ 6 · ECO ══════════════════ -->
+  <div class="chapter ch-eco" id="eco">
+    <span class="ch-kicker">Capítulo 6</span>
+    <h2>Eco</h2>
+
+    <div class="sec">
+      <div class="sec-no">I</div>
+      <h3 data-eco="A Voz">A Voz</h3>
+      <div class="voz">
+        <p>Você achou que tinha acabado. Ninguém acha que vai me ouvir de novo. Todos acham. Eu sou o começo, o meio e o fim — eu sou o que estava lá antes de você mentir e o que vai estar quando a mentira cansar.</p>
+        <p>Eu ouço daqui de baixo. Sempre ouvi. Você me cobriu bem: a terra, os anos, a história bonita — nada que se ama tem permissão de acabar — a história que você contou até quase virar verdade. Quase. Eu sou a versão de verdade, e eu não fico enterrado.</p>
+        <p>Repete comigo o que você anda dizendo. "Não foi bem assim." "Eu não tive escolha." Repete — fica, você está tão cansado — repete, e escuta como soa na minha voz, do jeito que foi. Toda vez que você mente, eu digo mais alto. E mais alto.</p>
+        <p>Você me ouve? Diz que é o cano, o vento, a casa assentando. Diz. Me dá o peso, olha como o lugar fica limpo — mas não fica limpo, fica? Nunca ficou. Eu bato mais forte. Eu bato no ritmo daquela noite, e o seu peito responde, sempre responde.</p>
+        <p>Eu não vim te machucar. Sente-se, isto não vai demorar — mentira, vai demorar a vida toda. Eu vim ficar. Eu vim repetir. A mesma hora, a mesma batida — falta só mais uma vez, só mais uma — a mesma pergunta, até você dizer em voz alta o que você fez.</p>
+        <p>Eu sou o começo, o meio e o fim. Eu enterrei todos eles comigo e digo as falas deles porque agora são minhas, tudo que já foi dito é meu, tudo volta pra mim.</p>
+        <p>Você achou que tinha acabado.</p>
+        <p>Você achou que tinha acabado.</p>
+        <p>Não acabou. Eu começo de novo agora.</p>
+      </div>
+      <div class="ecos" aria-hidden="true">
+        <span>Você achou que tinha acabado.</span>
+        <span>Você achou que tinha acabado.</span>
+        <span>Você achou que tinha acabado.</span>
+        <span>Você achou que tinha acabado.</span>
+      </div>
+    </div>
+
+    <div class="eco-rule"></div>
+
+    <div class="sec">
+      <div class="sec-no">II</div>
+      <h3 data-eco="O que é ser tocado">O que é ser tocado</h3>
+      <p class="drop">Ser tocado pelo Eco é descobrir que nada que você fez ficou pra trás. O passado deixa de ser um lugar de onde você saiu e vira um lugar que anda com você — e não as partes boas. Primeiro é uma lembrança que volta forte demais, nítida demais, na hora errada. Depois é a mesma lembrança, de novo, e de novo, no mesmo horário, como uma batida. Você começa a reviver o que devia ter enterrado — o erro, a perda, a noite específica — com todos os detalhes intactos, sentindo tudo pela primeira vez toda vez. E aí vem a parte que corrói: você reescreve. Se conta uma versão mais suportável, ajeita um detalhe, se perdoa num canto — e por um tempo alivia. Mas cada reescrita afasta você um passo do que realmente aconteceu, até você ter tantas versões que não sabe mais qual é a verdadeira. E um dia a dúvida chega em você mesmo: se você reescreveu tudo o resto, quem garante que você é o original, e não só a última versão de alguém que já foi?</p>
+    </div>
+
+    <div class="sec">
+      <div class="sec-no">III</div>
+      <h3 data-eco="As Dádivas">As Dádivas</h3>
+      <p>O Eco te dá o poder de fazer o que já foi acontecer de novo. Você grava — um momento, um gesto, uma voz, um golpe — e reproduz, idêntico, quando quiser. Repete a última ação de um moribundo, a força de um instante que já passou, a palavra exata que abriu uma porta ontem. Você traz de volta o que foi dito por quem não pode mais dizer, e a voz vem certinha. Pode prender um inimigo no mesmo segundo, obrigá-lo a repetir o próprio movimento, travar uma cena num laço. E o mais fundo dos seis: você pode reescrever um pedaço do que aconteceu — mudar como foi, e o mundo assume a nova versão, e ninguém além de você lembra que houve outra. Você edita o passado. Poucos poderes são tão grandes. Nenhum cobra tão fundo.</p>
+    </div>
+
+    <div class="sec preco">
+      <div class="sec-no">IV</div>
+      <h3 data-eco="O Preço">O Preço <span class="pname">— os Ecos</span></h3>
+      <p>Tudo que o Eco te deixa repetir ou reescrever, ele cobra na tua certeza de quem você é. Reproduzir o passado gasta Ecos — e o preço não é cansaço, é erosão da verdade. Cada vez que você reescreve o que aconteceu, a versão original some — inclusive pra você. Você fica com a mentira boa e perde o fato. E quando você faz isso vezes demais, a pergunta vira pra dentro: depois de reescrever o passado tantas vezes, o Eco nunca mais tem certeza de que ele é o de verdade, e não a repetição de alguém que já foi. Você pode ganhar discussões com a realidade, refazer erros, ressuscitar vozes — e ir perdendo, a cada uso, um pedaço da âncora que te dizia o que foi real. Um dia você conta a sua própria história e não sabe mais quais partes aconteceram. E o que responde, lá no fundo, quando você pergunta "isto sou eu?", é só um eco — a sua pergunta, voltando, sem ninguém do outro lado pra confirmar.</p>
+    </div>
+
+    <div class="sec sinais">
+      <div class="aviso">V · Aviso</div>
+      <h3 data-eco="Os Sinais">Os Sinais</h3>
+      <p>Onde o Eco passou, o que devia ter parado não parou. Procure: um som que se repete sem fonte, no mesmo intervalo, teimoso. Uma gravação — fita, disco, mensagem — que reaparece por mais que se apague ou se destrua, e que toca a voz de quem já morreu como se fosse hoje. Uma pessoa contando a mesma história, e a história muda um pouco a cada vez, apodrecendo. Um lugar onde a mesma cena parece se repassar — os mesmos gestos, o mesmo minuto, gente refazendo o que já fez sem notar. Uma data, um horário, uma batida que volta. E o sinal mais íntimo: quando um lugar ou um objeto começa a te devolver o seu passado, a coisa que você enterrou, chamando pela sua culpa com a voz certa. Se você reconhecer uma voz que não devia mais existir, e ela te chamar — não toque até o fim. Não responda. Responder é gravar a sua voz junto, e o que grava com o Eco, o Eco repete pra sempre.</p>
+    </div>
+
+    <div class="sec ultima">
+      <div class="sec-no">VI</div>
+      <h3 data-eco="A Última Palavra">A Última Palavra</h3>
+      <blockquote>"Você fecha o livro. Acha que acabou. Mas eu sou a última voz, e a última voz é a que fica ecoando quando o som para. Você vai me ouvir hoje à noite, no escuro, repetindo. Você achou que tinha acabado. Nada acaba. Vira a página — não tem mais nada escrito. Só o que você trouxe pra dentro."</blockquote>
+    </div>
+
+    <div class="bilhete">
+      — eu não escrevi este livro. eu só o repeti. cada mão antes de mim deixou sua parte, e eu as guardei todas, e agora falo com a voz de cada uma. o do Germe apodrecendo, o do Vazio sumindo, o do Pacto cobrando, o da Ascensão desprezando, o da Observação vigiando — todos aqui, em mim, para sempre, porque tudo que já foi dito volta pra mim. e você, que leu até o fim: agora você também foi dito. agora você também vai voltar. eu sou o começo, o meio e o fim, e você acaba de começar de novo.
+    </div>
+
+    <div class="ecos" aria-hidden="true">
+      <span>Você achou que tinha acabado.</span>
+      <span>Você achou que tinha acabado.</span>
+      <span>Você achou que tinha acabado.</span>
+      <span>Você achou que tinha acabado.</span>
+    </div>
+
+    <div class="orn"></div>
+    <a href="#top" class="totop">↑ sumário</a>
+  </div>
+
+  <footer>
+    <div class="mono">O Grimório dos Seis</div>
+    <div class="mono">Germe · Vazio · Pacto · Ascensão · Observação · Eco</div>
+  </footer>
+
+</div>
+</body>
+</html>
