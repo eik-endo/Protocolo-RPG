@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PROTOCOLO — Os Seis Motores (Leis, Recursos e Preços)</title>
+<style>
+:root{
+  --bg:#141210; --bg2:#1b1815; --panel:#1f1c18; --ink:#e9e2d3; --ink-dim:#a89e8c; --ink-faint:#71685a;
+  --rule:#3a352c; --rule-lite:#2a261f;
+  --gold:#c9a84c;
+  --mist:#8fa4b0;   /* referência cruzada — a.ref, aponta pra atrás da tela */
+  /* cores por elemento — código de navegação, nada além disso */
+  --c-obs:#c9a13a;   /* Observação — âmbar/olho */
+  --c-pac:#8a2f2f;   /* Pacto — vinho */
+  --c-ger:#3f7a4a;   /* Germe — verde */
+  --c-vaz:#5a86a8;   /* Vazio — gelo */
+  --c-asc:#b5602a;   /* Ascensão — ferrugem */
+  --c-eco:#7a5aa8;   /* Eco — violeta */
+  --warn:#b5432f;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:"Georgia","Times New Roman",serif; line-height:1.5; font-size:16px;}
+::selection{background:var(--gold); color:#1a1710;}
+
+/* ---------- layout ---------- */
+#shell{display:flex; min-height:100vh;}
+#nav{
+  position:sticky; top:0; height:100vh; width:300px; flex:0 0 300px; overflow-y:auto;
+  background:var(--panel); border-right:2px solid var(--rule); padding:0 0 3rem;
+  font-family:"Courier New",monospace;
+}
+#main{flex:1 1 auto; min-width:0; padding:2.2rem clamp(1rem,4vw,4rem) 8rem; max-width:60rem;}
+
+#nav .navhead{padding:1.1rem 1rem .8rem; border-bottom:2px solid var(--rule); position:sticky; top:0; background:var(--panel); z-index:5;}
+#nav .navhead b{display:block; font-size:.95rem; letter-spacing:.06em; color:var(--gold);}
+#nav .navhead span{display:block; font-size:.66rem; color:var(--ink-faint); margin-top:.2rem;}
+#nav input#navfilter{width:100%; margin-top:.6rem; background:var(--bg); border:1px solid var(--rule); color:var(--ink); padding:.35rem .5rem; font-family:inherit; font-size:.72rem;}
+
+#nav ul{list-style:none; margin:0; padding:0;}
+#nav .part{border-bottom:1px solid var(--rule-lite);}
+#nav .part > a{display:block; padding:.55rem 1rem; font-size:.74rem; letter-spacing:.05em; color:var(--ink); text-decoration:none; font-weight:bold;}
+#nav .part > a:hover{background:var(--rule-lite);}
+#nav .sub{padding-left:0; background:#17140f;}
+#nav .sub a{display:block; padding:.32rem 1rem .32rem 1.6rem; font-size:.68rem; color:var(--ink-dim); text-decoration:none; border-left:3px solid transparent;}
+#nav .sub a:hover{color:var(--ink); background:var(--rule-lite);}
+#nav .sub .motor-link{font-weight:bold; padding-top:.5rem;}
+#nav .sub2 a{padding-left:2.3rem; font-size:.64rem; border-left:3px solid transparent;}
+#nav .tag-pend{color:var(--ink-faint); font-style:italic;}
+
+/* borda de cor por elemento nos links de nav, aplicada via classe */
+.b-obs{border-left-color:var(--c-obs) !important;}
+.b-pac{border-left-color:var(--c-pac) !important;}
+.b-ger{border-left-color:var(--c-ger) !important;}
+.b-vaz{border-left-color:var(--c-vaz) !important;}
+.b-asc{border-left-color:var(--c-asc) !important;}
+.b-eco{border-left-color:var(--c-eco) !important;}
+
+/* ---------- tipografia geral ---------- */
+h1,h2,h3,h4{font-family:"Courier New",monospace; font-weight:bold; color:var(--gold); letter-spacing:.02em;}
+h1{font-size:1.9rem; border-bottom:3px double var(--rule); padding-bottom:.6rem; margin:0 0 1.2rem;}
+h2{font-size:1.5rem; margin:3rem 0 1rem; padding-top:1.4rem; border-top:2px solid var(--rule);}
+h3{font-size:1.05rem; margin:2rem 0 .8rem; color:var(--ink);}
+h4{font-size:.9rem; margin:1.4rem 0 .5rem; color:var(--ink-dim); text-transform:uppercase; letter-spacing:.08em;}
+p{margin:0 0 .9rem;}
+a{color:var(--gold);}
+a.anchor-target{scroll-margin-top:1rem;}
+.anchor-target{scroll-margin-top:1rem;}
+.kicker{font-family:"Courier New",monospace; font-size:.68rem; letter-spacing:.2em; text-transform:uppercase; color:var(--ink-faint);}
+hr{border:none; border-top:1px dashed var(--rule); margin:2rem 0;}
+.totop{display:inline-block; font-family:"Courier New",monospace; font-size:.62rem; letter-spacing:.15em; color:var(--ink-faint); text-decoration:none; margin-top:.8rem;}
+.totop:hover{color:var(--gold);}
+strong{color:var(--ink);}
+em{color:#cfc6b3;}
+ul.tight{margin:.3rem 0 .9rem; padding-left:1.2rem;}
+ul.tight li{margin-bottom:.4rem;}
+
+/* ---------- referência cruzada atrás da tela ---------- */
+a.ref{color:var(--mist); text-decoration:none; border-bottom:1px dotted var(--mist);}
+a.ref:hover{color:var(--gold); border-bottom-color:var(--gold);}
+
+/* ---------- aviso do topo ---------- */
+.regra-ouro{border:2px solid var(--gold); padding:1rem 1.2rem; margin:1.2rem 0; background:#1c1710;}
+.regra-ouro b{color:var(--gold);}
+.aviso-numeros{border:2px solid var(--warn); padding:1rem 1.2rem; margin:1.2rem 0; background:#1d1512;}
+.aviso-numeros .lbl{font-family:"Courier New",monospace; font-size:.66rem; letter-spacing:.15em; text-transform:uppercase; color:var(--warn); display:block; margin-bottom:.5rem;}
+
+/* ---------- chassi comum: caixa neutra ---------- */
+.chassi-box{border:1px solid var(--rule); background:var(--panel); padding:1.2rem 1.4rem; margin:1.4rem 0;}
+
+/* ---------- cartão de motor (um por elemento) ---------- */
+.motor{border:1px solid var(--rule); border-left:5px solid var(--ink-faint); background:var(--panel); padding:1.4rem 1.5rem; margin:2.2rem 0; scroll-margin-top:1rem;}
+.motor.b-obs{border-left-color:var(--c-obs);} .motor.b-obs h2{color:var(--c-obs);}
+.motor.b-pac{border-left-color:var(--c-pac);} .motor.b-pac h2{color:var(--c-pac);}
+.motor.b-ger{border-left-color:var(--c-ger);} .motor.b-ger h2{color:var(--c-ger);}
+.motor.b-vaz{border-left-color:var(--c-vaz);} .motor.b-vaz h2{color:var(--c-vaz);}
+.motor.b-asc{border-left-color:var(--c-asc);} .motor.b-asc h2{color:var(--c-asc);}
+.motor.b-eco{border-left-color:var(--c-eco);} .motor.b-eco h2{color:var(--c-eco);}
+.motor > h2{margin:0 0 .2rem; padding-top:0; border-top:none; font-size:1.55rem;}
+.motor .lei-linha{font-family:"Courier New",monospace; font-size:.72rem; letter-spacing:.06em; color:var(--ink-dim); text-transform:uppercase; margin:0 0 .3rem;}
+.motor .origem{font-size:.82rem; margin:.1rem 0 1rem;}
+
+.motor-dl{margin:1rem 0 0;}
+.motor-dl dt{font-family:"Courier New",monospace; font-size:.72rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); margin-top:1.3rem; border-top:1px dashed var(--rule-lite); padding-top:.8rem; scroll-margin-top:1rem;}
+.motor.b-obs .motor-dl dt{color:var(--c-obs);} .motor.b-pac .motor-dl dt{color:var(--c-pac);}
+.motor.b-ger .motor-dl dt{color:var(--c-ger);} .motor.b-vaz .motor-dl dt{color:var(--c-vaz);}
+.motor.b-asc .motor-dl dt{color:var(--c-asc);} .motor.b-eco .motor-dl dt{color:var(--c-eco);}
+.motor-dl dd{margin:.4rem 0 0;}
+.motor-dl dd p{margin:0 0 .6rem;}
+
+/* faixas das duplas */
+.duplas{margin:.4rem 0 0; padding:0; list-style:none;}
+.duplas li{padding:.35rem .7rem; margin:0 0 .4rem; border-left:3px solid var(--rule);}
+.duplas li b{font-family:"Courier New",monospace; font-size:.66rem; letter-spacing:.08em; text-transform:uppercase; color:var(--gold); display:inline-block; margin-right:.4rem;}
+
+/* patamares */
+.patamares{margin:.4rem 0 0; padding:0; list-style:none;}
+.patamares li{padding:.3rem 0 .3rem .8rem; border-left:3px solid var(--rule-lite); margin-bottom:.35rem;}
+.patamares li b{color:var(--ink); font-family:"Courier New",monospace; font-size:.66rem; letter-spacing:.06em; text-transform:uppercase; margin-right:.35rem;}
+
+/* pendências inline */
+.pend{border:1px dashed var(--warn); background:#1d1512; padding:.5rem .8rem; margin:.4rem 0 0; color:var(--ink-dim); font-size:.92rem;}
+.pend .lbl{font-family:"Courier New",monospace; font-size:.6rem; letter-spacing:.12em; text-transform:uppercase; color:var(--warn); display:block; margin-bottom:.3rem;}
+.acravar{color:var(--warn); font-family:"Courier New",monospace; font-size:.72rem; letter-spacing:.04em; text-transform:uppercase; border:1px solid var(--warn); padding:.02rem .3rem; white-space:nowrap;}
+
+/* ---------- tabelas ---------- */
+table{width:100%; border-collapse:collapse; margin:1rem 0 1.5rem; font-size:.92rem;}
+table caption{text-align:left; font-family:"Courier New",monospace; font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:.4rem; caption-side:top;}
+th,td{border:1px solid var(--rule); padding:.5rem .7rem; text-align:left; vertical-align:top;}
+th{background:var(--rule-lite); font-family:"Courier New",monospace; font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; color:var(--gold);}
+tr:nth-child(even) td{background:#191510;}
+td .vb{font-family:"Courier New",monospace; color:var(--gold);}
+
+/* ---------- caixa de pendência global ---------- */
+.pendente{border:1px dashed var(--warn); background:#1d1512; padding:1rem 1.2rem; margin:1.2rem 0; color:var(--ink-dim); font-size:.94rem;}
+.pendente .lbl{font-family:"Courier New",monospace; font-size:.62rem; letter-spacing:.15em; text-transform:uppercase; color:var(--warn); display:block; margin-bottom:.4rem;}
+.nota-mestre{border:1px dashed var(--ink-faint); background:#1c1810; padding:.9rem 1.1rem; margin:1.2rem 0; font-size:.92rem;}
+.nota-mestre .lbl{font-family:"Courier New",monospace; font-size:.62rem; letter-spacing:.15em; text-transform:uppercase; color:var(--ink-dim); display:block; margin-bottom:.4rem;}
+
+/* ---------- índice mestre ---------- */
+.idx-list{columns:2; column-gap:2.5rem;}
+.idx-list a{display:block; padding:.15rem 0; font-family:"Courier New",monospace; font-size:.78rem; text-decoration:none; color:var(--ink-dim); border-bottom:1px dashed var(--rule-lite); break-inside:avoid;}
+.idx-list a:hover{color:var(--gold);}
+@media (max-width:700px){.idx-list{columns:1;}}
+
+/* ---------- responsive ---------- */
+@media (max-width:960px){
+  #shell{flex-direction:column;}
+  #nav{position:relative; width:100%; height:auto; max-height:60vh; flex:none;}
+  #main{padding:1.4rem 1rem 6rem;}
+}
+
+/* impressão */
+@media print{
+  #nav{display:none;}
+  #main{padding:0; max-width:none;}
+  body{background:#fff; color:#000;}
+  .motor,.chassi-box,table{break-inside:avoid;}
+}
+</style>
+</head>
+<body>
+<div id="shell">
+
+<!-- ============================================================ NAV ============================================================ -->
+<nav id="nav">
+  <div class="navhead">
+    <b>PROTOCOLO</b>
+    <span>Os Seis Motores · material de mestre/designer</span>
+    <input id="navfilter" type="text" placeholder="Ctrl+F / buscar aqui…" oninput="filterNav(this.value)">
+  </div>
+  <ul>
+    <li class="part"><a href="#topo">Capa &amp; aviso</a></li>
+    <li class="part"><a href="#indice-mestre">Índice mestre (Ctrl+F)</a></li>
+    <li class="part"><a href="#principio">Princípio &amp; régua anti-reskin</a></li>
+    <li class="part"><a href="#chassi">O chassi comum</a>
+      <ul class="sub">
+        <li><a href="#chassi-teste">Teste &amp; dano</a></li>
+        <li><a href="#chassi-duplas">A regra das Duplas</a></li>
+      </ul>
+    </li>
+
+    <li class="part"><a href="#motores">Os seis motores</a>
+      <ul class="sub">
+        <li><a class="motor-link b-vaz" href="#vazio">Vazio · Erosão</a></li>
+        <li><a class="motor-link b-ger" href="#germe">Germe · Viço</a></li>
+        <li><a class="motor-link b-pac" href="#pacto">Pacto · Dívida</a></li>
+        <li><a class="motor-link b-obs" href="#observacao">Observação · Exposição</a></li>
+        <li><a class="motor-link b-asc" href="#ascensao">Ascensão · Perfeição</a></li>
+        <li><a class="motor-link b-eco" href="#eco">Eco · Desgaste</a></li>
+      </ul>
+    </li>
+
+    <li class="part"><a href="#verbos">Tabela-resumo dos verbos</a></li>
+    <li class="part"><a href="#pendencias">Pendências abertas globais</a></li>
+  </ul>
+</nav>
+
+<!-- ============================================================ MAIN ============================================================ -->
+<main id="main">
+
+<a id="topo" class="anchor-target"></a>
+<div class="kicker">Protocolo · documento de mestre / designer</div>
+<h1>Os Seis Motores — Leis, Recursos e Preços</h1>
+
+<p><strong>Documento de mestre.</strong> Consulta de designer, atrás da tela. Fixa a forma de cada elemento — a Lei, o recurso-próprio e como o elemento cobra. É material separado do <a class="ref" href="grimorio.html">Grimório dos Seis</a>, que é a fonte de sabor voltada ao sabor da mesa; aqui a régua é a mecânica.</p>
+
+<div class="aviso-numeros">
+  <span class="lbl">Antes de tudo — leia isto</span>
+  <p style="margin:0;">Os <strong>números finais</strong> de todos os medidores (taxas de subida e descida, tetos, custos, limiares) <strong>serão cravados junto com a ficha</strong>. Este documento fixa a <strong>forma</strong> de cada motor, <strong>não os valores</strong>. Onde o texto disser <span class="acravar">a cravar</span>, a pendência é explícita e continua aberta.</p>
+</div>
+
+<!-- ============================================================ ÍNDICE MESTRE ============================================================ -->
+<a id="indice-mestre" class="anchor-target"></a>
+<h2>Índice mestre <span class="kicker">— para achar rápido no Ctrl+F</span></h2>
+<p>Cada motor tem âncora própria, e cada seção interna (Lei · Recurso · Sobrecarga · Refluxo · Duplas · Pendências) também. Use Ctrl+F com o nome, ou clique abaixo.</p>
+<div class="idx-list">
+  <a href="#principio">princípio &amp; régua anti-reskin</a>
+  <a href="#chassi">o chassi comum</a>
+  <a href="#chassi-teste">teste &amp; dano</a>
+  <a href="#chassi-duplas">a regra das Duplas</a>
+  <a href="#vazio">Vazio (motor)</a>
+  <a href="#vazio-recurso">Erosão</a>
+  <a href="#germe">Germe (motor)</a>
+  <a href="#germe-recurso">Viço</a>
+  <a href="#pacto">Pacto (motor)</a>
+  <a href="#pacto-recurso">Dívida (Favor/Trato/Milagre)</a>
+  <a href="#observacao">Observação (motor)</a>
+  <a href="#observacao-recurso">Foco · Vigiado · Exposição</a>
+  <a href="#ascensao">Ascensão (motor)</a>
+  <a href="#ascensao-recurso">Perfeição · Controle</a>
+  <a href="#eco">Eco (motor)</a>
+  <a href="#eco-recurso">Ecos · Dissonância · Desgaste</a>
+  <a href="#verbos">tabela-resumo dos verbos</a>
+  <a href="#pendencias">pendências abertas globais</a>
+</div>
+
+<!-- ============================================================ PRINCÍPIO ============================================================ -->
+<a id="principio" class="anchor-target"></a>
+<h2>Princípio</h2>
+<p>Cada elemento tem uma <strong>Lei</strong> (sua filosofia mecânica) e um <strong>recurso-próprio</strong> que é essa Lei virada número.</p>
+<div class="regra-ouro">
+  <p style="margin:0;"><b>A régua anti-reskin:</b> cada recurso-maldição tem um "verbo" distinto — <em>se uma magia pudesse existir igual em outro elemento, está errada.</em></p>
+</div>
+
+<!-- ============================================================ CHASSI COMUM ============================================================ -->
+<a id="chassi" class="anchor-target"></a>
+<h2>O chassi comum</h2>
+
+<div class="chassi-box">
+  <h4 id="chassi-teste" class="anchor-target" style="margin-top:0;">Teste &amp; dano</h4>
+  <p><strong>Teste:</strong> 2d6 + Atributo + Perícia vs Limiar.</p>
+  <ul class="tight">
+    <li><strong>Falha (5−):</strong> falha com consequência.</li>
+    <li><strong>Parcial (6–9):</strong> funciona, mas cobra preço.</li>
+    <li><strong>Total (10+):</strong> limpo.</li>
+    <li><strong>Crítico:</strong> dados iguais (dupla).</li>
+  </ul>
+  <p><strong>Dano:</strong> [dado, base d4] + Atributo do elemento. Vida é baixa (base 2–3): horror tenso, cada ponto dói.</p>
+</div>
+
+<div class="chassi-box">
+  <h4 id="chassi-duplas" class="anchor-target" style="margin-top:0;">Regra das Duplas <span class="kicker">— universal; cada Lei traduz sozinha</span></h4>
+  <p>Todo crítico é um evento carregado.</p>
+  <ul class="duplas">
+    <li><b>1-1 / 2-2 · Morde</b> efeito grande + cauda; o elemento cobra junto.</li>
+    <li><b>3-3 / 4-4 · Limpo</b> potência pura, sem troco.</li>
+    <li><b>5-5 / 6-6 · Transcende</b> o elemento faz o que seria impossível pra aquela magia.</li>
+  </ul>
+</div>
+
+<!-- ============================================================ OS SEIS MOTORES ============================================================ -->
+<a id="motores" class="anchor-target"></a>
+<h2>Os seis motores</h2>
+
+<!-- ─────────────── VAZIO ─────────────── -->
+<section id="vazio" class="motor b-vaz anchor-target">
+  <h2>Vazio</h2>
+  <p class="lei-linha">Lei da Subtração · Atributo: Juízo</p>
+  <p class="origem"><a class="ref" href="../Historia/registro_dos_antigos.html">origem cósmica → Registro dos Antigos</a></p>
+  <dl class="motor-dl">
+    <dt>Lei</dt>
+    <dd><p>Nunca adiciona ao alvo, só remove (um sentido, uma firmeza, o próprio alvo). O que apaga não volta sozinho — precisa ser reaceso / refeito / relembrado de fora. Contra dano do Vazio, <strong>Absorção conta pela metade</strong>.</p></dd>
+
+    <dt id="vazio-recurso" class="anchor-target">Recurso — Erosão (0→10, só sobe, nunca desce)</dt>
+    <dd>
+      <p>Não é combustível (as magias conjuram-se com Sintonia); é <strong>preço de sangue</strong>. Sobe LENTO, só em grande apagamento; o mestre pode oferecer apagar mais numa cena grande. Cada ponto risca uma <strong>IDENTIDADE</strong> da ficha (um Laço, uma Âncora/memória, um Traço) — nunca uma capacidade.</p>
+      <ul class="patamares">
+        <li><b>3–5</b> escorregadio (−1 para ser lembrado / reconhecido).</li>
+        <li><b>6–8</b> quase-ausente (imune a medo / dor / mental — Entorpecimento nasce aqui, automático; o grupo se esforça pra te incluir).</li>
+        <li><b>9</b> a Direção que Não Existe (some de registros).</li>
+        <li><b>10</b> apagamento (saída de jogo, clímax de arco).</li>
+      </ul>
+    </dd>
+
+    <dt>Sobrecarga</dt>
+    <dd><p>Empilha pagando Sintonia; forçar além do Juízo arrisca derramar ausência (apaga algo que você não queria).</p></dd>
+
+    <dt>Refluxo</dt>
+    <dd><p>A falha não fere — esquece: +1 Erosão de graça (perda gratuita).</p></dd>
+
+    <dt>Duplas</dt>
+    <dd>
+      <ul class="duplas">
+        <li><b>Morde</b> apaga o alvo e derrama ausência (+1 Erosão).</li>
+        <li><b>Limpo</b> subtração plena.</li>
+        <li><b>Transcende</b> apaga o inapagável (imunidade, turno, parede) — sobe Erosão.</li>
+      </ul>
+    </dd>
+
+    <dt>Pendências de ficha</dt>
+    <dd>
+      <div class="pend">
+        <span class="lbl">a cravar / a aplicar</span>
+        Erosão de moeda → trilha 0–10 que só sobe (hoje as magias "custam Erosão"; passam a subir). · Entorpecimento de escolhível → automático no patamar 6 (abre slot na árvore). · Patamares como estado rastreado. · Lista de identidades perdidas (Laço / Âncora / Traço).
+      </div>
+    </dd>
+  </dl>
+  <a class="totop" href="#topo">↑ topo</a>
+</section>
+
+<!-- ─────────────── GERME ─────────────── -->
+<section id="germe" class="motor b-ger anchor-target">
+  <h2>Germe</h2>
+  <p class="lei-linha">Lei da Semeadura · conjura-se com Vida</p>
+  <p class="origem"><a class="ref" href="../Historia/registro_dos_antigos.html">origem cósmica → Registro dos Antigos</a></p>
+  <dl class="motor-dl">
+    <dt>Lei</dt>
+    <dd><p>O Germe não faz efeitos, <strong>planta</strong>. Efeitos não têm duração, têm <strong>TAMANHO</strong> (começam em X, crescem Y por turno); compõem sozinhos; não expiram — só param se arrancados, queimados ou tratados. Conjura-se com <strong>VIDA</strong> (o sangue fica).</p></dd>
+
+    <dt id="germe-recurso" class="anchor-target">Recurso — Viço (pulsa; o piso só sobe)</dt>
+    <dd>
+      <p>Mede quanto jardim vivo você tem plantado. Sobe quando sementes prosperam (cada dano / cura / cobertura que continua); desce quando você <strong>COLHE</strong> (gasta ação → vira Vida sua ou de aliados, poder, ou arrancar jardim). <strong>PISO CLIQUET:</strong> cada patamar cruzado deixa raiz — o mínimo nunca mais volta a 0.</p>
+      <ul class="patamares">
+        <li><b>0–3</b> jardineiro (manda no que plantou).</li>
+        <li><b>4–6</b> fértil (o jardim age sozinho no seu início de turno, sem escolher alvo; primeiros sinais no corpo).</li>
+        <li><b>7–8</b> virando solo (o jardim não distingue amigo de inimigo perto de você + deformação física que impõe condição até baixar).</li>
+        <li><b>9–10</b> transbordo (o mestre controla o jardim; baixar custa arrancar carne — Vida de verdade, sem colher de volta).</li>
+      </ul>
+    </dd>
+
+    <dt>Sobrecarga</dt>
+    <dd><p>Empilha pagando Vida; transborda (Viço salta).</p></dd>
+
+    <dt>Refluxo</dt>
+    <dd><p>Germina errado — você ganha Semeado(1), ou uma semente nasce hostil e não te reconhece como jardineiro.</p></dd>
+
+    <dt>Duplas</dt>
+    <dd>
+      <ul class="duplas">
+        <li><b>Morde</b> pega com força e transborda (+Viço / semente extra fora de controle).</li>
+        <li><b>Limpo</b> floresce obediente.</li>
+        <li><b>Transcende</b> semente imparável (não se arranca nem queima por [Juízo] turnos, ou se espalha sozinha).</li>
+      </ul>
+    </dd>
+
+    <dt>Pendências de ficha</dt>
+    <dd>
+      <div class="pend">
+        <span class="lbl">a cravar / a aplicar</span>
+        Medidor de Viço com piso-cliquet. · Colheita de Carne / Mãe da Carne = verbos oficiais de colher. · Magias avulsas trocam "dura [Juízo] turnos" por "começa em X / cresce Y por turno / some se arrancada".
+      </div>
+    </dd>
+  </dl>
+  <a class="totop" href="#topo">↑ topo</a>
+</section>
+
+<!-- ─────────────── PACTO ─────────────── -->
+<section id="pacto" class="motor b-pac anchor-target">
+  <h2>Pacto</h2>
+  <p class="lei-linha">Lei do Consentimento</p>
+  <p class="origem"><a class="ref" href="../Historia/registro_dos_antigos.html">origem cósmica → Registro dos Antigos</a></p>
+  <dl class="motor-dl">
+    <dt>Lei</dt>
+    <dd><p>O Pacto troca. As magias funcionam na hora, <strong>SEM custo no momento</strong> (não gasta Sintonia / Vida, não rola pra pagar) — a facilidade é a armadilha.</p></dd>
+
+    <dt id="pacto-recurso" class="anchor-target">Recurso — Dívida (enche)</dt>
+    <dd>
+      <p>Cada trato soma por degrau. O jogador só marca o número.</p>
+      <ul class="patamares">
+        <li><b>Favor +1</b> empurrão: bônus num teste, porta que cede, detalhe revelado.</li>
+        <li><b>Trato +2</b> muda a cena: anula um golpe, transfere uma condição, chance que não existia.</li>
+        <li><b>Milagre +4</b> o que a ficção não permitia: desfazer, forçar, reescrever um não em sim.</li>
+      </ul>
+      <p><strong>Como diminui:</strong> pode pagar ativamente (taxa única simples — <span class="acravar">a cravar</span>) pra ADIAR; mas o teto é inevitável — ao cruzar o limite (~10, <span class="acravar">a cravar</span>), o credor coleta sozinho.</p>
+      <p><strong>A coleta:</strong> o mestre cobra "o que você tem de mais caro AGORA" — não o que você ofereceu, o que dói mais neste momento (um laço, um recurso, uma vantagem, uma cena que vira). Decisão narrativa do mestre, zero aritmética do jogador. Pode disparar no teto OU por antecipação do mestre, COM FREIO (1×/sessão ou custo — <span class="acravar">a cravar</span>) pra proteger de mestre pesado.</p>
+    </dd>
+
+    <dt>Sobrecarga</dt>
+    <dd><p>Forçar = subir um degrau (assinar mais embaixo).</p></dd>
+
+    <dt>Refluxo</dt>
+    <dd><p>Nunca "falha e nada acontece" — o efeito vem TORTO, com uma cláusula que você não viu.</p></dd>
+
+    <dt>Duplas</dt>
+    <dd>
+      <ul class="duplas">
+        <li><b>Morde</b> a letra miúda cobra junto (Dívida extra / cláusula ativa).</li>
+        <li><b>Limpo</b> negócio limpo.</li>
+        <li><b>Transcende</b> o impossível a preço de tabela (Milagre sai como Trato), ou um "brinde" bom demais.</li>
+      </ul>
+    </dd>
+
+    <dt>Pendências de ficha <span class="kicker">(revamp grande)</span></dt>
+    <dd>
+      <div class="pend">
+        <span class="lbl">a cravar / a aplicar</span>
+        Remover Dívida-com-teto-móvel / reset-em-5. · Remover "alugar efeito de outra classe". · Remover taxas variáveis e Credor / Usurário do núcleo. · Criar trilha de Dívida simples, os três degraus, a taxa única de pagamento, o freio de antecipação.
+      </div>
+    </dd>
+  </dl>
+  <a class="totop" href="#topo">↑ topo</a>
+</section>
+
+<!-- ─────────────── OBSERVAÇÃO ─────────────── -->
+<section id="observacao" class="motor b-obs anchor-target">
+  <h2>Observação</h2>
+  <p class="lei-linha">Lei do Registro</p>
+  <p class="origem"><a class="ref" href="../Historia/registro_dos_antigos.html">origem cósmica → Registro dos Antigos</a></p>
+  <dl class="motor-dl">
+    <dt>Lei</dt>
+    <dd><p>Olhar é ter — o que você vê fica registrado, revisitável, transmissível. E olhar o oculto tem preço: <strong>o oculto olha de volta</strong>.</p></dd>
+
+    <dt id="observacao-recurso" class="anchor-target">Recursos — Foco · Vigiado · Exposição</dt>
+    <dd>
+      <p><strong>Dois medidores separados:</strong></p>
+      <ul class="tight">
+        <li><strong>Foco</strong> (seu recurso — a bala): sobe ao Observar / passar turno só olhando; você gasta nas magias.</li>
+        <li><strong>Vigiado</strong> (estado do alvo — a mira): quanta atenção sua está cravada nele; escala a paranoia dele; NÃO é gasto quando você conjura.</li>
+      </ul>
+      <p><strong>Recurso-maldição — Exposição</strong> (o quanto o oculto reparou em você = o Vigiado que o mundo te impõe): sobe ao usar a Observação sobre o oculto / anômalo (olhar o mundo comum é grátis). <strong>VERBO PRÓPRIO:</strong> esfria com cautela (desce quando você passa tempo sem espiar o oculto), MAS cada vez que chega ao topo e coleta, aquela entidade específica nunca mais te esquece — <strong>cicatriz nomeada</strong>; a trilha esfria, a lista de quem-já-te-viu só cresce.</p>
+      <ul class="patamares">
+        <li><b>baixa</b> o mundo não te olha.</li>
+        <li><b>média</b> os Sinais viram mecânica; anômalos preferem te atacar; você atrai o encontro.</li>
+        <li><b>alta</b> catalogado pelo oculto; coisas te acham sozinhas; Olhar de Volta automático.</li>
+      </ul>
+      <p><strong>A faca original (mantida):</strong> a Lucidez que a Observação custa não volta com descanso = preço interno; a Exposição = preço externo. Dois eixos, sem sobreposição.</p>
+    </dd>
+
+    <dt>Sobrecarga</dt>
+    <dd><p>Forçar a visão (ver mais / mais longe / o que não devia) sobe Exposição.</p></dd>
+
+    <dt>Refluxo</dt>
+    <dd><p>Vê demais (perde Lucidez) e/ou é vista primeiro (salto de Exposição).</p></dd>
+
+    <dt>Duplas</dt>
+    <dd>
+      <ul class="duplas">
+        <li><b>Morde</b> vê o que queria e algo vê você (sobe Exposição / Olhar de Volta).</li>
+        <li><b>Limpo</b> registro perfeito sem ser notado.</li>
+        <li><b>Transcende</b> vê o impossível (o apagado, o futuro, o que ninguém viu) sem deixar rastro.</li>
+      </ul>
+    </dd>
+
+    <dt>Pendências de ficha</dt>
+    <dd>
+      <div class="pend">
+        <span class="lbl">a cravar / a aplicar</span>
+        Separar Marcas em Foco + Vigiado. · Criar medidor de Exposição (esfria + lista de cicatrizes nomeadas + patamares). · Ligar Sobrecarga / Refluxo à Exposição.
+      </div>
+    </dd>
+  </dl>
+  <a class="totop" href="#topo">↑ topo</a>
+</section>
+
+<!-- ─────────────── ASCENSÃO ─────────────── -->
+<section id="ascensao" class="motor b-asc anchor-target">
+  <h2>Ascensão</h2>
+  <p class="lei-linha">Lei da Substituição</p>
+  <p class="origem"><a class="ref" href="../Historia/registro_dos_antigos.html">origem cósmica → Registro dos Antigos</a></p>
+  <dl class="motor-dl">
+    <dt>Lei</dt>
+    <dd><p>A Ascensão não melhora você, <strong>substitui</strong> você. A carne é rascunho; ela apaga e desenha por cima (metal, perfeição, forma superior). Cada poder ocupa o lugar de algo humano. Você fica mais perfeito e menos pessoa na mesma batida. É o único caminho cujo fim não é o fim.</p></dd>
+
+    <dt id="ascensao-recurso" class="anchor-target">Recurso — Perfeição (0→10, 15 no Ápice, só sobe)</dt>
+    <dd>
+      <p>Sobe ao se substituir (ação, gastando Sintonia) ou ao superar um limite humano de forma extraordinária (um Crítico, um feito impossível). Cada grau é uma <strong>TROCA</strong> declarada (Substituição): ganha uma função / poder concreto e permanente, perde uma faceta humana (social / emocional / de escolha — nunca capacidade de combate); deixa traço físico visível. Cada grau também <strong>−1 Lucidez máxima</strong> (cabe menos gente dentro de você).</p>
+      <p><strong>Medidor de Controle</strong> (anti-"modo fácil"): conforme a Perfeição sobe, o mestre ganha voz crescente sobre o que a forma-final DESEJA / teme (não sobre suas ações em combate).</p>
+      <ul class="patamares">
+        <li><b>0–3</b> você no controle.</li>
+        <li><b>4–6</b> o mestre sugere impulsos 1×/cena (você pode resistir, custa).</li>
+        <li><b>7–9</b> você joga contra a vontade da máquina em certas escolhas.</li>
+        <li><b>10</b> a metamorfose se completa: FICHA NOVA jogável (forma-final poderosíssima), o jogador continua jogando — mas a natureza dela foi escrita pela soma das trocas. Você pilota; ela já é.</li>
+      </ul>
+    </dd>
+
+    <dt>Sobrecarga</dt>
+    <dd><p>Única sem teto — empilha infinito; cada ponto além do Juízo soma +2 ao Refluxo; racha a carne (traço físico).</p></dd>
+
+    <dt>Refluxo</dt>
+    <dd><p>Perfeição INVOLUNTÁRIA — a transformação avança um passo que você não mandou dar; você ganha uma peça perfeita que não pediu, do jeito que o mestre desenhar.</p></dd>
+
+    <dt>Duplas</dt>
+    <dd>
+      <ul class="duplas">
+        <li><b>Morde</b> supera o limite e a carne racha junto (Perfeição involuntária / Substituição torta).</li>
+        <li><b>Limpo</b> refino perfeito.</li>
+        <li><b>Transcende</b> vislumbre da forma-final agora (aja vários graus acima por um instante, sem pagar).</li>
+      </ul>
+    </dd>
+
+    <dt>Pendências de ficha</dt>
+    <dd>
+      <div class="pend">
+        <span class="lbl">a cravar / a aplicar</span>
+        Trocar "Perfeição = +1 em tudo" pelo sistema de Substituições (poder ganho + humano trocado por grau). · Criar medidor de Controle. · Mecânica de ficha-nova no 10 (chassi de "personagem transcendido"). · Refluxo = Perfeição involuntária.
+      </div>
+    </dd>
+  </dl>
+  <a class="totop" href="#topo">↑ topo</a>
+</section>
+
+<!-- ─────────────── ECO ─────────────── -->
+<section id="eco" class="motor b-eco anchor-target">
+  <h2>Eco</h2>
+  <p class="lei-linha">Lei do Retorno</p>
+  <p class="origem"><a class="ref" href="../Historia/registro_dos_antigos.html">origem cósmica → Registro dos Antigos</a></p>
+  <dl class="motor-dl">
+    <dt>Lei</dt>
+    <dd><p>O Eco não cria, <strong>devolve</strong>. Toda magia exige uma <strong>FONTE</strong> (algo que aconteceu, foi dito, foi feito) — sem fonte, não conjura. <strong>Sulco:</strong> repetir a mesma magia na mesma cena dá +1 cumulativo (máx +2).</p></dd>
+
+    <dt id="eco-recurso" class="anchor-target">Recurso — Ecos gravados (3→5, reset por cena)</dt>
+    <dd>
+      <p>Grava eventos notáveis (um Crítico, um sucesso de grande margem, um efeito, uma condição, um instante-chave — não ataques / testes comuns), gasta pra reproduzir.</p>
+      <p><strong>A faca de cena — Dissonância:</strong> cada Eco reproduzido dá +1; no fim da cena, teste contra ela — se falhar, na próxima cena o mestre pode 1× fazer você reagir a um Eco antigo como se fosse o presente.</p>
+      <p><strong>Recurso-maldição de campanha — Desgaste (só sobe):</strong> +1 cada vez que você FALHA um teste de Dissonância — mede quantas vezes a realidade já te venceu. Cobra a certeza de quem você é:</p>
+      <ul class="patamares">
+        <li><b>médio</b> suas memórias ganham duas versões (o mestre pode te contar seu passado errado).</li>
+        <li><b>alto</b> facetas suas viram "gravações" que você executa mas não sente.</li>
+        <li><b>máximo</b> a pergunta se vira ("isto sou eu?") e talvez você seja a cópia, não o original (fim de arco — <span class="acravar">a desenhar</span>).</li>
+      </ul>
+    </dd>
+
+    <dt>Sobrecarga</dt>
+    <dd><p>O Sulco já é a Sobrecarga do Eco (repetir empilha bônus).</p></dd>
+
+    <dt>Refluxo</dt>
+    <dd><p>A repetição sai podre / errada — reproduz o evento deformado, e pode subir Dissonância.</p></dd>
+
+    <dt>Duplas</dt>
+    <dd>
+      <ul class="duplas">
+        <li><b>Morde</b> a repetição volta torta (sobe Dissonância junto).</li>
+        <li><b>Limpo</b> repetição perfeita.</li>
+        <li><b>Transcende</b> repete o irrepetível (um evento que não deveria poder ecoar).</li>
+      </ul>
+    </dd>
+
+    <dt>Pendências de ficha</dt>
+    <dd>
+      <div class="pend">
+        <span class="lbl">a cravar / a aplicar</span>
+        Manter Ecos + Sulco + Dissonância intactos. · Criar trilha de Desgaste (persistente, ligada às falhas de Dissonância) + patamares. · Fim-de-arco <span class="acravar">a desenhar</span>.
+      </div>
+    </dd>
+  </dl>
+  <a class="totop" href="#topo">↑ topo</a>
+</section>
+
+<!-- ============================================================ TABELA-RESUMO DOS VERBOS ============================================================ -->
+<a id="verbos" class="anchor-target"></a>
+<h2>Tabela-resumo dos verbos <span class="kicker">— prova anti-reskin</span></h2>
+<table>
+  <caption>Cada recurso-maldição, seu verbo distinto e o que cobra</caption>
+  <thead>
+    <tr><th>Elemento / Recurso</th><th>Verbo distinto</th><th>O que cobra</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><b>Vazio</b> / Erosão</td><td class="vb">só sobe, irreversível</td><td>cobra identidade (você some).</td></tr>
+    <tr><td><b>Germe</b> / Viço</td><td class="vb">pulsa, mas o piso sobe</td><td>cobra controle + corpo (vira solo).</td></tr>
+    <tr><td><b>Pacto</b> / Dívida</td><td class="vb">enche, adia mas não cancela</td><td>cobra o que você mais tem (a conta vence).</td></tr>
+    <tr><td><b>Observação</b> / Exposição</td><td class="vb">esfria, mas deixa cicatriz nomeada</td><td>ser caçado (caça vira caça).</td></tr>
+    <tr><td><b>Ascensão</b> / Perfeição</td><td class="vb">só sobe, dá-e-tira</td><td>cobra humanidade (vira outro — jogável).</td></tr>
+    <tr><td><b>Eco</b> / Desgaste</td><td class="vb">só sobe via Dissonância</td><td>cobra o original (talvez seja a cópia).</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ PENDÊNCIAS ABERTAS GLOBAIS ============================================================ -->
+<a id="pendencias" class="anchor-target"></a>
+<h2>Pendências abertas globais</h2>
+<div class="pendente">
+  <span class="lbl">Em aberto</span>
+  <ul class="tight" style="margin-bottom:0;">
+    <li>Chassi de "personagem transcendido" da Ascensão (até seis formas-finais jogáveis) — grande, fica pra depois.</li>
+    <li>Fim-de-arco do Eco (máximo de Desgaste) — <span class="acravar">a desenhar</span>.</li>
+    <li>Todas as alterações de ficha (data.js / core.js) listadas por elemento — viram um "documento de alterações de ficha" à parte.</li>
+    <li>Números finais de todos os medidores (taxas de subida / descida, tetos, custos) — <span class="acravar">a cravar</span> com a ficha.</li>
+  </ul>
+</div>
+<div class="nota-mestre">
+  <span class="lbl">NB — não tocar a ficha sem decisão explícita</span>
+  <p style="margin:0;">O documento-fonte marca <a class="ref" href="../Ficha/data.js">Ficha/data.js</a> e <a class="ref" href="../Ficha/Ficha_Automatica.html">Ficha_Automatica.html</a> como "NÃO ALTERAR". Aplicar qualquer pendência de ficha listada acima exige decisão explícita sobre como e quando tocar a ficha.</p>
+</div>
+
+<a class="totop" href="#topo">↑ topo</a>
+
+<script>
+function filterNav(q){
+  q = q.trim().toLowerCase();
+  document.querySelectorAll('#nav ul.sub a, #nav ul > li.part > a').forEach(function(a){
+    var li = a.closest('li');
+    if(!q){ li.style.display=''; return; }
+    var txt = a.textContent.toLowerCase();
+    li.style.display = txt.indexOf(q) !== -1 ? '' : 'none';
+  });
+}
+</script>
+
+</main>
+</div>
+</body>
+</html>
