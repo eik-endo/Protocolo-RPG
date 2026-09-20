@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PROTOCOLO — Distorções</title>
+<style>
+:root{
+  --bg:#141210; --bg2:#1b1815; --panel:#1f1c18; --ink:#e9e2d3; --ink-dim:#a89e8c; --ink-faint:#71685a;
+  --rule:#3a352c; --rule-lite:#2a261f;
+  --gold:#c9a84c;
+  --mist:#8fa4b0;   /* referência cruzada — a.ref */
+  --warn:#b5432f;
+  /* cores por elemento — código de navegação */
+  --c-vaz:#5a86a8;   /* Vazio — gelo */
+  --c-ger:#3f7a4a;   /* Germe — verde */
+  --c-pac:#8a2f2f;   /* Pacto — vinho */
+  --c-obs:#c9a13a;   /* Observação — âmbar */
+  --c-asc:#b5602a;   /* Ascensão — ferrugem */
+  --c-eco:#7a5aa8;   /* Eco — violeta */
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:"Georgia","Times New Roman",serif; line-height:1.5; font-size:16px;}
+::selection{background:var(--gold); color:#1a1710;}
+
+/* ---------- layout ---------- */
+#shell{display:flex; min-height:100vh;}
+#nav{
+  position:sticky; top:0; height:100vh; width:290px; flex:0 0 290px; overflow-y:auto;
+  background:var(--panel); border-right:2px solid var(--rule); padding:0 0 3rem;
+  font-family:"Courier New",monospace;
+}
+#main{flex:1 1 auto; min-width:0; padding:2.2rem clamp(1rem,4vw,4rem) 8rem; max-width:56rem;}
+
+#nav .navhead{padding:1.1rem 1rem .8rem; border-bottom:2px solid var(--rule); position:sticky; top:0; background:var(--panel); z-index:5;}
+#nav .navhead b{display:block; font-size:.95rem; letter-spacing:.06em; color:var(--gold);}
+#nav .navhead span{display:block; font-size:.66rem; color:var(--ink-faint); margin-top:.2rem;}
+#nav input#navfilter{width:100%; margin-top:.6rem; background:var(--bg); border:1px solid var(--rule); color:var(--ink); padding:.35rem .5rem; font-family:inherit; font-size:.72rem;}
+
+#nav ul{list-style:none; margin:0; padding:0;}
+#nav .part{border-bottom:1px solid var(--rule-lite);}
+#nav .part > a{display:block; padding:.55rem 1rem; font-size:.76rem; letter-spacing:.05em; color:var(--ink); text-decoration:none; font-weight:bold;}
+#nav .part > a:hover{background:var(--rule-lite);}
+#nav .sub{padding-left:0; background:#17140f;}
+#nav .sub a{display:block; padding:.3rem 1rem .3rem 1.6rem; font-size:.66rem; color:var(--ink-dim); text-decoration:none; border-left:3px solid transparent;}
+#nav .sub a:hover{color:var(--ink); background:var(--rule-lite);}
+#nav .soon > a{color:var(--ink-faint); font-style:italic;}
+#nav .soon > a::after{content:" · em breve"; font-size:.58rem; letter-spacing:.05em;}
+
+.b-vaz{border-left-color:var(--c-vaz) !important;}
+.b-ger{border-left-color:var(--c-ger) !important;}
+.b-pac{border-left-color:var(--c-pac) !important;}
+.b-obs{border-left-color:var(--c-obs) !important;}
+.b-asc{border-left-color:var(--c-asc) !important;}
+.b-eco{border-left-color:var(--c-eco) !important;}
+
+/* ---------- tipografia geral ---------- */
+h1,h2,h3,h4{font-family:"Courier New",monospace; font-weight:bold; color:var(--gold); letter-spacing:.02em;}
+h1{font-size:1.9rem; border-bottom:3px double var(--rule); padding-bottom:.6rem; margin:0 0 1.2rem;}
+h2.elem{font-size:1.7rem; margin:3.2rem 0 1rem; padding-top:1.4rem; border-top:2px solid var(--rule);}
+p{margin:0 0 .9rem;}
+a{color:var(--gold);}
+.anchor-target{scroll-margin-top:1rem;}
+.kicker{font-family:"Courier New",monospace; font-size:.68rem; letter-spacing:.2em; text-transform:uppercase; color:var(--ink-faint);}
+.totop{display:inline-block; font-family:"Courier New",monospace; font-size:.62rem; letter-spacing:.15em; color:var(--ink-faint); text-decoration:none; margin-top:.8rem;}
+.totop:hover{color:var(--gold);}
+strong{color:var(--ink);}
+em{color:#cfc6b3;}
+a.ref{color:var(--mist); text-decoration:none; border-bottom:1px dotted var(--mist);}
+a.ref:hover{color:var(--gold); border-bottom-color:var(--gold);}
+
+/* ---------- abertura ---------- */
+.aviso{border:2px solid var(--gold); padding:1rem 1.2rem; margin:1.2rem 0 0; background:#1c1710;}
+.aviso .lbl{font-family:"Courier New",monospace; font-size:.64rem; letter-spacing:.15em; text-transform:uppercase; color:var(--gold); display:block; margin-bottom:.4rem;}
+
+/* ---------- índice do topo ---------- */
+.toc{border:1px solid var(--rule); background:var(--panel); padding:1rem 1.2rem; margin:1.6rem 0;}
+.toc .h{font-family:"Courier New",monospace; font-size:.64rem; letter-spacing:.15em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:.5rem;}
+.toc .cols{columns:2; column-gap:2rem;}
+.toc a{display:block; padding:.12rem 0; font-family:"Courier New",monospace; font-size:.74rem; text-decoration:none; color:var(--ink-dim); border-bottom:1px dashed var(--rule-lite); break-inside:avoid;}
+.toc a:hover{color:var(--gold);}
+.toc .grp{font-family:"Courier New",monospace; font-size:.66rem; letter-spacing:.1em; text-transform:uppercase; color:var(--gold); margin:.5rem 0 .2rem; break-inside:avoid;}
+@media (max-width:640px){.toc .cols{columns:1;}}
+
+/* ---------- Lei + Como funciona ---------- */
+.lei{border-left:4px solid var(--accent,var(--gold)); padding:.4rem 0 .4rem 1.1rem; margin:1rem 0 1.2rem;
+     font-style:italic; color:#d8cfc0; background:linear-gradient(90deg,rgba(255,255,255,.02),transparent 60%);}
+.comofunciona{border:1px solid var(--rule); background:var(--bg2); padding:1rem 1.2rem; margin:1rem 0;}
+.comofunciona h4{margin:0 0 .5rem; color:var(--ink-dim); text-transform:uppercase; font-size:.74rem; letter-spacing:.08em;}
+.comofunciona p{margin:0 0 .5rem;}
+.comofunciona .r{margin:.15rem 0;}
+.comofunciona .r b{color:var(--ink); font-family:"Courier New",monospace; font-size:.78rem;}
+.degraus{width:100%; border-collapse:collapse; margin:.8rem 0 .2rem; font-size:.9rem;}
+.degraus th,.degraus td{border:1px solid var(--rule); padding:.42rem .6rem; text-align:left; vertical-align:top;}
+.degraus th{background:var(--rule-lite); font-family:"Courier New",monospace; font-size:.64rem; letter-spacing:.06em; text-transform:uppercase; color:var(--gold);}
+.degraus td b{color:var(--ink);} .degraus .deg{font-family:"Courier New",monospace; color:var(--c-pac); white-space:nowrap;}
+
+/* ---------- condição do elemento (destaque) ---------- */
+.cond{border:2px solid var(--accent,var(--gold)); border-radius:2px; padding:1rem 1.2rem; margin:1.4rem 0 2rem; background:#191510;}
+.cond .lbl{font-family:"Courier New",monospace; font-size:.66rem; letter-spacing:.14em; text-transform:uppercase; color:var(--accent,var(--gold)); display:block; margin-bottom:.5rem;}
+.cond p{margin:0 0 .5rem;}
+.cond p:last-child{margin-bottom:0;}
+
+/* ---------- card de Distorção ---------- */
+.card{border:1px solid var(--rule); border-left:5px solid var(--accent,var(--ink-faint)); background:var(--panel);
+      padding:1.2rem 1.4rem; margin:1.6rem 0; scroll-margin-top:1rem;}
+.card-head{display:flex; align-items:baseline; gap:.6rem; flex-wrap:wrap;}
+.card-num{font-family:"Courier New",monospace; font-weight:bold; color:var(--accent,var(--gold)); font-size:1.15rem;}
+.card-name{font-family:"Courier New",monospace; font-weight:bold; font-size:1.12rem; color:var(--ink); margin:0;}
+.card-name .card-sub{color:var(--ink-dim); font-weight:normal; font-style:italic; font-size:.86rem;}
+.auto{font-family:"Courier New",monospace; font-size:.6rem; letter-spacing:.08em; text-transform:uppercase; color:var(--accent,var(--gold)); margin-top:.5rem;}
+.meta{font-family:"Courier New",monospace; font-size:.72rem; letter-spacing:.02em; color:var(--ink-dim); margin:.3rem 0 .2rem; border-bottom:1px dashed var(--rule); padding-bottom:.6rem;}
+.desc{margin:.8rem 0; padding:.2rem 0 .2rem 1rem; border-left:2px solid var(--accent,var(--gold));
+      font-style:italic; color:var(--ink); font-size:1.02rem;}
+.fonte{margin:.5rem 0 .2rem; font-size:.92rem; color:#dcd4c6;}
+.fonte b{font-family:"Courier New",monospace; font-size:.64rem; letter-spacing:.1em; text-transform:uppercase; color:var(--accent,var(--gold)); margin-right:.45rem;}
+
+.bands{margin:.6rem 0 0; display:grid; grid-template-columns:auto 1fr; gap:.1rem .9rem;}
+.bands dt{font-family:"Courier New",monospace; font-size:.66rem; letter-spacing:.06em; text-transform:uppercase; padding-top:.42rem; white-space:nowrap; color:var(--ink-faint);}
+.bands dd{margin:.35rem 0 0; color:#dcd4c6;}
+.bands dt.falha{color:var(--warn);}
+.bands dt.parcial{color:var(--ink-dim);}
+.bands dt.total{color:#8fae7a;}
+.bands dt.crit{color:var(--gold);}
+.bands dt.efeito{color:var(--gold);}
+.bands dt.sobre{color:var(--mist);}
+.bands .ero{color:var(--c-vaz); font-style:italic; font-size:.92em;}
+.subchoice{margin:.3rem 0 0; padding-left:1rem;}
+.subchoice li{margin-bottom:.2rem; list-style:none;}
+.subchoice li b{color:var(--ink);}
+
+.escala{border-top:1px dashed var(--rule); margin-top:1rem; padding-top:.7rem;}
+.escala .lbl{font-family:"Courier New",monospace; font-size:.64rem; letter-spacing:.1em; text-transform:uppercase; color:var(--accent,var(--gold)); display:block; margin-bottom:.4rem;}
+.escala ul{margin:0; padding-left:1.1rem;}
+.escala li{margin-bottom:.3rem;}
+.escala li b{color:var(--ink); font-family:"Courier New",monospace; font-size:.76rem;}
+.escala p{margin:0;}
+
+.card-note{margin:1rem 0 0; font-style:italic; color:var(--ink-dim); font-size:.9rem; border-top:1px dashed var(--rule-lite); padding-top:.6rem;}
+
+/* ---------- elemento ainda por vir ---------- */
+.elem-wrap.soon{opacity:.62;}
+.soonbox{border:1px dashed var(--ink-faint); background:#191510; padding:1rem 1.2rem; margin:1rem 0; color:var(--ink-dim); font-size:.92rem;}
+.soonbox .lbl{font-family:"Courier New",monospace; font-size:.62rem; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint); display:block; margin-bottom:.4rem;}
+
+/* accent por elemento aplicado no wrapper */
+.e-vaz{--accent:var(--c-vaz);} .e-ger{--accent:var(--c-ger);} .e-pac{--accent:var(--c-pac);}
+.e-obs{--accent:var(--c-obs);} .e-asc{--accent:var(--c-asc);} .e-eco{--accent:var(--c-eco);}
+
+@media (max-width:960px){
+  #shell{flex-direction:column;}
+  #nav{position:relative; width:100%; height:auto; max-height:55vh; flex:none;}
+  #main{padding:1.4rem 1rem 6rem;}
+}
+@media (max-width:560px){
+  .bands{grid-template-columns:1fr; gap:0;}
+  .bands dt{padding-top:.6rem;}
+}
+@media print{
+  #nav{display:none;}
+  #main{padding:0; max-width:none;}
+  body{background:#fff; color:#000;}
+  .card,.cond,.comofunciona{break-inside:avoid;}
+}
+</style>
+</head>
+<body>
+<div id="shell">
+
+<!-- ============================================================ NAV ============================================================ -->
+<nav id="nav">
+  <div class="navhead">
+    <b>PROTOCOLO</b>
+    <span>Distorções · referência do jogador</span>
+    <input id="navfilter" type="text" placeholder="Ctrl+F / buscar aqui…" oninput="filterNav(this.value)">
+  </div>
+  <ul>
+    <li class="part"><a href="#topo">O que são Distorções</a></li>
+
+    <li class="part"><a href="#vazio">Vazio ◌</a>
+      <ul class="sub">
+        <li><a class="b-vaz" href="#vaz-lanca">1 · Lança do Nada</a></li>
+        <li><a class="b-vaz" href="#vaz-menos">2 · Menos</a></li>
+        <li><a class="b-vaz" href="#vaz-calar">3 · Calar</a></li>
+        <li><a class="b-vaz" href="#vaz-oquefalta">4 · O Que Falta</a></li>
+        <li><a class="b-vaz" href="#vaz-passo">5 · Passo Vazio</a></li>
+        <li><a class="b-vaz" href="#vaz-distancia">6 · Subtrair a Distância</a></li>
+        <li><a class="b-vaz" href="#vaz-vinculo">7 · Subtrair o Vínculo</a></li>
+        <li><a class="b-vaz" href="#vaz-nada">8 · O Nada que Resta</a></li>
+      </ul>
+    </li>
+
+    <li class="part"><a href="#germe">Germe ❋</a>
+      <ul class="sub">
+        <li><a class="b-ger" href="#ger-broto">1 · Broto Faminto</a></li>
+        <li><a class="b-ger" href="#ger-enxerto">2 · Enxerto</a></li>
+        <li><a class="b-ger" href="#ger-simbiose">3 · Simbiose</a></li>
+        <li><a class="b-ger" href="#ger-jardim">4 · O Jardim</a></li>
+        <li><a class="b-ger" href="#ger-praga">5 · Praga</a></li>
+        <li><a class="b-ger" href="#ger-colheita">6 · Colheita</a></li>
+        <li><a class="b-ger" href="#ger-floracao">7 · Floração</a></li>
+      </ul>
+    </li>
+
+    <li class="part"><a href="#pacto">Pacto ⚖</a>
+      <ul class="sub">
+        <li><a class="b-pac" href="#pac-palavra">1 · A Palavra</a></li>
+        <li><a class="b-pac" href="#pac-tomaladaca">2 · Toma Lá, Dá Cá</a></li>
+        <li><a class="b-pac" href="#pac-fianca">3 · Fiança</a></li>
+        <li><a class="b-pac" href="#pac-cobranca">4 · A Cobrança</a></li>
+        <li><a class="b-pac" href="#pac-letramiuda">5 · A Letra Miúda</a></li>
+        <li><a class="b-pac" href="#pac-contrato">6 · O Grande Contrato</a></li>
+      </ul>
+    </li>
+    <li class="part"><a href="#ascensao">Ascensão ⌬</a>
+      <ul class="sub">
+        <li><a class="b-asc" href="#asc-afiar">1 · Afiar a Carne</a></li>
+        <li><a class="b-asc" href="#asc-devorar">2 · Devorar</a></li>
+        <li><a class="b-asc" href="#asc-topo">3 · O Topo da Cadeia</a></li>
+        <li><a class="b-asc" href="#asc-frenesi">4 · Frenesi</a></li>
+        <li><a class="b-asc" href="#asc-vestir">5 · Vestir a Carne</a></li>
+        <li><a class="b-asc" href="#asc-naosinto">6 · Não Sinto Mais</a></li>
+        <li><a class="b-asc" href="#asc-formafinal">7 · A Forma Final</a></li>
+      </ul>
+    </li>
+    <li class="part"><a href="#observacao">Observação ⊙</a>
+      <ul class="sub">
+        <li><a class="b-obs" href="#obs-observar">1 · Observar</a></li>
+        <li><a class="b-obs" href="#obs-ponto">2 · Ponto Exato</a></li>
+        <li><a class="b-obs" href="#obs-ler">3 · Ler a Página</a></li>
+        <li><a class="b-obs" href="#obs-realcar">4 · Realçar</a></li>
+        <li><a class="b-obs" href="#obs-olhos">5 · Olhos Emprestados</a></li>
+        <li><a class="b-obs" href="#obs-verdeverdade">6 · Ver de Verdade</a></li>
+        <li><a class="b-obs" href="#obs-peso">7 · O Peso do Olhar</a></li>
+        <li><a class="b-obs" href="#obs-visto">8 · Você Foi Visto</a></li>
+        <li><a class="b-obs" href="#obs-memoria">9 · A Memória do Mundo</a></li>
+      </ul>
+    </li>
+    <li class="part"><a href="#eco">Eco ☊</a>
+      <ul class="sub">
+        <li><a class="b-eco" href="#eco-coro">1 · Coro</a></li>
+        <li><a class="b-eco" href="#eco-segundo">2 · O Segundo Antes</a></li>
+        <li><a class="b-eco" href="#eco-dejavu">3 · O Déjà Vu</a></li>
+        <li><a class="b-eco" href="#eco-gravacao">4 · A Gravação que Apodrece</a></li>
+        <li><a class="b-eco" href="#eco-vozes">5 · Todas as Vozes</a></li>
+        <li><a class="b-eco" href="#eco-dia">6 · O Dia que Não Passa</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+<!-- ============================================================ MAIN ============================================================ -->
+<main id="main">
+
+<a id="topo" class="anchor-target"></a>
+<div class="kicker">Protocolo · referência do jogador</div>
+<h1>Distorções</h1>
+
+<p><strong>Distorção</strong> é o termo do jogo para o que outros sistemas chamariam de "magia". Cada elemento distorce o mundo à sua maneira, segundo a sua Lei. Este documento reúne as Distorções que você pode aprender e conjurar, começando pelos dois primeiros elementos — <strong>Vazio</strong> e <strong>Germe</strong>. Os outros quatro entram depois.</p>
+
+<div class="aviso">
+  <span class="lbl">Nota de playtest</span>
+  <p style="margin:0;">Os <strong>números</strong> aqui — custos, dados, escalas, tetos — <strong>podem mudar em playtest</strong>. O que está fixo é a <em>forma</em> de cada Distorção: o que ela faz e como o elemento cobra por ela.</p>
+</div>
+
+<div class="toc">
+  <div class="h">Índice</div>
+  <div class="cols">
+    <div class="grp">Vazio ◌</div>
+    <a href="#vaz-lanca">1 · Lança do Nada</a>
+    <a href="#vaz-menos">2 · Menos</a>
+    <a href="#vaz-calar">3 · Calar</a>
+    <a href="#vaz-oquefalta">4 · O Que Falta</a>
+    <a href="#vaz-passo">5 · Passo Vazio</a>
+    <a href="#vaz-distancia">6 · Subtrair a Distância</a>
+    <a href="#vaz-vinculo">7 · Subtrair o Vínculo</a>
+    <a href="#vaz-nada">8 · O Nada que Resta</a>
+    <div class="grp">Germe ❋</div>
+    <a href="#ger-broto">1 · Broto Faminto</a>
+    <a href="#ger-enxerto">2 · Enxerto</a>
+    <a href="#ger-simbiose">3 · Simbiose</a>
+    <a href="#ger-jardim">4 · O Jardim</a>
+    <a href="#ger-praga">5 · Praga</a>
+    <a href="#ger-colheita">6 · Colheita</a>
+    <a href="#ger-floracao">7 · Floração</a>
+    <div class="grp">Pacto ⚖</div>
+    <a href="#pac-palavra">1 · A Palavra</a>
+    <a href="#pac-tomaladaca">2 · Toma Lá, Dá Cá</a>
+    <a href="#pac-fianca">3 · Fiança</a>
+    <a href="#pac-cobranca">4 · A Cobrança</a>
+    <a href="#pac-letramiuda">5 · A Letra Miúda</a>
+    <a href="#pac-contrato">6 · O Grande Contrato</a>
+    <div class="grp">Ascensão ⌬</div>
+    <a href="#asc-afiar">1 · Afiar a Carne</a>
+    <a href="#asc-devorar">2 · Devorar</a>
+    <a href="#asc-topo">3 · O Topo da Cadeia</a>
+    <a href="#asc-frenesi">4 · Frenesi</a>
+    <a href="#asc-vestir">5 · Vestir a Carne</a>
+    <a href="#asc-naosinto">6 · Não Sinto Mais</a>
+    <a href="#asc-formafinal">7 · A Forma Final</a>
+    <div class="grp">Observação ⊙</div>
+    <a href="#obs-observar">1 · Observar</a>
+    <a href="#obs-ponto">2 · Ponto Exato</a>
+    <a href="#obs-ler">3 · Ler a Página</a>
+    <a href="#obs-realcar">4 · Realçar</a>
+    <a href="#obs-olhos">5 · Olhos Emprestados</a>
+    <a href="#obs-verdeverdade">6 · Ver de Verdade</a>
+    <a href="#obs-peso">7 · O Peso do Olhar</a>
+    <a href="#obs-visto">8 · Você Foi Visto</a>
+    <a href="#obs-memoria">9 · A Memória do Mundo</a>
+    <div class="grp">Eco ☊</div>
+    <a href="#eco-coro">1 · Coro</a>
+    <a href="#eco-segundo">2 · O Segundo Antes</a>
+    <a href="#eco-dejavu">3 · O Déjà Vu</a>
+    <a href="#eco-gravacao">4 · A Gravação que Apodrece</a>
+    <a href="#eco-vozes">5 · Todas as Vozes</a>
+    <a href="#eco-dia">6 · O Dia que Não Passa</a>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ VAZIO ═══════════════════════════════════════════ -->
+<div class="elem-wrap e-vaz">
+<a id="vazio" class="anchor-target"></a>
+<h2 class="elem">Vazio ◌</h2>
+
+<div class="lei"><strong>Lei da Subtração.</strong> O Vazio não faz. Desfaz. Onde os outros acrescentam, ele só tira — e o que ele tira <strong>não volta sozinho</strong>: precisa ser reaceso, refeito, relembrado de fora. Contra o Vazio, blindar não basta: <strong>a Absorção conta pela metade</strong>, porque você apara um golpe, não uma ausência.</div>
+
+<div class="comofunciona">
+  <h4>Como funciona (vale para todas)</h4>
+  <p>Conjurar é um teste de <strong>2d6 + Juízo + perícia</strong> contra o Limiar. O resultado diz <em>quanto</em> se apaga:</p>
+  <p class="r"><b>Falha (5−)</b> o Vazio não apaga o que você queria, e te esquece um pouco — <strong>+1 Erosão</strong>, de graça.</p>
+  <p class="r"><b>Parcial (6–9)</b> apaga, mas raso ou por pouco tempo.</p>
+  <p class="r"><b>Total (10+)</b> apaga limpo.</p>
+  <p class="r"><b>Crítico (dois dados iguais)</b> lê-se em três faixas — <strong>morde</strong> (1-1, 2-2), <strong>limpo</strong> (3-3, 4-4), <strong>limite</strong> (5-5, 6-6).</p>
+  <p>A <strong>Erosão</strong> não é o que você gasta para conjurar (isso é Sintonia). Ela é o preço de apagar o que não devia: só sobe no apagamento grande, nunca volta, e cada ponto risca uma parte de quem você é.</p>
+  <p style="margin-bottom:0;">A <strong>Sobrecarga</strong> é sempre uma compra: pague o custo indicado e leve o a mais. Sem risco, sem rolar.</p>
+</div>
+
+<div class="cond">
+  <span class="lbl">Esvaziado — a condição do Vazio</span>
+  <p>Algo foi subtraído do alvo — uma capacidade, um sentido, um bônus, uma vantagem que ele usava. Enquanto Esvaziado, <strong>aquilo simplesmente não existe para ele</strong>: não dá para usar, contornar nem compensar, porque não está faltando <em>funcionar</em> — está faltando <em>existir</em>. <strong>Não se arranca</strong> (não há o que remover, só um buraco) e <strong>não volta sozinho</strong>, nem com o tempo nem com cura: só se for <strong>reposto de fora</strong> — reacendido, refeito, devolvido, relembrado. O card diz <em>de quê</em> o alvo ficou Esvaziado; a duração (enquanto você mantém o foco, ou permanente-até-refeito) vem da Distorção e do resultado.</p>
+</div>
+
+<!-- 1. Lança do Nada -->
+<article id="vaz-lanca" class="card b-vaz anchor-target">
+  <div class="card-head"><span class="card-num">1</span><h3 class="card-name">Lança do Nada <span class="card-sub">· a subtração de vida</span></h3></div>
+  <div class="auto">Automática do Marcado pelo Vazio.</div>
+  <div class="meta">Grau 1 (escala até o 4) · Juízo · 1 Sintonia · Ação · Curto</div>
+  <blockquote class="desc">Não é uma lança de coisa nenhuma. É o lugar onde a coisa parou de estar. Onde acerta, falta.</blockquote>
+  <dl class="bands">
+    <dt class="falha">Falha</dt><dd>o nada abre pro seu lado — 1 de dano em você. <span class="ero">(+1 Erosão.)</span></dd>
+    <dt class="parcial">Parcial</dt><dd>1d4 de dano; a Absorção dele conta pela metade.</dd>
+    <dt class="total">Total</dt><dd>1d4 + Juízo; Absorção pela metade; e apaga junto uma vantagem que ele estava usando (<strong>Esvaziado</strong>).</dd>
+    <dt class="crit">Crít · morde</dt><dd>1d4 + Juízo, e algo perto de você se apaga também. <span class="ero">(+1 Erosão.)</span></dd>
+    <dt class="crit">Crít · limpo</dt><dd>1d4 + Juízo, dano cheio, sem respingo.</dd>
+    <dt class="crit">Crít · limite</dt><dd>1d4 + Juízo ignorando toda a Absorção — você fura o que não se fura, e o que apagar não volta. <span class="ero">(+1 Erosão.)</span></dd>
+    <dt class="sobre">Sobrecarga</dt><dd>+1 Sintonia = alcança um segundo alvo.</dd>
+  </dl>
+  <div class="escala">
+    <span class="lbl">Escala por Grau (a Distorção cresce num slot só — o card mostra o Grau atual)</span>
+    <ul>
+      <li><b>G1:</b> Parcial 1d4 · Total 1d4 + Juízo, apaga uma vantagem ativa por 1 turno · Absorção pela metade.</li>
+      <li><b>G2:</b> Parcial 1d6 · Total 1d6 + Juízo, o apagado dura a cena · Absorção pela metade.</li>
+      <li><b>G3:</b> Parcial 1d6 · Total 2d6 + Juízo, o apagado é permanente-até-refeito · Absorção pela metade.</li>
+      <li><b>G4:</b> Parcial 2d6 · Total 2d6 + Juízo, apaga uma vantagem a cada acerto (empilha) · Absorção ignorada por inteiro.</li>
+    </ul>
+  </div>
+</article>
+
+<!-- 2. Menos -->
+<article id="vaz-menos" class="card b-vaz anchor-target">
+  <div class="card-head"><span class="card-num">2</span><h3 class="card-name">Menos <span class="card-sub">· a subtração de capacidade</span></h3></div>
+  <div class="meta">Grau 1 · Juízo · 1 Sintonia · Ação · Curto · dura enquanto você mantém o foco</div>
+  <blockquote class="desc">Você não bloqueia o que ele tem. Tira dele o direito de ter. A arma não está mais ali. O olho não vê. A força não ergue.</blockquote>
+  <dl class="bands">
+    <dt class="falha">Falha</dt><dd>o que some é seu — por um instante, você perde aquilo que ia tirar dele. <span class="ero">(+1 Erosão.)</span></dd>
+    <dt class="parcial">Parcial</dt><dd>apaga uma coisa do alvo enquanto você segurar o foco (<strong>Esvaziado</strong>).</dd>
+    <dt class="total">Total</dt><dd>o que você apaga é mais essencial, e ele fica <strong>Esvaziado</strong> de vez até reacender de fora.</dd>
+    <dt class="crit">Crít · morde</dt><dd>apaga o dele e apaga um pouco de você junto. <span class="ero">(+1 Erosão.)</span></dd>
+    <dt class="crit">Crít · limpo</dt><dd>apaga firme, sem custo.</dd>
+    <dt class="crit">Crít · limite</dt><dd>apaga algo que ninguém pensaria que dá pra tirar. Não volta. <span class="ero">(+1 Erosão.)</span></dd>
+    <dt class="sobre">Sobrecarga</dt><dd>+1 Sintonia = apaga de um segundo alvo.</dd>
+  </dl>
+  <p class="card-note">Não há resistência: não se resiste à ausência. Contra um poder muito grande, dura só um instante.</p>
+</article>
+
+<!-- 3. Calar -->
+<article id="vaz-calar" class="card b-vaz anchor-target">
+  <div class="card-head"><span class="card-num">3</span><h3 class="card-name">Calar <span class="card-sub">· a subtração de som</span></h3></div>
+  <div class="meta">Grau 1 · Juízo · 1 Sintonia · Ação · Curto · Cena</div>
+  <blockquote class="desc">Você não abafa o som. Faz o som deixar de acontecer. E a Lei não te poupa: ali dentro, você também emudece.</blockquote>
+  <dl class="bands">
+    <dt class="falha">Falha</dt><dd>o silêncio te engole primeiro — só você fica mudo, por um turno. <span class="ero">(+1 Erosão.)</span></dd>
+    <dt class="parcial">Parcial</dt><dd>uma pequena zona fica sem voz, sem grito, sem alarme.</dd>
+    <dt class="total">Total</dt><dd>som nenhum acontece ali — nem passo, nem tiro, nem conjuração dita.</dd>
+    <dt class="crit">Crít · morde</dt><dd>o silêncio pega mais do que a zona, e algo seu se apaga com ele. <span class="ero">(+1 Erosão.)</span></dd>
+    <dt class="crit">Crít · limpo</dt><dd>silêncio pleno e estável.</dd>
+    <dt class="crit">Crít · limite</dt><dd>você cala algo que não era som — uma ordem antes de ser dada, um nome antes de ser chamado. <span class="ero">(+1 Erosão.)</span></dd>
+    <dt class="sobre">Sobrecarga</dt><dd>+1 Sintonia = a zona é maior.</dd>
+  </dl>
+</article>
+
+<!-- 4. O Que Falta -->
+<article id="vaz-oquefalta" class="card b-vaz anchor-target">
+  <div class="card-head"><span class="card-num">4</span><h3 class="card-name">O Que Falta <span class="card-sub">· a percepção da ausência</span></h3></div>
+  <div class="meta">Grau 1 · Juízo · 1 Sintonia + começa com 1 Erosão · Ação · Curto</div>
+  <blockquote class="desc">Você enxerga os buracos que o mundo finge não ter. A passagem tapada que não devia. A pessoa de quem ninguém lembra. A mentira que é só uma coisa que não foi dita.</blockquote>
+  <dl class="bands">
+    <dt class="falha">Falha</dt><dd>você lê uma ausência que não existe — uma pista falsa e convincente.</dd>
+    <dt class="parcial">Parcial</dt><dd>o mestre te aponta uma ausência no ambiente ou no alvo.</dd>
+    <dt class="total">Total</dt><dd>e o que foi apagado ali, e há quanto tempo.</dd>
+    <dt class="crit">Crít · morde</dt><dd>você vê fundo, e o ver custa — algo seu some no processo. <span class="ero">(+1 Erosão.)</span></dd>
+    <dt class="crit">Crít · limpo</dt><dd>a ausência inteira, clara.</dd>
+    <dt class="crit">Crít · limite</dt><dd>você percebe uma ausência que ninguém deveria conseguir notar — o que foi apagado da própria memória do mundo.</dd>
+    <dt class="sobre">Sobrecarga</dt><dd>+1 Sintonia = varre uma área maior.</dd>
+  </dl>
+  <p class="card-note">Ver o Vazio já é ser um pouco dele: por isso o 1 de Erosão inicial, sempre.</p>
+</article>
+
+<!-- 5. Passo Vazio -->
+<article id="vaz-passo" class="card b-vaz anchor-target">
+  <div class="card-head"><span class="card-num">5</span><h3 class="card-name">Passo Vazio <span class="card-sub">· a subtração da própria presença</span></h3></div>
+  <div class="meta">Grau 2 (escala até o 4) · Juízo · 1 Sintonia · Ação · Pessoal · Cena</div>
+  <blockquote class="desc">Você tira o seu peso, a sua passagem, o seu estar-aqui. Não some de vista. Some de <em>estar</em>.</blockquote>
+  <dl class="bands">
+    <dt class="falha">Falha</dt><dd>você se apaga fundo demais — some da cena por um turno, sem poder agir. <span class="ero">(+1 Erosão.)</span></dd>
+    <dt class="parcial">Parcial</dt><dd>você deixa de existir para <strong>um alvo</strong> — ele não te vê, não te ouve, não te concebe, até você agir contra ele.</dd>
+    <dt class="total">Total</dt><dd>você atravessa o que não tem passagem, e o primeiro ataque da cena contra você simplesmente erra (você não estava lá).</dd>
+    <dt class="crit">Crít · morde</dt><dd>você some bem, e um pedaço de você fica para trás no vão. <span class="ero">(+1 Erosão.)</span></dd>
+    <dt class="crit">Crít · limpo</dt><dd>ausência limpa, você anda pelos buracos do mundo à vontade.</dd>
+    <dt class="crit">Crít · limite</dt><dd>você deixa de existir para <strong>todos</strong> por um tempo — não oculto, ausente; ninguém pode te tocar, e ninguém lembra que você esteve. <span class="ero">(+1 Erosão.)</span></dd>
+    <dt class="sobre">Sobrecarga</dt><dd>+1 Sintonia = leve um aliado tocado para o vão com você.</dd>
+  </dl>
+  <div class="escala">
+    <span class="lbl">Escala por Grau (começa no G2 — a Distorção cresce num slot só)</span>
+    <ul>
+      <li><b>G2:</b> você deixa de existir para <strong>um alvo</strong> até agir contra ele. Custo 1 Sintonia.</li>
+      <li><b>G3:</b> para <strong>um pequeno grupo</strong>, ou atravessa uma barreira física; o primeiro ataque da cena contra você erra. Custo 2 Sintonia.</li>
+      <li><b>G4:</b> você deixa de existir para <strong>todos</strong> por [Juízo] turnos — ninguém te toca, age contra você ou lembra que esteve, e você age livre nesse tempo. Custo 3 Sintonia. <span class="ero">(Só neste Grau: +1 Erosão — apagar-se por inteiro prova a si mesmo que você consegue não estar.)</span></li>
+    </ul>
+  </div>
+</article>
+
+<!-- 6. Subtrair a Distância -->
+<article id="vaz-distancia" class="card b-vaz anchor-target">
+  <div class="card-head"><span class="card-num">6</span><h3 class="card-name">Subtrair a Distância <span class="card-sub">· a subtração do espaço</span></h3></div>
+  <div class="meta">Grau 3 · Juízo · 2 Sintonia · Ação · Curto (o alvo do apagamento pode ser longe)</div>
+  <blockquote class="desc">Você não se move, nem move o alvo. Apaga o espaço no meio. O que estava longe está colado, sem ter atravessado nada. A fuga não é cortada — deixa de existir.</blockquote>
+  <dl class="bands">
+    <dt class="falha">Falha</dt><dd>o espaço colapsa errado — você se desloca para onde não queria, exposto. <span class="ero">(+1 Erosão.)</span></dd>
+    <dt class="parcial">Parcial</dt><dd>apaga a distância entre duas coisas próximas por um instante — dois passos viram zero.</dd>
+    <dt class="total">Total</dt><dd>apaga uma distância grande — o outro lado da sala, o alto do prédio, o golpe e o alvo (chega sem viajar, inaparável).</dd>
+    <dt class="crit">Crít · morde</dt><dd>o espaço some, e leva um pedaço de espaço seu junto — você perde o chão por um turno. <span class="ero">(+1 Erosão.)</span></dd>
+    <dt class="crit">Crít · limpo</dt><dd>a distância some limpa, exatamente onde você quis.</dd>
+    <dt class="crit">Crít · limite</dt><dd>você apaga a distância entre coisas que <em>deveriam</em> estar sempre separadas — e ela não volta sozinha. <span class="ero">(+1 Erosão.)</span></dd>
+    <dt class="sobre">Sobrecarga</dt><dd>+1 Sintonia = apaga uma segunda distância no mesmo ato.</dd>
+  </dl>
+</article>
+
+<!-- 7. Subtrair o Vínculo -->
+<article id="vaz-vinculo" class="card b-vaz anchor-target">
+  <div class="card-head"><span class="card-num">7</span><h3 class="card-name">Subtrair o Vínculo <span class="card-sub">· a subtração da relação</span></h3></div>
+  <div class="meta">Grau 3 · Juízo · 2 Sintonia · Ação · Curto · dura enquanto você mantém o foco</div>
+  <blockquote class="desc">Você não tira as coisas uma da outra. Tira o <em>entre</em> delas. A espada e o cortar, o pé e o chão, a pessoa e o que ela ama — continuam lado a lado, sem se reconhecerem. E o entre não volta sozinho.</blockquote>
+  <dl class="bands">
+    <dt class="falha">Falha</dt><dd>o entre que cede é um seu — por um instante, algo seu para de te obedecer. <span class="ero">(+1 Erosão.)</span></dd>
+    <dt class="parcial">Parcial</dt><dd>você apaga um vínculo simples, enquanto mantém o foco.</dd>
+    <dt class="total">Total</dt><dd>o vínculo pode ser fundo, e fica apagado a cena inteira.</dd>
+    <dt class="crit">Crít · morde</dt><dd>apaga o que você mirou e algo perto que você não queria. <span class="ero">(+1 Erosão.)</span></dd>
+    <dt class="crit">Crít · limpo</dt><dd>apaga sem respingo, a cena toda.</dd>
+    <dt class="crit">Crít · limite</dt><dd>você apaga um entre que não devia poder ser tocado, e ele não volta. <span class="ero">(+1 Erosão; o mestre pode oferecer apagar mais um, por mais 1 Erosão.)</span></dd>
+    <dt class="sobre">Sobrecarga</dt><dd>+1 Sintonia = mira um segundo vínculo no mesmo ato.</dd>
+  </dl>
+</article>
+
+<!-- 8. O Nada que Resta -->
+<article id="vaz-nada" class="card b-vaz anchor-target">
+  <div class="card-head"><span class="card-num">8</span><h3 class="card-name">O Nada que Resta <span class="card-sub">· o apagamento absoluto</span></h3></div>
+  <div class="meta">Grau 4 · Juízo · 5 Erosão + 4 Lucidez · Ação · o que você conseguir nomear · permanente · 1×/campanha</div>
+  <blockquote class="desc">Você pensa no nome. E o mundo esquece que ele um dia significou algo.</blockquote>
+  <dl class="bands">
+    <dt class="efeito">Efeito</dt><dd>apague algo grande da existência — uma criatura poderosa, um evento, uma linhagem, um lugar, um conceito. Não é destruído: nunca terá existido. O mundo se reorganiza em volta do buraco, e ninguém sente falta.</dd>
+    <dt class="parcial">Parcial</dt><dd>o apagamento pega, mas deixa uma sombra — alguém, em algum canto, lembra vagamente.</dd>
+    <dt class="total">Total</dt><dd>apagamento limpo e total. Nunca existiu, ponto.</dd>
+    <dt class="crit">Crít · limpo/limite</dt><dd>o buraco se reorganiza a seu favor; o mundo fecha do jeito que mais te serve.</dd>
+    <dt class="falha">Falha</dt><dd>a realidade recusa, consome os 5 de Erosão assim mesmo, e o buraco se abre em você — o mundo começa a esquecer o seu nome.</dd>
+  </dl>
+</article>
+
+<p class="card-note">As 8 Distorções do Vazio. Oito verbos de subtração — vida, capacidade, som, ausência, presença, espaço, vínculo, existência. Nenhuma repete a outra; nenhuma poderia ser de outro elemento.</p>
+<a class="totop" href="#topo">↑ topo</a>
+</div>
+
+<!-- ═══════════════════════════════════════════ GERME ═══════════════════════════════════════════ -->
+<div class="elem-wrap e-ger">
+<a id="germe" class="anchor-target"></a>
+<h2 class="elem">Germe ❋</h2>
+
+<div class="lei"><strong>Lei da Semeadura.</strong> O Germe não faz efeitos. Planta. O que você planta não tem prazo — tem tamanho. Cresce sozinho, turno após turno, e <strong>não some com o tempo</strong>: só para se for arrancado, queimado ou tratado. E você não paga com Sintonia. Paga com <strong>carne</strong>: a sua Vida é a semente.</div>
+
+<div class="comofunciona">
+  <h4>Como funciona (vale para todas)</h4>
+  <p>Conjurar é um teste de <strong>2d6 + Juízo + perícia</strong> contra o Limiar. O resultado diz <em>o quão bem pega o que você planta</em>:</p>
+  <p class="r"><b>Falha (5−)</b> a semente germina errado — nasce em você, ou vira contra você.</p>
+  <p class="r"><b>Parcial (6–9)</b> pega, mas raso ou incompleto.</p>
+  <p class="r"><b>Total (10+)</b> pega fundo.</p>
+  <p class="r"><b>Crítico (dois dados iguais)</b> — <strong>morde</strong> (1-1, 2-2), <strong>limpo</strong> (3-3, 4-4), <strong>limite</strong> (5-5, 6-6).</p>
+  <p>Tudo do Germe custa <strong>Vida</strong> (a Lei); as Distorções grandes custam Vida <strong>e Lucidez</strong> (virar jardim corrói a mente).</p>
+  <p>O <strong>Viço</strong> é o que cresce do que você plantou. Ele <strong>sobe</strong> sozinho quando suas sementes prosperam (cada dano que elas causam), e você o <strong>colhe</strong> com uma ação — em Vida, em surto, ou arrancando o próprio jardim. Cada patamar de Viço que você cruza <strong>deixa raiz</strong>: o piso nunca mais volta ao que era.</p>
+  <p style="margin-bottom:0;">A <strong>Sobrecarga</strong> é sempre uma compra: pague o a mais em Vida e leve o extra.</p>
+</div>
+
+<div class="cond">
+  <span class="lbl">Semeado (X) — a condição do Germe</span>
+  <p>Há uma semente sua crescendo no alvo. No início de cada turno dele, ela causa <strong>X de dano</strong> e depois <strong>cresce (+1 em X)</strong>, até um teto, quando para de crescer mas continua doendo. <strong>Não sai sozinha:</strong> só se for <strong>arrancada</strong> (uma ação + teste de Resistência ou Medicina), <strong>queimada</strong> (fogo remove) ou <strong>tratada</strong>. Cada dano que uma semente sua causa <strong>sobe o seu Viço</strong>.</p>
+</div>
+
+<!-- 1. Broto Faminto -->
+<article id="ger-broto" class="card b-ger anchor-target">
+  <div class="card-head"><span class="card-num">1</span><h3 class="card-name">Broto Faminto <span class="card-sub">· a semente que dói</span></h3></div>
+  <div class="auto">Automática do Marcado pelo Germe.</div>
+  <div class="meta">Grau 1 (cresce até o 4) · Carne · 1 de Vida · Ação · Curto</div>
+  <blockquote class="desc">Você planta um dente no alvo. Ele não fere agora. Fere mais amanhã, e depois mais, até alguém arrancar.</blockquote>
+  <dl class="bands">
+    <dt class="falha">Falha</dt><dd>o broto abre a boca pro lado errado — nasce em <strong>você</strong>: Semeado (1) em você.</dd>
+    <dt class="parcial">Parcial</dt><dd>o alvo fica <strong>Semeado (1)</strong>.</dd>
+    <dt class="total">Total</dt><dd><strong>Semeado (2)</strong>, e a semente já criou raiz — arrancá-la exige um teste mais difícil.</dd>
+    <dt class="crit">Crít · morde</dt><dd>pega fundo e cospe esporo perto — um segundo alvo próximo fica Semeado (1), e teu Viço salta.</dd>
+    <dt class="crit">Crít · limpo</dt><dd>Semeado no teto do Grau de uma vez, sem respingo.</dd>
+    <dt class="crit">Crít · limite</dt><dd>a semente pega num ponto que não se alcança — não pode ser arrancada por [Juízo] turnos, só queimada.</dd>
+    <dt class="sobre">Sobrecarga</dt><dd>+1 de Vida = planta em um segundo alvo ao alcance.</dd>
+  </dl>
+  <div class="escala">
+    <span class="lbl">Escala por Grau (a Distorção cresce num slot só)</span>
+    <ul>
+      <li><b>G1:</b> Semeado (1), teto 2.</li>
+      <li><b>G2:</b> Semeado (1), teto 3, e o Total já começa em (2).</li>
+      <li><b>G3:</b> Semeado (2), teto 4; ao arrancar, o esporo pula pra quem arrancou (Resistência nega).</li>
+      <li><b>G4:</b> Semeado (2), teto 5; a semente se divide — cada turno sem ser arrancada, planta uma cópia (1) num alvo adjacente.</li>
+    </ul>
+  </div>
+</article>
+
+<!-- 2. Enxerto -->
+<article id="ger-enxerto" class="card b-ger anchor-target">
+  <div class="card-head"><span class="card-num">2</span><h3 class="card-name">Enxerto <span class="card-sub">· a cura que hospeda</span></h3></div>
+  <div class="meta">Grau 2 (cresce até o 4) · Carne · 1 de Vida · Ação · Toque · o hóspede fica</div>
+  <blockquote class="desc">Você abre a própria mão, arranca o que cresce lá dentro e planta no outro. Cura. É horrível, mas cura — e o que você plantou continua ali, quieto, depois.</blockquote>
+  <dl class="bands">
+    <dt class="falha">Falha</dt><dd>o enxerto não pega e volta pra você meio digerido — 1 de dano em você.</dd>
+    <dt class="parcial">Parcial</dt><dd>cure o alvo em 1d4, e deixe nele uma semente dormente (sua, benigna por ora).</dd>
+    <dt class="total">Total</dt><dd>cure 1d4 + Juízo, e a semente dormente pode ser <strong>acordada</strong> por você depois (à distância, como Ação Livre) — para curar de novo, ou para algo pior.</dd>
+    <dt class="crit">Crít · morde</dt><dd>cura cheia, mas o hóspede acorda com fome — o alvo fica Semeado (1) junto com a cura.</dd>
+    <dt class="crit">Crít · limpo</dt><dd>cura plena, hóspede calmo.</dd>
+    <dt class="crit">Crít · limite</dt><dd>você enxerta algo que a carne não devia aceitar — remova uma condição grave, uma aflição anômala, ou reconstrua um membro perdido (o hóspede vira parte dele para sempre).</dd>
+    <dt class="sobre">Sobrecarga</dt><dd>+1 de Vida = enxerta em um segundo alvo ao alcance.</dd>
+  </dl>
+  <p class="card-note">Toda cura do Germe deixa um inquilino. O que você faz com ele depois é problema de outra cena.</p>
+</article>
+
+<!-- 3. Simbiose -->
+<article id="ger-simbiose" class="card b-ger anchor-target">
+  <div class="card-head"><span class="card-num">3</span><h3 class="card-name">Simbiose <span class="card-sub">· a defesa que se alimenta de você</span></h3></div>
+  <div class="meta">Grau 2 (cresce até o 4) · Carne · 2 de Vida · Ação · Pessoal ou toque · dura a cena</div>
+  <blockquote class="desc">Você cultiva uma coisa viva na própria pele e deixa ela ficar na frente. Ela come o que vinha te ferir. E cada mordida que leva por você, engorda.</blockquote>
+  <dl class="bands">
+    <dt class="falha">Falha</dt><dd>ela nasce com fome errada e morde você — 1 de dano, e Semeado (1) em você.</dd>
+    <dt class="parcial">Parcial</dt><dd>ela come parte do dano dos golpes que te acertam, enquanto durar.</dd>
+    <dt class="total">Total</dt><dd>come mais, e cada golpe que engole <strong>sobe teu Viço</strong> — ela cresce se te baterem.</dd>
+    <dt class="crit">Crít · morde</dt><dd>come faminta demais e leva junto um pedaço seu — cresce, mas teu Viço sobe além do que você queria.</dd>
+    <dt class="crit">Crít · limpo</dt><dd>te cobre bem, a cena toda.</dd>
+    <dt class="crit">Crít · limite</dt><dd>engole um golpe que não devia dar pra engolir — anula por inteiro um único ataque grande, e transborda de Viço.</dd>
+    <dt class="sobre">Sobrecarga</dt><dd>+1 de Vida = ela cobre também um aliado adjacente.</dd>
+  </dl>
+  <div class="escala">
+    <span class="lbl">Escala por Grau (a coisa amadurece num slot só)</span>
+    <ul>
+      <li><b>G2 — ela come:</b> Absorção viva; cada golpe absorvido sobe teu Viço.</li>
+      <li><b>G3 — ela ganha dentes:</b> quem te acerta corpo a corpo se <strong>semeia</strong> no contato (Semeado (1)).</li>
+      <li><b>G4 — ela não te deixa cair:</b> quando você levaria um golpe fatal, ela <strong>te rebrota</strong> — um pedaço seu apodrece e cai, e você renasce dele a 1d4 de Vida no próximo turno.</li>
+    </ul>
+  </div>
+  <p class="card-note">Enquanto teu Viço está alto, ela está grande. Passado o limiar de "virando solo", o mestre decide se ainda é você que a carrega — ou ela que carrega você.</p>
+</article>
+
+<!-- 4. O Jardim -->
+<article id="ger-jardim" class="card b-ger anchor-target">
+  <div class="card-head"><span class="card-num">4</span><h3 class="card-name">O Jardim <span class="card-sub">· a semente que toma o lugar</span></h3></div>
+  <div class="meta">Grau 2 (cresce até o 4) · Carne · 3 de Vida · Ação · área Curta em Médio · até ser queimado ou arrancado</div>
+  <blockquote class="desc">Você semeia o chão. Ele acorda: raízes rachando o piso, dentes onde era grama, umidade morna. E ele não para no tamanho que você plantou — cresce, avança, toma.</blockquote>
+  <dl class="bands">
+    <dt class="falha">Falha</dt><dd>o jardim nasce centrado em <strong>você</strong> e não te reconhece como jardineiro.</dd>
+    <dt class="parcial">Parcial</dt><dd>a área vira terreno vivo e difícil para quem você não nomear.</dd>
+    <dt class="total">Total</dt><dd>e quem termina o turno lá dentro fica <strong>Semeado (1)</strong>; o jardim <strong>cresce</strong> uma área adjacente por rodada, e não expira.</dd>
+    <dt class="crit">Crít · morde</dt><dd>cresce rápido demais e lambe seus aliados junto — todo mundo lá dentro é semeado, amigo ou não.</dd>
+    <dt class="crit">Crít · limpo</dt><dd>cresce forte e obediente, poupando quem você nomear.</dd>
+    <dt class="crit">Crít · limite</dt><dd>o jardim cria fome própria — a cada turno, arrasta um alvo em Curto para dentro dele (raízes que agarram).</dd>
+    <dt class="sobre">Sobrecarga</dt><dd>+1 de Vida = começa maior (área Média).</dd>
+  </dl>
+  <div class="escala">
+    <span class="lbl">Escala por Grau</span>
+    <p>o dano por turno dentro dele sobe (1 → 3), o teto de crescimento aumenta, e no G4 aliados no jardim regeneram enquanto os inimigos afundam.</p>
+  </div>
+</article>
+
+<!-- 5. Praga -->
+<article id="ger-praga" class="card b-ger anchor-target">
+  <div class="card-head"><span class="card-num">5</span><h3 class="card-name">Praga <span class="card-sub">· o que se espalha sozinho</span></h3></div>
+  <div class="meta">Grau 3 · Carne · 2 de Vida + 1 Lucidez · Ação · Curto · não expira</div>
+  <blockquote class="desc">Você não ataca uma pessoa. Você começa uma. A partir daí, ela caminha sozinha, de corpo em corpo, e você nem precisa estar olhando.</blockquote>
+  <dl class="bands">
+    <dt class="falha">Falha</dt><dd>a praga estreia em você — Semeado (1), e você é o paciente zero.</dd>
+    <dt class="parcial">Parcial</dt><dd>o alvo adoece: −1 em tudo, e piora um pouco a cada turno (compõe).</dd>
+    <dt class="total">Total</dt><dd>e a praga <strong>contagia</strong> — quem encostar no doente testa Resistência ou pega também. Cada novo infectado sobe teu Viço.</dd>
+    <dt class="crit">Crít · morde</dt><dd>espalha rápido demais e não escolhe lado — pode pular pra um aliado seu que estava perto.</dd>
+    <dt class="crit">Crít · limpo</dt><dd>espalha limpa, só entre os que você não nomeou.</dd>
+    <dt class="crit">Crít · limite</dt><dd>a praga ganha vontade — persegue ativamente o alvo mais próximo a cada turno, saltando sozinha, até ser queimada de todos.</dd>
+    <dt class="sobre">Sobrecarga</dt><dd>+1 de Vida = começa em dois alvos.</dd>
+  </dl>
+  <p class="card-note">Não tem alcance depois de plantada. Tem vontade. Você larga, e ela anda.</p>
+</article>
+
+<!-- 6. Colheita -->
+<article id="ger-colheita" class="card b-ger anchor-target">
+  <div class="card-head"><span class="card-num">6</span><h3 class="card-name">Colheita <span class="card-sub">· arrancar a safra</span></h3></div>
+  <div class="meta">Grau 3 · Carne · grátis (colhe o Viço) · Ação · você e aliados à vista · instantânea</div>
+  <blockquote class="desc">Tudo que suas sementes comeram, volta. Vivo. Você só precisa abrir e chamar de volta.</blockquote>
+  <dl class="bands">
+    <dt class="efeito">Efeito</dt><dd>gaste o <strong>Viço</strong> acumulado e escolha, ao arrancar a safra:
+      <ul class="subchoice">
+        <li>— <b>Carne:</b> recupere Vida (sua e distribua o excedente entre aliados à vista como enxerto).</li>
+        <li>— <b>Surto:</b> todas as suas sementes ativas dão o dano do turno <strong>agora</strong>, de uma vez.</li>
+        <li>— <b>Arranque:</b> desfaça parte do próprio jardim para <strong>baixar o Viço</strong> de propósito (útil perto de "virando solo").</li>
+      </ul>
+    </dd>
+    <dt class="parcial">Parcial</dt><dd>você colhe, mas incompleto — parte da safra apodrece no caminho (metade do valor).</dd>
+    <dt class="total">Total</dt><dd>colheita cheia.</dd>
+    <dt class="crit">Crít · limpo/limite</dt><dd>a safra rende além da conta — o excedente vira uma semente nova, plantada onde você quiser.</dd>
+    <dt class="falha">Falha</dt><dd>a colheita azeda — você não recupera nada e o Viço não baixa; a carne recusou a mão.</dd>
+  </dl>
+  <p class="card-note">O único jeito de o Viço descer é colhendo. E colher custa a sua ação — enquanto o jardim cresce por conta própria.</p>
+</article>
+
+<!-- 7. Floração -->
+<article id="ger-floracao" class="card b-ger anchor-target">
+  <div class="card-head"><span class="card-num">7</span><h3 class="card-name">Floração <span class="card-sub">· você vira o solo</span></h3></div>
+  <div class="meta">Grau 4 · Carne · 5 de Vida + 3 Lucidez · Ação · área ampla · [Juízo] turnos · 1×/cena</div>
+  <blockquote class="desc">Você se abre inteiro. Não sobra quase nada de humano — mas o que floresce salva ou condena tudo em volta.</blockquote>
+  <dl class="bands">
+    <dt class="efeito">Efeito</dt><dd>rasgue-se e transforme uma área ampla no seu corpo por [Juízo] turnos. Inimigos ali afundam — Semeado, terreno vivo, medo. Aliados regeneram e ficam imunes a novas condições físicas. Suas sementes por toda parte agem sozinhas a cada turno. O <strong>Viço transborda</strong>.</dd>
+    <dt class="parcial">Parcial</dt><dd>a floração pega só em parte da área, e você fica exposto no centro.</dd>
+    <dt class="total">Total</dt><dd>a área inteira é você, plena.</dd>
+    <dt class="crit">Crít · limpo/limite</dt><dd>a floração não quer parar — dura até você mandar, e cada turno arrasta a borda mais para longe.</dd>
+    <dt class="falha">Falha</dt><dd>você se rasga e nada floresce — perde a Vida, ganha Exausto pela cena, e o jardim não veio.</dd>
+  </dl>
+  <p class="card-note">Não custa você virar nada, como o Vazio. Custa você virar tudo — o chão que os outros pisam. É a vida que não sabe a hora de parar.</p>
+</article>
+
+<p class="card-note">As 7 Distorções do Germe. Sete verbos de semeadura — dor, cura, defesa, lugar, contágio, colheita, virar-solo. Todas custam carne; todas alimentam ou gastam o Viço. Nenhuma poderia ser de outro elemento.</p>
+<a class="totop" href="#topo">↑ topo</a>
+</div>
+
+<!-- ═══════════════════════════════════════════ ELEMENTOS A SEGUIR ═══════════════════════════════════════════ -->
+<!--
+  ESTRUTURA PREPARADA para os quatro elementos restantes.
+  Quando as Distorções de cada um forem definidas, preencher o wrapper abaixo com o mesmo molde:
+    <div class="elem-wrap e-XXX"> <h2 class="elem">Nome</h2>
+      <div class="lei">...</div>
+      <div class="comofunciona">...</div>
+      <div class="cond">... condição-assinatura do elemento ...</div>
+      <article class="card b-XXX"> ...cards... </article>
+    </div>
+  e remover a classe "soon" do respectivo <li> no menu lateral.
+-->
+
+<div class="elem-wrap e-pac">
+<a id="pacto" class="anchor-target"></a>
+<h2 class="elem">Pacto ⚖</h2>
+
+<div class="lei"><strong>Lei do Consentimento.</strong> O Pacto não tira nem acrescenta à força. Ele <strong>troca</strong> — e a troca acontece na hora, de graça, sem esforço, sem rolar para pagar. Você recebe primeiro. A conta anota sozinha, num canto, e vence quando você menos quer, cobrando o que você mais tem. A facilidade é a armadilha.</div>
+
+<div class="comofunciona">
+  <h4>Como funciona (vale para todas)</h4>
+  <p>Conjurar um trato <strong>funciona imediatamente</strong> — você não gasta Sintonia, não gasta Vida, não rola para pagar. O que você faz é <strong>assinar</strong>: cada trato soma <strong>Dívida</strong> conforme o tamanho do que você pediu.</p>
+  <table class="degraus">
+    <thead><tr><th>Degrau</th><th>Dívida</th><th>O que é</th></tr></thead>
+    <tbody>
+      <tr><td class="deg">Favor</td><td>+1 Dívida</td><td>um empurrão: um bônus, uma porta que cede, um detalhe que aparece.</td></tr>
+      <tr><td class="deg">Trato</td><td>+2 Dívida</td><td>algo que muda a cena: anular um golpe, mover uma condição, uma chance que não existia.</td></tr>
+      <tr><td class="deg">Milagre</td><td>+4 Dívida</td><td>algo que a ficção não permitia: desfazer, forçar, reescrever um "não" em "sim".</td></tr>
+    </tbody>
+  </table>
+  <p>O teste (<strong>2d6 + Lábia + perícia</strong>) não decide <em>se</em> o trato acontece — decide <em>o quão limpo</em> ele sai:</p>
+  <p class="r"><b>Falha (5−)</b> o trato vale, mas os termos saíram tortos contra você (o mestre lê a letra miúda).</p>
+  <p class="r"><b>Parcial (6–9)</b> o trato pega, com uma condição embutida.</p>
+  <p class="r"><b>Total (10+)</b> negócio limpo, do jeito que você quis.</p>
+  <p class="r"><b>Crítico (dois dados iguais)</b> — <strong>morde</strong> (1-1, 2-2), <strong>limpo</strong> (3-3, 4-4), <strong>limite</strong> (5-5, 6-6).</p>
+  <p style="margin-bottom:0;"><strong>A Dívida</strong> só enche. Você pode <strong>pagar</strong> para adiar — mas o teto é inevitável: ao cruzar o limite, o credor <strong>coleta</strong> sozinho, e cobra o que você tem de mais caro <em>naquele momento</em>. A <strong>Sobrecarga</strong> do Pacto é subir um degrau (pedir mais, assinar mais embaixo).</p>
+</div>
+
+<!-- 1. A Palavra -->
+<article id="pac-palavra" class="card b-pac anchor-target">
+  <div class="card-head"><span class="card-num">1</span><h3 class="card-name">A Palavra <span class="card-sub">· o aperto de mão</span></h3></div>
+  <div class="auto">Automática do Marcado pelo Pacto.</div>
+  <div class="meta">Grau 1 (cresce até o 4) · Lábia · soma +1 Dívida (Favor) · Ação · Curto</div>
+  <blockquote class="desc">Você propõe. O outro topa — um aperto de mão, um "eu topo", um aceno. E a partir daí a palavra vale: quem quebrar, paga.</blockquote>
+  <dl class="bands">
+    <dt class="efeito">Como funciona</dt><dd>ofereça a alguém (aliado, inimigo ou NPC) um trato concreto — passagem, silêncio, uma trégua, uma cobertura, ou, em luta, <em>"aceita não fugir"</em>, <em>"topa largar a arma"</em>. Se o outro <strong>aceita</strong>, o trato sela: quem <strong>cumpre</strong> ganha um leve empurrão; quem <strong>quebra</strong> sofre a consequência combinada, automática, sem rolar.</dd>
+    <dt class="efeito">Sobre inimigos</dt><dd>eles podem recusar — A Palavra não força (nos Graus baixos). A arte é oferecer um trato bom demais pra recusar.</dd>
+    <dt class="falha">Falha</dt><dd>o outro achou que topou uma coisa, você achou que ele topou outra — vale, mas torto contra você.</dd>
+    <dt class="crit">Crít · morde</dt><dd>ele topa fundo, mas você ficou preso a uma cláusula que não viu.</dd>
+    <dt class="crit">Crít · limpo</dt><dd>sela exatamente como você quis.</dd>
+    <dt class="crit">Crít · limite</dt><dd>você sela um trato que ninguém sensato aceitaria — o alvo concorda contra os próprios interesses, e não entende por quê.</dd>
+    <dt class="sobre">Sobrecarga</dt><dd>não tem — A Palavra é o gesto simples.</dd>
+  </dl>
+  <div class="escala">
+    <span class="lbl">Escala por Grau (a Distorção cresce num slot só)</span>
+    <ul>
+      <li><b>G1:</b> trato leve; o inimigo pode recusar.</li>
+      <li><b>G2:</b> o empurrão de cumprir e o castigo de quebrar ficam maiores; prende em combate se aceito.</li>
+      <li><b>G3:</b> você pode <strong>forçar o aceite</strong> de um trato pequeno (o alvo testa para recusar).</li>
+      <li><b>G4:</b> o trato aceito vira <strong>corrente</strong> — quebrá-lo custa caro o bastante para travar o alvo por completo na ação proibida.</li>
+    </ul>
+  </div>
+</article>
+
+<!-- 2. Toma Lá, Dá Cá -->
+<article id="pac-tomaladaca" class="card b-pac anchor-target">
+  <div class="card-head"><span class="card-num">2</span><h3 class="card-name">Toma Lá, Dá Cá <span class="card-sub">· muda de dono</span></h3></div>
+  <div class="meta">Grau 2 (cresce até o 4) · Lábia · soma +2 Dívida (Trato) · Ação · Curto</div>
+  <blockquote class="desc">Nada se cura. Nada some. Só muda de dono. A ferida que era dele passa a ser de outro; a maldição troca de ombros; o que pesava aqui pesa ali.</blockquote>
+  <dl class="bands">
+    <dt class="falha">Falha</dt><dd>a troca respinga em você — parte do que você movia gruda no seu próprio ombro.</dd>
+    <dt class="parcial">Parcial</dt><dd>mova um dano recém-sofrido, ou uma condição, de um alvo para outro ao alcance.</dd>
+    <dt class="total">Total</dt><dd>mova algo maior, ou já instalado há mais tempo — uma condição grave, um efeito contínuo, uma dívida alheia.</dd>
+    <dt class="crit">Crít · morde</dt><dd>a troca funciona, mas abre uma porta: quem recebeu pode, depois, devolver a você.</dd>
+    <dt class="crit">Crít · limpo</dt><dd>troca limpa, exatamente de quem para quem você quis.</dd>
+    <dt class="crit">Crít · limite</dt><dd>você move o que não se move — a morte iminente de um aliado para um inimigo, o alvo de um efeito que já "escolheu" quem atingir.</dd>
+    <dt class="sobre">Sobrecarga</dt><dd>subir para <strong>Milagre</strong> (+4) = mova de/para todos ao alcance de uma vez.</dd>
+  </dl>
+</article>
+
+<!-- 3. Fiança -->
+<article id="pac-fianca" class="card b-pac anchor-target">
+  <div class="card-head"><span class="card-num">3</span><h3 class="card-name">Fiança <span class="card-sub">· a conta é minha</span></h3></div>
+  <div class="meta">Grau 1 (cresce até o 4) · Lábia · soma +1 Dívida (Favor), ou +2 se for grande · Reação · Curto</div>
+  <blockquote class="desc">Alguém ia pagar. Você se mete na frente e assina por ele. O dano não some — vira sua conta.</blockquote>
+  <dl class="bands">
+    <dt class="falha">Falha</dt><dd>você cobre, mas cobre demais — assume também um fiapo de algo que não era seu.</dd>
+    <dt class="parcial">Parcial</dt><dd>anule um dano ou condição que atingiria você ou um aliado ao alcance; a Dívida é sua.</dd>
+    <dt class="total">Total</dt><dd>anule algo maior, ou cubra vários aliados do mesmo golpe.</dd>
+    <dt class="crit">Crít · morde</dt><dd>você cobre e cobre bem, mas o credor gosta de você agora — sua próxima Dívida vem um degrau acima.</dd>
+    <dt class="crit">Crít · limpo</dt><dd>cobertura plena, conta na medida.</dd>
+    <dt class="crit">Crít · limite</dt><dd>você afiança o inafiançável — cubra uma morte, uma perda permanente, um apagamento; adia o irreversível para si.</dd>
+    <dt class="sobre">Sobrecarga</dt><dd>+1 degrau de Dívida = estenda a fiança pela cena (tudo que atingir os cobertos, você assume).</dd>
+  </dl>
+</article>
+
+<!-- 4. A Cobrança -->
+<article id="pac-cobranca" class="card b-pac anchor-target">
+  <div class="card-head"><span class="card-num">4</span><h3 class="card-name">A Cobrança <span class="card-sub">· você não bate, cobra</span></h3></div>
+  <div class="meta">Grau 2 (cresce até o 4) · Lábia · soma +1 Dívida (Favor) · Ação · Curto · dura enquanto o alvo dever</div>
+  <blockquote class="desc">Você não levanta a mão. Levanta uma fatura. E a partir daí, cada coisa que ele faz contra você, ele paga.</blockquote>
+  <dl class="bands">
+    <dt class="falha">Falha</dt><dd>a fatura sai no seu nome — você é quem começa devendo ao alvo.</dd>
+    <dt class="parcial">Parcial</dt><dd>marque um inimigo como <strong>devedor</strong>: quando ele age contra você (ataca, foge, quebra uma condição sua), sofre um preço.</dd>
+    <dt class="total">Total</dt><dd>o preço é maior, e a dívida dele com você <strong>rende</strong> — cresce a cada vez que ele age contra você.</dd>
+    <dt class="crit">Crít · morde</dt><dd>ele começa a pagar, mas a cobrança te expõe — ele sabe exatamente quem é o credor, e vem atrás.</dd>
+    <dt class="crit">Crít · limpo</dt><dd>a fatura gruda limpa, ele paga sem saber por quê.</dd>
+    <dt class="crit">Crít · limite</dt><dd>você cobra algo que ele não pode pagar sem se arruinar — a próxima ação hostil dele o custa uma capacidade, um aliado, ou a própria posição.</dd>
+    <dt class="sobre">Sobrecarga</dt><dd>+1 degrau = marque um segundo devedor.</dd>
+  </dl>
+</article>
+
+<!-- 5. A Letra Miúda -->
+<article id="pac-letramiuda" class="card b-pac anchor-target">
+  <div class="card-head"><span class="card-num">5</span><h3 class="card-name">A Letra Miúda <span class="card-sub">· o trato-armadilha</span></h3></div>
+  <div class="meta">Grau 3 · Lábia · soma +2 Dívida (Trato) — mas só quando a armadilha dispara · Ação · Curto · dorme até disparar</div>
+  <blockquote class="desc">Todo trato tem uma linha lá embaixo que ninguém lê. Você é quem escreve essa linha. Ela dorme, sorrindo, até a hora certa.</blockquote>
+  <dl class="bands">
+    <dt class="efeito">Como funciona</dt><dd>plante uma <strong>cláusula escondida</strong> num trato — um seu, um de A Palavra, ou aproveitando um trato que o alvo já fez. Você define a condição secreta; quando ela dispara, cobra, e só então a Dívida entra na sua conta.</dd>
+    <dt class="falha">Falha</dt><dd>você se atrapalha na própria letra — a cláusula dispara contra você quando menos espera.</dd>
+    <dt class="parcial">Parcial</dt><dd>a armadilha pega, mas o alvo sente o cheiro — desconfia que há algo escrito embaixo.</dd>
+    <dt class="total">Total</dt><dd>a cláusula dorme perfeita e invisível até a condição que você quis.</dd>
+    <dt class="crit">Crít · morde</dt><dd>dispara devastadora, mas o mestre ganha uma letra miúda <strong>sua</strong> para usar depois.</dd>
+    <dt class="crit">Crít · limpo</dt><dd>dispara exatamente como planejado.</dd>
+    <dt class="crit">Crít · limite</dt><dd>você embute uma cláusula que reescreve o trato inteiro no gatilho — no momento certo, o trato vira algo completamente diferente, a seu favor.</dd>
+    <dt class="sobre">Sobrecarga</dt><dd>+1 degrau = a cláusula, ao disparar, salta para um segundo trato próximo.</dd>
+  </dl>
+</article>
+
+<!-- 6. O Grande Contrato -->
+<article id="pac-contrato" class="card b-pac anchor-target">
+  <div class="card-head"><span class="card-num">6</span><h3 class="card-name">O Grande Contrato <span class="card-sub">· o milagre</span></h3></div>
+  <div class="meta">Grau 4 · Lábia · soma Dívida catastrófica (coleta ao fim da cena) · Ação · o que você conseguir nomear · 1×/cena</div>
+  <blockquote class="desc">Você pede o impossível. E o impossível vem, pontual, educado, perfeito. A única pergunta que sobra é o preço — e o preço já está a caminho.</blockquote>
+  <dl class="bands">
+    <dt class="efeito">Efeito</dt><dd>peça algo que a ficção não permite — ressuscitar, reescrever um acontecimento, forçar um "sim" absoluto, mover uma cena inteira a seu favor. Acontece. A Dívida resultante é enorme e <strong>coleta ao fim desta cena</strong>, sem apelação: o credor cobra o que você tem de mais caro naquele momento.</dd>
+    <dt class="parcial">Parcial</dt><dd>o milagre acontece, mas incompleto ou com um efeito colateral que o mestre escolhe.</dd>
+    <dt class="total">Total</dt><dd>o impossível, pleno, exatamente como pedido.</dd>
+    <dt class="crit">Crít · limpo/limite</dt><dd>o milagre vem, e o credor "arredonda a seu favor" — um brinde que parece bom demais (e talvez seja).</dd>
+    <dt class="falha">Falha</dt><dd>o contrato é assinado, a Dívida entra na conta assim mesmo — e o milagre vem torto, cumprindo a letra e traindo a intenção.</dd>
+  </dl>
+  <p class="card-note">Não custa nada na hora. Nunca custa. É esse o problema.</p>
+</article>
+
+<p class="card-note">As 6 Distorções do Pacto. Seis tratos — a palavra, a troca, a fiança, a cobrança, a armadilha, o milagre. Nenhum bate direto; nenhum custa nada na hora; todos somam Dívida. Nenhum poderia ser de outro elemento.</p>
+<a class="totop" href="#topo">↑ topo</a>
+</div>
+
+<div class="elem-wrap e-asc">
+<a id="ascensao" class="anchor-target"></a>
+<h2 class="elem">Ascensão ⌬</h2>
+
+<div class="lei"><strong>Lei da Predação.</strong> A Ascensão não melhora você com paciência. Ela te ensina uma regra só: para subir, devore quem está abaixo. Com fome? Mate e coma. Quer algo? Pegue, e abra quem estiver no caminho. Cada coisa que você arranca de uma presa vira sua — garra, força, um pedaço de carne que funciona melhor que a sua. Por cima, ferro e crômio; por baixo, um bicho que não conhece a palavra <em>chega</em>.</div>
+
+<div class="comofunciona">
+  <h4>Como funciona (vale para todas)</h4>
+  <p>Conjurar é um teste de <strong>2d6 + Carne + perícia</strong> contra o Limiar. O resultado diz <em>o quão fundo o bicho vai</em>:</p>
+  <p class="r"><b>Falha (5−)</b> a fome te trai — a carne se rebela, ou você ataca o errado.</p>
+  <p class="r"><b>Parcial (6–9)</b> funciona, mas suja, incompleto, com sangue seu no meio.</p>
+  <p class="r"><b>Total (10+)</b> você abre a presa limpo.</p>
+  <p class="r"><b>Crítico (dois dados iguais)</b> — <strong>morde</strong> (1-1, 2-2), <strong>limpo</strong> (3-3, 4-4), <strong>limite</strong> (5-5, 6-6).</p>
+  <p>A <strong>Perfeição</strong> não sobe treinando. Sobe <strong>matando e devorando o mais fraco</strong>: abata uma presa abaixo de você e consuma-a, e você cresce um degrau — para sempre. Matar iguais ou mais fortes te <em>alimenta</em> (te cura, mata a fome), mas não te <em>eleva</em>: só o fraco vira escada. Cada grau troca um pedaço de gente por um pedaço de predador, e encolhe sua sanidade — a mente da pessoa sendo comida pela mente da fera.</p>
+  <p>O <strong>Controle</strong>: quanto mais alto você sobe, mais o mestre narra o que a fome quer. No fim, não é você que caça — é a caça acontecendo através de você.</p>
+  <p style="margin-bottom:0;">A <strong>Sobrecarga</strong> é sempre uma compra.</p>
+</div>
+
+<!-- 1. Afiar a Carne -->
+<article id="asc-afiar" class="card b-asc anchor-target">
+  <div class="card-head"><span class="card-num">1</span><h3 class="card-name">Afiar a Carne <span class="card-sub">· o corpo vira arma</span></h3></div>
+  <div class="auto">Automática do Marcado pela Ascensão.</div>
+  <div class="meta">Grau 1 (cresce até o 4) · Carne · 1 Sintonia · Ação · Pessoal</div>
+  <blockquote class="desc">Você agarra a própria carne e a reforma no que precisa: o osso vira lâmina rompendo a pele, os dedos viram garra, os dentes crescem. Dói. Você aprendeu a gostar da dor.</blockquote>
+  <dl class="bands">
+    <dt class="falha">Falha</dt><dd>a carne se reforma errada e trava — a parte afiada fica presa, inútil, 1 de dano em você até você a arrancar.</dd>
+    <dt class="parcial">Parcial</dt><dd>uma parte sua vira arma até o fim da cena — garra, presa, esporão. Ataque corpo a corpo que rasga.</dd>
+    <dt class="total">Total</dt><dd>vira arma melhor, e o primeiro golpe com ela abre a presa fundo (dano extra, sangramento).</dd>
+    <dt class="crit">Crít · morde</dt><dd>a arma nasce faminta e te muda — funciona lindo, mas aquela parte <strong>nunca mais volta a ser gentil</strong> (some um gesto humano seu: um toque, um afago, algo que a mão fazia).</dd>
+    <dt class="crit">Crít · limpo</dt><dd>a arma nasce perfeita, sem cauda.</dd>
+    <dt class="crit">Crít · limite</dt><dd>o corpo inteiro se rearma por um instante — você vira uma coisa de lâminas por [Juízo] turnos, e nada corpo a corpo chega perto sem se cortar.</dd>
+    <dt class="sobre">Sobrecarga</dt><dd>+1 Sintonia = afie duas partes de uma vez.</dd>
+  </dl>
+  <div class="escala">
+    <span class="lbl">Escala por Grau (a carne aprende num slot só)</span>
+    <ul>
+      <li><b>G1:</b> uma arma simples (garra, presa), dano corpo a corpo.</li>
+      <li><b>G2:</b> a arma alcança um pouco (tentáculo, esporão longo), e sangra a presa.</li>
+      <li><b>G3:</b> a arma vira metal-osso — ignora parte da Absorção, e a carne trocada some do humano de vez.</li>
+      <li><b>G4:</b> o corpo é um arsenal — múltiplos ataques por turno, e você escolhe a arma para cada presa.</li>
+    </ul>
+  </div>
+</article>
+
+<!-- 2. Devorar -->
+<article id="asc-devorar" class="card b-asc anchor-target">
+  <div class="card-head"><span class="card-num">2</span><h3 class="card-name">Devorar <span class="card-sub">· comer para subir</span></h3></div>
+  <div class="meta">Grau 1 (cresce até o 4) · Carne · 1 Sintonia · Ação (sobre uma presa abatida) · Toque</div>
+  <blockquote class="desc">Você abre a presa e come o que ela tinha de melhor. A força dela vira sua força. A velocidade dela, sua. Por um tempo, você é ela também — e ela não é mais nada.</blockquote>
+  <dl class="bands">
+    <dt class="efeito">Como funciona</dt><dd>sobre uma presa que <strong>você já abateu</strong>, gaste a ação e consuma. Você ganha, <strong>até o fim da cena</strong>, o que ela tinha de melhor — uma perícia, um traço, uma capacidade, um pedaço de poder. Só <strong>uma refeição por vez</strong>: comer outra descarta a anterior. Se a presa era <strong>mais fraca que você</strong>, você também <strong>sobe 1 de Perfeição</strong>. Se era igual ou mais forte, você se cura e mata a fome, mas não sobe.</dd>
+    <dt class="falha">Falha</dt><dd>você come afoito e engasga — a carne dela te faz mal (1 de dano) e você não aproveita nada.</dd>
+    <dt class="parcial">Parcial</dt><dd>você absorve o traço dela, mas cru — funciona com −1, ou some antes do fim da cena.</dd>
+    <dt class="total">Total</dt><dd>absorção plena até o fim da cena.</dd>
+    <dt class="crit">Crít · morde</dt><dd>você come demais e a presa come de volta — ganha o poder dela, mas leva junto uma mania, um medo ou uma lembrança dela que agora é sua.</dd>
+    <dt class="crit">Crít · limpo</dt><dd>refeição perfeita.</dd>
+    <dt class="crit">Crít · limite</dt><dd>você digere algo que não devia poder ser digerido — um traço sobre-humano, um fragmento de poder anômalo — e o mestre decide se <strong>esse</strong> fica para sempre (e o que ele te custa).</dd>
+    <dt class="sobre">Sobrecarga</dt><dd>+1 Sintonia = a refeição também recupera Vida sua.</dd>
+  </dl>
+</article>
+
+<!-- 3. O Topo da Cadeia -->
+<article id="asc-topo" class="card b-asc anchor-target">
+  <div class="card-head"><span class="card-num">3</span><h3 class="card-name">O Topo da Cadeia <span class="card-sub">· o predador que os outros reconhecem</span></h3></div>
+  <div class="meta">Grau 2 (cresce até o 4) · Carne · 1 Sintonia · Ação · Curto</div>
+  <blockquote class="desc">Você para de fingir que é um deles. O cheiro muda, o jeito de olhar muda, e os menores sentem no osso: chegou algo que come coisas como eles.</blockquote>
+  <dl class="bands">
+    <dt class="falha">Falha</dt><dd>você exala forte demais e chama a atenção errada — algo maior também percebe o predador na sala.</dd>
+    <dt class="parcial">Parcial</dt><dd>os mais fracos que você (Perfeição maior que a Vontade deles) hesitam — não conseguem te atacar primeiro, recuam um passo.</dd>
+    <dt class="total">Total</dt><dd>eles congelam como presa — perdem a ação, ou se submetem, ou fogem. <em>(Sobe o Controle: você os olhou como comida, e a fome gostou.)</em></dd>
+    <dt class="crit">Crít · morde</dt><dd>todos os fracos ao redor se curvam — mas a fome fala mais alto, e o mestre ganha voz no seu Controle agora.</dd>
+    <dt class="crit">Crít · limpo</dt><dd>domínio limpo sobre os fracos, sem custo.</dd>
+    <dt class="crit">Crít · limite</dt><dd>até algo que <strong>não</strong> era mais fraco sente o arrepio — um inimigo forte perde o primeiro turno, encarando o que você virou.</dd>
+    <dt class="sobre">Sobrecarga</dt><dd>+1 Sintonia = o medo alcança uma área, não um alvo.</dd>
+  </dl>
+</article>
+
+<!-- 4. Frenesi -->
+<article id="asc-frenesi" class="card b-asc anchor-target">
+  <div class="card-head"><span class="card-num">4</span><h3 class="card-name">Frenesi <span class="card-sub">· queimar a mente por força</span></h3></div>
+  <div class="meta">Grau 2 (cresce até o 4) · Carne · queima Lucidez (você escolhe quanto) · Ação · Pessoal · [Juízo] turnos</div>
+  <blockquote class="desc">Você deixa a fome tomar o volante. Não é uma decisão de quanta força você quer — é de quanto de você mesmo você está disposto a queimar pra ter ela. E a mente não volta.</blockquote>
+  <dl class="bands">
+    <dt class="efeito">Como funciona</dt><dd>ao entrar, <strong>queime pontos de Lucidez</strong> — cada ponto te dá <strong>+1 passo acima do seu grau</strong> (mais ataques, mais velocidade, mais brutalidade) por [Juízo] turnos. Você decide a dose: um gole ou a garrafa. A Lucidez gasta <strong>não volta</strong> nesta cena.</dd>
+    <dt class="falha">Falha</dt><dd>(ao tentar segurar a fome) você não controla a dose — queima mais Lucidez do que queria.</dd>
+    <dt class="parcial">Parcial</dt><dd>o frenesi vem, mas turvo — você age acima do grau, mas com −1 em qualquer coisa que não seja atacar.</dd>
+    <dt class="total">Total</dt><dd>frenesi pleno, você é uma tempestade pela duração.</dd>
+    <dt class="crit">Crít · morde</dt><dd>a fome é gloriosa e voraz — força enorme, mas você desce um degrau a mais rumo ao Controle do mestre.</dd>
+    <dt class="crit">Crít · limpo</dt><dd>frenesi limpo, na dose exata.</dd>
+    <dt class="crit">Crít · limite</dt><dd>por um instante você toca a Forma Final sem pagar a metamorfose — aja como se estivesse vários graus acima, com uma capacidade impossível, até o frenesi passar.</dd>
+    <dt class="sobre">Sobrecarga</dt><dd>não tem — a dose já é a Lucidez que você queima.</dd>
+  </dl>
+  <p class="card-note">Quanto mais perfeito você é, menos sanidade sobra pra queimar. O predador no auge tem pouca mente pra gastar — e sabe disso.</p>
+</article>
+
+<!-- 5. Vestir a Carne -->
+<article id="asc-vestir" class="card b-asc anchor-target">
+  <div class="card-head"><span class="card-num">5</span><h3 class="card-name">Vestir a Carne <span class="card-sub">· usar um corpo maior</span></h3></div>
+  <div class="meta">Grau 3 · Carne · 2 Sintonia + 1 Lucidez · Ação (agarrando o corpo) · Toque · Cena ou até sair</div>
+  <blockquote class="desc">Você não se funde com a máquina como quem opera. Você se enfia nela — ou na fera, ou no morto grande — e a veste como pele. Ela vira seu corpo estendido, e você não quer mais tirar.</blockquote>
+  <dl class="bands">
+    <dt class="falha">Falha</dt><dd>você se enfia errado e fica preso meio dentro — 1 de dano e Lento até se arrancar.</dd>
+    <dt class="parcial">Parcial</dt><dd>você veste o corpo e o move com esforço (+1 para operá-lo); colisões e ferimentos dele respingam metade em você.</dd>
+    <dt class="total">Total</dt><dd>fusão plena — você opera o corpo grande como o seu, manobras impossíveis viram triviais, e a força/tamanho dele é sua pela cena.</dd>
+    <dt class="crit">Crít · morde</dt><dd>o corpo desperta junto e gosta de você — poderosíssimo, mas sair agora exige um teste difícil (ele não quer te soltar).</dd>
+    <dt class="crit">Crít · limpo</dt><dd>você veste e tira à vontade.</dd>
+    <dt class="crit">Crít · limite</dt><dd>você veste algo que não devia caber em ninguém — uma estrutura enorme, uma fera anômala — e o pilota inteiro pela cena.</dd>
+    <dt class="sobre">Sobrecarga</dt><dd>+1 Sintonia = a carne vestida também se afia (ganha uma arma de Afiar a Carne).</dd>
+  </dl>
+</article>
+
+<!-- 6. Não Sinto Mais -->
+<article id="asc-naosinto" class="card b-asc anchor-target">
+  <div class="card-head"><span class="card-num">6</span><h3 class="card-name">Não Sinto Mais <span class="card-sub">· trocar o que sente pelo que aguenta</span></h3></div>
+  <div class="meta">Grau 3 (cresce até o 4) · Carne · 2 Sintonia · Ação · Pessoal · Cena</div>
+  <blockquote class="desc">Você arranca a carne que dói e põe no lugar a carne que só funciona. Não sente o golpe. Não sente o medo. Não sente a mão de ninguém, também — mas isso você já nem lembra que sentia.</blockquote>
+  <dl class="bands">
+    <dt class="falha">Falha</dt><dd>você tira a carne errada — fica dormente onde não devia, −1 até o fim da cena.</dd>
+    <dt class="parcial">Parcial</dt><dd>ignore dor e medo pela cena; o dano ainda entra, mas não te para.</dd>
+    <dt class="total">Total</dt><dd>ignore dor, medo, e reduza todo dano recebido — você luta como coisa, não como gente. <em>(Some, enquanto durar, uma capacidade de</em> sentir<em>: você não se assusta, não se comove, não sente o toque de um aliado.)</em></dd>
+    <dt class="crit">Crít · morde</dt><dd>você fica imune ao sofrimento — mas um pedaço do que você trocou <strong>não volta</strong> depois da cena. Ganhou couraça, perdeu gente.</dd>
+    <dt class="crit">Crít · limpo</dt><dd>invulnerabilidade limpa pela cena.</dd>
+    <dt class="crit">Crít · limite</dt><dd>por [Juízo] turnos nada te fere de verdade — você é a estátua discutindo por que deveria rachar. E depois, o mestre diz o que da sua humanidade ficou dormente para sempre.</dd>
+    <dt class="sobre">Sobrecarga</dt><dd>+1 Sintonia = estenda a dormência a um aliado (ele também não sente — o bom e o ruim).</dd>
+  </dl>
+  <div class="escala">
+    <span class="lbl">Escala por Grau</span>
+    <p>G3 ignora dor/medo e reduz dano; G4 você simplesmente não cai enquanto a fome tiver a quem devorar — mas cada vez que isso te salva, some mais um pedaço do que fazia de você alguém.</p>
+  </div>
+</article>
+
+<!-- 7. A Forma Final -->
+<article id="asc-formafinal" class="card b-asc anchor-target">
+  <div class="card-head"><span class="card-num">7</span><h3 class="card-name">A Forma Final <span class="card-sub">· o predador se completa</span></h3></div>
+  <div class="meta">Grau 4 · Carne · Perfeição no máximo + a última refeição · Ação · 1×/personagem</div>
+  <blockquote class="desc">A carne humana acaba. O que sobe do sangue não é você melhorado — é a coisa que você vinha alimentando esse tempo todo, de pé, faminta, magnífica. Você ainda está aí dentro. Só não manda mais em tudo.</blockquote>
+  <dl class="bands">
+    <dt class="efeito">Efeito</dt><dd>quando a Perfeição chega ao topo, você <strong>termina de virar</strong>. Ganha uma <strong>ficha nova</strong> — a Forma Final: poderosíssima, cheia das armas e traços de tudo que você devorou. Você continua jogando. Mas <em>quem ela é</em> — o que ela deseja, quem ela vê como comida — foi escrito por cada presa que você comeu no caminho, e o mestre segura essa fome. Você pilota um predador-deus; ele já tem vontade própria.</dd>
+    <dt class="efeito">Como se chega</dt><dd>não se conjura por impulso — chega-se, pela Lei da Predação, devorando até o topo. A cena da metamorfose é o clímax do arco do personagem.</dd>
+    <dt class="total">O que você ganha</dt><dd>a forma, as armas, a escala.</dd>
+    <dt class="falha">O que você perde</dt><dd>o direito de decidir sozinho o que essa forma quer — o mestre narra os impulsos, e você joga contra eles (ou com eles) pelo resto da história.</dd>
+  </dl>
+  <p class="card-note">Você venceu. Comeu o mundo inteiro até virar o topo da cadeia. Só sobrou uma presa que você ainda não tinha comido: você.</p>
+</article>
+
+<p class="card-note">As 7 Distorções da Ascensão. Sete formas de devorar — afiar, comer, dominar, enfrenesir, vestir, deixar de sentir, completar-se. A predação é o motor; o crômio é só verniz; a fome come dos dois lados até não sobrar ninguém, nem lá fora nem aqui dentro. Nenhuma poderia ser de outro elemento.</p>
+<a class="totop" href="#topo">↑ topo</a>
+</div>
+
+<div class="elem-wrap e-obs">
+<a id="observacao" class="anchor-target"></a>
+<h2 class="elem">Observação ⊙</h2>
+
+<div class="lei"><strong>Lei do Registro.</strong> Olhar é ter. O que você vê através da Observação fica gravado — revisitável, transmissível, seu. Mas olhar o que não devia tem preço: <strong>o que você encara, encara você de volta.</strong> Quanto mais fundo você vê o oculto, mais o oculto repara em você.</div>
+
+<div class="comofunciona">
+  <h4>Como funciona (vale para todas)</h4>
+  <p>Conjurar é um teste de <strong>2d6 + Juízo + perícia</strong> contra o Limiar.</p>
+  <p class="r"><b>Falha (5−)</b> você vê o que não é, ou é visto primeiro.</p>
+  <p class="r"><b>Parcial (6–9)</b> você vê, mas incompleto, ou o olhar deixa rastro.</p>
+  <p class="r"><b>Total (10+)</b> registro limpo.</p>
+  <p class="r"><b>Crítico (dois dados iguais)</b> — <strong>morde</strong> (1-1, 2-2), <strong>limpo</strong> (3-3, 4-4), <strong>limite</strong> (5-5, 6-6).</p>
+  <p><strong>Foco</strong> é o seu recurso — a atenção acumulada, a bala. Sobe quando você <strong>Observa</strong> ou passa um turno só olhando; você o <strong>gasta</strong> nas Distorções.</p>
+  <p><strong>Vigiado</strong> é o estado do alvo — a mira. Mede quanta atenção sua está cravada nele, e escala a paranoia dele. Não é gasto quando você conjura.</p>
+  <p><strong>Exposição</strong> é o preço externo — o quanto o oculto reparou em você. Sobe quando você usa a Observação sobre o <strong>oculto/anômalo</strong> (olhar o mundo comum é grátis). Ela esfria se você para de espiar o oculto — mas cada vez que ela transborda, algo lá fora te acha, e <strong>nunca mais te esquece</strong>.</p>
+  <p>A <strong>Lucidez</strong> que a Observação custa não volta com descanso: é o preço interno, a mente que grava e não apaga.</p>
+  <p style="margin-bottom:0;">A <strong>Sobrecarga</strong> é sempre uma compra.</p>
+</div>
+
+<div class="cond">
+  <span class="lbl">Vigiado — a condição do alvo</span>
+  <p>O alvo se sente observado, e a sensação cresce com o Foco cravado nele. <strong>Baixo:</strong> ele checa os cantos, hesita — −1 em furtividade e concentração. <strong>Médio:</strong> não vira as costas, não surpreende ninguém, −1 em tudo. <strong>Alto:</strong> não consegue mentir na sua presença, age por último, e o mestre narra a paranoia — ele não descansa, não guarda um pensamento só seu. Ser olhado assim é insuportável, e ele sabe que você é a fonte.</p>
+</div>
+
+<!-- 1. Observar -->
+<article id="obs-observar" class="card b-obs anchor-target">
+  <div class="card-head"><span class="card-num">1</span><h3 class="card-name">Observar <span class="card-sub">· o ato-raiz</span></h3></div>
+  <div class="auto">Automática do Marcado pela Observação.</div>
+  <div class="meta">Grau 1 · Juízo · grátis (ganha Foco) · Ação Livre (1×/turno)</div>
+  <blockquote class="desc">Você fixa a atenção num alvo, numa cena, num objeto. E ele começa a ser seu.</blockquote>
+  <dl class="bands">
+    <dt class="efeito">Efeito</dt><dd>observe algo — <strong>ganhe 1 Foco</strong>, e o mestre responde uma pergunta sua sobre o alvo (o que é, o que esconde, o que teme). Atenção cravada numa criatura impõe <strong>Vigiado</strong>.</dd>
+    <dt class="efeito">Passiva</dt><dd>você é imune a surpresa e emboscada; percebe o disfarçado, o deslocado, o fora do lugar; sua memória do que já observou é perfeita e permanente.</dd>
+    <dt class="falha">Falha</dt><dd>você vê o que esperava ver, não o que é — o mestre te dá uma leitura errada e convincente.</dd>
+    <dt class="crit">Crít · morde</dt><dd>você lê fundo, mas o olhar foi longe demais — sobe Exposição (algo notou você observando).</dd>
+    <dt class="crit">Crít · limpo</dt><dd>duas respostas em vez de uma.</dd>
+    <dt class="crit">Crít · limite</dt><dd>você lê algo que o alvo não sabe sobre si mesmo.</dd>
+    <dt class="sobre">Sobre o oculto</dt><dd>observar algo anômalo sobe <strong>Exposição</strong>.</dd>
+  </dl>
+</article>
+
+<!-- 2. Ponto Exato -->
+<article id="obs-ponto" class="card b-obs anchor-target">
+  <div class="card-head"><span class="card-num">2</span><h3 class="card-name">Ponto Exato <span class="card-sub">· o dano que é conhecimento</span></h3></div>
+  <div class="meta">Grau 2 (cresce até o 4) · Juízo · 2 Foco · Ação · contra alvo Observado</div>
+  <blockquote class="desc">Você não acerta em algum lugar. Acerta no único lugar que importa — porque você já estudou onde ele quebra.</blockquote>
+  <dl class="bands">
+    <dt class="falha">Falha</dt><dd>você mira o ponto errado — o ataque erra feio, e o alvo percebe que você o estudava.</dd>
+    <dt class="parcial">Parcial</dt><dd>acerto certeiro, ignora metade da Absorção, dano cheio.</dd>
+    <dt class="total">Total</dt><dd>acerto automático, ignora toda a Absorção, dano máximo, e aplica uma condição (Sangrando, Cego, Lento, Atordoado).</dd>
+    <dt class="crit">Crít · morde</dt><dd>você acerta o ponto perfeito, mas se expôs pra isso — o alvo (ou algo perto) agora sabe exatamente onde <em>você</em> está.</dd>
+    <dt class="crit">Crít · limpo</dt><dd>o ponto exato, limpo.</dd>
+    <dt class="crit">Crít · limite</dt><dd>você acerta um ponto que não devia existir — desliga uma capacidade do alvo, não só o fere.</dd>
+    <dt class="sobre">Sobrecarga</dt><dd>+1 Foco = um segundo alvo Observado.</dd>
+  </dl>
+  <div class="escala">
+    <span class="lbl">Escala por Grau</span>
+    <p>o quanto você ignora de Absorção e a força da condição sobem; no G4, um Ponto Exato contra alvo em Vigiado alto é sempre crítico.</p>
+  </div>
+</article>
+
+<!-- 3. Ler a Página -->
+<article id="obs-ler" class="card b-obs anchor-target">
+  <div class="card-head"><span class="card-num">3</span><h3 class="card-name">Ler a Página <span class="card-sub">· pessoas e cenas se abrem</span></h3></div>
+  <div class="meta">Grau 2 · Juízo · 2 Foco (3 para o porquê) · Ação · Curto</div>
+  <blockquote class="desc">Você olha e o alvo se lê como página aberta: o que teme, o que esconde, o que vai fazer. Ou olha um lugar, e o que aconteceu ali se remonta diante de você.</blockquote>
+  <dl class="bands">
+    <dt class="falha">Falha</dt><dd>a página está borrada — você lê uma coisa que parece verdade e não é.</dd>
+    <dt class="parcial">Parcial</dt><dd>leia uma coisa clara sobre o alvo (um medo, um segredo, a próxima intenção) — ou reconstrua o essencial do que aconteceu num local.</dd>
+    <dt class="total">Total</dt><dd>leia fundo — a sequência inteira de uma cena, quem esteve, o que foi dito ou levado; num alvo vivo, sua próxima ação antes dele.</dd>
+    <dt class="crit">Crít · morde</dt><dd>você lê tudo, mas mergulhou fundo demais — sobe Exposição, e o alvo sente que foi devassado.</dd>
+    <dt class="crit">Crít · limpo</dt><dd>leitura completa e limpa.</dd>
+    <dt class="crit">Crít · limite</dt><dd>por 3 Foco, o mestre revela o <em>porquê</em> — a razão por trás do que você leu.</dd>
+    <dt class="sobre">Sobrecarga</dt><dd>+1 Foco = leia um segundo alvo/cena.</dd>
+  </dl>
+</article>
+
+<!-- 4. Realçar -->
+<article id="obs-realcar" class="card b-obs anchor-target">
+  <div class="card-head"><span class="card-num">4</span><h3 class="card-name">Realçar <span class="card-sub">· o ambiente confessa</span></h3></div>
+  <div class="meta">Grau 1 · Juízo · 1 Foco · Ação · Curto · Cena</div>
+  <blockquote class="desc">Você escolhe o que quer que o mundo mostre, e ele mostra. Sangue que lavaram. O que foi movido. A passagem que fingiram não existir.</blockquote>
+  <dl class="bands">
+    <dt class="falha">Falha</dt><dd>tudo brilha igual — informação demais, inútil; −1 em Percepção e Investigação na cena.</dd>
+    <dt class="parcial">Parcial</dt><dd>uma categoria acende fraco — sangue e fluidos, ou toques recentes, ou coisas movidas, ou passagens dissimuladas.</dd>
+    <dt class="total">Total</dt><dd>duas categorias, claras, com idade (o mais recente brilha mais).</dd>
+    <dt class="crit">Crít · morde</dt><dd>tudo acende — e uma das coisas que acende olha de volta (sobe Exposição).</dd>
+    <dt class="crit">Crít · limpo</dt><dd>todas as categorias, limpas.</dd>
+    <dt class="crit">Crít · limite</dt><dd>o realce aponta a anomalia-mestra — a única coisa na cena que não bate com o resto.</dd>
+    <dt class="sobre">Sobrecarga</dt><dd>+1 Foco = alcance Médio. <em>(Não revela o magicamente oculto — isso é Ver de Verdade.)</em></dd>
+  </dl>
+</article>
+
+<!-- 5. Olhos Emprestados -->
+<article id="obs-olhos" class="card b-obs anchor-target">
+  <div class="card-head"><span class="card-num">5</span><h3 class="card-name">Olhos Emprestados <span class="card-sub">· ver por onde você não está</span></h3></div>
+  <div class="meta">Grau 1 (cresce até o 4) · Juízo · 1 Foco (+1 Lucidez para os remotos) · Ação · varia</div>
+  <blockquote class="desc">Você não precisa estar onde olha. Planta um olho, empresta a visão de um aliado, abre uma rede — e vê por todos eles.</blockquote>
+  <dl class="bands">
+    <dt class="falha">Falha</dt><dd>a visão emprestada cruza — por um turno você só vê pelos olhos do outro, não pelos seus.</dd>
+    <dt class="parcial">Parcial</dt><dd>veja por um ponto — um olho plantado (dura horas), ou pelos olhos de um aliado à vista.</dd>
+    <dt class="total">Total</dt><dd>canal contínuo — alterne entre vários pontos/aliados como Ação Livre; ninguém ligado à rede é surpreendido.</dd>
+    <dt class="crit">Crít · morde</dt><dd>a rede se abre ampla, mas um dos olhos vê algo que vê de volta (sobe Exposição).</dd>
+    <dt class="crit">Crít · limpo</dt><dd>rede limpa e estável.</dd>
+    <dt class="crit">Crít · limite</dt><dd>você vê por um ponto onde não há olho nenhum — um lugar que você só conhece de memória.</dd>
+    <dt class="sobre">Sobrecarga</dt><dd>+1 Foco = +1 olho/aliado na rede.</dd>
+  </dl>
+  <div class="escala">
+    <span class="lbl">Escala por Grau</span>
+    <p>de um olho (G1) a uma rede que cobre uma área ampla através de paredes e no escuro (G4), com os inimigos na área sentindo-se vigiados o tempo todo.</p>
+  </div>
+</article>
+
+<!-- 6. Ver de Verdade -->
+<article id="obs-verdeverdade" class="card b-obs anchor-target">
+  <div class="card-head"><span class="card-num">6</span><h3 class="card-name">Ver de Verdade <span class="card-sub">· o oculto aparece</span></h3></div>
+  <div class="meta">Grau 3 · Juízo · 3 Foco + 2 Lucidez · Ação · Pessoal · Sustentada (1 Foco/turno)</div>
+  <blockquote class="desc">Você para de ver o que te mostram e passa a ver o que há. Disfarces caem. Ilusões tremem. O invisível ganha contorno. E o que você vê, vê você.</blockquote>
+  <dl class="bands">
+    <dt class="falha">Falha</dt><dd>você vê demais por um instante — 1d4 Lucidez e Atordoado 1 turno.</dd>
+    <dt class="parcial">Parcial</dt><dd>veja através de disfarces mundanos e ilusões fracas; o invisível aparece como contorno trêmulo.</dd>
+    <dt class="total">Total</dt><dd>o oculto inteiro — invisibilidade, disfarces sobrenaturais, coisas fora de registro, possessões — e a natureza anômala de cada coisa presente.</dd>
+    <dt class="crit">Crít · morde</dt><dd>você vê tudo, e tudo te vê — o Olhar de Volta é imediato e sobe Exposição forte.</dd>
+    <dt class="crit">Crít · limpo</dt><dd>visão verdadeira estável, o oculto exposto.</dd>
+    <dt class="crit">Crít · limite</dt><dd>você vê algo que estava escondido <em>do próprio mundo</em> — uma verdade apagada.</dd>
+    <dt class="sobre">Sobrecarga</dt><dd>+2 Foco = estende a um aliado em contato.</dd>
+  </dl>
+  <p class="card-note">Cada coisa oculta revelada sobe Exposição: ver o que se esconde é ser fichado por ele. O Olhar de Volta é automático aqui.</p>
+</article>
+
+<!-- 7. O Peso do Olhar -->
+<article id="obs-peso" class="card b-obs anchor-target">
+  <div class="card-head"><span class="card-num">7</span><h3 class="card-name">O Peso do Olhar <span class="card-sub">· a atenção que esmaga</span></h3></div>
+  <div class="meta">Grau 2 (cresce até o 4) · Juízo · 2 Foco · Ação · Curto · dura enquanto você encara</div>
+  <blockquote class="desc">Você não levanta a mão. Levanta os olhos. E o alvo sente, de repente, o peso de todos os olhos do mundo em cima dele — e não aguenta.</blockquote>
+  <dl class="bands">
+    <dt class="falha">Falha</dt><dd>o peso escorrega e volta pra você — por um turno, é você que se sente encarado (−1 em tudo).</dd>
+    <dt class="parcial">Parcial</dt><dd>o alvo salta para <strong>Vigiado alto</strong> enquanto você o encara — ele hesita, se expõe, não consegue agir com naturalidade.</dd>
+    <dt class="total">Total</dt><dd>e ele não pode virar as costas nem te ignorar — cada ação dele que não seja lidar com você sai com desvantagem.</dd>
+    <dt class="crit">Crít · morde</dt><dd>o peso esmaga, mas te fixa também — você não pode desviar o olhar dele sem soltá-lo (e enquanto encara, baixa a guarda pro resto).</dd>
+    <dt class="crit">Crít · limpo</dt><dd>o peso prende limpo, a cena toda.</dd>
+    <dt class="crit">Crít · limite</dt><dd>o olhar é insuportável — o alvo trava por completo por um turno, incapaz de agir sob a atenção.</dd>
+    <dt class="sobre">Sobrecarga</dt><dd>+1 Foco = encare um segundo alvo (o peso se divide, mas alcança os dois).</dd>
+  </dl>
+  <div class="escala">
+    <span class="lbl">Escala por Grau</span>
+    <p>o Vigiado imposto e a penalidade sobem; no G4, o alvo sob O Peso do Olhar não consegue nem fugir do seu campo de visão sem passar num teste.</p>
+  </div>
+</article>
+
+<!-- 8. Você Foi Visto -->
+<article id="obs-visto" class="card b-obs anchor-target">
+  <div class="card-head"><span class="card-num">8</span><h3 class="card-name">Você Foi Visto <span class="card-sub">· a revelação que apavora</span></h3></div>
+  <div class="meta">Grau 3 · Juízo · 2 Foco + 1 Lucidez · Ação · Longo (à vista) · instantânea</div>
+  <blockquote class="desc">O alvo, no meio do que fazia, simplesmente sabe. Algo o observa. Observa agora. Observava antes. Nunca não observou. E não há canto no mundo onde isso não seja verdade.</blockquote>
+  <dl class="bands">
+    <dt class="falha">Falha</dt><dd>a revelação erra o alvo e roça em você — 1 Lucidez, a sensação dos olhos na nuca é sua por uma cena.</dd>
+    <dt class="parcial">Parcial</dt><dd>o alvo é tomado de paranoia aguda — perde a próxima ação, checando cantos, procurando o observador.</dd>
+    <dt class="total">Total</dt><dd>pânico pleno — o alvo foge, se entrega, trai a própria posição, ou congela; um NPC pode simplesmente quebrar e falar o que sabe.</dd>
+    <dt class="crit">Crít · morde</dt><dd>o pavor é total, mas a revelação abre um canal de duas vias — por um instante, o alvo vislumbra <em>você</em> de volta.</dd>
+    <dt class="crit">Crít · limpo</dt><dd>o pavor pega limpo, sem respingo.</dd>
+    <dt class="crit">Crít · limite</dt><dd>o alvo entende que <strong>sempre</strong> foi observado — não só agora; a paranoia vira permanente (some só se ele for tratado/curado do trauma).</dd>
+    <dt class="sobre">Sobrecarga</dt><dd>+1 Foco +1 Lucidez = atinge um pequeno grupo que compartilha o mesmo pavor.</dd>
+  </dl>
+  <p class="card-note">Ela não mostra ao alvo quem observa — só que é observado. Às vezes o observador é você. Às vezes você só abriu os olhos dele para o que já estava lá.</p>
+</article>
+
+<!-- 9. A Memória do Mundo -->
+<article id="obs-memoria" class="card b-obs anchor-target">
+  <div class="card-head"><span class="card-num">9</span><h3 class="card-name">A Memória do Mundo <span class="card-sub">· consultar o registro da realidade</span></h3></div>
+  <div class="meta">Grau 4 · Juízo · 8 Foco · Ação · 1×/campanha</div>
+  <blockquote class="desc">Você observou o bastante. Não uma pessoa, não uma cena — o suficiente para consultar o registro que o próprio mundo guarda de si.</blockquote>
+  <dl class="bands">
+    <dt class="efeito">Efeito</dt><dd>escolha um — <strong>reviva</strong> qualquer evento já ocorrido, em qualquer lugar; ou <strong>observe o presente</strong> em qualquer ponto que você já pisou; ou <strong>preveja</strong> o desenrolar total de uma situação (o mestre narra o fim, e você age para mudá-lo).</dd>
+    <dt class="parcial">Parcial</dt><dd>a consulta vem, mas turva — o mestre omite ou distorce uma parte.</dd>
+    <dt class="total">Total</dt><dd>a consulta vem inteira e nítida.</dd>
+    <dt class="crit">Crít · limpo/limite</dt><dd>você vê mais do que pediu — um detalhe adjacente que muda tudo.</dd>
+    <dt class="falha">Falha</dt><dd>você abre o registro e ele abre você — vê algo que não suporta; perda alta de Lucidez, e sobe Exposição ao máximo (você consultou a memória do mundo, e o mundo reparou).</dd>
+    <dt class="sobre">O custo</dt><dd>o que essa consulta tira de você é permanente, definido com o mestre.</dd>
+  </dl>
+</article>
+
+<p class="card-note">As 9 Distorções da Observação. Sete formas de ver — observar, acertar, ler, realçar, ver à distância, ver o oculto, consultar a realidade — e duas de fazer <em>ser visto</em>: o peso do olhar e a revelação que apavora. O poder de olhar e o terror de ser olhado são o mesmo olho. Nenhuma poderia ser de outro elemento.</p>
+<a class="totop" href="#topo">↑ topo</a>
+</div>
+
+<div class="elem-wrap e-eco">
+<a id="eco" class="anchor-target"></a>
+<h2 class="elem">Eco ☊</h2>
+
+<div class="lei"><strong>Lei do Retorno.</strong> O Eco não cria. Devolve. Toda Distorção do Eco precisa de uma <strong>fonte</strong> — algo que aconteceu, foi dito, foi feito. Sem fonte, não há o que repetir, e sem repetição não há Eco. E o <strong>Sulco</strong>: repetir a mesma Distorção na mesma cena dá +1 cumulativo (máx +2) — o mundo aprende a rachar no mesmo lugar.</div>
+
+<div class="comofunciona">
+  <h4>Como funciona (vale para todas)</h4>
+  <p>Conjurar é um teste de <strong>2d6 + Juízo + perícia</strong> contra o Limiar.</p>
+  <p class="r"><b>Falha (5−)</b> a repetição volta errada, podre, ou contra você.</p>
+  <p class="r"><b>Parcial (6–9)</b> repete, mas incompleto ou deformado.</p>
+  <p class="r"><b>Total (10+)</b> repete fiel.</p>
+  <p class="r"><b>Crítico (dois dados iguais)</b> — <strong>morde</strong> (1-1, 2-2), <strong>limpo</strong> (3-3, 4-4), <strong>limite</strong> (5-5, 6-6).</p>
+  <p style="border-left:3px solid var(--c-eco); padding-left:.9rem; font-style:italic; color:#d3cee0;"><strong>Nota:</strong> o <em>ser</em> do Eco — gravar instantes e reproduzi-los, ecoar golpes, prender no laço, congelar a cena — é a base do Marcado, e vive na sua Maestria. Estas Distorções são o <strong>andar de cima</strong>: o que o Eco faz de espetacular, além de repetir momentos guardados.</p>
+  <p>A <strong>Dissonância</strong> sobe a cada repetição numa cena; ao fim, você testa contra ela — falhar deixa um Eco antigo te confundir com o presente. E o <strong>Desgaste</strong> é a maldição longa: cada vez que a Dissonância te vence, ele sobe, e você perde mais um pouco da certeza de quem, entre tantas versões, é o original. As Distorções que reescrevem o passado sobem Desgaste.</p>
+  <p style="margin-bottom:0;">A <strong>Sobrecarga</strong> é sempre uma compra.</p>
+</div>
+
+<!-- 1. Coro -->
+<article id="eco-coro" class="card b-eco anchor-target">
+  <div class="card-head"><span class="card-num">1</span><h3 class="card-name">Coro <span class="card-sub">· repetir a si mesmo</span></h3></div>
+  <div class="meta">Grau 2 (cresce até o 4) · Juízo · 2 Sintonia · Ação · Pessoal</div>
+  <blockquote class="desc">Você não repete um instante. Repete <em>você</em>. Um segundo você, meio segundo atrasado, faz o que você acabou de fazer — ou o que você não teve tempo de fazer.</blockquote>
+  <p class="fonte"><b>Fonte</b> uma ação sua neste turno ou no anterior.</p>
+  <dl class="bands">
+    <dt class="falha">Falha</dt><dd>o eco de você sai fora de compasso — atrapalha em vez de ajudar (você age por último no próximo turno).</dd>
+    <dt class="parcial">Parcial</dt><dd>um segundo você repete uma ação simples que você já fez nesta cena.</dd>
+    <dt class="total">Total</dt><dd>o eco age em paralelo — você faz duas coisas neste turno, ou a mesma ação atinge o dobro.</dd>
+    <dt class="crit">Crít · morde</dt><dd>o coro é forte, mas você perde de vista qual é o original — sobe Dissonância.</dd>
+    <dt class="crit">Crít · limpo</dt><dd>dois de você, limpos e sincronizados.</dd>
+    <dt class="crit">Crít · limite</dt><dd>um <strong>coro inteiro</strong> de vocês por [Juízo] turnos — vários ecos seus agindo na mesma rodada, cada um uma cópia do momento em que você era mais capaz.</dd>
+    <dt class="sobre">Sobrecarga</dt><dd>+1 Sintonia = o eco também pode repetir a ação de um aliado, não só a sua.</dd>
+  </dl>
+  <div class="escala">
+    <span class="lbl">Escala por Grau</span>
+    <p>de um eco (G2) a um coro que enche a cena (G4); nos Graus altos os ecos duram mais e agem sozinhos.</p>
+  </div>
+</article>
+
+<!-- 2. O Segundo Antes -->
+<article id="eco-segundo" class="card b-eco anchor-target">
+  <div class="card-head"><span class="card-num">2</span><h3 class="card-name">O Segundo Antes <span class="card-sub">· rebobinar a beira da tragédia</span></h3></div>
+  <div class="meta">Grau 3 · Juízo · 3 Sintonia + 1 Lucidez · Reação (quando a tragédia acontece) · Curto</div>
+  <blockquote class="desc">Alguém ia cair, o golpe ia acertar, a bomba ia estourar. Você agarra o meio-segundo antes — o último instante em que ainda dava — e o faz acontecer de novo. Desta vez, todo mundo sabe o que vem.</blockquote>
+  <p class="fonte"><b>Fonte</b> a tragédia que acabou de acontecer (o golpe fatal, a queda, o desastre) é a fonte que você rebobina.</p>
+  <dl class="bands">
+    <dt class="falha">Falha</dt><dd>você puxa o instante errado — rebobina, mas todos voltam sem saber por quê (sem a vantagem de lembrar).</dd>
+    <dt class="parcial">Parcial</dt><dd>o instante volta para <em>uma</em> pessoa — ela revive o segundo antes e pode agir diferente.</dd>
+    <dt class="total">Total</dt><dd>o instante volta para <strong>todos</strong> os envolvidos, que revivem o segundo antes da tragédia com a chance de mudá-la; quem você escolher lembra do que ia acontecer.</dd>
+    <dt class="crit">Crít · morde</dt><dd>você rebobina, mas o tempo cobra o esforço — sobe Dissonância, e a cena fica "instável" (o mestre pode fazer o momento tentar se repetir de novo).</dd>
+    <dt class="crit">Crít · limpo</dt><dd>rebobinagem limpa, todos com a memória do que vem.</dd>
+    <dt class="crit">Crít · limite</dt><dd>você rebobina um pouco mais fundo — não o segundo antes, mas o minuto antes; uma janela bem maior para desfazer o desastre.</dd>
+    <dt class="sobre">Sobrecarga</dt><dd>+2 Sintonia = rebobina uma tragédia que atingiu uma área grande, não só um ponto.</dd>
+  </dl>
+  <p class="card-note">Não é ver o futuro. É agarrar o passado imediato antes que ele esfrie. O Eco só repete o que já foi — e o que quase aconteceu já foi, por um segundo.</p>
+</article>
+
+<!-- 3. O Déjà Vu -->
+<article id="eco-dejavu" class="card b-eco anchor-target">
+  <div class="card-head"><span class="card-num">3</span><h3 class="card-name">O Déjà Vu <span class="card-sub">· a certeza que paralisa</span></h3></div>
+  <div class="meta">Grau 2 (cresce até o 4) · Juízo · 2 Sintonia · Ação · Curto · dura enquanto você sustenta</div>
+  <blockquote class="desc">Você faz o alvo sentir, no osso, que tudo isto já aconteceu — e vai acontecer de novo, do mesmo jeito, sem saída. E quem acredita que já perdeu, perde.</blockquote>
+  <p class="fonte"><b>Fonte</b> algo que o alvo já fez ou sofreu nesta cena — você o faz sentir que está preso naquilo.</p>
+  <dl class="bands">
+    <dt class="falha">Falha</dt><dd>o déjà vu gruda em você — por um turno, é você que sente que já viveu (e errou) isto; −1 em tudo.</dd>
+    <dt class="parcial">Parcial</dt><dd>o alvo é tomado de déjà vu — −2 em ações que ele "sente que já falharam", hesita.</dd>
+    <dt class="total">Total</dt><dd>a certeza esmaga — o alvo não consegue tentar nada que ele acredite já ter dado errado; fica preso na inevitabilidade.</dd>
+    <dt class="crit">Crít · morde</dt><dd>a fatalidade é total, mas contagiosa — sobe Dissonância, e você começa a sentir o déjà vu também.</dd>
+    <dt class="crit">Crít · limpo</dt><dd>o fatalismo prende limpo.</dd>
+    <dt class="crit">Crít · limite</dt><dd>o alvo fica convencido de que <strong>perder é inevitável</strong> — age como quem já está derrotado, pela cena inteira.</dd>
+    <dt class="sobre">Sobrecarga</dt><dd>+1 Sintonia = o déjà vu pega uma pequena área, não um alvo.</dd>
+  </dl>
+</article>
+
+<!-- 4. A Gravação que Apodrece -->
+<article id="eco-gravacao" class="card b-eco anchor-target">
+  <div class="card-head"><span class="card-num">4</span><h3 class="card-name">A Gravação que Apodrece <span class="card-sub">· a repetição que corrói</span></h3></div>
+  <div class="meta">Grau 3 · Juízo · 3 Sintonia + 1 Lucidez · Ação · Curto · não expira (só é purgada)</div>
+  <blockquote class="desc">Você planta num alvo, ou num lugar, um momento em loop. Mas cada volta apodrece um pouco — a lembrança se deforma, os detalhes mofam, e a coisa presa lá dentro não percebe que está ficando errada.</blockquote>
+  <p class="fonte"><b>Fonte</b> um momento do alvo (uma memória, um gesto, uma identidade) — você o prende repetindo.</p>
+  <dl class="bands">
+    <dt class="falha">Falha</dt><dd>a gravação apodrece em você — uma lembrança sua fica deformada até você a tratar.</dd>
+    <dt class="parcial">Parcial</dt><dd>o alvo fica preso repetindo um comportamento, e a cada volta ele piora (−1 cumulativo).</dd>
+    <dt class="total">Total</dt><dd>a repetição apodrece fundo — o alvo perde a noção do que é real em si mesmo; confunde o que fez com o que você plantou.</dd>
+    <dt class="crit">Crít · morde</dt><dd>apodrece rápido demais e vaza — algo perto do alvo (talvez você) também começa a se repetir errado; sobe Dissonância.</dd>
+    <dt class="crit">Crít · limpo</dt><dd>a podridão pega só o alvo, funda.</dd>
+    <dt class="crit">Crít · limite</dt><dd>a gravação apaga a identidade do alvo por reescrita podre — ele vira uma caricatura mofada de si mesmo, sem saber. (Sobe Desgaste — reescrever quem alguém é te custa a certeza de quem você é.)</dd>
+    <dt class="sobre">Sobrecarga</dt><dd>+1 Sintonia = planta a gravação num lugar, não num alvo — a área inteira passa a reencenar.</dd>
+  </dl>
+  <p class="card-note">Isto é o que faz nascer as coisas que repetem uma pessoa até virarem uma paródia podre dela. Você faz de propósito.</p>
+</article>
+
+<!-- 5. Todas as Vozes -->
+<article id="eco-vozes" class="card b-eco anchor-target">
+  <div class="card-head"><span class="card-num">5</span><h3 class="card-name">Todas as Vozes <span class="card-sub">· o coro do que já foi dito</span></h3></div>
+  <div class="meta">Grau 3 (cresce até o 4) · Juízo · 3 Sintonia + 2 Lucidez · Ação · área · Cena</div>
+  <blockquote class="desc">Todo lugar guarda tudo que já foi dito nele. As orações, os gritos, as últimas palavras, as promessas quebradas — tudo ainda está lá, ecoando baixo. Você manda todas falarem de uma vez.</blockquote>
+  <p class="fonte"><b>Fonte</b> o passado sonoro do lugar onde você está — tudo que já se disse ali.</p>
+  <dl class="bands">
+    <dt class="falha">Falha</dt><dd>as vozes vêm confusas e viram contra você — o coro grita <em>o seu</em> passado, o que você enterrou (perde Lucidez).</dd>
+    <dt class="parcial">Parcial</dt><dd>você extrai do lugar uma coisa que foi dita ali — uma senha, uma confissão, um nome, uma última palavra.</dd>
+    <dt class="total">Total</dt><dd>o coro inteiro fala — você ouve, comanda ou solta tudo que já foi dito ali; pode fazer um lugar "confessar" seu passado inteiro, ou usar o coro como uma onda que atordoa e revela.</dd>
+    <dt class="crit">Crít · morde</dt><dd>o coro é ensurdecedor, mas não quer mais parar — sobe Dissonância, e as vozes continuam ecoando depois de você mandar calar.</dd>
+    <dt class="crit">Crít · limpo</dt><dd>o coro obedece, limpo.</dd>
+    <dt class="crit">Crít · limite</dt><dd>você fala com a voz de <strong>todos os mortos</strong> de um lugar — comanda o coro como uma força, e ele responde perguntas que nenhum vivo saberia.</dd>
+    <dt class="sobre">Sobrecarga</dt><dd>+2 Sintonia = alcança tudo que foi dito num lugar muito além do som — anos de passado sonoro de uma vez.</dd>
+  </dl>
+  <div class="escala">
+    <span class="lbl">Escala por Grau</span>
+    <p>de uma frase resgatada (G3) ao comando pleno do coro de todos os mortos de um local (G4).</p>
+  </div>
+</article>
+
+<!-- 6. O Dia que Não Passa -->
+<article id="eco-dia" class="card b-eco anchor-target">
+  <div class="card-head"><span class="card-num">6</span><h3 class="card-name">O Dia que Não Passa <span class="card-sub">· criar um lugar preso no tempo</span></h3></div>
+  <div class="meta">Grau 4 · Juízo · todos os Ecos + 3 Lucidez + sobe Desgaste · Ação (ritual) · um lugar · permanente · 1×/campanha</div>
+  <blockquote class="desc">Você pega um único momento e o obriga a nunca terminar. O tempo, naquele lugar, para de andar e passa a rodar em círculo — para sempre. É assim que nascem os lugares assombrados. Você acabou de fazer um.</blockquote>
+  <p class="fonte"><b>Fonte</b> um momento vivido naquele lugar — a fonte que você prende em loop eterno.</p>
+  <dl class="bands">
+    <dt class="efeito">Efeito</dt><dd>escolha um lugar e um momento. Dali em diante, aquele lugar <strong>repete aquele momento sem fim</strong> — quem entra é puxado para dentro do loop e revive a cena, esquecendo a cada volta, a menos que seja forte o bastante para perceber e escapar. Você criou uma anomalia permanente no mundo: um dia que não passa.</dd>
+    <dt class="parcial">Parcial</dt><dd>o loop pega, mas instável — dura enquanto você estiver vivo, ou até alguém quebrar a fonte.</dd>
+    <dt class="total">Total</dt><dd>o loop é permanente e se sustenta sozinho, independente de você.</dd>
+    <dt class="crit">Crít · limpo/limite</dt><dd>você controla os termos do loop — quem fica preso, quem passa livre, e pode entrar e sair dele à vontade como o único que lembra.</dd>
+    <dt class="falha">Falha</dt><dd>o loop se fecha em volta de <strong>você</strong> — por um tempo, é você que fica preso repetindo, até escapar ou ser resgatado.</dd>
+    <dt class="sobre">O que fica</dt><dd>um dos lugares assombrados do mundo, feito pela sua mão. E cada um que você faz sobe seu Desgaste — quem reescreve o tempo dos outros esquece qual era o seu.</dd>
+  </dl>
+</article>
+
+<p class="card-note">As 6 Distorções do Eco. Seis formas de repetir o que a Maestria não alcança — repetir-se, rebobinar a tragédia, impor o déjà vu, plantar a repetição podre, invocar todas as vozes, e prender um lugar no tempo para sempre. Nenhuma cria; todas precisam de fonte; nenhuma poderia ser de outro elemento.</p>
+<a class="totop" href="#topo">↑ topo</a>
+</div>
+
+<a class="totop" href="#topo">↑ topo</a>
+
+<script>
+function filterNav(q){
+  q = q.trim().toLowerCase();
+  document.querySelectorAll('#nav ul.sub a, #nav ul > li.part > a').forEach(function(a){
+    var li = a.closest('li');
+    if(!q){ li.style.display=''; return; }
+    var txt = a.textContent.toLowerCase();
+    li.style.display = txt.indexOf(q) !== -1 ? '' : 'none';
+  });
+}
+</script>
+
+</main>
+</div>
+</body>
+</html>
