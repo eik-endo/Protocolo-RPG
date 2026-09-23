@@ -667,4 +667,166 @@ body.calm[data-el=asc] .panel h2,body.calm[data-el=asc] label,body.calm[data-el=
  body[data-el=asc] .wrap,body[data-el=asc] .panel,body[data-el=asc] .attr,body[data-el=asc] .rec,
  body[data-el=asc] .panel h2,body[data-el=asc] label,body[data-el=asc] .hint{transform:none!important}}
 @media(max-width:640px){h1{font-size:20px;letter-spacing:5px}.wrap{padding:10px 10px 50px}.elc{width:100%}}
+/* ══ A MOLDURA DE CADA ELEMENTO ═══════════════════════════════════════════════
+   porte da borda de mofo do Sistema/distorcoes.html, agora para os seis.
 
+   é UMA camada fixa e só de MARGEM: z4 — acima dos canvas de clima (z2) e ABAIXO
+   da ficha inteira (z5 do .wrap) —, então ela nunca cobre um campo: onde há
+   painel, a moldura fica atrás dele, e o que se vê é a beirada da tela. inset:0
+   + overflow:hidden garantem que nada escapa da viewport.
+
+   não fala com o JS: a ficha já escreve data-el, data-band e --band no body, e
+   isto aqui só lê. sobe com a banda, some no calmar e no movimento reduzido, e
+   convive com o que já existe (o túnel, o olho, o jardim, a mão) em vez de
+   repetir: nenhuma delas desenha no meio da tela. */
+#fx-borda{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:4;
+ opacity:0;visibility:hidden;transition:opacity 2s,visibility 2s;
+ --mg:calc(10px + var(--band)*10px + var(--band)*.55vmin);   /* o avanço da margem para dentro: um tanto fixo e um tanto de tela, para a faixa não sumir no monitor grande */
+ --ma:calc(.09 + var(--band)*.032);    /* a densidade do que cresce nela */
+ --fr:calc(9px + var(--band)*3.4px)}   /* a régua onde correm as molduras de linha */
+body[data-el]:not([data-el=""]) #fx-borda{visibility:visible;opacity:calc(.5 + var(--band)*.1)}
+#fx-borda::before,#fx-borda::after{content:"";position:absolute;inset:0;pointer-events:none}
+
+/* ── ger — o mofo. as colônias nascem com o centro NA aresta (metade já está fora
+      e é recortada) e são comidas por um ruído SVG que serve de máscara: sem ele
+      a borda do mofo sai lisa, e mofo liso não é mofo */
+body[data-el=ger] #fx-borda{
+ box-shadow:inset 0 0 calc(var(--mg)*.9) rgba(79,109,52,calc(.07 + var(--band)*.03));
+ background:linear-gradient(to bottom,rgba(58,82,38,var(--ma)),transparent calc(var(--mg)*1.1)),
+  linear-gradient(to top,rgba(58,82,38,calc(var(--ma)*1.25)),transparent calc(var(--mg)*1.3)),
+  linear-gradient(to right,rgba(58,82,38,var(--ma)),transparent calc(var(--mg)*1.05)),
+  linear-gradient(to left,rgba(58,82,38,var(--ma)),transparent calc(var(--mg)*1.05))}
+body[data-el=ger] #fx-borda::before{background:
+  radial-gradient(ellipse calc(var(--mg)*3) calc(var(--mg)*1.25) at 9% 0%,rgba(141,187,98,calc(var(--ma)*2.7)),transparent 70%),
+  radial-gradient(ellipse calc(var(--mg)*1.9) calc(var(--mg)*1.3) at 27% 0%,rgba(111,154,78,calc(var(--ma)*2.2)),transparent 68%),
+  radial-gradient(ellipse calc(var(--mg)*3.4) calc(var(--mg)*1.05) at 62% 0%,rgba(79,109,52,calc(var(--ma)*2.5)),transparent 72%),
+  radial-gradient(ellipse calc(var(--mg)*1.7) calc(var(--mg)*1.15) at 88% 0%,rgba(141,187,98,calc(var(--ma)*1.9)),transparent 66%),
+  radial-gradient(ellipse calc(var(--mg)*3.2) calc(var(--mg)*1.2) at 17% 100%,rgba(111,154,78,calc(var(--ma)*2.6)),transparent 70%),
+  radial-gradient(ellipse calc(var(--mg)*2) calc(var(--mg)*.9) at 44% 100%,rgba(141,187,98,calc(var(--ma)*2.1)),transparent 68%),
+  radial-gradient(ellipse calc(var(--mg)*3.6) calc(var(--mg)*1.35) at 73% 100%,rgba(79,109,52,calc(var(--ma)*2.6)),transparent 72%),
+  radial-gradient(ellipse calc(var(--mg)*1.5) calc(var(--mg)*1) at 95% 100%,rgba(111,154,78,calc(var(--ma)*1.8)),transparent 66%),
+  radial-gradient(ellipse calc(var(--mg)*1.05) calc(var(--mg)*3) at 0% 18%,rgba(111,154,78,calc(var(--ma)*2.3)),transparent 69%),
+  radial-gradient(ellipse calc(var(--mg)*1.35) calc(var(--mg)*1.9) at 0% 57%,rgba(141,187,98,calc(var(--ma)*1.9)),transparent 67%),
+  radial-gradient(ellipse calc(var(--mg)*.9) calc(var(--mg)*2.6) at 0% 88%,rgba(79,109,52,calc(var(--ma)*2.2)),transparent 71%),
+  radial-gradient(ellipse calc(var(--mg)*1.15) calc(var(--mg)*2.8) at 100% 12%,rgba(79,109,52,calc(var(--ma)*2.5)),transparent 70%),
+  radial-gradient(ellipse calc(var(--mg)*1.4) calc(var(--mg)*1.7) at 100% 49%,rgba(111,154,78,calc(var(--ma)*2.2)),transparent 67%),
+  radial-gradient(ellipse calc(var(--mg)*1) calc(var(--mg)*3.2) at 100% 80%,rgba(141,187,98,calc(var(--ma)*2.6)),transparent 69%);
+ -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='mf' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.062' numOctaves='4' seed='13'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 -0.16'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23mf)'/%3E%3C/svg%3E");
+ mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='mf' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.062' numOctaves='4' seed='13'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 -0.16'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23mf)'/%3E%3C/svg%3E");
+ -webkit-mask-size:240px 240px;mask-size:240px 240px}
+
+/* ── vaz — o oposto do mofo: a margem não cresce, ela é COMIDA. o escuro entra
+      pelos cantos e engole a beirada, e o azul só aparece como frio na aresta do
+      que foi comido — um fio de gelo na borda do buraco */
+body[data-el=vaz] #fx-borda{
+ box-shadow:inset 0 0 calc(var(--mg)*2.4) calc(var(--mg)*.45) rgba(4,6,12,calc(.3 + var(--band)*.14))}
+body[data-el=vaz] #fx-borda::before{background:
+  radial-gradient(ellipse calc(var(--mg)*5.2) calc(var(--mg)*4.2) at 0% 0%,rgba(4,6,13,calc(.5 + var(--band)*.12)),transparent 74%),
+  radial-gradient(ellipse calc(var(--mg)*4.6) calc(var(--mg)*4.8) at 100% 0%,rgba(4,6,13,calc(.46 + var(--band)*.12)),transparent 72%),
+  radial-gradient(ellipse calc(var(--mg)*5.6) calc(var(--mg)*4) at 0% 100%,rgba(3,5,11,calc(.48 + var(--band)*.13)),transparent 73%),
+  radial-gradient(ellipse calc(var(--mg)*4.8) calc(var(--mg)*4.4) at 100% 100%,rgba(3,5,11,calc(.52 + var(--band)*.12)),transparent 74%)}
+body[data-el=vaz] #fx-borda::after{background:
+  linear-gradient(to bottom,rgba(124,143,181,calc(var(--ma)*.8)),transparent calc(var(--mg)*.55)),
+  linear-gradient(to top,rgba(124,143,181,calc(var(--ma)*.65)),transparent calc(var(--mg)*.5)),
+  linear-gradient(to right,rgba(124,143,181,calc(var(--ma)*.8)),transparent calc(var(--mg)*.5)),
+  linear-gradient(to left,rgba(124,143,181,calc(var(--ma)*.8)),transparent calc(var(--mg)*.5))}
+
+/* ── asc — a moldura ferida: aço rasgado mordendo a aresta, estática na lateral e
+      respingo por cima. a carne toda passa por (1 - --ouro), o mesmo trato dos
+      dois eixos que a ficha já faz: quando a Perfeição cobre, o sangue some da
+      borda junto com o resto do inferno, e o que fica é a régua de crômio */
+body[data-el=asc] #fx-borda{--carn:calc(1 - var(--ouro,0));
+ box-shadow:inset 0 0 0 1px rgba(200,216,230,calc(.05 + var(--band)*.035 + var(--ouro,0)*.12)),
+  inset 0 0 calc(var(--mg)*1.1) rgba(56,15,11,calc(var(--carn)*(.12 + var(--band)*.06)));
+ background:
+  radial-gradient(ellipse calc(var(--mg)*2.6) calc(var(--mg)*1.5) at 12% 0%,rgba(142,32,32,calc(var(--carn)*var(--ma)*2.6)),transparent 66%),
+  radial-gradient(ellipse calc(var(--mg)*1.3) calc(var(--mg)*2.2) at 0% 34%,rgba(112,22,22,calc(var(--carn)*var(--ma)*2.4)),transparent 64%),
+  radial-gradient(ellipse calc(var(--mg)*1.8) calc(var(--mg)*1.2) at 81% 0%,rgba(112,22,22,calc(var(--carn)*var(--ma)*2)),transparent 62%),
+  radial-gradient(ellipse calc(var(--mg)*1.1) calc(var(--mg)*2.6) at 100% 62%,rgba(142,32,32,calc(var(--carn)*var(--ma)*2.5)),transparent 65%),
+  radial-gradient(ellipse calc(var(--mg)*3.1) calc(var(--mg)*1.4) at 38% 100%,rgba(96,18,18,calc(var(--carn)*var(--ma)*2.2)),transparent 67%),
+  radial-gradient(ellipse calc(var(--mg)*1.6) calc(var(--mg)*1.9) at 93% 100%,rgba(142,32,32,calc(var(--carn)*var(--ma)*2.1)),transparent 63%)}
+/* o respingo: gotas pequenas e duras, sem difusão — sangue que bateu e parou */
+body[data-el=asc] #fx-borda::before{background:
+  radial-gradient(circle calc(3px + var(--band)*2.2px) at 6% 11%,rgba(142,32,32,calc(var(--carn)*(.3 + var(--band)*.1))),transparent 70%),
+  radial-gradient(circle calc(2px + var(--band)*1.4px) at 10% 19%,rgba(112,22,22,calc(var(--carn)*(.26 + var(--band)*.09))),transparent 68%),
+  radial-gradient(circle calc(4px + var(--band)*2.6px) at 2.5% 63%,rgba(142,32,32,calc(var(--carn)*(.28 + var(--band)*.1))),transparent 72%),
+  radial-gradient(circle calc(2.5px + var(--band)*1.6px) at 7% 81%,rgba(96,18,18,calc(var(--carn)*(.24 + var(--band)*.09))),transparent 68%),
+  radial-gradient(circle calc(3.5px + var(--band)*2px) at 95% 27%,rgba(142,32,32,calc(var(--carn)*(.27 + var(--band)*.1))),transparent 70%),
+  radial-gradient(circle calc(2px + var(--band)*1.5px) at 91% 38%,rgba(112,22,22,calc(var(--carn)*(.24 + var(--band)*.08))),transparent 66%),
+  radial-gradient(circle calc(3px + var(--band)*2.4px) at 97.5% 72%,rgba(142,32,32,calc(var(--carn)*(.29 + var(--band)*.1))),transparent 71%),
+  radial-gradient(circle calc(2.5px + var(--band)*1.8px) at 29% 97%,rgba(112,22,22,calc(var(--carn)*(.25 + var(--band)*.09))),transparent 68%),
+  radial-gradient(circle calc(3.5px + var(--band)*2.2px) at 66% 3%,rgba(96,18,18,calc(var(--carn)*(.26 + var(--band)*.09))),transparent 70%)}
+/* o aço rasgado e a estática: fita diagonal só na faixa da aresta, mastigada pelo
+   mesmo ruído do mofo (outra semente) para a chapa não sair inteira */
+body[data-el=asc] #fx-borda::after{background:
+  repeating-linear-gradient(45deg,rgba(193,90,69,calc(var(--carn)*.46 + var(--ouro,0)*.3)) 0 5px,transparent 5px 11px) left top/100% calc(var(--mg)*.5) no-repeat,
+  repeating-linear-gradient(45deg,rgba(125,53,39,calc(var(--carn)*.44 + var(--ouro,0)*.28)) 0 5px,transparent 5px 11px) left bottom/100% calc(var(--mg)*.45) no-repeat,
+  repeating-linear-gradient(135deg,rgba(193,90,69,calc(var(--carn)*.4 + var(--ouro,0)*.26)) 0 5px,transparent 5px 11px) left top/calc(var(--mg)*.45) 100% no-repeat,
+  repeating-linear-gradient(135deg,rgba(125,53,39,calc(var(--carn)*.44 + var(--ouro,0)*.28)) 0 5px,transparent 5px 11px) right top/calc(var(--mg)*.45) 100% no-repeat,
+  repeating-linear-gradient(0deg,rgba(200,216,230,calc(.08 + var(--band)*.045)) 0 1px,transparent 1px 3px) left top/calc(var(--mg)*1.2) 100% no-repeat,
+  repeating-linear-gradient(0deg,rgba(200,216,230,calc(.08 + var(--band)*.045)) 0 1px,transparent 1px 3px) right top/calc(var(--mg)*1.2) 100% no-repeat;
+ -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='st' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.4' numOctaves='2' seed='5'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 -0.1'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23st)'/%3E%3C/svg%3E");
+ mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='st' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.4' numOctaves='2' seed='5'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 -0.1'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23st)'/%3E%3C/svg%3E");
+ -webkit-mask-size:200px 200px;mask-size:200px 200px}
+
+/* ── obs — a moldura de vigilância: quatro cantos de mira na régua da margem e
+      olhos fracos encostados na aresta. e ela respira na cadência que a
+      escopofobia já tem — scopobreath, o mesmo compasso do túnel */
+body[data-el=obs] #fx-borda{--mira:calc(30px + var(--band)*8px);--mirv:calc(20px + var(--band)*6px)}
+body[data-el=obs] #fx-borda::before{background:
+  linear-gradient(90deg,rgba(201,162,39,calc(.4 + var(--band)*.12)) 0 var(--mira),transparent var(--mira)) left var(--fr) top var(--fr)/100% 1px no-repeat,
+  linear-gradient(180deg,rgba(201,162,39,calc(.4 + var(--band)*.12)) 0 var(--mirv),transparent var(--mirv)) left var(--fr) top var(--fr)/1px 100% no-repeat,
+  linear-gradient(270deg,rgba(201,162,39,calc(.4 + var(--band)*.12)) 0 var(--mira),transparent var(--mira)) right var(--fr) top var(--fr)/100% 1px no-repeat,
+  linear-gradient(180deg,rgba(201,162,39,calc(.4 + var(--band)*.12)) 0 var(--mirv),transparent var(--mirv)) right var(--fr) top var(--fr)/1px 100% no-repeat,
+  linear-gradient(90deg,rgba(201,162,39,calc(.34 + var(--band)*.12)) 0 var(--mira),transparent var(--mira)) left var(--fr) bottom var(--fr)/100% 1px no-repeat,
+  linear-gradient(0deg,rgba(201,162,39,calc(.34 + var(--band)*.12)) 0 var(--mirv),transparent var(--mirv)) left var(--fr) bottom var(--fr)/1px 100% no-repeat,
+  linear-gradient(270deg,rgba(201,162,39,calc(.34 + var(--band)*.12)) 0 var(--mira),transparent var(--mira)) right var(--fr) bottom var(--fr)/100% 1px no-repeat,
+  linear-gradient(0deg,rgba(201,162,39,calc(.34 + var(--band)*.12)) 0 var(--mirv),transparent var(--mirv)) right var(--fr) bottom var(--fr)/1px 100% no-repeat,
+  linear-gradient(90deg,transparent calc(50% - 8px),rgba(201,162,39,calc(.26 + var(--band)*.1)) calc(50% - 8px) calc(50% + 8px),transparent calc(50% + 8px)) 0 var(--fr)/100% 1px no-repeat,
+  linear-gradient(90deg,transparent calc(50% - 8px),rgba(201,162,39,calc(.22 + var(--band)*.1)) calc(50% - 8px) calc(50% + 8px),transparent calc(50% + 8px)) 0 calc(100% - var(--fr))/100% 1px no-repeat,
+  linear-gradient(180deg,transparent calc(50% - 8px),rgba(201,162,39,calc(.26 + var(--band)*.1)) calc(50% - 8px) calc(50% + 8px),transparent calc(50% + 8px)) var(--fr) 0/1px 100% no-repeat,
+  linear-gradient(180deg,transparent calc(50% - 8px),rgba(201,162,39,calc(.22 + var(--band)*.1)) calc(50% - 8px) calc(50% + 8px),transparent calc(50% + 8px)) calc(100% - var(--fr)) 0/1px 100% no-repeat}
+/* os olhos: a pálpebra meio aberta e a pupila, coladas na borda — nunca no meio */
+body[data-el=obs] #fx-borda::after{background:
+  radial-gradient(ellipse calc(var(--mg)*1.6) calc(var(--mg)*.62) at 0% 42%,rgba(201,162,39,calc(var(--ma)*2.2)),transparent 70%),
+  radial-gradient(circle calc(2px + var(--band)*1.3px) at calc(var(--mg)*.5) 42%,rgba(201,162,39,calc(.18 + var(--band)*.08)),transparent 72%),
+  radial-gradient(ellipse calc(var(--mg)*1.4) calc(var(--mg)*.55) at 100% 67%,rgba(201,162,39,calc(var(--ma)*2)),transparent 70%),
+  radial-gradient(circle calc(2px + var(--band)*1.2px) at calc(100% - var(--mg)*.45) 67%,rgba(201,162,39,calc(.16 + var(--band)*.07)),transparent 72%),
+  radial-gradient(ellipse calc(var(--mg)*1.9) calc(var(--mg)*.5) at 34% 0%,rgba(201,162,39,calc(var(--ma)*1.7)),transparent 68%)}
+body[data-el=obs][data-band="3"] #fx-borda,body[data-el=obs][data-band="4"] #fx-borda,
+body[data-el=obs][data-band="5"] #fx-borda{animation:scopobreath 11s ease-in-out infinite}
+
+/* ── pac — o ornamento do contrato: duas réguas douradas correndo a margem (a de
+      fora no border, a de dentro puxada pelo outline), blocos de cláusula
+      ilegível nos cantos e o lacre no pé da folha */
+body[data-el=pac] #fx-borda{background:
+  repeating-linear-gradient(180deg,rgba(184,147,47,calc(.15 + var(--band)*.05)) 0 1px,transparent 1px 4px) left calc(var(--fr) + 13px) top calc(var(--fr) + 13px)/76px calc(26px + var(--band)*10px) no-repeat,
+  repeating-linear-gradient(180deg,rgba(184,147,47,calc(.12 + var(--band)*.04)) 0 1px,transparent 1px 5px) right calc(var(--fr) + 13px) top calc(var(--fr) + 16px)/54px calc(20px + var(--band)*8px) no-repeat,
+  repeating-linear-gradient(180deg,rgba(184,147,47,calc(.12 + var(--band)*.045)) 0 1px,transparent 1px 4px) left calc(var(--fr) + 13px) bottom calc(var(--fr) + 15px)/62px calc(22px + var(--band)*9px) no-repeat,
+  radial-gradient(circle calc(11px + var(--band)*3px) at calc(100% - var(--fr) - 26px) calc(100% - var(--fr) - 22px),rgba(163,38,56,calc(.22 + var(--band)*.09)),rgba(119,32,47,calc(.13 + var(--band)*.06)) 62%,transparent 74%)}
+body[data-el=pac] #fx-borda::before{inset:var(--fr);
+ border:1px solid rgba(184,147,47,calc(.18 + var(--band)*.07));
+ outline:1px solid rgba(184,147,47,calc(.1 + var(--band)*.045));outline-offset:-5px}
+body[data-el=pac] #fx-borda::after{content:"§";inset:auto calc(var(--fr) + 19px) calc(var(--fr) + 12px) auto;
+ width:14px;height:22px;font:20px/1.1 Georgia,'Times New Roman',serif;text-align:center;
+ color:rgba(184,147,47,calc(.3 + var(--band)*.12))}
+
+/* ── eco — a borda que se repete: a moldura é desenhada duas vezes, e a segunda
+      custa a chegar. o deslocamento cresce com a banda, como o ghosting que os
+      títulos já fazem */
+body[data-el=eco] #fx-borda{background:
+  linear-gradient(to bottom,rgba(127,184,168,calc(var(--ma)*.85)),transparent calc(var(--mg)*.6)),
+  linear-gradient(to top,rgba(127,184,168,calc(var(--ma)*.7)),transparent calc(var(--mg)*.5)),
+  linear-gradient(to right,rgba(127,184,168,calc(var(--ma)*.75)),transparent calc(var(--mg)*.5)),
+  linear-gradient(to left,rgba(127,184,168,calc(var(--ma)*.75)),transparent calc(var(--mg)*.5))}
+body[data-el=eco] #fx-borda::before{inset:var(--fr);
+ border:1px solid rgba(127,184,168,calc(.18 + var(--band)*.07))}
+body[data-el=eco] #fx-borda::after{inset:var(--fr);
+ border:1px solid rgba(127,184,168,calc(.1 + var(--band)*.05));
+ transform:translate(calc(2px + var(--band)*1.6px),calc(1.5px + var(--band)*1.3px));
+ animation:ecoborda 9s ease-in-out infinite}
+@keyframes ecoborda{0%,100%{opacity:.8}44%{opacity:.3}72%{opacity:.55}}
+
+/* a moldura é efeito, e efeito se desliga */
+body.calm #fx-borda{display:none}
+@media (prefers-reduced-motion:reduce){#fx-borda{display:none}}

@@ -3,326 +3,811 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PROTOCOLO — Distorções</title>
+<title>PROTOCOLO — O Arquivo dos Seis</title>
+<!-- a mão do Pacto: a caligrafia que assina os títulos do santuário do contrato -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tangerine:wght@400;700&display=swap" rel="stylesheet">
 <style>
+/* ══════════════════════════════════════════════════════════════════════════════
+   O ARQUIVO DOS SEIS — as 43 Distorções, um santuário por elemento.
+
+   A linguagem visual é a da ficha (Ficha/style.css, Ficha/climate.js): as mesmas
+   cores por elemento (--ec/--ecd/--eglow), os mesmos glifos, o mesmo par serif +
+   monoespaçada de 2002, e os mesmos efeitos de corrupção — o apagamento do Vazio,
+   o texto-fantasma do Eco, o jardim do Germe, o olho da Observação, a mão do
+   Pacto, a máquina do Ascensão. Nada aqui é invenção nova: é porte.
+
+   E o eixo que a ficha chama de BANDA (o Ruído, 0→5) existe aqui também: ele sobe
+   conforme você desce no santuário. Ler fundo é estar fundo.
+   ══════════════════════════════════════════════════════════════════════════════ */
+
 :root{
-  --bg:#141210; --bg2:#1b1815; --panel:#1f1c18; --ink:#e9e2d3; --ink-dim:#a89e8c; --ink-faint:#71685a;
-  --rule:#3a352c; --rule-lite:#2a261f;
-  --gold:#c9a84c;
-  --mist:#8fa4b0;   /* referência cruzada — a.ref */
-  --warn:#b5432f;
-  /* cores por elemento — código de navegação */
-  --c-vaz:#5a86a8;   /* Vazio — gelo */
-  --c-ger:#3f7a4a;   /* Germe — verde */
-  --c-pac:#8a2f2f;   /* Pacto — vinho */
-  --c-obs:#c9a13a;   /* Observação — âmbar */
-  --c-asc:#b5602a;   /* Ascensão — ferrugem */
-  --c-eco:#7a5aa8;   /* Eco — violeta */
+  /* base — portada de Ficha/style.css :root */
+  --bg:#0f0d0b; --panel:#18140f; --panel2:#1f1a13;
+  --line:#332a1e; --line2:#443826;
+  --ink:#d9d2c2; --dim:#a29679; --faint:#6d6350;
+  --gold:#b8932f; --goldim:#7c6524; --red:#8e2020;
+  --ec:#b8932f; --ecd:#7c6524; --eglow:rgba(184,147,47,.14);
+  --band:0;
+  /* herdados do distorcoes.html anterior */
+  --mist:#8fa4b0; --warn:#b5432f;
+  --mono:"Courier New",ui-monospace,Consolas,monospace;
+  --serif:Georgia,"Times New Roman",serif;
+  --rail:48px;
+  /* aliases de compatibilidade: o conteúdo das Distorções traz um style inline que
+     cita var(--c-eco). os nomes vêm do distorcoes.html anterior e continuam valendo,
+     agora apontando para as cores da ficha */
+  --c-vaz:#7c8fb5; --c-ger:#8dbb62; --c-pac:#c13a52;
+  --c-obs:#c9a227; --c-asc:#c15a45; --c-eco:#7fb8a8;
 }
-*{box-sizing:border-box;}
-html{scroll-behavior:smooth;}
-body{margin:0; background:var(--bg); color:var(--ink); font-family:"Georgia","Times New Roman",serif; line-height:1.5; font-size:16px;}
-::selection{background:var(--gold); color:#1a1710;}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 var(--serif);min-height:100vh;overflow-x:hidden}
+::selection{background:var(--ec);color:#120f0a}
+button{cursor:pointer;font:inherit}
+a{color:var(--ec)}
 
-/* ---------- layout ---------- */
-#shell{display:flex; min-height:100vh;}
-#nav{
-  position:sticky; top:0; height:100vh; width:290px; flex:0 0 290px; overflow-y:auto;
-  background:var(--panel); border-right:2px solid var(--rule); padding:0 0 3rem;
-  font-family:"Courier New",monospace;
+/* ─────────── paletas por elemento — portadas de Ficha/style.css:312-317 ─────────── */
+body[data-el=obs]{--ec:#c9a227;--ecd:#8a6f1c;--eglow:rgba(201,162,39,.16)}
+body[data-el=eco]{--ec:#7fb8a8;--ecd:#4f7a6d;--eglow:rgba(127,184,168,.13)}
+body[data-el=vaz]{--ec:#7c8fb5;--ecd:#48566f;--eglow:rgba(90,107,140,.14);
+  --bg:#0a0b10;--panel:#10121a;--panel2:#141724;--line:#232838;--line2:#2f374d;
+  --ink:#c8ccd8;--dim:#8f96a8;--faint:#5d6478}
+body[data-el=asc]{--ec:#c15a45;--ecd:#7d3527;--eglow:rgba(176,74,58,.15)}
+body[data-el=pac]{--ec:#c13a52;--ecd:#77202f;--eglow:rgba(163,38,56,.15);
+  /* o dourado-sujo do contrato: o --gold da ficha, servindo de tinta sobre papel velho */
+  --tinta:#b8932f;--panel:#1b1610;--panel2:#231b12;--line:#3a2c1c;--line2:#503c25}
+body[data-el=ger]{--ec:#8dbb62;--ecd:#4f6d34;--eglow:rgba(111,154,78,.14);
+  --panel:#141610;--panel2:#191d13;--line:#2b331f;--line2:#3a4529}
+
+/* ══ CAMADAS DE EFEITO ══════════════════════════════════════════════════════════
+   todas fixas, todas pointer-events:none, todas abaixo do conteúdo (z2) menos as
+   pontuais. mesmo arranjo do Ficha_Automatica.html */
+#fx-bg,#fx-fore{position:fixed;inset:0;pointer-events:none;opacity:0;visibility:hidden;
+  transition:opacity 2s,visibility 2s}
+#fx-bg{z-index:2}
+#fx-fore{z-index:7}
+body[data-el]:not([data-el=""]) #fx-bg{visibility:visible;opacity:calc(.38 + var(--band)*.12)}
+body[data-el=pac] #fx-fore{visibility:visible;opacity:calc(.26 + var(--band)*.08)}
+#fx-vign{position:fixed;inset:0;pointer-events:none;z-index:7;
+  box-shadow:inset 0 0 calc(44px + var(--band)*36px) calc(var(--band)*8px) rgba(0,0,0,calc(.14 + var(--band)*.09));
+  transition:box-shadow 1.2s}
+#fx-glow{position:fixed;inset:0;pointer-events:none;z-index:1;
+  background:radial-gradient(ellipse at 50% -12%,var(--eglow),transparent 58%);transition:background 1.4s}
+/* o grão analógico: papel de 2002 fotocopiado. estático, pintado uma vez pelo JS */
+#fx-grain{position:fixed;inset:0;pointer-events:none;z-index:8;opacity:.045;mix-blend-mode:overlay}
+/* obs — o túnel de escopofobia. gradiente puro, sem backdrop-filter (Ficha/style.css:17-20) */
+#fx-tunnel{position:fixed;inset:0;pointer-events:none;z-index:6;opacity:0;visibility:hidden;
+  transition:opacity 1.6s,visibility 1.6s;
+  background:radial-gradient(ellipse at 50% 45%,transparent 44%,rgba(0,0,0,calc(.03 + var(--band)*.05)) 82%,rgba(0,0,0,calc(.07 + var(--band)*.07)) 100%),
+   radial-gradient(ellipse at 50% 45%,transparent 62%,var(--eglow) 100%)}
+body[data-el=obs] #fx-tunnel{opacity:1;visibility:visible}
+body[data-el=obs][data-band="5"] #fx-tunnel{animation:scopobreath 11s ease-in-out infinite}
+@keyframes scopobreath{0%,100%{opacity:.7}50%{opacity:1}}
+/* pac — a vinheta respira: algo grande atrás do vidro (Ficha/style.css:527-536) */
+#fx-vign::after{content:"";position:absolute;inset:-14%;pointer-events:none;opacity:0;
+  background:radial-gradient(ellipse at 50% 52%,transparent 40%,rgba(52,2,12,.42) 76%,rgba(28,0,6,.8) 100%);
+  will-change:opacity,transform}
+body[data-el=pac][data-band="3"] #fx-vign::after{--pk:.3;animation:pacresp 14s ease-in-out infinite}
+body[data-el=pac][data-band="4"] #fx-vign::after{--pk:.52;animation:pacresp 11s ease-in-out infinite}
+body[data-el=pac][data-band="5"] #fx-vign::after{--pk:.82;animation:pacresp 8s ease-in-out infinite}
+@keyframes pacresp{0%,100%{opacity:calc(var(--pk)*.3);transform:scale(1)}
+  46%{opacity:var(--pk);transform:scale(1.05)}74%{opacity:calc(var(--pk)*.7);transform:scale(1.02)}}
+/* asc — a fita de vídeo rasgando. evento, não loop: o JS põe e tira a classe */
+#fx-tear{position:fixed;left:0;right:0;height:0;pointer-events:none;z-index:9;opacity:0;
+  background:repeating-linear-gradient(0deg,rgba(255,240,220,.5) 0 1px,transparent 1px 3px),
+   linear-gradient(90deg,transparent,rgba(193,90,69,.5) 30%,rgba(230,214,196,.35) 52%,rgba(193,90,69,.4) 70%,transparent)}
+#fx-tear.on{animation:ascrip .22s steps(3,end)}
+@keyframes ascrip{0%{opacity:0}18%{opacity:1}72%{opacity:.8}100%{opacity:0}}
+/* o sussurro — mesma caixa e mesma cadência do #whisper da ficha */
+#whisper{position:fixed;z-index:8;pointer-events:none;font-family:var(--mono);font-size:12px;
+  letter-spacing:2px;color:var(--ec);opacity:0;transition:opacity 2.4s;max-width:250px;
+  text-shadow:0 0 8px var(--eglow)}
+#whisper.on{opacity:calc(.26 + var(--band)*.1)}
+
+/* efeitos pontuais portados da ficha */
+.fx-ghost{position:fixed;pointer-events:none;z-index:9;color:var(--ec);font-size:13px;
+  font-family:var(--mono);letter-spacing:.5px;white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;max-width:46vw;opacity:0;text-shadow:0 0 8px var(--eglow);
+  animation:ecolembra 1.8s ease-in-out}
+@keyframes ecolembra{0%{opacity:0}22%{opacity:.5}70%{opacity:.42}100%{opacity:0}}
+.fx-stut{animation:ecosoluco 220ms steps(2)}
+@keyframes ecosoluco{0%{transform:translateX(0)}25%{transform:translateX(3px);opacity:.8}
+  50%{transform:translateX(-2px);opacity:.45}75%{transform:translateX(4px);opacity:.7}100%{transform:translateX(0)}}
+.fx-loop{animation:ecoloop .42s steps(4) 3}
+@keyframes ecoloop{0%{transform:translateX(0)}30%{transform:translateX(2px)}
+  60%{transform:translateX(-1px);opacity:.7}100%{transform:translateX(0)}}
+.vaz-sub{animation:vazsub var(--vzd,.4s) ease-in-out}
+@keyframes vazsub{0%{opacity:1}20%{opacity:0}72%{opacity:0}100%{opacity:1}}
+.vaz-cut{animation:vazcut var(--vzd,.4s) steps(1,end)}
+@keyframes vazcut{0%{clip-path:inset(0 0 0 0)}22%{clip-path:inset(0 100% 0 0)}
+  70%{clip-path:inset(0 100% 0 0)}100%{clip-path:inset(0 0 0 0)}}
+.ger-scar{position:fixed;pointer-events:none;z-index:9;border-radius:5px;opacity:0;transform-origin:20% 50%;
+  background:linear-gradient(90deg,transparent,rgba(141,187,98,.62) 18%,rgba(176,214,132,.5) 42%,rgba(79,109,52,.55) 74%,transparent),
+   radial-gradient(ellipse at 38% 50%,rgba(200,230,170,.4),transparent 65%);
+  box-shadow:0 0 9px rgba(111,154,78,.45),inset 0 0 5px rgba(30,52,18,.6);animation:gercic 1.25s ease-in-out}
+@keyframes gercic{0%{opacity:0;transform:scaleX(.16)}20%{opacity:.92;transform:scaleX(1)}
+  62%{opacity:.78;transform:scaleX(.97)}100%{opacity:0;transform:scaleX(.05)}}
+.pac-caret{position:fixed;pointer-events:none;z-index:9;color:var(--tinta,var(--ec));
+  font:14px/1 var(--mono);text-shadow:0 0 7px var(--eglow);animation:pacpisca 1.06s steps(1,end) infinite}
+@keyframes pacpisca{0%,49%{opacity:.85}50%,100%{opacity:0}}
+.pac-sug{position:fixed;pointer-events:none;z-index:9;color:var(--tinta,var(--ec));opacity:0;
+  white-space:nowrap;line-height:1.25;font-family:var(--mono);font-size:12.5px;overflow:hidden;
+  text-overflow:ellipsis;max-width:40vw;text-shadow:0 0 8px var(--eglow);animation:pacsug 1.5s ease-in-out}
+@keyframes pacsug{0%{opacity:0}20%{opacity:.6}68%{opacity:.5}100%{opacity:0}}
+/* obs — o registro: a moldura que a Observação deixa em cima do que você encarou */
+.obs-reg{position:fixed;pointer-events:none;z-index:9;border:1px solid var(--ec);opacity:0;
+  box-shadow:0 0 10px -2px var(--eglow);animation:obsreg 2.6s ease-out}
+.obs-reg::after{content:attr(data-t);position:absolute;right:0;top:-13px;font:9px/1 var(--mono);
+  letter-spacing:1.5px;color:var(--ec);opacity:.8;white-space:nowrap}
+@keyframes obsreg{0%{opacity:0;transform:scale(1.05)}14%{opacity:.85;transform:scale(1)}
+  70%{opacity:.6}100%{opacity:0}}
+.asc-correct{animation:asccorr .32s steps(1,end)}
+@keyframes asccorr{0%{transform:none}12%{transform:translate(2.1px,-1.4px)}
+  46%{transform:translate(2.1px,-1.4px)}64%{transform:translate(-.7px,.2px)}100%{transform:none}}
+.asc-rgb{animation:ascrgb .3s steps(2,end)}
+@keyframes ascrgb{0%,100%{text-shadow:none}
+  30%{text-shadow:-3px 0 rgba(142,32,32,.9),3px 0 rgba(160,196,214,.75)}
+  65%{text-shadow:2px 0 rgba(142,32,32,.8),-2px 0 rgba(160,196,214,.7)}}
+
+/* ══ TRILHO SUPERIOR ══════════════════════════════════════════════════════════ */
+#rail{position:fixed;top:0;left:0;right:0;height:var(--rail);z-index:20;display:flex;
+  align-items:center;gap:14px;padding:0 16px;background:rgba(10,8,6,.93);
+  border-bottom:1px solid var(--line2);backdrop-filter:blur(3px);transition:border-color 1s}
+#rail .brand{font-family:var(--mono);font-size:11px;letter-spacing:3.4px;color:var(--dim);
+  text-transform:uppercase;white-space:nowrap}
+#rail .brand b{color:var(--ec);font-weight:normal}
+#rail .glyphs{display:flex;gap:3px;margin-left:auto}
+#rail .g{background:none;border:1px solid transparent;border-radius:2px;color:var(--faint);
+  width:34px;height:30px;font-size:15px;line-height:1;transition:.18s;position:relative}
+#rail .g:hover{color:var(--ink);border-color:var(--gl)}
+#rail .g.on{color:var(--gl);border-color:var(--gl);background:rgba(0,0,0,.4)}
+#rail .g.on::after{content:"";position:absolute;left:5px;right:5px;bottom:-1px;height:2px;background:var(--gl)}
+#rail .g[data-g=vaz]{--gl:#7c8fb5}#rail .g[data-g=ger]{--gl:#8dbb62}#rail .g[data-g=pac]{--gl:#c13a52}
+#rail .g[data-g=asc]{--gl:#c15a45}#rail .g[data-g=obs]{--gl:#c9a227}#rail .g[data-g=eco]{--gl:#7fb8a8}
+.btn{background:var(--panel2);border:1px solid var(--line2);color:var(--dim);padding:5px 11px;
+  border-radius:2px;font-family:var(--mono);font-size:10.5px;letter-spacing:1.6px;
+  text-transform:uppercase;transition:.18s;white-space:nowrap}
+.btn:hover{color:var(--ink);border-color:var(--ec)}
+.btn.on{border-color:var(--ec);color:var(--ec);background:rgba(0,0,0,.3)}
+/* na capa o botão de volta não existe — nem para o mouse nem para o Tab */
+#btnBack{opacity:0;pointer-events:none;visibility:hidden;transition:opacity .3s}
+body[data-view=santuario] #btnBack{opacity:1;pointer-events:auto;visibility:visible}
+#railsearch{background:var(--bg);border:1px solid var(--line2);color:var(--ink);
+  font-family:var(--mono);font-size:11px;padding:5px 8px;width:168px;border-radius:2px}
+#railsearch:focus{outline:none;border-color:var(--ec)}
+#railsearch::placeholder{color:var(--faint)}
+
+/* ══ ESQUELETO DE VISTA ══════════════════════════════════════════════════════ */
+.view{display:none}
+.view.on{display:block}
+#capa{max-width:1080px;margin:0 auto;padding:calc(var(--rail) + 42px) 26px 90px;position:relative;z-index:5}
+
+/* ══ A CAPA — a pasta do arquivo ══════════════════════════════════════════════ */
+.pasta{position:relative;background:linear-gradient(168deg,#1d1811 0%,#191410 48%,#15110d 100%);
+  border:1px solid var(--line2);border-left:5px solid var(--goldim);
+  padding:40px 46px 40px 62px;
+  box-shadow:0 26px 60px -22px #000,inset 0 1px 0 rgba(255,244,214,.05)}
+/* a perfuração de fichário na margem esquerda */
+.pasta::before{content:"";position:absolute;left:19px;top:52px;bottom:52px;width:14px;
+  background:radial-gradient(circle at 50% 8px,#070503 6px,transparent 6.6px),
+   radial-gradient(circle at 50% 50%,#070503 6px,transparent 6.6px),
+   radial-gradient(circle at 50% calc(100% - 8px),#070503 6px,transparent 6.6px)}
+/* o carimbo */
+.selo{position:absolute;right:30px;top:26px;transform:rotate(-8.5deg);
+  border:2.5px solid rgba(142,32,32,.62);color:rgba(178,52,44,.72);padding:6px 16px 7px;
+  font-family:var(--mono);font-size:15px;font-weight:bold;letter-spacing:5px;
+  text-transform:uppercase;pointer-events:none;
+  box-shadow:inset 0 0 0 1px rgba(142,32,32,.2)}
+.selo small{display:block;font-size:7.5px;letter-spacing:2.6px;text-align:center;
+  margin-top:2px;opacity:.82;font-weight:normal}
+.pasta .tag{font-family:var(--mono);font-size:9.5px;letter-spacing:3.6px;text-transform:uppercase;
+  color:var(--faint)}
+.pasta h1{font-family:var(--serif);font-weight:400;font-size:52px;letter-spacing:11px;
+  margin:12px 0 2px;color:var(--ink);line-height:1.02}
+.pasta h1 b{font-weight:400;color:var(--gold)}
+.pasta .sub{font-family:var(--mono);font-size:10px;letter-spacing:4.4px;text-transform:uppercase;
+  color:var(--dim);margin:8px 0 0}
+.regs{display:grid;grid-template-columns:repeat(4,auto);gap:2px 34px;justify-content:start;
+  margin:26px 0 24px;padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.regs div{font-family:var(--mono);font-size:10px;letter-spacing:1.6px}
+.regs .k{color:var(--faint);text-transform:uppercase;font-size:8.5px;letter-spacing:2.4px}
+.regs .v{color:var(--gold);margin-top:3px}
+.lede{font-size:16.5px;color:#ded5c5;max-width:66ch}
+.lede strong{color:var(--ink)}
+.lede em{color:#cfc6b3}
+
+/* o aviso — herdado do documento anterior */
+.aviso{border:2px solid var(--gold);padding:14px 18px;margin:22px 0 0;background:#1c1710}
+.aviso .lbl{font-family:var(--mono);font-size:9.5px;letter-spacing:2.6px;text-transform:uppercase;
+  color:var(--gold);display:block;margin-bottom:6px}
+.aviso p{margin:0;font-size:15px;color:#ded5c5}
+
+/* as seis entradas */
+.entradas-h{font-family:var(--mono);font-size:9.5px;letter-spacing:3.6px;text-transform:uppercase;
+  color:var(--faint);margin:46px 0 14px;display:flex;align-items:center;gap:14px}
+.entradas-h::after{content:"";flex:1;height:1px;background:var(--line)}
+.entradas{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.ent{position:relative;text-align:left;overflow:hidden;
+  background:linear-gradient(162deg,var(--p1,#1a1611),#131009);
+  border:1px solid var(--line2);border-top:3px solid var(--k);
+  padding:20px 20px 16px;transition:.24s;min-height:246px;display:flex;flex-direction:column}
+.ent:hover,.ent:focus-visible{border-color:var(--k);outline:none;transform:translateY(-3px);
+  box-shadow:0 18px 34px -16px #000,0 0 0 1px var(--k),0 0 30px -8px var(--kg)}
+.ent .gly{position:absolute;right:8px;bottom:-16px;font-size:108px;line-height:1;color:var(--k);
+  opacity:.1;transition:.3s;pointer-events:none}
+.ent:hover .gly{opacity:.2;transform:scale(1.06) rotate(-4deg)}
+.ent .vol{font-family:var(--mono);font-size:8.5px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--faint)}
+.ent .nm{font-family:var(--mono);font-size:21px;font-weight:bold;letter-spacing:1.4px;
+  color:var(--ink);margin:7px 0 0;display:flex;align-items:baseline;gap:9px}
+.ent .nm i{font-style:normal;font-size:17px;color:var(--k)}
+.ent:hover .nm{color:#fff8e8}
+.ent .vb{font-family:var(--mono);font-size:9.5px;letter-spacing:2.6px;text-transform:uppercase;
+  color:var(--k);opacity:.9;margin-top:4px}
+.ent .ep{font-style:italic;font-size:14px;color:var(--dim);margin:14px 0 0;
+  border-left:2px solid var(--k);padding-left:11px;position:relative;z-index:1}
+.ent .fim{margin-top:auto;padding-top:14px;display:flex;justify-content:space-between;
+  align-items:baseline;gap:10px;border-top:1px dashed var(--line);
+  font-family:var(--mono);font-size:9.5px;letter-spacing:1.8px;text-transform:uppercase;
+  color:var(--faint);position:relative;z-index:1}
+.ent .fim b{color:var(--k);font-weight:normal}
+.ent .abrir{color:var(--faint);transition:.2s}
+.ent:hover .abrir{color:var(--k)}
+.ent[data-k=vaz]{--k:#7c8fb5;--kg:rgba(90,107,140,.5);--p1:#131620}
+.ent[data-k=ger]{--k:#8dbb62;--kg:rgba(111,154,78,.5);--p1:#161a11}
+.ent[data-k=pac]{--k:#c13a52;--kg:rgba(163,38,56,.45);--p1:#1d1510}
+.ent[data-k=asc]{--k:#c15a45;--kg:rgba(176,74,58,.45);--p1:#1c1410}
+.ent[data-k=obs]{--k:#c9a227;--kg:rgba(201,162,39,.45);--p1:#1b1710}
+.ent[data-k=eco]{--k:#7fb8a8;--kg:rgba(127,184,168,.42);--p1:#131917}
+.rodape{margin:42px 0 0;font-family:var(--mono);font-size:9.5px;letter-spacing:2.4px;
+  text-transform:uppercase;color:var(--faint);text-align:center}
+
+/* ══ SANTUÁRIO ═══════════════════════════════════════════════════════════════ */
+.santuario{position:relative;z-index:5}
+.santuario:not(.on){display:none}
+
+/* o pórtico: a abertura em tela cheia do elemento */
+.portico{position:relative;min-height:min(78vh,720px);display:flex;flex-direction:column;
+  justify-content:flex-end;padding:calc(var(--rail) + 70px) 0 46px;overflow:hidden;
+  border-bottom:1px solid var(--line2)}
+.portico .fundo{position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse at 22% 88%,var(--eglow),transparent 62%)}
+.portico .glifao{position:absolute;right:2vw;top:50%;transform:translateY(-50%);
+  font-size:min(46vh,430px);line-height:1;color:var(--ec);opacity:.085;pointer-events:none;
+  user-select:none;transition:opacity 1.4s}
+body[data-band="4"] .portico .glifao,body[data-band="5"] .portico .glifao{opacity:.14}
+.portico .dentro{position:relative;width:100%;max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
+.portico .volume{font-family:var(--mono);font-size:9.5px;letter-spacing:3.6px;text-transform:uppercase;
+  color:var(--faint)}
+.portico h2{font-family:var(--serif);font-weight:400;font-size:clamp(46px,8vw,104px);
+  letter-spacing:clamp(4px,1vw,13px);margin:10px 0 0;color:var(--ink);line-height:1;
+  display:flex;align-items:center;gap:clamp(14px,2.4vw,30px);flex-wrap:wrap}
+.portico h2 i{font-style:normal;font-size:.44em;color:var(--ec)}
+.portico .verbo{font-family:var(--mono);font-size:clamp(11px,1.3vw,14px);letter-spacing:6px;
+  text-transform:uppercase;color:var(--ec);margin:16px 0 0}
+.portico .frase{font-style:italic;font-size:clamp(16px,1.8vw,21px);color:#ded5c5;max-width:52ch;
+  margin:20px 0 0;border-left:3px solid var(--ec);padding-left:16px}
+.portico .fatos{display:flex;gap:30px;flex-wrap:wrap;margin:30px 0 0;padding-top:16px;
+  border-top:1px solid var(--line)}
+.portico .fatos div{font-family:var(--mono);font-size:10px;letter-spacing:1.8px}
+.portico .fatos .k{color:var(--faint);font-size:8.5px;letter-spacing:2.6px;text-transform:uppercase}
+.portico .fatos .v{color:var(--ec);margin-top:3px}
+
+/* o corpo do santuário: índice fixo + coluna de leitura */
+.corpo{display:grid;grid-template-columns:238px minmax(0,1fr);gap:0;
+  max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
+.indice{position:sticky;top:var(--rail);align-self:start;max-height:calc(100vh - var(--rail));
+  overflow-y:auto;padding:26px 22px 40px 0;border-right:1px solid var(--line);
+  font-family:var(--mono);scrollbar-width:thin}
+.indice .h{font-size:8.5px;letter-spacing:2.8px;text-transform:uppercase;color:var(--faint);
+  margin-bottom:12px}
+.indice a{display:block;padding:5px 9px 5px 11px;font-size:11.5px;letter-spacing:.3px;
+  color:var(--dim);text-decoration:none;border-left:2px solid transparent;transition:.16s;
+  line-height:1.35}
+.indice a:hover{color:var(--ink);background:rgba(255,255,255,.028);border-left-color:var(--ecd)}
+.indice a.here{color:var(--ec);border-left-color:var(--ec);background:rgba(0,0,0,.3)}
+.indice a b{font-weight:normal;color:var(--faint);margin-right:6px}
+.indice a.here b{color:var(--ec)}
+.indice .sep{margin:16px 0 8px;font-size:8.5px;letter-spacing:2.6px;text-transform:uppercase;
+  color:var(--faint);border-top:1px solid var(--line);padding-top:12px}
+.leitura{padding:30px 0 120px clamp(22px,3vw,44px);min-width:0}
+
+/* ─────────── os blocos de regra ─────────── */
+h3,h4{font-family:var(--mono);font-weight:bold;color:var(--ec);letter-spacing:.02em}
+p{margin:0 0 .9rem}
+strong{color:var(--ink)}
+em{color:#cfc6b3}
+.lei{border-left:4px solid var(--ec);padding:10px 0 10px 18px;margin:0 0 26px;font-style:italic;
+  color:#ded5c5;font-size:17px;
+  background:linear-gradient(90deg,rgba(255,255,255,.022),transparent 62%)}
+.lei strong{color:var(--ec);font-style:normal;font-family:var(--mono);font-size:15px;
+  letter-spacing:.6px;display:inline-block;margin-right:4px}
+.comofunciona,.cond,.card{position:relative;background:var(--panel);border:1px solid var(--line);
+  transition:background .5s,border-color .5s,opacity 1.6s ease-out,filter 1.6s ease-out}
+.comofunciona{padding:18px 22px;margin:0 0 26px}
+.comofunciona h4{margin:0 0 10px;color:var(--dim);text-transform:uppercase;font-size:11px;
+  letter-spacing:1.6px}
+.comofunciona p{margin:0 0 8px;font-size:15px}
+.comofunciona p:last-child{margin-bottom:0}
+.comofunciona .r{margin:3px 0}
+.comofunciona .r b{color:var(--ink);font-family:var(--mono);font-size:12.5px;
+  display:inline-block;min-width:11em}
+.degraus{width:100%;border-collapse:collapse;margin:14px 0 4px;font-size:14.5px}
+.degraus th,.degraus td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+.degraus th{background:var(--panel2);font-family:var(--mono);font-size:9.5px;letter-spacing:1.4px;
+  text-transform:uppercase;color:var(--ec)}
+.degraus td b{color:var(--ink)}
+.degraus .deg{font-family:var(--mono);color:var(--ec);white-space:nowrap}
+/* a condição-assinatura: o bloco mais alto do santuário */
+.cond{border:1px solid var(--ec);border-left:5px solid var(--ec);padding:18px 22px;margin:0 0 34px;
+  background:linear-gradient(140deg,color-mix(in srgb,var(--ec) 6%,var(--panel)),var(--panel) 62%);
+  box-shadow:0 0 34px -18px var(--eglow)}
+.cond .lbl{font-family:var(--mono);font-size:11px;letter-spacing:2.4px;text-transform:uppercase;
+  color:var(--ec);display:block;margin-bottom:10px}
+.cond p{margin:0 0 8px;font-size:15.5px}
+.cond p:last-child{margin-bottom:0}
+
+/* ─────────── o card da Distorção ─────────── */
+.card{border-left:5px solid var(--ec);padding:22px 26px;margin:0 0 20px;scroll-margin-top:calc(var(--rail) + 18px)}
+.card:hover,.card:focus-within{border-color:var(--ecd);border-left-color:var(--ec);
+  box-shadow:0 0 0 1px var(--ecd),0 18px 36px -24px #000}
+.card-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.card-num{font-family:var(--mono);font-weight:bold;color:var(--ec);font-size:26px;line-height:1;
+  opacity:.75;min-width:1.3em}
+.card-name{font-family:var(--mono);font-weight:bold;font-size:19px;color:var(--ink);margin:0;
+  letter-spacing:.4px;line-height:1.25}
+.card-name .card-sub{color:var(--dim);font-weight:normal;font-style:italic;font-size:14px;
+  letter-spacing:0;font-family:var(--serif)}
+.auto{font-family:var(--mono);font-size:9px;letter-spacing:2.2px;text-transform:uppercase;
+  color:var(--ec);margin-top:8px;display:inline-block;border:1px solid var(--ecd);padding:3px 8px}
+.meta{font-family:var(--mono);font-size:11.5px;letter-spacing:.2px;color:var(--dim);
+  margin:10px 0 0;border-bottom:1px dashed var(--line2);padding-bottom:12px}
+.desc{margin:16px 0;padding:2px 0 2px 16px;border-left:2px solid var(--ec);font-style:italic;
+  color:#e4dccb;font-size:16.5px;line-height:1.5}
+.fonte{margin:10px 0 4px;font-size:15px;color:#dcd4c6}
+.fonte b{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--ec);margin-right:8px}
+.bands{margin:14px 0 0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:1px 18px}
+.bands dt{font-family:var(--mono);font-size:10px;letter-spacing:1.4px;text-transform:uppercase;
+  padding-top:8px;white-space:nowrap;color:var(--faint)}
+.bands dd{margin:7px 0 0;color:#dcd4c6;font-size:15px}
+.bands dt.falha{color:var(--warn)}
+.bands dt.parcial{color:var(--dim)}
+.bands dt.total{color:#8fae7a}
+.bands dt.crit,.bands dt.efeito{color:var(--ec)}
+.bands dt.sobre{color:var(--mist)}
+.bands .ero{color:var(--warn);font-style:italic;font-size:.92em}
+.subchoice{margin:5px 0 0;padding-left:16px}
+.subchoice li{margin-bottom:3px;list-style:none;position:relative}
+.subchoice li::before{content:"·";position:absolute;left:-12px;color:var(--ec)}
+.subchoice li b{color:var(--ink)}
+.escala{border-top:1px dashed var(--line2);margin-top:18px;padding-top:12px}
+.escala .lbl{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--ec);display:block;margin-bottom:8px}
+.escala ul{margin:0;padding-left:18px}
+.escala li{margin-bottom:5px;font-size:15px}
+.escala li b{color:var(--ink);font-family:var(--mono);font-size:12.5px}
+.escala p{margin:0;font-size:15px}
+.card-note{margin:16px 0 0;font-style:italic;color:var(--dim);font-size:14.5px;
+  border-top:1px dashed var(--line);padding-top:10px}
+/* o fechamento de cada santuário — o .card-note solto, fora de card */
+.leitura > .card-note{border:1px solid var(--line);border-left:3px solid var(--ecd);
+  background:var(--panel2);padding:16px 20px;margin:34px 0 0;font-size:15px;color:#cfc6b3}
+.fim-santuario{margin:26px 0 0;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* ══ ATMOSFERA POR ELEMENTO ═════════════════════════════════════════════════ */
+
+/* ── VAZIO: ausência. o que você não está olhando esmaece; o texto é apagado e
+      reposto INTEIRO; a interface só existe enquanto você olha direto para ela.
+      porte de Ficha/style.css:611-625 */
+body[data-el=vaz] .card:hover,body[data-el=vaz] .card:focus-within{transition:opacity .16s,filter .16s}
+body[data-el=vaz][data-band="1"] .card:not(:hover):not(:focus-within),
+body[data-el=vaz][data-band="2"] .card:not(:hover):not(:focus-within){opacity:.9}
+body[data-el=vaz][data-band="3"] .card:not(:hover):not(:focus-within){opacity:.72;filter:saturate(.55)}
+body[data-el=vaz][data-band="4"] .card:not(:hover):not(:focus-within){opacity:.6;filter:saturate(.4)}
+body[data-el=vaz][data-band="5"] .card:not(:hover):not(:focus-within){opacity:.44;filter:saturate(.22)}
+body[data-el=vaz] .indice a:not(:hover):not(.here){opacity:calc(1 - var(--band)*.12)}
+/* o céu e os buracos precisam de fresta para existir atrás do card */
+body[data-el=vaz]:not(.calm) .card{background:rgba(16,18,26,calc(.95 - var(--band)*.05))}
+
+/* ── GERME: úmido, orgânico, algo crescendo. porte de Ficha/style.css:560-600 */
+body[data-el=ger] .card,body[data-el=ger] .cond,body[data-el=ger] .comofunciona{
+  border-radius:calc(3px + var(--band)*2.4px);
+  border-color:rgba(111,154,78,calc(.16 + var(--band)*.08));
+  box-shadow:inset 0 2px 8px rgba(186,224,152,calc(.012 + var(--band)*.014)),
+   inset 0 calc(var(--band)*-3px) calc(var(--band)*9px) rgba(41,64,26,calc(.08 + var(--band)*.06))}
+/* ── o mofo ───────────────────────────────────────────────────────────────────
+   a mancha verde solta saiu (o glow do Germe e o musgo pendurado no canto do
+   card): no lugar dela, a colônia que vem das BORDAS para dentro. cada mancha
+   nasce com o centro NA aresta da tela — metade dela já está fora e a camada
+   recorta o que passar —, então nada flutua no meio e nada vaza. a banda diz o
+   quanto o mofo já avançou para cima da folha; mesmo no fundo do santuário ele
+   não passa de um palmo de parede. */
+body[data-el=ger] #fx-glow{background:none}
+#fx-mofo{position:fixed;inset:var(--rail) 0 0;overflow:hidden;pointer-events:none;z-index:6;
+  opacity:0;visibility:hidden;transition:opacity 2s,visibility 2s;
+  --m:calc(14px + var(--band)*13px);   /* o avanço para dentro */
+  --ma:calc(.07 + var(--band)*.036);   /* a densidade do esporo */
+  box-shadow:inset 0 0 calc(var(--m)*.9) rgba(79,109,52,calc(.07 + var(--band)*.03));
+  background:linear-gradient(to bottom,rgba(58,82,38,var(--ma)),transparent calc(var(--m)*1.1)),
+   linear-gradient(to top,rgba(58,82,38,calc(var(--ma)*1.25)),transparent calc(var(--m)*1.3)),
+   linear-gradient(to right,rgba(58,82,38,var(--ma)),transparent calc(var(--m)*1.05)),
+   linear-gradient(to left,rgba(58,82,38,var(--ma)),transparent calc(var(--m)*1.05))}
+/* as colônias, comidas por um ruído SVG que serve de máscara: sem ele a borda do
+   mofo sai lisa, e mofo liso não é mofo */
+#fx-mofo::before{content:"";position:absolute;inset:0;
+  background:
+   radial-gradient(ellipse calc(var(--m)*3) calc(var(--m)*1.25) at 9% 0%,rgba(141,187,98,calc(var(--ma)*2.7)),transparent 70%),
+   radial-gradient(ellipse calc(var(--m)*1.9) calc(var(--m)*1.3) at 27% 0%,rgba(111,154,78,calc(var(--ma)*2.2)),transparent 68%),
+   radial-gradient(ellipse calc(var(--m)*3.4) calc(var(--m)*1.05) at 62% 0%,rgba(79,109,52,calc(var(--ma)*2.5)),transparent 72%),
+   radial-gradient(ellipse calc(var(--m)*1.7) calc(var(--m)*1.15) at 88% 0%,rgba(141,187,98,calc(var(--ma)*1.9)),transparent 66%),
+   radial-gradient(ellipse calc(var(--m)*3.2) calc(var(--m)*1.2) at 17% 100%,rgba(111,154,78,calc(var(--ma)*2.6)),transparent 70%),
+   radial-gradient(ellipse calc(var(--m)*2) calc(var(--m)*.9) at 44% 100%,rgba(141,187,98,calc(var(--ma)*2.1)),transparent 68%),
+   radial-gradient(ellipse calc(var(--m)*3.6) calc(var(--m)*1.35) at 73% 100%,rgba(79,109,52,calc(var(--ma)*2.6)),transparent 72%),
+   radial-gradient(ellipse calc(var(--m)*1.5) calc(var(--m)*1) at 95% 100%,rgba(111,154,78,calc(var(--ma)*1.8)),transparent 66%),
+   radial-gradient(ellipse calc(var(--m)*1.05) calc(var(--m)*3) at 0% 18%,rgba(111,154,78,calc(var(--ma)*2.3)),transparent 69%),
+   radial-gradient(ellipse calc(var(--m)*1.35) calc(var(--m)*1.9) at 0% 57%,rgba(141,187,98,calc(var(--ma)*1.9)),transparent 67%),
+   radial-gradient(ellipse calc(var(--m)*.9) calc(var(--m)*2.6) at 0% 88%,rgba(79,109,52,calc(var(--ma)*2.2)),transparent 71%),
+   radial-gradient(ellipse calc(var(--m)*1.15) calc(var(--m)*2.8) at 100% 12%,rgba(79,109,52,calc(var(--ma)*2.5)),transparent 70%),
+   radial-gradient(ellipse calc(var(--m)*1.4) calc(var(--m)*1.7) at 100% 49%,rgba(111,154,78,calc(var(--ma)*2.2)),transparent 67%),
+   radial-gradient(ellipse calc(var(--m)*1) calc(var(--m)*3.2) at 100% 80%,rgba(141,187,98,calc(var(--ma)*2.6)),transparent 69%);
+  -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='mf' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.062' numOctaves='4' seed='13'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 -0.16'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23mf)'/%3E%3C/svg%3E");mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='mf' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.062' numOctaves='4' seed='13'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 -0.16'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23mf)'/%3E%3C/svg%3E");
+  -webkit-mask-size:240px 240px;mask-size:240px 240px}
+body[data-el=ger] #fx-mofo{visibility:visible;opacity:calc(.32 + var(--band)*.135)}
+body[data-el=ger][data-band="5"] #fx-mofo{animation:mofresp 13s ease-in-out infinite}
+@keyframes mofresp{0%,100%{opacity:.82}50%{opacity:1}}
+/* o mofo é efeito, e efeito se desliga: fora com os efeitos, fora no movimento
+   reduzido, fora no papel */
+body.calm #fx-mofo{display:none!important}
+@media (prefers-reduced-motion:reduce){#fx-mofo{display:none!important}}
+@media print{#fx-mofo{display:none!important}}
+body[data-el=ger][data-band="4"] .card::after,body[data-el=ger][data-band="5"] .card::after{
+  content:"❋";position:absolute;right:9px;bottom:5px;color:var(--ecd);font-size:12px;opacity:.6}
+/* a respiração: mole, lenta e fora de compasso entre cards */
+body[data-el=ger][data-band="4"] .card:not(:focus-within):not(:hover):not(.ger-swell){
+  animation:gerresp 7.4s ease-in-out infinite}
+body[data-el=ger][data-band="5"] .card:not(:focus-within):not(:hover):not(.ger-swell){
+  animation:gerresp 5.6s ease-in-out infinite}
+body[data-el=ger] .card:nth-of-type(2n){animation-delay:-2.3s}
+body[data-el=ger] .card:nth-of-type(3n){animation-delay:-4.1s}
+@keyframes gerresp{0%,100%{transform:scale(1)}52%{transform:scale(1.004,1.006)}}
+body[data-el=ger] .card.ger-swell{animation:gerincha 2.6s ease-in-out}
+@keyframes gerincha{0%,100%{transform:scale(1)}26%{transform:scale(1.009,1.015)}
+  48%{transform:scale(1.004,1.007)}72%{transform:scale(1.012,1.021)}}
+body[data-el=ger]:not(.calm) .card{background:rgba(20,22,16,calc(.95 - var(--band)*.035))}
+
+/* ── PACTO: papel de contrato, tinta dourada-suja, cláusulas. a linha de assinatura
+      sob cada título é o porte de Ficha/style.css:525 */
+body[data-el=pac] .card{
+  background:linear-gradient(176deg,#1d1710,#181208 88%);
+  border-color:var(--line2);border-left-color:var(--ec)}
+body[data-el=pac] .card-name{border-bottom:1px solid var(--ecd);padding-bottom:7px}
+/* a pauta do papel timbrado */
+body[data-el=pac][data-band="2"] .card,body[data-el=pac][data-band="3"] .card,
+body[data-el=pac][data-band="4"] .card,body[data-el=pac][data-band="5"] .card{
+  background-image:linear-gradient(176deg,#1d1710,#181208 88%),
+   repeating-linear-gradient(0deg,transparent 0 25px,rgba(184,147,47,calc(var(--band)*.016)) 25px 26px)}
+body[data-el=pac] .card::after{content:"§";position:absolute;right:13px;bottom:8px;
+  color:var(--tinta);opacity:calc(.12 + var(--band)*.06);font-family:var(--serif);font-size:22px}
+body[data-el=pac] .bands dt{color:var(--tinta);opacity:.8}
+body[data-el=pac] .bands dt.falha{color:var(--warn);opacity:1}
+body[data-el=pac] .degraus th{color:var(--tinta)}
+body[data-el=pac] .escala .lbl,body[data-el=pac] .fonte b,body[data-el=pac] .auto{color:var(--tinta)}
+body[data-el=pac] .auto{border-color:var(--tinta)}
+/* a caligrafia: o nome do elemento e os nomes das Distorções são ASSINADOS —
+   Tangerine, a letra do rodapé de um papel que você já assinou. ela desenha
+   pequeno dentro do corpo, então o corpo cresce junto e a entrelinha abre para
+   não cortar a perna das letras. só os títulos: descrição, meta e faixas
+   continuam na serif do arquivo. */
+body[data-el=pac]{--assina:"Tangerine","Apple Chancery","Segoe Script",cursive}
+body[data-el=pac] .portico h2{font-family:var(--assina);font-weight:700;
+  font-size:clamp(82px,14vw,184px);letter-spacing:clamp(0px,.25vw,4px);
+  line-height:1;margin-top:0;padding-bottom:.06em}
+body[data-el=pac] .portico h2 i{font-family:var(--serif);font-size:.26em;letter-spacing:0;
+  align-self:center}
+body[data-el=pac] .card-name{font-family:var(--assina);font-weight:700;font-size:42px;
+  letter-spacing:0;line-height:1.1;padding-bottom:10px}
+body[data-el=pac] .card-name .card-sub{font-family:var(--serif);font-weight:normal;
+  font-size:15px;line-height:1.4;letter-spacing:0}
+
+/* ── ASCENSÃO: sangue e crômio. os dois eixos da ficha, com --ouro em 0 e --carne
+      crescendo com a banda. porte de Ficha/style.css:361-412 */
+body[data-el=asc]{--ouro:0;--carne:0;
+  --infer:calc(var(--carne)*(1 - var(--ouro)));
+  --ecj:rgba(252,241,203,.85);
+  --infr:color-mix(in srgb,var(--ecd) calc(var(--carne)*100%),var(--line));
+  --infl:color-mix(in srgb,#2b1512 calc(var(--carne)*100%),var(--line))}
+body[data-el=asc][data-band="1"]{--srvstep:steps(4,end);--carne:.18}
+body[data-el=asc][data-band="2"]{--srvstep:steps(4,end);--carne:.4}
+body[data-el=asc][data-band="3"]{--srvstep:steps(3,end);--carne:.62}
+body[data-el=asc][data-band="4"]{--srvstep:steps(3,end);--carne:.82}
+body[data-el=asc][data-band="5"]{--srvstep:steps(2,end);--carne:1}
+body[data-el=asc] .btn,body[data-el=asc] #rail .g,body[data-el=asc] .indice a{
+  transition-timing-function:var(--srvstep,ease)}
+body[data-el=asc] .card{
+  border-image:repeating-linear-gradient(45deg,var(--infr) 0 8px,var(--infl) 8px 16px) 1;
+  box-shadow:inset 0 1px 0 rgba(198,214,228,calc(.03 + var(--band)*.03)),
+   inset 0 -1px 0 rgba(0,0,0,calc(.22 + var(--band)*.08)),
+   inset 0 0 calc(var(--infer)*15px) calc(var(--infer)*-3px) rgba(56,15,11,calc(var(--infer)*.55));
+  transition:box-shadow .18s steps(2,end),background .5s}
+/* o inferno na superfície: carne úmida nos cantos, óleo escorrendo, aço sujo pegando luz */
+body[data-el=asc] .card::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(104deg,transparent 0 16%,rgba(200,216,230,calc(.004 + var(--band)*.011)) 25% 32%,transparent 41% 63%,rgba(200,216,230,calc(.003 + var(--band)*.008)) 70% 74%,transparent 82%),
+   radial-gradient(38% 20% at 26% 13%,rgba(206,140,116,calc(var(--infer)*.07)) 0 42%,transparent 76%),
+   linear-gradient(178deg,rgba(14,9,7,calc(var(--infer)*.5)) 0 3%,transparent 9% 84%,rgba(10,6,5,calc(var(--infer)*.42)) 96%),
+   radial-gradient(126% 66% at 3% 0%,rgba(92,30,23,calc(var(--infer)*.42)) 0 21%,rgba(49,17,14,calc(var(--infer)*.2)) 47%,transparent 73%),
+   radial-gradient(98% 58% at 99% 103%,rgba(78,25,19,calc(var(--infer)*.34)) 0 25%,transparent 65%),
+   radial-gradient(28% 74% at 82% 8%,rgba(18,13,9,calc(var(--infer)*.4)) 0 34%,transparent 72%)}
+body[data-el=asc]:not(.calm) .card{background:rgba(22,17,13,calc(.97 - var(--band)*.06))}
+body[data-el=asc] .card-name:not(:hover){filter:blur(calc(var(--band)*.07px))}
+body[data-el=asc].asc-beat .card:not(:hover):not(:focus-within){
+  box-shadow:inset 0 1px 0 rgba(198,214,228,calc(.03 + var(--band)*.03)),
+   inset 0 -1px 0 rgba(0,0,0,calc(.22 + var(--band)*.08)),
+   inset 0 0 calc(var(--infer)*26px) calc(var(--infer)*-2px) rgba(84,20,14,calc(var(--infer)*.7))}
+
+/* ── OBSERVAÇÃO: vigilância. o olho vive ATRÁS dos cards, e para ele existir o card
+      deixa passar um pouco — recuando na hora sob o cursor. porte de Ficha/style.css:335 */
+body[data-el=obs]:not(.calm) .card:not(:hover):not(:focus-within){
+  background:rgba(24,20,15,calc(.96 - var(--band)*.09));transition:background .5s}
+body[data-el=obs][data-band="2"] .card-name::after,body[data-el=obs][data-band="3"] .card-name::after,
+body[data-el=obs][data-band="4"] .card-name::after,body[data-el=obs][data-band="5"] .card-name::after{
+  content:"⊙";font-size:11px;color:var(--ec);margin-left:8px;animation:blinkeye 6s infinite;
+  display:inline-block;vertical-align:middle}
+@keyframes blinkeye{0%,92%,100%{transform:scaleY(1);opacity:.85}95%{transform:scaleY(.1);opacity:.4}}
+body[data-el=obs] .card{border-top:1px solid var(--line2)}
+
+/* ── ECO: repetição, atraso, texto-fantasma. porte de Ficha/style.css:318-325 */
+body[data-el=eco] .portico h2,body[data-el=eco] .card-name,body[data-el=eco] .cond .lbl{
+  text-shadow:calc(var(--band)*1.2px) calc(var(--band)*1.2px) 0 rgba(127,184,168,.35)}
+body[data-el=eco][data-band="3"] .portico h2,body[data-el=eco][data-band="3"] .card-name,
+body[data-el=eco][data-band="4"] .portico h2,body[data-el=eco][data-band="4"] .card-name,
+body[data-el=eco][data-band="5"] .portico h2,body[data-el=eco][data-band="5"] .card-name{
+  text-shadow:calc(var(--band)*1.2px) calc(var(--band)*1.2px) 0 rgba(127,184,168,.35),
+   calc(var(--band)*2.7px) calc(var(--band)*2.2px) 0 rgba(127,184,168,.15);
+  transition:text-shadow 1.1s ease-out;animation:ecoghost 1.1s ease-out}
+@keyframes ecoghost{from{text-shadow:calc(var(--band)*3.6px) calc(var(--band)*3px) 0 rgba(127,184,168,.42),
+  calc(var(--band)*7px) calc(var(--band)*5.5px) 0 rgba(127,184,168,.22)}}
+body[data-el=eco][data-band="5"] .meta,body[data-el=eco][data-band="5"] .bands dt,
+body[data-el=eco][data-band="5"] .indice a{text-shadow:1.5px 1.4px 0 rgba(127,184,168,.14);
+  transition:text-shadow 1.3s ease-out}
+body[data-el=eco]:not(.calm) .card{background:rgba(19,22,21,calc(.96 - var(--band)*.03))}
+/* o sulco: a segunda leitura do mesmo card deixa marca */
+body[data-el=eco] .card[data-relido]::before{content:attr(data-relido);position:absolute;
+  right:12px;top:8px;font-family:var(--mono);font-size:8.5px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--ec);opacity:.42}
+
+/* ── o colapso geral da banda 5, portado de Ficha/style.css:632-636 ── */
+body[data-band="5"] .portico h2{animation:aberra 4s steps(3) infinite}
+@keyframes aberra{0%,94%{text-shadow:none}96%{text-shadow:-2px 0 var(--red),2px 0 var(--ec)}
+  98%{text-shadow:2px 0 var(--red),-2px 0 var(--ec)}}
+body[data-band="5"] .portico h2:hover{animation:none}
+
+/* ══ CALMAR / MOVIMENTO REDUZIDO ═════════════════════════════════════════════
+   com os efeitos desligados o documento continua legível e bonito: nada de
+   opacidade parcial, nada de blur, nada de animação — só a tipografia e a cor.
+   porte de Ficha/style.css:640-663 */
+body.calm *,body.calm *::before,body.calm *::after{animation:none!important;transition:none!important}
+body.calm #fx-bg,body.calm #fx-fore,body.calm #fx-tunnel,body.calm #whisper,
+body.calm #fx-tear,body.calm #fx-vign::after,body.calm .fx-ghost,body.calm .ger-scar,
+body.calm .pac-caret,body.calm .pac-sug,body.calm .obs-reg{display:none!important}
+body.calm .card,body.calm .comofunciona,body.calm .indice a{opacity:1!important;filter:none!important}
+body.calm[data-el=vaz] .card,body.calm[data-el=ger] .card,body.calm[data-el=obs] .card,
+body.calm[data-el=eco] .card,body.calm[data-el=asc] .card{background:var(--panel)!important}
+body.calm .vaz-sub,body.calm .vaz-cut{opacity:1!important;clip-path:none!important}
+body.calm[data-el=asc]{--carne:.3!important}
+body.calm[data-el=asc] .card-name{filter:none!important}
+body.calm .portico .glifao{opacity:.1}
+body.calm #fx-grain{opacity:.03}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  #fx-bg,#fx-fore,#fx-tunnel,#fx-tear,#fx-vign::after,.fx-ghost,.ger-scar,.pac-caret,
+  .pac-sug,.obs-reg,#whisper{display:none!important}
+  .card,.comofunciona,.indice a{opacity:1!important;filter:none!important}
+  html{scroll-behavior:auto}
 }
-#main{flex:1 1 auto; min-width:0; padding:2.2rem clamp(1rem,4vw,4rem) 8rem; max-width:56rem;}
 
-#nav .navhead{padding:1.1rem 1rem .8rem; border-bottom:2px solid var(--rule); position:sticky; top:0; background:var(--panel); z-index:5;}
-#nav .navhead b{display:block; font-size:.95rem; letter-spacing:.06em; color:var(--gold);}
-#nav .navhead span{display:block; font-size:.66rem; color:var(--ink-faint); margin-top:.2rem;}
-#nav input#navfilter{width:100%; margin-top:.6rem; background:var(--bg); border:1px solid var(--rule); color:var(--ink); padding:.35rem .5rem; font-family:inherit; font-size:.72rem;}
+/* ══ FOCO VISÍVEL / ACESSIBILIDADE ═════════════════════════════════════════ */
+:focus-visible{outline:2px solid var(--ec);outline-offset:2px}
+.skip{position:absolute;left:-9999px;top:0;z-index:99;background:var(--panel);color:var(--ec);
+  padding:10px 16px;font-family:var(--mono);font-size:12px;border:1px solid var(--ec)}
+.skip:focus{left:8px;top:calc(var(--rail) + 8px)}
+.busca-vazia{font-family:var(--mono);font-size:11px;letter-spacing:1.6px;color:var(--faint);
+  padding:10px 12px}
+.card.oculto,.ent.oculto,.indice a.oculto{display:none}
 
-#nav ul{list-style:none; margin:0; padding:0;}
-#nav .part{border-bottom:1px solid var(--rule-lite);}
-#nav .part > a{display:block; padding:.55rem 1rem; font-size:.76rem; letter-spacing:.05em; color:var(--ink); text-decoration:none; font-weight:bold;}
-#nav .part > a:hover{background:var(--rule-lite);}
-#nav .sub{padding-left:0; background:#17140f;}
-#nav .sub a{display:block; padding:.3rem 1rem .3rem 1.6rem; font-size:.66rem; color:var(--ink-dim); text-decoration:none; border-left:3px solid transparent;}
-#nav .sub a:hover{color:var(--ink); background:var(--rule-lite);}
-#nav .soon > a{color:var(--ink-faint); font-style:italic;}
-#nav .soon > a::after{content:" · em breve"; font-size:.58rem; letter-spacing:.05em;}
+/* ══ A BUSCA — o resultado sobre as 43, de qualquer lugar do arquivo ══ */
+#resultados{position:fixed;z-index:30;width:320px;max-height:62vh;overflow-y:auto;
+  background:rgba(12,10,8,.98);border:1px solid var(--line2);
+  box-shadow:0 22px 44px -18px #000;display:none}
+#resultados.on{display:block}
+#resultados .res{display:flex;align-items:baseline;gap:9px;width:100%;text-align:left;
+  background:none;border:none;border-bottom:1px solid rgba(255,255,255,.04);
+  padding:8px 11px;color:var(--dim);font-family:var(--mono);font-size:11.5px;transition:.14s}
+#resultados .res:hover,#resultados .res:focus-visible{background:rgba(255,255,255,.05);color:var(--ink);outline:none}
+#resultados .res i{font-style:normal;font-size:14px;width:16px;flex:0 0 16px;color:var(--rk)}
+#resultados .res span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#resultados .res em{font-style:normal;font-size:8.5px;letter-spacing:1.8px;text-transform:uppercase;
+  color:var(--faint);flex:0 0 auto}
+#resultados .res[data-el=vaz]{--rk:#7c8fb5}#resultados .res[data-el=ger]{--rk:#8dbb62}
+#resultados .res[data-el=pac]{--rk:#c13a52}#resultados .res[data-el=asc]{--rk:#c15a45}
+#resultados .res[data-el=obs]{--rk:#c9a227}#resultados .res[data-el=eco]{--rk:#7fb8a8}
 
-.b-vaz{border-left-color:var(--c-vaz) !important;}
-.b-ger{border-left-color:var(--c-ger) !important;}
-.b-pac{border-left-color:var(--c-pac) !important;}
-.b-obs{border-left-color:var(--c-obs) !important;}
-.b-asc{border-left-color:var(--c-asc) !important;}
-.b-eco{border-left-color:var(--c-eco) !important;}
-
-/* ---------- tipografia geral ---------- */
-h1,h2,h3,h4{font-family:"Courier New",monospace; font-weight:bold; color:var(--gold); letter-spacing:.02em;}
-h1{font-size:1.9rem; border-bottom:3px double var(--rule); padding-bottom:.6rem; margin:0 0 1.2rem;}
-h2.elem{font-size:1.7rem; margin:3.2rem 0 1rem; padding-top:1.4rem; border-top:2px solid var(--rule);}
-p{margin:0 0 .9rem;}
-a{color:var(--gold);}
-.anchor-target{scroll-margin-top:1rem;}
-.kicker{font-family:"Courier New",monospace; font-size:.68rem; letter-spacing:.2em; text-transform:uppercase; color:var(--ink-faint);}
-.totop{display:inline-block; font-family:"Courier New",monospace; font-size:.62rem; letter-spacing:.15em; color:var(--ink-faint); text-decoration:none; margin-top:.8rem;}
-.totop:hover{color:var(--gold);}
-strong{color:var(--ink);}
-em{color:#cfc6b3;}
-a.ref{color:var(--mist); text-decoration:none; border-bottom:1px dotted var(--mist);}
-a.ref:hover{color:var(--gold); border-bottom-color:var(--gold);}
-
-/* ---------- abertura ---------- */
-.aviso{border:2px solid var(--gold); padding:1rem 1.2rem; margin:1.2rem 0 0; background:#1c1710;}
-.aviso .lbl{font-family:"Courier New",monospace; font-size:.64rem; letter-spacing:.15em; text-transform:uppercase; color:var(--gold); display:block; margin-bottom:.4rem;}
-
-/* ---------- índice do topo ---------- */
-.toc{border:1px solid var(--rule); background:var(--panel); padding:1rem 1.2rem; margin:1.6rem 0;}
-.toc .h{font-family:"Courier New",monospace; font-size:.64rem; letter-spacing:.15em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:.5rem;}
-.toc .cols{columns:2; column-gap:2rem;}
-.toc a{display:block; padding:.12rem 0; font-family:"Courier New",monospace; font-size:.74rem; text-decoration:none; color:var(--ink-dim); border-bottom:1px dashed var(--rule-lite); break-inside:avoid;}
-.toc a:hover{color:var(--gold);}
-.toc .grp{font-family:"Courier New",monospace; font-size:.66rem; letter-spacing:.1em; text-transform:uppercase; color:var(--gold); margin:.5rem 0 .2rem; break-inside:avoid;}
-@media (max-width:640px){.toc .cols{columns:1;}}
-
-/* ---------- Lei + Como funciona ---------- */
-.lei{border-left:4px solid var(--accent,var(--gold)); padding:.4rem 0 .4rem 1.1rem; margin:1rem 0 1.2rem;
-     font-style:italic; color:#d8cfc0; background:linear-gradient(90deg,rgba(255,255,255,.02),transparent 60%);}
-.comofunciona{border:1px solid var(--rule); background:var(--bg2); padding:1rem 1.2rem; margin:1rem 0;}
-.comofunciona h4{margin:0 0 .5rem; color:var(--ink-dim); text-transform:uppercase; font-size:.74rem; letter-spacing:.08em;}
-.comofunciona p{margin:0 0 .5rem;}
-.comofunciona .r{margin:.15rem 0;}
-.comofunciona .r b{color:var(--ink); font-family:"Courier New",monospace; font-size:.78rem;}
-.degraus{width:100%; border-collapse:collapse; margin:.8rem 0 .2rem; font-size:.9rem;}
-.degraus th,.degraus td{border:1px solid var(--rule); padding:.42rem .6rem; text-align:left; vertical-align:top;}
-.degraus th{background:var(--rule-lite); font-family:"Courier New",monospace; font-size:.64rem; letter-spacing:.06em; text-transform:uppercase; color:var(--gold);}
-.degraus td b{color:var(--ink);} .degraus .deg{font-family:"Courier New",monospace; color:var(--c-pac); white-space:nowrap;}
-
-/* ---------- condição do elemento (destaque) ---------- */
-.cond{border:2px solid var(--accent,var(--gold)); border-radius:2px; padding:1rem 1.2rem; margin:1.4rem 0 2rem; background:#191510;}
-.cond .lbl{font-family:"Courier New",monospace; font-size:.66rem; letter-spacing:.14em; text-transform:uppercase; color:var(--accent,var(--gold)); display:block; margin-bottom:.5rem;}
-.cond p{margin:0 0 .5rem;}
-.cond p:last-child{margin-bottom:0;}
-
-/* ---------- card de Distorção ---------- */
-.card{border:1px solid var(--rule); border-left:5px solid var(--accent,var(--ink-faint)); background:var(--panel);
-      padding:1.2rem 1.4rem; margin:1.6rem 0; scroll-margin-top:1rem;}
-.card-head{display:flex; align-items:baseline; gap:.6rem; flex-wrap:wrap;}
-.card-num{font-family:"Courier New",monospace; font-weight:bold; color:var(--accent,var(--gold)); font-size:1.15rem;}
-.card-name{font-family:"Courier New",monospace; font-weight:bold; font-size:1.12rem; color:var(--ink); margin:0;}
-.card-name .card-sub{color:var(--ink-dim); font-weight:normal; font-style:italic; font-size:.86rem;}
-.auto{font-family:"Courier New",monospace; font-size:.6rem; letter-spacing:.08em; text-transform:uppercase; color:var(--accent,var(--gold)); margin-top:.5rem;}
-.meta{font-family:"Courier New",monospace; font-size:.72rem; letter-spacing:.02em; color:var(--ink-dim); margin:.3rem 0 .2rem; border-bottom:1px dashed var(--rule); padding-bottom:.6rem;}
-.desc{margin:.8rem 0; padding:.2rem 0 .2rem 1rem; border-left:2px solid var(--accent,var(--gold));
-      font-style:italic; color:var(--ink); font-size:1.02rem;}
-.fonte{margin:.5rem 0 .2rem; font-size:.92rem; color:#dcd4c6;}
-.fonte b{font-family:"Courier New",monospace; font-size:.64rem; letter-spacing:.1em; text-transform:uppercase; color:var(--accent,var(--gold)); margin-right:.45rem;}
-
-.bands{margin:.6rem 0 0; display:grid; grid-template-columns:auto 1fr; gap:.1rem .9rem;}
-.bands dt{font-family:"Courier New",monospace; font-size:.66rem; letter-spacing:.06em; text-transform:uppercase; padding-top:.42rem; white-space:nowrap; color:var(--ink-faint);}
-.bands dd{margin:.35rem 0 0; color:#dcd4c6;}
-.bands dt.falha{color:var(--warn);}
-.bands dt.parcial{color:var(--ink-dim);}
-.bands dt.total{color:#8fae7a;}
-.bands dt.crit{color:var(--gold);}
-.bands dt.efeito{color:var(--gold);}
-.bands dt.sobre{color:var(--mist);}
-.bands .ero{color:var(--c-vaz); font-style:italic; font-size:.92em;}
-.subchoice{margin:.3rem 0 0; padding-left:1rem;}
-.subchoice li{margin-bottom:.2rem; list-style:none;}
-.subchoice li b{color:var(--ink);}
-
-.escala{border-top:1px dashed var(--rule); margin-top:1rem; padding-top:.7rem;}
-.escala .lbl{font-family:"Courier New",monospace; font-size:.64rem; letter-spacing:.1em; text-transform:uppercase; color:var(--accent,var(--gold)); display:block; margin-bottom:.4rem;}
-.escala ul{margin:0; padding-left:1.1rem;}
-.escala li{margin-bottom:.3rem;}
-.escala li b{color:var(--ink); font-family:"Courier New",monospace; font-size:.76rem;}
-.escala p{margin:0;}
-
-.card-note{margin:1rem 0 0; font-style:italic; color:var(--ink-dim); font-size:.9rem; border-top:1px dashed var(--rule-lite); padding-top:.6rem;}
-
-/* ---------- elemento ainda por vir ---------- */
-.elem-wrap.soon{opacity:.62;}
-.soonbox{border:1px dashed var(--ink-faint); background:#191510; padding:1rem 1.2rem; margin:1rem 0; color:var(--ink-dim); font-size:.92rem;}
-.soonbox .lbl{font-family:"Courier New",monospace; font-size:.62rem; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint); display:block; margin-bottom:.4rem;}
-
-/* accent por elemento aplicado no wrapper */
-.e-vaz{--accent:var(--c-vaz);} .e-ger{--accent:var(--c-ger);} .e-pac{--accent:var(--c-pac);}
-.e-obs{--accent:var(--c-obs);} .e-asc{--accent:var(--c-asc);} .e-eco{--accent:var(--c-eco);}
-
-@media (max-width:960px){
-  #shell{flex-direction:column;}
-  #nav{position:relative; width:100%; height:auto; max-height:55vh; flex:none;}
-  #main{padding:1.4rem 1rem 6rem;}
+/* ══ RESPONSIVO — desktop primeiro, mas não quebrado no resto ══════════════ */
+@media (max-width:1040px){
+  .entradas{grid-template-columns:repeat(2,1fr)}
+  .corpo{grid-template-columns:1fr}
+  .indice{position:relative;top:0;max-height:none;border-right:none;
+    border-bottom:1px solid var(--line);padding:20px 0 18px;
+    display:flex;flex-wrap:wrap;gap:2px}
+  .indice .h,.indice .sep{width:100%}
+  .indice a{border-left:none;border-bottom:2px solid transparent;padding:5px 10px}
+  .indice a.here{border-left:none;border-bottom-color:var(--ec)}
+  .leitura{padding-left:0}
+  .pasta{padding:32px 26px 32px 44px}
+  .pasta h1{font-size:38px;letter-spacing:7px}
+  .selo{position:static;display:inline-block;transform:rotate(-3deg);margin-bottom:14px}
 }
-@media (max-width:560px){
-  .bands{grid-template-columns:1fr; gap:0;}
-  .bands dt{padding-top:.6rem;}
+@media (max-width:680px){
+  body{font-size:15px}
+  .entradas{grid-template-columns:1fr}
+  .regs{grid-template-columns:repeat(2,auto);gap:12px 26px}
+  #rail{gap:8px;padding:0 10px}
+  #rail .brand span,#railsearch{display:none}
+  #rail .g{width:29px}
+  .bands{grid-template-columns:1fr;gap:0}
+  .bands dt{padding-top:12px}
+  .card{padding:16px 16px}
+  .comofunciona .r b{min-width:0;display:block}
+  .portico{padding-top:calc(var(--rail) + 40px)}
 }
 @media print{
-  #nav{display:none;}
-  #main{padding:0; max-width:none;}
-  body{background:#fff; color:#000;}
-  .card,.cond,.comofunciona{break-inside:avoid;}
+  #rail,.indice,#fx-bg,#fx-fore,#fx-vign,#fx-glow,#fx-grain,#fx-tunnel,#whisper{display:none!important}
+  .view,.santuario{display:block!important}
+  body{background:#fff;color:#000}
+  .card,.cond,.comofunciona{break-inside:avoid;border-color:#999;background:#fff}
+  .corpo{grid-template-columns:1fr}
+  .portico{min-height:0;padding:20px 0}
 }
 </style>
 </head>
-<body>
-<div id="shell">
+<body data-view="capa" data-el="" data-band="0">
 
-<!-- ============================================================ NAV ============================================================ -->
-<nav id="nav">
-  <div class="navhead">
-    <b>PROTOCOLO</b>
-    <span>Distorções · referência do jogador</span>
-    <input id="navfilter" type="text" placeholder="Ctrl+F / buscar aqui…" oninput="filterNav(this.value)">
+<!-- ══ as camadas de efeito. mesmo arranjo do Ficha_Automatica.html: canvas por trás
+        do conteúdo, vinheta e grão por cima, tudo pointer-events:none ══ -->
+<canvas id="fx-bg"></canvas>
+<canvas id="fx-fore"></canvas>
+<div id="fx-glow"></div>
+<div id="fx-mofo"></div>
+<div id="fx-tunnel"></div>
+<div id="fx-vign"></div>
+<div id="fx-grain"></div>
+<div id="fx-tear"></div>
+<div id="whisper" aria-hidden="true"></div>
+
+<a class="skip" href="#leitura-atual">pular para o conteúdo</a>
+
+<!-- ══ TRILHO: volta à capa, salto entre santuários, busca, efeitos ══ -->
+<header id="rail">
+  <div class="brand">PROTOCOLO<span> · O ARQUIVO DOS <b>SEIS</b></span></div>
+  <button class="btn" id="btnBack" title="voltar à capa (Esc)">◄ Arquivo</button>
+  <input id="railsearch" type="search" placeholder="buscar distorção…" autocomplete="off" spellcheck="false">
+  <div class="glyphs" role="tablist" aria-label="santuários">
+    <button class="g" data-g="vaz" data-glyph="◌︎" title="Vazio ◌︎" role="tab">◌︎</button>
+    <button class="g" data-g="ger" data-glyph="❋︎" title="Germe ❋︎" role="tab">❋︎</button>
+    <button class="g" data-g="pac" data-glyph="⚖︎" title="Pacto ⚖︎" role="tab">⚖︎</button>
+    <button class="g" data-g="asc" data-glyph="⌬︎" title="Ascensão ⌬︎" role="tab">⌬︎</button>
+    <button class="g" data-g="obs" data-glyph="⊙︎" title="Observação ⊙︎" role="tab">⊙︎</button>
+    <button class="g" data-g="eco" data-glyph="☊︎" title="Eco ☊︎" role="tab">☊︎</button>
   </div>
-  <ul>
-    <li class="part"><a href="#topo">O que são Distorções</a></li>
+  <button class="btn" id="btnCalm" title="ligar/desligar os efeitos visuais">🌫 Efeitos</button>
+</header>
 
-    <li class="part"><a href="#vazio">Vazio ◌</a>
-      <ul class="sub">
-        <li><a class="b-vaz" href="#vaz-lanca">1 · Lança do Nada</a></li>
-        <li><a class="b-vaz" href="#vaz-menos">2 · Menos</a></li>
-        <li><a class="b-vaz" href="#vaz-calar">3 · Calar</a></li>
-        <li><a class="b-vaz" href="#vaz-oquefalta">4 · O Que Falta</a></li>
-        <li><a class="b-vaz" href="#vaz-passo">5 · Passo Vazio</a></li>
-        <li><a class="b-vaz" href="#vaz-distancia">6 · Subtrair a Distância</a></li>
-        <li><a class="b-vaz" href="#vaz-vinculo">7 · Subtrair o Vínculo</a></li>
-        <li><a class="b-vaz" href="#vaz-nada">8 · O Nada que Resta</a></li>
-      </ul>
-    </li>
+<!-- ══════════════════════════════════════════════════════════════════════════
+     A CAPA — a pasta do arquivo confidencial
+     ══════════════════════════════════════════════════════════════════════════ -->
+<main class="view on" id="capa">
+  <div class="pasta">
+    <div class="selo">Confidencial<small>não reproduzir</small></div>
+    <div class="tag">Protocolo · referência do jogador</div>
+    <h1>O ARQUIVO<br>DOS <b>SEIS</b></h1>
+    <p class="sub">Distorções · as quarenta e três · brasil, 2002</p>
 
-    <li class="part"><a href="#germe">Germe ❋</a>
-      <ul class="sub">
-        <li><a class="b-ger" href="#ger-broto">1 · Broto Faminto</a></li>
-        <li><a class="b-ger" href="#ger-enxerto">2 · Enxerto</a></li>
-        <li><a class="b-ger" href="#ger-simbiose">3 · Simbiose</a></li>
-        <li><a class="b-ger" href="#ger-jardim">4 · O Jardim</a></li>
-        <li><a class="b-ger" href="#ger-praga">5 · Praga</a></li>
-        <li><a class="b-ger" href="#ger-colheita">6 · Colheita</a></li>
-        <li><a class="b-ger" href="#ger-floracao">7 · Floração</a></li>
-      </ul>
-    </li>
+    <div class="regs">
+      <div><div class="k">Arquivo</div><div class="v">DIST-43</div></div>
+      <div><div class="k">Volumes</div><div class="v">VI</div></div>
+      <div><div class="k">Entradas</div><div class="v">43</div></div>
+      <div><div class="k">Classe</div><div class="v">interno</div></div>
+    </div>
 
-    <li class="part"><a href="#pacto">Pacto ⚖</a>
-      <ul class="sub">
-        <li><a class="b-pac" href="#pac-palavra">1 · A Palavra</a></li>
-        <li><a class="b-pac" href="#pac-tomaladaca">2 · Toma Lá, Dá Cá</a></li>
-        <li><a class="b-pac" href="#pac-fianca">3 · Fiança</a></li>
-        <li><a class="b-pac" href="#pac-cobranca">4 · A Cobrança</a></li>
-        <li><a class="b-pac" href="#pac-letramiuda">5 · A Letra Miúda</a></li>
-        <li><a class="b-pac" href="#pac-contrato">6 · O Grande Contrato</a></li>
-      </ul>
-    </li>
-    <li class="part"><a href="#ascensao">Ascensão ⌬</a>
-      <ul class="sub">
-        <li><a class="b-asc" href="#asc-afiar">1 · Afiar a Carne</a></li>
-        <li><a class="b-asc" href="#asc-devorar">2 · Devorar</a></li>
-        <li><a class="b-asc" href="#asc-topo">3 · O Topo da Cadeia</a></li>
-        <li><a class="b-asc" href="#asc-frenesi">4 · Frenesi</a></li>
-        <li><a class="b-asc" href="#asc-vestir">5 · Vestir a Carne</a></li>
-        <li><a class="b-asc" href="#asc-naosinto">6 · Não Sinto Mais</a></li>
-        <li><a class="b-asc" href="#asc-formafinal">7 · A Forma Final</a></li>
-      </ul>
-    </li>
-    <li class="part"><a href="#observacao">Observação ⊙</a>
-      <ul class="sub">
-        <li><a class="b-obs" href="#obs-observar">1 · Observar</a></li>
-        <li><a class="b-obs" href="#obs-ponto">2 · Ponto Exato</a></li>
-        <li><a class="b-obs" href="#obs-ler">3 · Ler a Página</a></li>
-        <li><a class="b-obs" href="#obs-realcar">4 · Realçar</a></li>
-        <li><a class="b-obs" href="#obs-olhos">5 · Olhos Emprestados</a></li>
-        <li><a class="b-obs" href="#obs-verdeverdade">6 · Ver de Verdade</a></li>
-        <li><a class="b-obs" href="#obs-peso">7 · O Peso do Olhar</a></li>
-        <li><a class="b-obs" href="#obs-visto">8 · Você Foi Visto</a></li>
-        <li><a class="b-obs" href="#obs-memoria">9 · A Memória do Mundo</a></li>
-      </ul>
-    </li>
-    <li class="part"><a href="#eco">Eco ☊</a>
-      <ul class="sub">
-        <li><a class="b-eco" href="#eco-coro">1 · Coro</a></li>
-        <li><a class="b-eco" href="#eco-segundo">2 · O Segundo Antes</a></li>
-        <li><a class="b-eco" href="#eco-dejavu">3 · O Déjà Vu</a></li>
-        <li><a class="b-eco" href="#eco-gravacao">4 · A Gravação que Apodrece</a></li>
-        <li><a class="b-eco" href="#eco-vozes">5 · Todas as Vozes</a></li>
-        <li><a class="b-eco" href="#eco-dia">6 · O Dia que Não Passa</a></li>
-      </ul>
-    </li>
-  </ul>
-</nav>
+    <p class="lede"><strong>Distorção</strong> é o termo do jogo para o que outros sistemas chamariam de "magia". Cada elemento distorce o mundo à sua maneira, segundo a sua Lei. Este documento reúne as Distorções que você pode aprender e conjurar, começando pelos dois primeiros elementos — <strong>Vazio</strong> e <strong>Germe</strong>. Os outros quatro entram depois.</p>
 
-<!-- ============================================================ MAIN ============================================================ -->
-<main id="main">
-
-<a id="topo" class="anchor-target"></a>
-<div class="kicker">Protocolo · referência do jogador</div>
-<h1>Distorções</h1>
-
-<p><strong>Distorção</strong> é o termo do jogo para o que outros sistemas chamariam de "magia". Cada elemento distorce o mundo à sua maneira, segundo a sua Lei. Este documento reúne as Distorções que você pode aprender e conjurar, começando pelos dois primeiros elementos — <strong>Vazio</strong> e <strong>Germe</strong>. Os outros quatro entram depois.</p>
-
-<div class="aviso">
-  <span class="lbl">Nota de playtest</span>
-  <p style="margin:0;">Os <strong>números</strong> aqui — custos, dados, escalas, tetos — <strong>podem mudar em playtest</strong>. O que está fixo é a <em>forma</em> de cada Distorção: o que ela faz e como o elemento cobra por ela.</p>
-</div>
-
-<div class="toc">
-  <div class="h">Índice</div>
-  <div class="cols">
-    <div class="grp">Vazio ◌</div>
-    <a href="#vaz-lanca">1 · Lança do Nada</a>
-    <a href="#vaz-menos">2 · Menos</a>
-    <a href="#vaz-calar">3 · Calar</a>
-    <a href="#vaz-oquefalta">4 · O Que Falta</a>
-    <a href="#vaz-passo">5 · Passo Vazio</a>
-    <a href="#vaz-distancia">6 · Subtrair a Distância</a>
-    <a href="#vaz-vinculo">7 · Subtrair o Vínculo</a>
-    <a href="#vaz-nada">8 · O Nada que Resta</a>
-    <div class="grp">Germe ❋</div>
-    <a href="#ger-broto">1 · Broto Faminto</a>
-    <a href="#ger-enxerto">2 · Enxerto</a>
-    <a href="#ger-simbiose">3 · Simbiose</a>
-    <a href="#ger-jardim">4 · O Jardim</a>
-    <a href="#ger-praga">5 · Praga</a>
-    <a href="#ger-colheita">6 · Colheita</a>
-    <a href="#ger-floracao">7 · Floração</a>
-    <div class="grp">Pacto ⚖</div>
-    <a href="#pac-palavra">1 · A Palavra</a>
-    <a href="#pac-tomaladaca">2 · Toma Lá, Dá Cá</a>
-    <a href="#pac-fianca">3 · Fiança</a>
-    <a href="#pac-cobranca">4 · A Cobrança</a>
-    <a href="#pac-letramiuda">5 · A Letra Miúda</a>
-    <a href="#pac-contrato">6 · O Grande Contrato</a>
-    <div class="grp">Ascensão ⌬</div>
-    <a href="#asc-afiar">1 · Afiar a Carne</a>
-    <a href="#asc-devorar">2 · Devorar</a>
-    <a href="#asc-topo">3 · O Topo da Cadeia</a>
-    <a href="#asc-frenesi">4 · Frenesi</a>
-    <a href="#asc-vestir">5 · Vestir a Carne</a>
-    <a href="#asc-naosinto">6 · Não Sinto Mais</a>
-    <a href="#asc-formafinal">7 · A Forma Final</a>
-    <div class="grp">Observação ⊙</div>
-    <a href="#obs-observar">1 · Observar</a>
-    <a href="#obs-ponto">2 · Ponto Exato</a>
-    <a href="#obs-ler">3 · Ler a Página</a>
-    <a href="#obs-realcar">4 · Realçar</a>
-    <a href="#obs-olhos">5 · Olhos Emprestados</a>
-    <a href="#obs-verdeverdade">6 · Ver de Verdade</a>
-    <a href="#obs-peso">7 · O Peso do Olhar</a>
-    <a href="#obs-visto">8 · Você Foi Visto</a>
-    <a href="#obs-memoria">9 · A Memória do Mundo</a>
-    <div class="grp">Eco ☊</div>
-    <a href="#eco-coro">1 · Coro</a>
-    <a href="#eco-segundo">2 · O Segundo Antes</a>
-    <a href="#eco-dejavu">3 · O Déjà Vu</a>
-    <a href="#eco-gravacao">4 · A Gravação que Apodrece</a>
-    <a href="#eco-vozes">5 · Todas as Vozes</a>
-    <a href="#eco-dia">6 · O Dia que Não Passa</a>
+    <div class="aviso">
+      <span class="lbl">Nota de playtest</span>
+      <p style="margin:0;">Os <strong>números</strong> aqui — custos, dados, escalas, tetos — <strong>podem mudar em playtest</strong>. O que está fixo é a <em>forma</em> de cada Distorção: o que ela faz e como o elemento cobra por ela.</p>
+    </div>
   </div>
-</div>
 
-<!-- ═══════════════════════════════════════════ VAZIO ═══════════════════════════════════════════ -->
-<div class="elem-wrap e-vaz">
-<a id="vazio" class="anchor-target"></a>
-<h2 class="elem">Vazio ◌</h2>
+  <div class="entradas-h">Os seis volumes</div>
+  <div class="entradas" id="entradas">
+    <button class="ent" data-k="vaz" data-go="vaz">
+      <span class="gly">◌︎</span>
+      <span class="vol">Volume I</span>
+      <span class="nm"><i>◌︎</i>Vazio</span>
+      <span class="vb">subtrai</span>
+      <span class="ep">O que se aproxima volta com menos do que tinha.</span>
+      <span class="fim"><span>Lei da Subtração · <b>8 Distorções</b></span><span class="abrir">Abrir ▸</span></span>
+    </button>
+    <button class="ent" data-k="ger" data-go="ger">
+      <span class="gly">❋︎</span>
+      <span class="vol">Volume II</span>
+      <span class="nm"><i>❋︎</i>Germe</span>
+      <span class="vb">infecta</span>
+      <span class="ep">O que você planta fica plantado.</span>
+      <span class="fim"><span>Lei da Semeadura · <b>7 Distorções</b></span><span class="abrir">Abrir ▸</span></span>
+    </button>
+    <button class="ent" data-k="pac" data-go="pac">
+      <span class="gly">⚖︎</span>
+      <span class="vol">Volume III</span>
+      <span class="nm"><i>⚖︎</i>Pacto</span>
+      <span class="vb">troca</span>
+      <span class="ep">Tudo se anota. Nada se esquece.</span>
+      <span class="fim"><span>Lei do Consentimento · <b>6 Distorções</b></span><span class="abrir">Abrir ▸</span></span>
+    </button>
+    <button class="ent" data-k="asc" data-go="asc">
+      <span class="gly">⌬︎</span>
+      <span class="vol">Volume IV</span>
+      <span class="nm"><i>⌬︎</i>Ascensão</span>
+      <span class="vb">acumula</span>
+      <span class="ep">A carne é um rascunho. A Ascensão não teve paciência de esperar a versão final.</span>
+      <span class="fim"><span>Lei da Predação · <b>7 Distorções</b></span><span class="abrir">Abrir ▸</span></span>
+    </button>
+    <button class="ent" data-k="obs" data-go="obs">
+      <span class="gly">⊙︎</span>
+      <span class="vol">Volume V</span>
+      <span class="nm"><i>⊙︎</i>Observação</span>
+      <span class="vb">registra</span>
+      <span class="ep">O que você vê fica registrado. O que registra você, também.</span>
+      <span class="fim"><span>Lei do Registro · <b>9 Distorções</b></span><span class="abrir">Abrir ▸</span></span>
+    </button>
+    <button class="ent" data-k="eco" data-go="eco">
+      <span class="gly">☊︎</span>
+      <span class="vol">Volume VI</span>
+      <span class="nm"><i>☊︎</i>Eco</span>
+      <span class="vb">repete</span>
+      <span class="ep">O Eco não cria. Devolve — meio segundo atrasado.</span>
+      <span class="fim"><span>Lei do Retorno · <b>6 Distorções</b></span><span class="abrir">Abrir ▸</span></span>
+    </button>
+  </div>
+
+  <p class="rodape">seis volumes · quarenta e três entradas · abra um por vez</p>
+</main>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     SANTUÁRIO — Vazio ◌︎
+     ══════════════════════════════════════════════════════════════════════════ -->
+<section class="view santuario" id="s-vaz" data-s="vaz" data-hash="vazio" aria-label="Santuário do Vazio">
+  <header class="portico">
+    <div class="fundo"></div>
+    <div class="glifao" aria-hidden="true">◌︎</div>
+    <div class="dentro">
+      <p class="volume">Volume I · Arquivo DIST-43</p>
+      <h2><i aria-hidden="true">◌︎</i>Vazio</h2>
+      <p class="verbo">subtrai</p>
+      <p class="frase" data-epigrafe="vaz"></p>
+      <div class="fatos">
+        <div><div class="k">Lei</div><div class="v">Lei da Subtração</div></div>
+        <div><div class="k">Distorções</div><div class="v">8</div></div>
+        <div><div class="k">Condição</div><div class="v">Esvaziado</div></div>
+        <div><div class="k">Faixas</div><div class="v">Falha · Parcial · Total · Crítico · Sobrecarga</div></div>
+      </div>
+    </div>
+  </header>
+  <div class="corpo">
+    <nav class="indice" aria-label="Índice das Distorções do Vazio"></nav>
+    <div class="leitura">
 
 <div class="lei"><strong>Lei da Subtração.</strong> O Vazio não faz. Desfaz. Onde os outros acrescentam, ele só tira — e o que ele tira <strong>não volta sozinho</strong>: precisa ser reaceso, refeito, relembrado de fora. Contra o Vazio, blindar não basta: <strong>a Absorção conta pela metade</strong>, porque você apara um golpe, não uma ausência.</div>
 
@@ -489,13 +974,37 @@ a.ref:hover{color:var(--gold); border-bottom-color:var(--gold);}
 </article>
 
 <p class="card-note">As 8 Distorções do Vazio. Oito verbos de subtração — vida, capacidade, som, ausência, presença, espaço, vínculo, existência. Nenhuma repete a outra; nenhuma poderia ser de outro elemento.</p>
-<a class="totop" href="#topo">↑ topo</a>
-</div>
+      <div class="fim-santuario">
+        <button class="btn" data-go="capa">◄ voltar ao arquivo</button>
+        <button class="btn" data-go="ger">Germe ❋︎ ►</button>
+      </div>
+    </div>
+  </div>
+</section>
 
-<!-- ═══════════════════════════════════════════ GERME ═══════════════════════════════════════════ -->
-<div class="elem-wrap e-ger">
-<a id="germe" class="anchor-target"></a>
-<h2 class="elem">Germe ❋</h2>
+<!-- ══════════════════════════════════════════════════════════════════════════
+     SANTUÁRIO — Germe ❋︎
+     ══════════════════════════════════════════════════════════════════════════ -->
+<section class="view santuario" id="s-ger" data-s="ger" data-hash="germe" aria-label="Santuário do Germe">
+  <header class="portico">
+    <div class="fundo"></div>
+    <div class="glifao" aria-hidden="true">❋︎</div>
+    <div class="dentro">
+      <p class="volume">Volume II · Arquivo DIST-43</p>
+      <h2><i aria-hidden="true">❋︎</i>Germe</h2>
+      <p class="verbo">infecta</p>
+      <p class="frase" data-epigrafe="ger"></p>
+      <div class="fatos">
+        <div><div class="k">Lei</div><div class="v">Lei da Semeadura</div></div>
+        <div><div class="k">Distorções</div><div class="v">7</div></div>
+        <div><div class="k">Condição</div><div class="v">Semeado (X)</div></div>
+        <div><div class="k">Faixas</div><div class="v">Falha · Parcial · Total · Crítico · Sobrecarga</div></div>
+      </div>
+    </div>
+  </header>
+  <div class="corpo">
+    <nav class="indice" aria-label="Índice das Distorções do Germe"></nav>
+    <div class="leitura">
 
 <div class="lei"><strong>Lei da Semeadura.</strong> O Germe não faz efeitos. Planta. O que você planta não tem prazo — tem tamanho. Cresce sozinho, turno após turno, e <strong>não some com o tempo</strong>: só para se for arrancado, queimado ou tratado. E você não paga com Sintonia. Paga com <strong>carne</strong>: a sua Vida é a semente.</div>
 
@@ -658,25 +1167,37 @@ a.ref:hover{color:var(--gold); border-bottom-color:var(--gold);}
 </article>
 
 <p class="card-note">As 7 Distorções do Germe. Sete verbos de semeadura — dor, cura, defesa, lugar, contágio, colheita, virar-solo. Todas custam carne; todas alimentam ou gastam o Viço. Nenhuma poderia ser de outro elemento.</p>
-<a class="totop" href="#topo">↑ topo</a>
-</div>
-
-<!-- ═══════════════════════════════════════════ ELEMENTOS A SEGUIR ═══════════════════════════════════════════ -->
-<!--
-  ESTRUTURA PREPARADA para os quatro elementos restantes.
-  Quando as Distorções de cada um forem definidas, preencher o wrapper abaixo com o mesmo molde:
-    <div class="elem-wrap e-XXX"> <h2 class="elem">Nome</h2>
-      <div class="lei">...</div>
-      <div class="comofunciona">...</div>
-      <div class="cond">... condição-assinatura do elemento ...</div>
-      <article class="card b-XXX"> ...cards... </article>
+      <div class="fim-santuario">
+        <button class="btn" data-go="capa">◄ voltar ao arquivo</button>
+        <button class="btn" data-go="pac">Pacto ⚖︎ ►</button>
+      </div>
     </div>
-  e remover a classe "soon" do respectivo <li> no menu lateral.
--->
+  </div>
+</section>
 
-<div class="elem-wrap e-pac">
-<a id="pacto" class="anchor-target"></a>
-<h2 class="elem">Pacto ⚖</h2>
+<!-- ══════════════════════════════════════════════════════════════════════════
+     SANTUÁRIO — Pacto ⚖︎
+     ══════════════════════════════════════════════════════════════════════════ -->
+<section class="view santuario" id="s-pac" data-s="pac" data-hash="pacto" aria-label="Santuário do Pacto">
+  <header class="portico">
+    <div class="fundo"></div>
+    <div class="glifao" aria-hidden="true">⚖︎</div>
+    <div class="dentro">
+      <p class="volume">Volume III · Arquivo DIST-43</p>
+      <h2><i aria-hidden="true">⚖︎</i>Pacto</h2>
+      <p class="verbo">troca</p>
+      <p class="frase" data-epigrafe="pac"></p>
+      <div class="fatos">
+        <div><div class="k">Lei</div><div class="v">Lei do Consentimento</div></div>
+        <div><div class="k">Distorções</div><div class="v">6</div></div>
+        <div><div class="k">Eixo</div><div class="v">Dívida</div></div>
+        <div><div class="k">Faixas</div><div class="v">Falha · Parcial · Total · Crítico · Sobrecarga</div></div>
+      </div>
+    </div>
+  </header>
+  <div class="corpo">
+    <nav class="indice" aria-label="Índice das Distorções do Pacto"></nav>
+    <div class="leitura">
 
 <div class="lei"><strong>Lei do Consentimento.</strong> O Pacto não tira nem acrescenta à força. Ele <strong>troca</strong> — e a troca acontece na hora, de graça, sem esforço, sem rolar para pagar. Você recebe primeiro. A conta anota sozinha, num canto, e vence quando você menos quer, cobrando o que você mais tem. A facilidade é a armadilha.</div>
 
@@ -806,12 +1327,37 @@ a.ref:hover{color:var(--gold); border-bottom-color:var(--gold);}
 </article>
 
 <p class="card-note">As 6 Distorções do Pacto. Seis tratos — a palavra, a troca, a fiança, a cobrança, a armadilha, o milagre. Nenhum bate direto; nenhum custa nada na hora; todos somam Dívida. Nenhum poderia ser de outro elemento.</p>
-<a class="totop" href="#topo">↑ topo</a>
-</div>
+      <div class="fim-santuario">
+        <button class="btn" data-go="capa">◄ voltar ao arquivo</button>
+        <button class="btn" data-go="asc">Ascensão ⌬︎ ►</button>
+      </div>
+    </div>
+  </div>
+</section>
 
-<div class="elem-wrap e-asc">
-<a id="ascensao" class="anchor-target"></a>
-<h2 class="elem">Ascensão ⌬</h2>
+<!-- ══════════════════════════════════════════════════════════════════════════
+     SANTUÁRIO — Ascensão ⌬︎
+     ══════════════════════════════════════════════════════════════════════════ -->
+<section class="view santuario" id="s-asc" data-s="asc" data-hash="ascensao" aria-label="Santuário da Ascensão">
+  <header class="portico">
+    <div class="fundo"></div>
+    <div class="glifao" aria-hidden="true">⌬︎</div>
+    <div class="dentro">
+      <p class="volume">Volume IV · Arquivo DIST-43</p>
+      <h2><i aria-hidden="true">⌬︎</i>Ascensão</h2>
+      <p class="verbo">acumula</p>
+      <p class="frase" data-epigrafe="asc"></p>
+      <div class="fatos">
+        <div><div class="k">Lei</div><div class="v">Lei da Predação</div></div>
+        <div><div class="k">Distorções</div><div class="v">7</div></div>
+        <div><div class="k">Eixo</div><div class="v">Perfeição</div></div>
+        <div><div class="k">Faixas</div><div class="v">Falha · Parcial · Total · Crítico · Sobrecarga</div></div>
+      </div>
+    </div>
+  </header>
+  <div class="corpo">
+    <nav class="indice" aria-label="Índice das Distorções da Ascensão"></nav>
+    <div class="leitura">
 
 <div class="lei"><strong>Lei da Predação.</strong> A Ascensão não melhora você com paciência. Ela te ensina uma regra só: para subir, devore quem está abaixo. Com fome? Mate e coma. Quer algo? Pegue, e abra quem estiver no caminho. Cada coisa que você arranca de uma presa vira sua — garra, força, um pedaço de carne que funciona melhor que a sua. Por cima, ferro e crômio; por baixo, um bicho que não conhece a palavra <em>chega</em>.</div>
 
@@ -955,12 +1501,37 @@ a.ref:hover{color:var(--gold); border-bottom-color:var(--gold);}
 </article>
 
 <p class="card-note">As 7 Distorções da Ascensão. Sete formas de devorar — afiar, comer, dominar, enfrenesir, vestir, deixar de sentir, completar-se. A predação é o motor; o crômio é só verniz; a fome come dos dois lados até não sobrar ninguém, nem lá fora nem aqui dentro. Nenhuma poderia ser de outro elemento.</p>
-<a class="totop" href="#topo">↑ topo</a>
-</div>
+      <div class="fim-santuario">
+        <button class="btn" data-go="capa">◄ voltar ao arquivo</button>
+        <button class="btn" data-go="obs">Observação ⊙︎ ►</button>
+      </div>
+    </div>
+  </div>
+</section>
 
-<div class="elem-wrap e-obs">
-<a id="observacao" class="anchor-target"></a>
-<h2 class="elem">Observação ⊙</h2>
+<!-- ══════════════════════════════════════════════════════════════════════════
+     SANTUÁRIO — Observação ⊙︎
+     ══════════════════════════════════════════════════════════════════════════ -->
+<section class="view santuario" id="s-obs" data-s="obs" data-hash="observacao" aria-label="Santuário da Observação">
+  <header class="portico">
+    <div class="fundo"></div>
+    <div class="glifao" aria-hidden="true">⊙︎</div>
+    <div class="dentro">
+      <p class="volume">Volume V · Arquivo DIST-43</p>
+      <h2><i aria-hidden="true">⊙︎</i>Observação</h2>
+      <p class="verbo">registra</p>
+      <p class="frase" data-epigrafe="obs"></p>
+      <div class="fatos">
+        <div><div class="k">Lei</div><div class="v">Lei do Registro</div></div>
+        <div><div class="k">Distorções</div><div class="v">9</div></div>
+        <div><div class="k">Condição</div><div class="v">Vigiado</div></div>
+        <div><div class="k">Faixas</div><div class="v">Falha · Parcial · Total · Crítico · Sobrecarga</div></div>
+      </div>
+    </div>
+  </header>
+  <div class="corpo">
+    <nav class="indice" aria-label="Índice das Distorções da Observação"></nav>
+    <div class="leitura">
 
 <div class="lei"><strong>Lei do Registro.</strong> Olhar é ter. O que você vê através da Observação fica gravado — revisitável, transmissível, seu. Mas olhar o que não devia tem preço: <strong>o que você encara, encara você de volta.</strong> Quanto mais fundo você vê o oculto, mais o oculto repara em você.</div>
 
@@ -1142,12 +1713,37 @@ a.ref:hover{color:var(--gold); border-bottom-color:var(--gold);}
 </article>
 
 <p class="card-note">As 9 Distorções da Observação. Sete formas de ver — observar, acertar, ler, realçar, ver à distância, ver o oculto, consultar a realidade — e duas de fazer <em>ser visto</em>: o peso do olhar e a revelação que apavora. O poder de olhar e o terror de ser olhado são o mesmo olho. Nenhuma poderia ser de outro elemento.</p>
-<a class="totop" href="#topo">↑ topo</a>
-</div>
+      <div class="fim-santuario">
+        <button class="btn" data-go="capa">◄ voltar ao arquivo</button>
+        <button class="btn" data-go="eco">Eco ☊︎ ►</button>
+      </div>
+    </div>
+  </div>
+</section>
 
-<div class="elem-wrap e-eco">
-<a id="eco" class="anchor-target"></a>
-<h2 class="elem">Eco ☊</h2>
+<!-- ══════════════════════════════════════════════════════════════════════════
+     SANTUÁRIO — Eco ☊︎
+     ══════════════════════════════════════════════════════════════════════════ -->
+<section class="view santuario" id="s-eco" data-s="eco" data-hash="eco" aria-label="Santuário do Eco">
+  <header class="portico">
+    <div class="fundo"></div>
+    <div class="glifao" aria-hidden="true">☊︎</div>
+    <div class="dentro">
+      <p class="volume">Volume VI · Arquivo DIST-43</p>
+      <h2><i aria-hidden="true">☊︎</i>Eco</h2>
+      <p class="verbo">repete</p>
+      <p class="frase" data-epigrafe="eco"></p>
+      <div class="fatos">
+        <div><div class="k">Lei</div><div class="v">Lei do Retorno</div></div>
+        <div><div class="k">Distorções</div><div class="v">6</div></div>
+        <div><div class="k">Eixo</div><div class="v">Dissonância</div></div>
+        <div><div class="k">Faixas</div><div class="v">Falha · Parcial · Total · Crítico · Sobrecarga</div></div>
+      </div>
+    </div>
+  </header>
+  <div class="corpo">
+    <nav class="indice" aria-label="Índice das Distorções do Eco"></nav>
+    <div class="leitura">
 
 <div class="lei"><strong>Lei do Retorno.</strong> O Eco não cria. Devolve. Toda Distorção do Eco precisa de uma <strong>fonte</strong> — algo que aconteceu, foi dito, foi feito. Sem fonte, não há o que repetir, e sem repetição não há Eco. E o <strong>Sulco</strong>: repetir a mesma Distorção na mesma cena dá +1 cumulativo (máx +2) — o mundo aprende a rachar no mesmo lugar.</div>
 
@@ -1275,24 +1871,1343 @@ a.ref:hover{color:var(--gold); border-bottom-color:var(--gold);}
 </article>
 
 <p class="card-note">As 6 Distorções do Eco. Seis formas de repetir o que a Maestria não alcança — repetir-se, rebobinar a tragédia, impor o déjà vu, plantar a repetição podre, invocar todas as vozes, e prender um lugar no tempo para sempre. Nenhuma cria; todas precisam de fonte; nenhuma poderia ser de outro elemento.</p>
-<a class="totop" href="#topo">↑ topo</a>
 </div>
 
-<a class="totop" href="#topo">↑ topo</a>
+
+      <div class="fim-santuario">
+        <button class="btn" data-go="capa">◄ voltar ao arquivo</button>
+        <button class="btn" data-go="vaz">Vazio ◌︎ ►</button>
+      </div>
+    </div>
+  </div>
+</section>
 
 <script>
-function filterNav(q){
-  q = q.trim().toLowerCase();
-  document.querySelectorAll('#nav ul.sub a, #nav ul > li.part > a').forEach(function(a){
-    var li = a.closest('li');
-    if(!q){ li.style.display=''; return; }
-    var txt = a.textContent.toLowerCase();
-    li.style.display = txt.indexOf(q) !== -1 ? '' : 'none';
-  });
-}
-</script>
+/* ══════════════════════════════════════════════════════════════════════════════
+   O ARQUIVO DOS SEIS — motor de clima
 
-</main>
-</div>
+   Porte do Ficha/climate.js para um documento de leitura. As seis regras da base
+   ClimateEffect valem aqui do mesmo jeito:
+
+     1. o canvas é montado, redimensionado e limpo pela base;
+     2. a cor do tema sai de um cache, nunca de getComputedStyle por frame;
+     3. a zona ativa é sagrada — nada de geometria em cima do cursor nem do que
+        você está lendo;
+     4. calmar e prefers-reduced-motion desligam tudo;
+     5. um único rAF: ninguém abre loop próprio;
+     6. sair do elemento limpa canvas e timers.
+
+   E o eixo da BANDA (o Ruído da ficha, 0→5) aqui é a PROFUNDIDADE DE LEITURA:
+   quanto mais fundo no santuário, mais alta a banda.
+   ══════════════════════════════════════════════════════════════════════════════ */
+(function(){
+'use strict';
+
+const $=id=>document.getElementById(id);
+const B=document.body;
+const rAF=window.requestAnimationFrame?window.requestAnimationFrame.bind(window):(f=>setTimeout(()=>f(performance.now()),16));
+const _mqRM=window.matchMedia?matchMedia('(prefers-reduced-motion:reduce)'):null;
+const RM=()=>!!(_mqRM&&_mqRM.matches);
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const clamp=(v,a,b)=>v<a?a:(v>b?b:v);
+/* o ruído de três senos incomensuráveis do jardim da ficha (climate.js vnz) */
+const vnz=(s,i)=>Math.sin(s+i*.131)*.54+Math.sin(s*1.73+i*.049)*.33+Math.sin(s*2.91+i*.283)*.13;
+
+/* ── os seis, com as cores de Ficha/style.css:312-317 e as frases de data.js ELEMS ── */
+const ORDEM=['vaz','ger','pac','asc','obs','eco'];
+const ELS={
+ vaz:{g:'◌︎',n:'Vazio',fb:'#7c8fb5',fr:'O que se aproxima volta com menos do que tinha.'},
+ ger:{g:'❋︎',n:'Germe',fb:'#8dbb62',fr:'O que você planta fica plantado.'},
+ pac:{g:'⚖︎',n:'Pacto',fb:'#c13a52',fr:'Tudo se anota. Nada se esquece.'},
+ asc:{g:'⌬︎',n:'Ascensão',fb:'#c15a45',fr:'A carne é um rascunho. A Ascensão não teve paciência de esperar a versão final.'},
+ obs:{g:'⊙︎',n:'Observação',fb:'#c9a227',fr:'O que você vê fica registrado. O que registra você, também.'},
+ eco:{g:'☊︎',n:'Eco',fb:'#7fb8a8',fr:'O Eco não cria. Devolve — meio segundo atrasado.'}
+};
+
+/* ── SUSSURROS — portados verbatim de Ficha/data.js SUS_* ── */
+const SUS={
+ obs:{lo:["há algo na porta","você não fechou a cortina","isto não estava assim antes","a sala parece diferente quando você não olha","alguém esteve aqui"],
+  mid:["ele te viu chegar","continue. estou anotando.","não olhe para trás","você está sendo observado agora","por que você parou de ler?"],
+  hi:["eu vi você fazer aquilo","sei o que você está pensando agora","você sente, não sente?","não precisa se virar. eu já sei onde você está.","estou olhando através da tela"]},
+ vaz:{lo:["sobra menos a cada dia","ninguém vai notar a falta","isto também vai passar","não há ninguém do outro lado","estava tudo vazio antes de você chegar"],
+  mid:["você podia parar agora e seria igual","nada do que você fez ficou","o silêncio não está esperando você","não há um plano. nunca houve.","você não é necessário"],
+  hi:["você é uma pausa curta entre dois nadas","quando isto acabar, não terá havido diferença","nem o vazio vai lembrar do seu nome","você já está quase todo apagado","não havia motivo. desculpe."]},
+ eco:{lo:["você já leu isso","isto já aconteceu","de novo","você reconhece este momento","já estava assim"],
+  mid:["você já esteve exatamente aqui","a resposta veio antes da pergunta","quantas vezes já?","você não saiu daqui","outra vez. outra vez. outra vez."],
+  hi:["você lembra. eu sei que lembra.","aconteceu de novo, como sempre acontece","você já viveu isto e vai viver outra vez","não foi a primeira vez. não vai ser a última.","volte ao começo. você sabe o caminho."]},
+ asc:{lo:["a carne é lenta","você pode ser melhor que isto","a dor é só um sinal mal projetado","por que ainda sente?","a carne é fraca, substitua-a"],
+  mid:["remova o que falha","emoção é ineficiência","o metal não hesita","você não precisa mais dormir","um parafuso a mais"],
+  hi:["não sinto mais falta de nada. você também não vai.","a carne era o rascunho","eu me consertei. você ainda pode.","logo você vai agradecer","não dói mais. nada mais dói."]},
+ pac:{lo:["eu ouvi isso","continue. estou interessado.","você queria dizer outra coisa","sei que você está aí","fale. eu escuto."],
+  mid:["posso fazer isso valer a pena","é só pedir","você já sabe o preço","deixa eu ajudar","nós podemos resolver isso agora"],
+  hi:["eu sei o que você quer.","aceite e acabou","você me chamou primeiro","não foi você que começou esta conversa?","diga sim. só isso."]},
+ ger:{lo:["está quente aqui dentro","algo se mexeu sob a sua pele","você sente coçar?","está germinando","não coce. vai espalhar.","tem algo crescendo aí","o cheiro é seu","está úmido","isso não é sujeira","já criou raiz"],
+  mid:["está dentro de você agora","não adianta lavar","você já faz parte","sente inchar?","abriu uma fresta e entrou","está se alimentando","logo vai romper a pele","você está mais quente que ontem","não é febre. é vida.","cresce quando você dorme"],
+  hi:["você é solo fértil","obrigado por hospedar","não vai doer. só vai abrir.","estamos quase prontos para florescer","você nunca esteve sozinho aí dentro","sinta as raízes","isto sempre foi um jardim","seu corpo já não é só seu","respire fundo. nós respiramos junto.","não resista. floresça."]}
+};
+/* as sugestões da presença do Pacto — verbatim de climate.js PAC_SUG */
+const PAC_SUG=["…e você aceitou","…como combinamos","…o preço já foi pago","…não foi?","…eu lembro disso"];
+
+/* ══ ESTADO ══ */
+const S={el:'',view:'capa',band:0,calm:false,ativo:null};
+
+/* ── regra 2: a cor do tema em cache, lida uma vez por troca de elemento ── */
+let _ec='#b8932f';
+function temaSync(){
+ _ec=(getComputedStyle(B).getPropertyValue('--ec')||'#b8932f').trim()||'#b8932f';
+}
+/* climCor da ficha: a cor do tema escurecida por k, com alfa a */
+function cor(k,a){
+ const h=_ec.replace('#','');
+ const v=h.length===3?h[0]+h[0]+h[1]+h[1]+h[2]+h[2]:h.slice(0,6);
+ let n=parseInt(v,16); if(isNaN(n))n=0xb8932f;
+ return 'rgba('+Math.round(((n>>16)&255)*k)+','+Math.round(((n>>8)&255)*k)+','+Math.round((n&255)*k)+','+a+')';
+}
+
+/* ══ O TEXTO MORTO ═══════════════════════════════════════════════════════════
+   o análogo do TXSEL/VAZSEL da ficha: rótulos e títulos que não carregam a regra.
+   as faixas em si (.bands dd, .desc, .escala li) NUNCA são tocadas — apagar a
+   regra que o jogador precisa ler seria o efeito comendo o documento. */
+const TXSEL='.card-name,.bands dt,.escala .lbl,.comofunciona h4,.fonte b,.cond .lbl,.card-note,.indice a,.portico .verbo,.portico .volume,.degraus th';
+function txMorto(el){
+ if(!el||!el.isConnected)return false;
+ if(el.matches(':hover'))return false;
+ const a=document.activeElement;
+ if(a&&a!==B&&(el===a||el.contains(a)))return false;
+ return !!el.textContent.trim();
+}
+/* sorteia um texto morto visível e fora da zona sagrada */
+function txPick(fx,minW){
+ const out=[],sec=secAtual(); if(!sec)return null;
+ sec.querySelectorAll(TXSEL).forEach(el=>{
+  if(!txMorto(el))return;
+  const r=el.getBoundingClientRect();
+  if(r.width<(minW||54)||r.height<9||r.height>90||r.top<56||r.bottom>innerHeight-8)return;
+  if(fx&&fx.forbBox({l:r.left,r:r.right,t:r.top,b:r.bottom}))return;
+  out.push([el,r]);
+ });
+ return out.length?pick(out):null;
+}
+function cardPick(){
+ const sec=secAtual(); if(!sec)return null;
+ const out=[];
+ sec.querySelectorAll('.card:not(.oculto)').forEach(c=>{
+  const r=c.getBoundingClientRect();
+  if(r.bottom<80||r.top>innerHeight-40)return;
+  if(c.matches(':hover'))return;
+  out.push(c);
+ });
+ return out.length?pick(out):null;
+}
+
+/* ══ A BASE — porte compacto do ClimateEffect ════════════════════════════════ */
+class Clima{
+ constructor(o){
+  this.h=o; this.id=o.id; this.cvid=o.cv||'fx-bg';
+  this.zr=o.zr||118; this.tk=o.timers||[];
+  this.cv=null;this.cx=null;this.W=0;this.H=0;this.on=false;this.dirty=false;
+  this.mx=-1e4;this.my=-1e4;this.mt=-1e9;this.fz=null;this.fzt=0;this.lt=0;
+  Object.assign(this,o.state||{});
+  Clima.all[this.id]=this;
+ }
+ /* regra 4 */
+ active(){return S.el===this.id&&S.band>=1&&!S.calm&&!RM()&&!document.hidden;}
+ /* regra 3 — a zona sagrada: o cursor vivo e o retângulo em foco */
+ forb(x,y){
+  if(performance.now()-this.mt<5000){const dx=x-this.mx,dy=y-this.my;
+   if(dx*dx+dy*dy<this.zr*this.zr)return true;}
+  const r=this.fz;return !!(r&&x>r.l&&x<r.r&&y>r.t&&y<r.b);
+ }
+ forbBox(q){
+  if(performance.now()-this.mt<5000){
+   const x=clamp(this.mx,q.l,q.r),y=clamp(this.my,q.t,q.b);
+   const dx=x-this.mx,dy=y-this.my;
+   if(dx*dx+dy*dy<this.zr*this.zr)return true;}
+  const f=this.fz;
+  return !!(f&&q.l<f.r&&q.r>f.l&&q.t<f.b&&q.b>f.t);
+ }
+ cor(k,a){return cor(k,a);}
+ /* regra 1 */
+ resize(){const cv=this.cv;if(!cv)return;
+  this.W=cv.width=innerWidth;this.H=cv.height=innerHeight;this.dirty=true;}
+ mount(){const cv=$(this.cvid);if(!cv||!cv.getContext)return false;
+  this.cv=cv;this.cx=cv.getContext('2d');if(!this.cx)return false;this.resize();return true;}
+ /* regra 6 */
+ tear(){for(const k of this.tk){clearTimeout(this[k]);this[k]=null;}
+  if(this.h.tear)this.h.tear.call(this);
+  this.dirty=false;this.fz=null;
+  if(this.cx)this.cx.clearRect(0,0,this.W,this.H);}
+ /* regra 5 — um passo por frame, chamado pelo loop único */
+ tick(t){
+  if(!this.on||!this.cx)return;
+  if(this.cv.width!==innerWidth||this.cv.height!==innerHeight)this.resize();
+  const dt=Math.min(60,t-(this.lt||t));this.lt=t;
+  if(t-this.fzt>320){this.fzt=t;this.fz=focoZona(26);}
+  if(this.h.step)this.h.step.call(this,dt,t);
+  if(this.dirty){this.dirty=false;if(this.h.draw)this.h.draw.call(this,this.cx);}
+ }
+ sync(){
+  const on=this.active();
+  if(on!==this.on){
+   this.on=on;
+   if(on){if(!this.mount()){this.on=false;return;}
+    this.lt=0;if(this.h.mount)this.h.mount.call(this);}
+   else this.tear();
+   return;}
+  if(!on)return;
+  if(this.h.band)this.h.band.call(this,S.band);
+ }
+}
+Clima.all={};
+function focoZona(pad){const a=document.activeElement;let r=null;
+ if(a&&a!==B&&a.getBoundingClientRect){const q=a.getBoundingClientRect();
+  if(q.width>0&&q.height>0)r={l:q.left-pad,r:q.right+pad,t:q.top-pad,b:q.bottom+pad};}
+ return r;}
+addEventListener('mousemove',e=>{
+ const f=S.ativo;if(!f)return;
+ f.mx=e.clientX;f.my=e.clientY;f.mt=performance.now();
+},{passive:true});
+
+/* ══ O LOOP ÚNICO ══ */
+let LOOP={run:false,q:false};
+function loopKick(){if(LOOP.q||!LOOP.run)return;LOOP.q=true;rAF(loopTick);}
+function loopTick(t){
+ LOOP.q=false;if(!LOOP.run)return;
+ const f=S.ativo;if(f)f.tick(t);
+ loopKick();
+}
+function loopSync(){
+ const want=!!(S.ativo&&S.ativo.on);
+ if(want===LOOP.run)return;
+ LOOP.run=want;if(want)loopKick();
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   VAZIO — o céu, os buracos e a subtração
+   o céu é uma chapa fria sem estrela; os buracos crescem, vagam e não devolvem
+   nada. e o texto morto é apagado por menos de um segundo e reposto INTEIRO
+   (porte de climate.js vazSub + Ficha/style.css .vaz-sub/.vaz-cut).
+   ══════════════════════════════════════════════════════════════════════════════ */
+const VCAP=[0,2,3,4,5,7];
+const VAZ=new Clima({id:'vaz',zr:124,timers:['subT','subRm','burT'],
+ state:{bur:[],subEl:null,subT:null,subRm:null,burT:null,seed:0},
+ mount(){this.bur=[];this.seed=Math.random()*97;
+  for(let i=0;i<2;i++)vazBuraco(this);
+  vazSubSched(this);vazBurSched(this);},
+ tear(){vazSubClear(this);this.bur=[];},
+ step(dt,t){
+  const b=S.band;
+  /* os buracos vagam devagar e engordam. teto por banda */
+  for(const h of this.bur){
+   h.x+=h.vx*dt*.012;h.y+=h.vy*dt*.012;
+   h.r=Math.min(h.rmax,h.r+dt*.0016*(1+b*.3));
+   h.ph+=dt*.0004;
+   if(h.x<-h.r*1.6)h.x=this.W+h.r;if(h.x>this.W+h.r*1.6)h.x=-h.r;
+   if(h.y<-h.r*1.6)h.y=this.H+h.r;if(h.y>this.H+h.r*1.6)h.y=-h.r;
+  }
+  while(this.bur.length>VCAP[b])this.bur.shift();
+  this.dirty=true;
+ },
+ draw(c){
+  const b=S.band;c.clearRect(0,0,this.W,this.H);
+  /* o céu: uma varredura fria, sem astro nenhum */
+  const g=c.createLinearGradient(0,0,this.W*.4,this.H);
+  g.addColorStop(0,cor(.7,.05+b*.012));
+  g.addColorStop(.55,'rgba(0,0,0,0)');
+  g.addColorStop(1,cor(.45,.03+b*.01));
+  c.fillStyle=g;c.fillRect(0,0,this.W,this.H);
+  /* os buracos: um halo escuro e, dentro, nada */
+  for(const h of this.bur){
+   const r=h.r*(1+Math.sin(h.ph)*.06);
+   const hg=c.createRadialGradient(h.x,h.y,r*.18,h.x,h.y,r*1.45);
+   hg.addColorStop(0,'rgba(0,0,0,.92)');
+   hg.addColorStop(.52,'rgba(0,0,0,.72)');
+   hg.addColorStop(.78,cor(.3,.1));
+   hg.addColorStop(1,'rgba(0,0,0,0)');
+   c.fillStyle=hg;c.beginPath();c.arc(h.x,h.y,r*1.45,0,6.2832);c.fill();
+   /* a borda: um anel finíssimo — é o que dá BURACO em vez de mancha */
+   c.strokeStyle=cor(.8,.1+b*.03);c.lineWidth=Math.max(.6,r*.016);
+   c.beginPath();c.arc(h.x,h.y,r,0,6.2832);c.stroke();
+  }
+ }
+});
+function vazBuraco(f){
+ if(f.bur.length>=VCAP[Math.max(1,S.band)])return;
+ const R=Math.min(f.W,f.H);
+ f.bur.push({x:rnd(0,f.W),y:rnd(0,f.H),r:rnd(R*.03,R*.07),rmax:rnd(R*.09,R*.2),
+  vx:rnd(-1,1),vy:rnd(-.6,.6),ph:Math.random()*6.28});
+ f.dirty=true;
+}
+function vazBurSched(f){clearTimeout(f.burT);
+ if(!f.on)return;
+ f.burT=setTimeout(()=>{f.burT=null;vazBuraco(f);vazBurSched(f);},rnd(9000,22000));
+}
+function vazSubClear(f){clearTimeout(f.subRm);f.subRm=null;
+ const el=f.subEl;f.subEl=null;if(!el)return;
+ el.classList.remove('vaz-sub','vaz-cut');el.style.removeProperty('--vzd');}
+function vazSub(f){
+ vazSubClear(f);
+ if(!f.on||S.band<2)return;
+ const p=txPick(f,54);if(!p)return;
+ const el=p[0],dur=rnd(.22,.62);
+ el.style.setProperty('--vzd',dur.toFixed(2)+'s');
+ /* clip-path também recorta o clique: o que é clicável só pisca por opacidade */
+ const clic=el.matches('a,button')||!!el.querySelector('a,button');
+ el.classList.add(!clic&&Math.random()<.45?'vaz-cut':'vaz-sub');
+ f.subEl=el;
+ f.subRm=setTimeout(()=>vazSubClear(f),Math.round(dur*1000)+240);
+}
+function vazSubSched(f){clearTimeout(f.subT);
+ if(!f.on)return;
+ const b=S.band,iv=b>=5?rnd(5,11):(b>=4?rnd(9,19):(b>=3?rnd(14,28):rnd(22,40)));
+ f.subT=setTimeout(()=>{f.subT=null;vazSub(f);vazSubSched(f);},iv*1000);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   GERME — o jardim
+   porte do VIN de climate.js: trepadeiras que sobem das bordas, ramificam, dão
+   folha e às vezes flor. geometria PARADA depois de madura — o canvas só é
+   repintado quando algo cresceu (dirty).
+   ══════════════════════════════════════════════════════════════════════════════ */
+const GCAP=[0,3,5,7,9,12],GGRW=[0,1,2,2,3,3],GPTS=[0,140,260,420,620,900];
+const GER=new Clima({id:'ger',zr:116,timers:['budT','swT'],
+ state:{vs:[],pts:0,budT:null,swT:null},
+ mount(){this.vs=[];this.pts=0;this.bandVista=1;gerBudSched(this);gerSwSched(this);
+  for(let i=0;i<2;i++)gerBud(this);},
+ /* a banda subiu = você desceu no santuário, e o jardim avança com você. sem isto,
+    chegar fundo depois de rolar rápido encontrava o canteiro quase vazio: o teto
+    tinha subido, mas nada tinha brotado para ocupá-lo */
+ band(b){
+  if(b>(this.bandVista||1)){this.bandVista=b;
+   const quer=Math.min(GCAP[b],Math.round(b*1.6));
+   for(let i=this.vs.length;i<quer;i++)gerBud(this,true);}
+  else this.bandVista=b;
+ },
+ tear(){this.vs=[];this.pts=0;
+  document.querySelectorAll('.ger-swell').forEach(e=>e.classList.remove('ger-swell'));},
+ step(dt,t){
+  let cresceu=false;
+  for(const v of this.vs){
+   if(v.ph)continue;
+   v.acc+=dt*v.spd*.001;
+   while(v.acc>=1){v.acc-=1;if(!gerCresce(this,v))break;cresceu=true;}
+  }
+  if(cresceu)this.dirty=true;
+  if(this.vs.some(v=>v.dead)){this.vs=this.vs.filter(v=>!v.dead);this.dirty=true;}
+ },
+ draw(c){
+  c.clearRect(0,0,this.W,this.H);
+  for(const v of this.vs){
+   const P=v.pts;if(P.length<2)continue;
+   /* o caule: uma polilinha suavizada, afinando para a ponta */
+   c.strokeStyle=v.stem;c.lineCap='round';c.lineJoin='round';
+   for(let i=1;i<P.length;i++){
+    c.lineWidth=Math.max(.5,P[i].w);
+    c.beginPath();c.moveTo(P[i-1].x,P[i-1].y);c.lineTo(P[i].x,P[i].y);c.stroke();
+   }
+   /* as folhas: alternando de lado, como planta de verdade */
+   c.fillStyle=v.leaf;
+   for(const L of v.lv){
+    c.save();c.translate(L.x,L.y);c.rotate(L.a);
+    c.beginPath();c.moveTo(0,0);
+    c.quadraticCurveTo(L.s*.55,-L.s*.42,L.s,0);
+    c.quadraticCurveTo(L.s*.55,L.s*.42,0,0);
+    c.fill();c.restore();
+   }
+   /* a flor: pétalas e miolo, só nas vinhas que vingaram */
+   for(const F of v.fl){
+    for(let i=0;i<F.n;i++){
+     const a=F.a0+i/F.n*6.2832;
+     c.fillStyle=F.pc;c.beginPath();
+     c.ellipse(F.x+Math.cos(a)*F.r*.62,F.y+Math.sin(a)*F.r*.62,F.r*.52,F.r*.3,a,0,6.2832);
+     c.fill();
+    }
+    c.fillStyle=F.cc;c.beginPath();c.arc(F.x,F.y,F.r*.26,0,6.2832);c.fill();
+   }
+  }
+ }
+});
+function gerPush(f,o){
+ const b=Math.max(1,S.band);
+ if(f.vs.length>=GCAP[b]||f.pts>=GPTS[b])return null;
+ const hue=o.hue!=null?o.hue+(Math.random()-.5)*10:86+Math.random()*30,lig=24+Math.random()*15;
+ const v={pts:[{x:o.x,y:o.y,w:o.w}],a0:o.a,w0:o.w,max:o.max,spd:o.spd||18,dep:o.dep||0,
+  seed:Math.random()*97,acc:0,ph:0,lv:[],fl:[],side:1,hue,
+  lstep:4+Math.floor(Math.random()*3),
+  stem:'hsl('+hue.toFixed(0)+',32%,'+(lig*.72).toFixed(1)+'%)',
+  leaf:'hsl('+hue.toFixed(0)+','+(30+Math.random()*16).toFixed(0)+'%,'+lig.toFixed(1)+'%)'};
+ f.vs.push(v);f.pts++;f.dirty=true;return v;
+}
+function gerMadura(f,v){
+ v.ph=1;const b=Math.max(1,S.band);
+ if(v.pts.length<3){v.dead=1;return false;}
+ if(v.pts.length>8&&Math.random()<.2+b*.07){
+  const p=v.pts[v.pts.length-1];
+  if(v.fl.length<=2)v.fl.push({x:p.x,y:p.y,n:5+(Math.random()<.35?1:0),r:3.6+Math.random()*3.4,
+   a0:Math.random()*6.2832,
+   pc:'hsl('+(v.hue-14).toFixed(0)+','+(26+Math.random()*16).toFixed(0)+'%,'+(54+Math.random()*14).toFixed(0)+'%)',
+   cc:'hsl('+(v.hue-24).toFixed(0)+',34%,13%)'});
+ }
+ return false;
+}
+function gerCresce(f,v){
+ const P=v.pts,i=P.length,p=P[i-1],b=Math.max(1,S.band);
+ if(i>=v.max||f.pts>=GPTS[b])return gerMadura(f,v);
+ let a=v.a0+vnz(v.seed,i)*.86;
+ const st=4+Math.random()*1.8;
+ let nx=p.x+Math.cos(a)*st,ny=p.y+Math.sin(a)*st;
+ /* bateu na zona sagrada: vira para longe do cursor. três tentativas e amadurece */
+ for(let k=0;k<3&&f.forb(nx,ny);k++){
+  const fora=Math.atan2(ny-f.my,nx-f.mx);
+  a=a*.32+fora*.68+(Math.random()-.5)*.3;
+  nx=p.x+Math.cos(a)*st;ny=p.y+Math.sin(a)*st;
+ }
+ if(f.forb(nx,ny))return gerMadura(f,v);
+ if(nx<-40||nx>f.W+40||ny<-40||ny>f.H+40)return gerMadura(f,v);
+ const w=Math.max(.5,v.w0*Math.pow(1-i/v.max,.82));
+ P.push({x:nx,y:ny,w});f.pts++;
+ if(i>3&&i%v.lstep===0){v.side=-v.side;
+  v.lv.push({x:nx,y:ny,a:a+v.side*(.62+Math.random()*.55),s:3.4+Math.random()*4.6+v.w0});}
+ if(v.dep<3&&i>7&&i<v.max*.82&&Math.random()<.03)
+  gerPush(f,{x:nx,y:ny,a:a+(Math.random()<.5?-1:1)*(.5+Math.random()*.5),
+   max:Math.max(9,Math.round(v.max*(.34+Math.random()*.3))),w:w*.72,spd:v.spd*1.15,
+   dep:v.dep+1,hue:v.hue});
+ return true;
+}
+function gerBud(f,forca){
+ const b=Math.max(1,S.band),W=f.W,H=f.H,r=Math.random;
+ if(f.vs.length>=GCAP[b])return;
+ /* o teto de vinhas CRESCENDO ao mesmo tempo é o que dá o ritmo de planta; a semeadura
+    por banda (o avanço do jardim quando você desce) passa por cima dele de propósito */
+ if(!forca){let g=0;for(const v of f.vs)if(v.ph===0)g++;
+  if(g>=GGRW[b])return;}
+ let o;const e=r();
+ if(e<.33)      o={x:-8,   y:H*(.08+r()*.9), a:(r()-.5)*1.15};
+ else if(e<.66) o={x:W+8,  y:H*(.08+r()*.9), a:Math.PI+(r()-.5)*1.15};
+ else if(e<.92) o={x:W*r(),y:H+8,            a:-Math.PI/2+(r()-.5)*1.2};
+ else           o={x:W*r(),y:-8,             a:Math.PI/2+(r()-.5)};
+ o.max=Math.round((20+b*15)*(.6+r()*.85));o.w=1.5+b*.3+r()*.5;o.spd=15+r()*11;
+ gerPush(f,o);
+}
+function gerBudSched(f){clearTimeout(f.budT);
+ if(!f.on)return;
+ f.budT=setTimeout(()=>{f.budT=null;gerBud(f);gerBudSched(f);},rnd(2600,7000));
+}
+/* o inchaço: algo se remexe sob o card e assenta (porte de .ger-swell) */
+function gerSwSched(f){clearTimeout(f.swT);
+ if(!f.on)return;
+ f.swT=setTimeout(()=>{f.swT=null;
+  if(S.band>=2){const c=cardPick();
+   if(c){c.classList.add('ger-swell');setTimeout(()=>c.classList.remove('ger-swell'),2700);}
+   if(S.band>=3)gerCicatriz(f);}
+  gerSwSched(f);},rnd(7000,17000));
+}
+/* a cicatriz: a aresta de baixo de um card abre e fecha (porte de .ger-scar) */
+function gerCicatriz(f){
+ const c=cardPick();if(!c)return;
+ const r=c.getBoundingClientRect();
+ if(f.forbBox({l:r.left,r:r.right,t:r.bottom-6,b:r.bottom+6}))return;
+ const d=document.createElement('div');d.className='ger-scar';
+ d.style.left=(r.left+r.width*.12)+'px';d.style.top=(r.bottom-2)+'px';
+ d.style.width=Math.min(r.width*.66,320)+'px';d.style.height='3px';
+ document.body.appendChild(d);setTimeout(()=>d.remove(),1400);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   PACTO — a mão que assina
+   o corpo fica ACIMA do conteúdo (#fx-fore, z7): a tinta é sobre a folha, não
+   atrás dela. a caneta escreve devagar, a assinatura seca e vira mancha. mais o
+   cursor-fantasma e as sugestões da presença (porte de PACX/PAC_SUG).
+   ══════════════════════════════════════════════════════════════════════════════ */
+const PAC=new Clima({id:'pac',cv:'fx-fore',zr:120,timers:['asT','sgT'],
+ state:{as:[],asT:null,sgT:null,car:null},
+ mount(){this.as=[];pacSched(this,true);pacSugSched(this,true);pacCaret(this);},
+ tear(){this.as=[];if(this.car){this.car.remove();this.car=null;}
+  document.querySelectorAll('.pac-sug,.pac-caret').forEach(e=>e.remove());},
+ step(dt,t){
+  let mudou=false;
+  for(const a of this.as){
+   if(a.i<a.p.length){a.acc+=dt*.055;
+    while(a.acc>=1&&a.i<a.p.length){a.acc-=1;a.i++;mudou=true;}}
+   else{a.seca+=dt;if(a.seca>2600){a.al-=dt*.00022;mudou=true;}}
+  }
+  const antes=this.as.length;
+  this.as=this.as.filter(a=>a.al>.02);
+  if(this.as.length!==antes)mudou=true;
+  if(mudou)this.dirty=true;
+ },
+ draw(c){
+  c.clearRect(0,0,this.W,this.H);
+  for(const a of this.as){
+   /* a mancha: a tinta que encharcou o papel embaixo do traço */
+   const mg=c.createRadialGradient(a.cx,a.cy,0,a.cx,a.cy,a.w*.62);
+   mg.addColorStop(0,cor(.5,a.al*.1));
+   mg.addColorStop(1,cor(.4,0));
+   c.fillStyle=mg;c.beginPath();c.arc(a.cx,a.cy,a.w*.62,0,6.2832);c.fill();
+   /* o traço: cursivo, espessura variando como pena de verdade */
+   c.lineCap='round';c.lineJoin='round';
+   for(let i=1;i<a.i;i++){
+    const p0=a.p[i-1],p1=a.p[i];
+    c.strokeStyle='rgba(184,147,47,'+(a.al*p1.a).toFixed(3)+')';
+    c.lineWidth=p1.w;
+    c.beginPath();c.moveTo(p0.x,p0.y);c.lineTo(p1.x,p1.y);c.stroke();
+   }
+   /* a ponta da caneta enquanto ela ainda escreve */
+   if(a.i<a.p.length&&a.i>0){
+    const p=a.p[a.i-1];
+    c.fillStyle='rgba(230,214,180,'+(a.al*.5).toFixed(3)+')';
+    c.beginPath();c.arc(p.x,p.y,1.7,0,6.2832);c.fill();
+   }
+  }
+ }
+});
+/* um garrancho: três laçadas de altura irregular, do jeito que se assina rápido */
+function pacAssina(f){
+ if(f.as.length>=2)return;
+ const w=rnd(150,290),h=rnd(26,44);
+ const x0=rnd(f.W*.1,f.W*.72),y0=rnd(innerHeight*.22,innerHeight*.84);
+ if(f.forbBox({l:x0-10,r:x0+w+10,t:y0-h-10,b:y0+h+10}))return;
+ const p=[],n=Math.round(w*.9),sd=Math.random()*97;
+ for(let i=0;i<n;i++){
+  const u=i/n;
+  const x=x0+u*w;
+  const y=y0+Math.sin(u*Math.PI*rnd(4.4,6.2))*h*(.32+vnz(sd,i)*.42)+vnz(sd*1.7,i)*h*.3;
+  p.push({x,y,w:Math.max(.7,1.5+vnz(sd*2.3,i)*1.1),a:.6+Math.abs(vnz(sd*3.1,i))*.4});
+ }
+ f.as.push({p,i:0,acc:0,al:.85,seca:0,cx:x0+w*.5,cy:y0,w});
+ f.dirty=true;
+}
+/* a primeira assinatura vem cedo — entrar no santuário e não ver a mão trabalhar por
+   quinze segundos era o Pacto chegando mudo. depois disso ela volta ao passo largo */
+function pacSched(f,primeira){clearTimeout(f.asT);
+ if(!f.on)return;
+ f.asT=setTimeout(()=>{f.asT=null;if(S.band>=1)pacAssina(f);pacSched(f);},
+  primeira?rnd(1800,4200):rnd(7000,17000));
+}
+/* o cursor que pisca numa margem: não é foco, é desenho (porte de .pac-caret) */
+function pacCaret(f){
+ if(f.car){f.car.remove();f.car=null;}
+ if(!f.on||S.band<3)return;
+ const d=document.createElement('div');d.className='pac-caret';d.textContent='▌';
+ d.style.left=rnd(14,52)+'px';d.style.top=rnd(innerHeight*.3,innerHeight*.8)+'px';
+ document.body.appendChild(d);f.car=d;
+}
+/* a presença completa a frase que você não escreveu (porte de .pac-sug) */
+function pacSugSched(f,primeira){clearTimeout(f.sgT);
+ if(!f.on)return;
+ f.sgT=setTimeout(()=>{f.sgT=null;
+  if(S.band>=2){
+   const p=txPick(f,70);
+   if(p){const r=p[1],d=document.createElement('div');
+    d.className='pac-sug';d.textContent=pick(PAC_SUG);
+    d.style.left=Math.min(innerWidth-240,r.right+10)+'px';
+    d.style.top=(r.top+r.height*.1)+'px';
+    document.body.appendChild(d);setTimeout(()=>d.remove(),1600);}
+  }
+  if(S.band>=3&&Math.random()<.4)pacCaret(f);
+  pacSugSched(f);},primeira?rnd(2600,5000):rnd(6000,14000));
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   ASCENSÃO — a máquina sob a carne
+   engrenagens girando ATRÁS do conteúdo, e eventos secos por cima: a correção do
+   servo, a separação de canal no título, o rasgo de fita e a batida da mestra.
+   nada de tremor contínuo — o metal não hesita (porte de ASC/Ficha/style.css).
+   ══════════════════════════════════════════════════════════════════════════════ */
+const ASCN=[0,3,4,6,8,10],ASCV=[0,.000075,.000105,.00014,.000185,.00024];
+const ASC=new Clima({id:'asc',zr:120,timers:['evT'],
+ state:{gr:[],evT:null,ang:0,volta:0},
+ mount(){ascGears(this);ascSched(this);},
+ tear(){this.gr=[];B.classList.remove('asc-beat');
+  document.querySelectorAll('.asc-correct,.asc-rgb').forEach(e=>e.classList.remove('asc-correct','asc-rgb'));
+  const t=$('fx-tear');if(t)t.classList.remove('on');},
+ /* a banda não reconstrói o maquinário: ela ACRESCENTA peça ou tira a última.
+    regenerar tudo faria a máquina inteira pular de posição a cada faixa de leitura */
+ band(b){const n=ASCN[b];
+  while(this.gr.length>n)this.gr.pop();
+  while(this.gr.length<n)this.gr.push(ascNovaGear(this));
+  this.dirty=true;},
+ step(dt,t){
+  const b=S.band,v=ASCV[b];
+  /* ASCV está em rad/ms, como na ficha: o passo é dt(ms) × rad/ms, e nada mais */
+  this.ang+=dt*v;
+  /* a batida: a mestra fechou uma volta e o documento inteiro sente */
+  const voltas=Math.floor(this.ang/6.2832);
+  if(voltas!==this.volta){this.volta=voltas;
+   if(b>=2&&!B.classList.contains('asc-beat')){
+    B.classList.add('asc-beat');setTimeout(()=>B.classList.remove('asc-beat'),190);}}
+  for(const g of this.gr)g.a=this.ang*g.rt+g.a0;
+  this.dirty=true;
+ },
+ draw(c){
+  const b=S.band;c.clearRect(0,0,this.W,this.H);
+  for(const g of this.gr)ascGear(c,g,b);
+ }
+});
+function ascNovaGear(f){
+ const W=f.W||innerWidth,H=f.H||innerHeight,R=Math.min(W,H);
+ const r=R*rnd(.05,.17);
+ return {x:rnd(-r*.4,W+r*.4),y:rnd(-r*.4,H+r*.4),
+  r,d:Math.round(rnd(7,15)),a:0,a0:Math.random()*6.28,
+  rt:(Math.random()<.5?-1:1)*rnd(.5,2.1)};
+}
+function ascGears(f){
+ const n=ASCN[Math.max(1,S.band)];
+ f.gr=[];
+ for(let i=0;i<n;i++)f.gr.push(ascNovaGear(f));
+ f.dirty=true;
+}
+function ascGear(c,g,b){
+ const R=g.r,ri=R*.62,rh=R*.2;
+ c.save();c.translate(g.x,g.y);c.rotate(g.a);
+ /* o dente: trapézio, não triângulo — engrenagem, não serra */
+ c.beginPath();
+ for(let i=0;i<g.d;i++){
+  const a0=i/g.d*6.2832,pa=6.2832/g.d;
+  c.lineTo(Math.cos(a0)*ri,Math.sin(a0)*ri);
+  c.lineTo(Math.cos(a0+pa*.16)*R,Math.sin(a0+pa*.16)*R);
+  c.lineTo(Math.cos(a0+pa*.48)*R,Math.sin(a0+pa*.48)*R);
+  c.lineTo(Math.cos(a0+pa*.64)*ri,Math.sin(a0+pa*.64)*ri);
+ }
+ c.closePath();
+ /* o gradiente do aço vive no espaço JÁ transformado da peça: é o mesmo a cada frame.
+    recriá-lo 10 vezes por quadro era o único custo real desta camada — fica em cache,
+    e só é refeito quando a banda muda a sujeira */
+ if(!g.grad||g.gradB!==b){
+  const gg=c.createLinearGradient(-R,-R,R,R);
+  gg.addColorStop(0,cor(.42,.16+b*.03));
+  gg.addColorStop(.48,'rgba(126,110,96,'+(.06+b*.016).toFixed(3)+')');
+  gg.addColorStop(1,cor(.3,.1+b*.02));
+  g.grad=gg;g.gradB=b;
+ }
+ c.fillStyle=g.grad;c.fill();
+ c.strokeStyle=cor(.75,.14+b*.035);c.lineWidth=Math.max(.7,R*.012);c.stroke();
+ /* o eixo e os vãos */
+ c.strokeStyle=cor(.6,.1+b*.03);c.lineWidth=Math.max(.6,R*.01);
+ c.beginPath();c.arc(0,0,rh,0,6.2832);c.stroke();
+ for(let i=0;i<4;i++){
+  const a=i/4*6.2832;
+  c.beginPath();c.moveTo(Math.cos(a)*rh*1.25,Math.sin(a)*rh*1.25);
+  c.lineTo(Math.cos(a)*ri*.86,Math.sin(a)*ri*.86);c.stroke();
+ }
+ c.restore();
+}
+function ascSched(f){clearTimeout(f.evT);
+ if(!f.on)return;
+ f.evT=setTimeout(()=>{f.evT=null;
+  const b=S.band,r=Math.random();
+  if(b>=1&&r<.4){const c=cardPick();
+   if(c){c.classList.add('asc-correct');setTimeout(()=>c.classList.remove('asc-correct'),360);}}
+  else if(b>=2&&r<.72){const p=txPick(f,54);
+   if(p){p[0].classList.add('asc-rgb');setTimeout(()=>p[0].classList.remove('asc-rgb'),340);}}
+  else if(b>=3){ascRasgo();}
+  ascSched(f);},rnd(b1(S.band),b2(S.band)));
+}
+const b1=b=>b>=5?1800:(b>=4?2800:(b>=3?4200:6000));
+const b2=b=>b>=5?4800:(b>=4?7000:(b>=3?10000:15000));
+/* o rasgo de fita: uma faixa de varredura atravessa a tela e some */
+function ascRasgo(){
+ const t=$('fx-tear');if(!t)return;
+ t.style.top=rnd(innerHeight*.12,innerHeight*.9)+'px';
+ t.style.height=Math.round(rnd(3,16))+'px';
+ t.classList.remove('on');void t.offsetWidth;t.classList.add('on');
+ setTimeout(()=>t.classList.remove('on'),260);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   OBSERVAÇÃO — o olho
+   porte do OBS de climate.js: esclera com gradiente quente e dessaturado, íris
+   que se desloca na direção do cursor, fibras, anel limbal, pupila que dilata,
+   sombra de órbita e dois brilhos. o olho vive ATRÁS dos cards, e o que você
+   encarou fica REGISTRADO.
+   ══════════════════════════════════════════════════════════════════════════════ */
+const OEYE=[0,.085,.10,.12,.145,.17],OALF=[0,.42,.55,.7,.86,1];
+const obsCi=(c,x,y,R,ry)=>c.moveTo(x-R,y+ry*.10);
+const obsCo=(c,x,y,R,ry)=>c.moveTo(x+R,y-ry*.14);
+const obsSup=(c,x,y,R,ry)=>c.bezierCurveTo(x-R*.56,y-ry*1.20,x+R*.18,y-ry*1.13,x+R,y-ry*.14);
+const obsInf=(c,x,y,R,ry)=>c.bezierCurveTo(x+R*.30,y+ry*.86,x-R*.46,y+ry*.74,x-R,y+ry*.10);
+const OBS=new Clima({id:'obs',zr:130,timers:['fugaT','piscaT'],
+ state:{ex:0,ey:0,r:0,lid:1,pup:.5,pupAlvo:.5,hip:1,seed:0,fugaT:null,piscaT:null,
+  hT:0,hEl:null,hSince:0,regs:[]},
+ mount(){this.seed=Math.random()*97;obsAlvo(this);this.lid=1;this.pup=.5;
+  obsFugaSched(this);obsPiscaSched(this);},
+ tear(){this.regs.forEach(r=>r.remove());this.regs=[];this.hEl=null;},
+ step(dt,t){
+  const b=S.band,R=Math.min(this.W,this.H);
+  const alvo=R*OEYE[b];
+  this.r+=(alvo-this.r)*Math.min(1,dt*.0022);
+  /* a pupila dilata quando você para de mexer: ela está te ACHANDO */
+  const parado=performance.now()-this.mt>2400;
+  this.pupAlvo=parado?.78:.36;
+  this.pup+=(this.pupAlvo-this.pup)*Math.min(1,dt*.0016);
+  this.hip=1+Math.sin(t*.0013)*.035;
+  this.dirty=true;
+  /* o registro: parado 900ms no mesmo texto morto, aquilo fica anotado */
+  if(t-this.hT>200){this.hT=t;
+   let el=null;
+   if(performance.now()-this.mt<5000&&this.mx>=0){
+    const n=document.elementFromPoint(this.mx,this.my);
+    const cd=n&&n.closest?n.closest(TXSEL):null;
+    if(cd&&txMorto(cd))el=cd;
+   }
+   if(el!==this.hEl){this.hEl=el;this.hSince=t;}
+   else if(el&&t-this.hSince>900&&S.band>=2){this.hSince=1e9;obsRegistra(this,el);}
+  }
+ },
+ draw(c){obsDraw(this,c);}
+});
+function obsAlvo(f){
+ /* o olho mora na periferia: nunca no meio da coluna de leitura */
+ const W=f.W||innerWidth,H=f.H||innerHeight;
+ const lado=Math.random()<.5?-1:1;
+ f.ex=lado<0?rnd(W*.04,W*.2):rnd(W*.8,W*.96);
+ f.ey=rnd(H*.2,H*.82);
+ f.dirty=true;
+}
+function obsFugaSched(f){clearTimeout(f.fugaT);
+ if(!f.on)return;
+ f.fugaT=setTimeout(()=>{f.fugaT=null;
+  /* ele troca de canto — e é sempre quando você não estava olhando para lá */
+  obsAlvo(f);obsFugaSched(f);},rnd(11000,24000));
+}
+function obsPiscaSched(f){clearTimeout(f.piscaT);
+ if(!f.on)return;
+ f.piscaT=setTimeout(()=>{f.piscaT=null;
+  const dur=110;let t0=performance.now();
+  const pisca=()=>{
+   const u=(performance.now()-t0)/dur;
+   if(u>=1){f.lid=1;f.dirty=true;obsPiscaSched(f);return;}
+   f.lid=Math.abs(Math.cos(u*Math.PI));f.dirty=true;rAF(pisca);
+  };pisca();},rnd(5000,13000));
+}
+function obsDraw(f,c){
+ const b=S.band,R=f.r,ry=R*.58*f.lid;
+ c.clearRect(0,0,f.W,f.H);
+ if(R<6||ry<1.2)return;
+ const x=f.ex,y=f.ey,A=Math.min(1,OALF[b]);
+ if(A<=.01)return;
+ const lw=Math.max(1,R*.017),Rx=R-lw*.5;
+ c.save();c.lineJoin='round';c.lineCap='round';
+ c.beginPath();obsCi(c,x,y,Rx,ry);obsSup(c,x,y,Rx,ry);obsInf(c,x,y,Rx,ry);c.closePath();
+ /* a esclera: cinza QUENTE e dessaturado — o branco do olho numa sala sem luz */
+ const sg=c.createRadialGradient(x,y+ry*.08,R*.06,x,y-ry*.16,R);
+ sg.addColorStop(0,'rgba(170,160,140,'+Math.min(1,.82*A).toFixed(3)+')');
+ sg.addColorStop(.5,'rgba(126,117,99,'+Math.min(1,.62*A).toFixed(3)+')');
+ sg.addColorStop(.82,'rgba(76,69,56,'+Math.min(1,.4*A).toFixed(3)+')');
+ sg.addColorStop(1,'rgba(44,40,32,'+Math.min(1,.22*A).toFixed(3)+')');
+ c.fillStyle=sg;c.fill();
+ c.save();c.clip();
+ /* os vasos, só no fundo do poço */
+ if(b>=4){
+  const n=b>=5?6:3;
+  c.lineCap='round';
+  for(let i=0;i<n;i++){
+   const s=i%2?-1:1,a=vnz(f.seed*4.1,i)*.5;
+   c.strokeStyle='rgba(150,64,54,'+Math.min(1,(.1+.07*Math.abs(vnz(f.seed,i)))*A).toFixed(3)+')';
+   c.lineWidth=Math.max(.6,R*.008);
+   c.beginPath();c.moveTo(x+s*R*.96,y+a*ry);
+   c.quadraticCurveTo(x+s*R*.6,y+a*ry*1.5,x+s*R*.3,y+a*ry*.4);c.stroke();
+  }
+ }
+ /* a íris: desloca DENTRO da esclera na direção do cursor. o corpo chega atrasado,
+    mas o olhar já está em você. parado há muito tempo, ela volta ao centro e encara */
+ let gx=f.mx,gy=f.my;
+ if(performance.now()-f.mt>4000||gx<0){gx=f.W*.5;gy=f.H*.5;}
+ let ox=gx-x,oy=gy-y;const ol=Math.hypot(ox,oy)||1,om=Math.min(1,ol/(R*3));
+ ox=ox/ol*om*R*.24;oy=oy/ol*om*ry*.30;
+ const ir=Math.min(R*.4,ry*.74),ix=x+ox,iy=y-ry*.17+oy;
+ const pr=ir*(.2+.3*f.pup)*f.hip;
+ const ig=c.createRadialGradient(ix-ir*.18,iy-ir*.2,ir*.12,ix,iy,ir);
+ ig.addColorStop(0,cor(.92,Math.min(1,.9*A)));
+ ig.addColorStop(.34,cor(1,Math.min(1,.95*A)));
+ ig.addColorStop(.66,cor(.8,Math.min(1,.95*A)));
+ ig.addColorStop(.9,cor(.62,Math.min(1,.95*A)));
+ ig.addColorStop(1,cor(.52,Math.min(1,.95*A)));
+ c.fillStyle=ig;c.beginPath();c.arc(ix,iy,ir,0,6.2832);c.fill();
+ /* as fibras: poucas, finas, arqueadas. textura, não raio de sol */
+ const nf=34;c.lineWidth=Math.max(.5,ir*.022);
+ for(let i=0;i<nf;i++){
+  const a=i/nf*6.2832+vnz(f.seed,i)*.055;
+  const r0=pr*1.04,r1=ir*(.80+vnz(f.seed*1.9,i)*.13),mr=(r0+r1)*.5;
+  const bw=vnz(f.seed*3.3,i)*.05;
+  c.strokeStyle=cor(.95,Math.min(1,(.06+.10*(vnz(f.seed*2.7,i)*.5+.5))*A));
+  c.beginPath();
+  c.moveTo(ix+Math.cos(a)*r0,iy+Math.sin(a)*r0);
+  c.quadraticCurveTo(ix+Math.cos(a+bw)*mr,iy+Math.sin(a+bw)*mr,
+   ix+Math.cos(a)*r1,iy+Math.sin(a)*r1);
+  c.stroke();
+ }
+ /* o anel limbal: sem ele a íris FLUTUA por cima da esclera. duas passadas */
+ const lg=c.createRadialGradient(ix,iy,ir*.88,ix,iy,ir*1.2);
+ lg.addColorStop(0,cor(.16,0));
+ lg.addColorStop(.38,cor(.16,Math.min(1,.5*A)));
+ lg.addColorStop(.72,cor(.14,Math.min(1,.26*A)));
+ lg.addColorStop(1,cor(.12,0));
+ c.fillStyle=lg;c.beginPath();c.arc(ix,iy,ir*1.2,0,6.2832);c.fill();
+ c.strokeStyle=cor(.14,Math.min(1,.95*A));c.lineWidth=Math.max(1,ir*.045);
+ c.beginPath();c.arc(ix,iy,ir*.98,0,6.2832);c.stroke();
+ /* a pupila é BURACO, não cor */
+ c.fillStyle='rgba(0,0,0,'+Math.min(1,.95*A).toFixed(3)+')';
+ c.beginPath();c.arc(ix,iy,pr,0,6.2832);c.fill();
+ const pg=c.createRadialGradient(ix,iy,pr*.9,ix,iy,pr*1.2);
+ pg.addColorStop(0,'rgba(0,0,0,'+Math.min(1,.55*A).toFixed(3)+')');
+ pg.addColorStop(1,'rgba(0,0,0,0)');
+ c.fillStyle=pg;c.beginPath();c.arc(ix,iy,pr*1.2,0,6.2832);c.fill();
+ /* a órbita: a pálpebra de cima projeta sombra, e os cantos ficam fundos */
+ const og=c.createLinearGradient(0,y-ry*.9,0,y+ry*.62);
+ og.addColorStop(0,'rgba(0,0,0,'+Math.min(1,.62*A).toFixed(3)+')');
+ og.addColorStop(.3,'rgba(0,0,0,'+Math.min(1,.22*A).toFixed(3)+')');
+ og.addColorStop(.62,'rgba(0,0,0,0)');
+ og.addColorStop(1,'rgba(0,0,0,'+Math.min(1,.26*A).toFixed(3)+')');
+ c.fillStyle=og;c.fillRect(x-R*1.02,y-ry*1.1,R*2.04,ry*1.9);
+ for(const s of [-1,1]){
+  const qx=x+s*R*.94,qy=y+(s<0?ry*.1:-ry*.14);
+  const qg=c.createRadialGradient(qx,qy,0,qx,qy,R*.5);
+  qg.addColorStop(0,'rgba(0,0,0,'+Math.min(1,.5*A).toFixed(3)+')');
+  qg.addColorStop(1,'rgba(0,0,0,0)');
+  c.fillStyle=qg;c.beginPath();c.arc(qx,qy,R*.5,0,6.2832);c.fill();
+ }
+ /* o brilho: alto e à esquerda. é o que diz que esta superfície é MOLHADA */
+ const hx=ix-ir*.34,hy=iy-ir*.4,hr=Math.max(1.6,ir*.24);
+ const hg=c.createRadialGradient(hx,hy,0,hx,hy,hr);
+ hg.addColorStop(0,'rgba(255,253,246,'+Math.min(1,.62*A).toFixed(3)+')');
+ hg.addColorStop(.42,cor(1,Math.min(1,.3*A)));
+ hg.addColorStop(1,cor(1,0));
+ c.fillStyle=hg;c.beginPath();c.arc(hx,hy,hr,0,6.2832);c.fill();
+ const wx=ix+ir*.3,wy=iy+ir*.34,wr=Math.max(1,ir*.1);
+ const wg=c.createRadialGradient(wx,wy,0,wx,wy,wr);
+ wg.addColorStop(0,'rgba(255,250,232,'+Math.min(1,.22*A).toFixed(3)+')');
+ wg.addColorStop(1,'rgba(255,250,232,0)');
+ c.fillStyle=wg;c.beginPath();c.arc(wx,wy,wr,0,6.2832);c.fill();
+ c.restore();
+ /* o contorno das pálpebras: é ELE que faz a silhueta aparecer por trás do card */
+ c.lineWidth=lw;
+ c.strokeStyle=cor(.7,Math.min(1,.72*A));
+ c.beginPath();obsCi(c,x,y,Rx,ry);obsSup(c,x,y,Rx,ry);c.stroke();
+ c.strokeStyle=cor(.52,Math.min(1,.55*A));
+ c.beginPath();obsCo(c,x,y,Rx,ry);obsInf(c,x,y,Rx,ry);c.stroke();
+ /* a prega: é o que dá PÁLPEBRA em vez de lente */
+ c.strokeStyle=cor(.34,Math.min(1,.3*A));c.lineWidth=Math.max(.7,R*.009);
+ c.beginPath();c.moveTo(x-R*.8,y-ry*.16);
+ c.bezierCurveTo(x-R*.42,y-ry*1.25,x+R*.2,y-ry*1.25,x+R*.84,y-ry*.4);c.stroke();
+ c.restore();
+}
+/* o registro: uma moldura e uma hora em cima do que você encarou */
+function obsRegistra(f,el){
+ const r=el.getBoundingClientRect();
+ if(r.width<30)return;
+ const d=document.createElement('div');d.className='obs-reg';
+ const n=new Date();
+ const z=v=>String(v).padStart(2,'0');
+ d.setAttribute('data-t','REG '+z(n.getHours())+':'+z(n.getMinutes())+':'+z(n.getSeconds()));
+ d.style.left=(r.left-5)+'px';d.style.top=(r.top-4)+'px';
+ d.style.width=(r.width+10)+'px';d.style.height=(r.height+8)+'px';
+ document.body.appendChild(d);f.regs.push(d);
+ setTimeout(()=>{d.remove();f.regs=f.regs.filter(x=>x!==d);},2700);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   ECO — a dupla-visão
+   o rastro do cursor chega ATRASADO, e onde você demorou fica uma cicatriz de
+   laço. mais o soluço, o micro-laço e o fantasma do que passou (porte de ECO).
+   ══════════════════════════════════════════════════════════════════════════════ */
+const ECO=new Clima({id:'eco',zr:104,timers:['evT'],
+ state:{tr:[],cic:[],gh:[],ghT:0,evT:null,lx:-1e4,ly:-1e4,par:0},
+ mount(){this.tr=[];this.cic=[];this.gh=[];this.ghT=0;ecoSched(this);},
+ tear(){this.tr=[];this.cic=[];this.gh=[];
+  document.querySelectorAll('.fx-stut,.fx-loop').forEach(e=>e.classList.remove('fx-stut','fx-loop'));
+  document.querySelectorAll('.fx-ghost').forEach(e=>e.remove());},
+ step(dt,t){
+  const b=S.band;
+  ecoDupla(this,dt,t);
+  /* o rastro: uma fila de posições com atraso crescente pela banda */
+  if(performance.now()-this.mt<5000&&this.mx>0){
+   const d=Math.hypot(this.mx-this.lx,this.my-this.ly);
+   if(d>6){this.tr.push({x:this.mx,y:this.my,t});this.lx=this.mx;this.ly=this.my;this.par=t;}
+   else if(t-this.par>820&&this.cic.length<8+b){
+    /* parado: o laço cicatriza ali */
+    this.cic.push({x:this.mx,y:this.my,r:5,t});this.par=t;}
+  }
+  const atraso=420+b*120;
+  this.tr=this.tr.filter(p=>t-p.t<atraso+680);
+  this.cic=this.cic.filter(p=>t-p.t<9000);
+  this.dirty=true;
+ },
+ draw(c){
+  const b=S.band,t=performance.now(),atraso=420+b*120;
+  c.clearRect(0,0,this.W,this.H);
+  /* A DUPLA-VISÃO: o contorno do documento chega atrasado. não depende de cursor
+     nenhum — está ali sempre, e quando você rola ele vem correndo atrás.
+     o deslocamento fixo para baixo-e-direita é o MESMO sentido do text-shadow do
+     Eco no CSS: o fantasma do layout e o fantasma do texto caem juntos, senão são
+     dois efeitos brigando. e ele acende quando o eco está longe de chegar */
+  const off=2+b*1.7;
+  c.lineWidth=1;
+  for(const g of this.gh){
+   const d=Math.abs(g.t-g.at)+Math.abs(g.l-g.al);
+   const a=Math.min(.42,(.1+b*.05)*(1+d*.05));
+   const x=g.l+off,y=g.t+off;
+   c.strokeStyle=cor(1,a);
+   c.strokeRect(x+.5,y+.5,g.w,g.h);
+   /* a linha do título, um instante atrás da de verdade */
+   c.strokeStyle=cor(1,Math.min(.5,a*1.6));
+   c.beginPath();c.moveTo(x+14,y+g.hd);c.lineTo(x+g.w*.62,y+g.hd);c.stroke();
+   /* e a aresta esquerda — a que o card marca em cor — dobra mais forte */
+   c.strokeStyle=cor(1,Math.min(.55,a*1.9));c.lineWidth=2;
+   c.beginPath();c.moveTo(x+1,y);c.lineTo(x+1,y+g.h);c.stroke();
+   c.lineWidth=1;
+  }
+  /* o rastro fantasma: o cursor de meio segundo atrás */
+  let prev=null;
+  for(const p of this.tr){
+   const age=t-p.t;
+   if(age<atraso){prev=null;continue;}
+   const u=1-Math.min(1,(age-atraso)/680);
+   if(prev){
+    c.strokeStyle=cor(1,(.1+b*.035)*u);
+    c.lineWidth=Math.max(.7,1.6*u);c.lineCap='round';
+    c.beginPath();c.moveTo(prev.x,prev.y);c.lineTo(p.x,p.y);c.stroke();
+   }
+   prev=p;
+  }
+  if(prev){
+   c.fillStyle=cor(1,.22+b*.05);
+   c.beginPath();c.arc(prev.x,prev.y,2.4,0,6.2832);c.fill();
+  }
+  /* as cicatrizes de laço: anéis concêntricos que repetem e desbotam */
+  for(const s of this.cic){
+   const age=t-s.t,u=1-Math.min(1,age/9000);
+   for(let k=0;k<3;k++){
+    const r=s.r+k*7+ (age*.004)%9;
+    c.strokeStyle=cor(.9,(.055+b*.018)*u*(1-k*.28));
+    c.lineWidth=.9;
+    c.beginPath();c.arc(s.x,s.y,r,0,6.2832);c.stroke();
+   }
+  }
+ }
+});
+/* a dupla-visão: uma cópia do layout que persegue o layout de verdade, sempre atrás.
+   reamostra as caixas ~5×/s (getBoundingClientRect é caro), e interpola por frame —
+   é a interpolação lenta que produz o atraso. a zona sagrada é respeitada: o que
+   está sob o cursor não ganha fantasma. */
+function ecoDupla(f,dt,t){
+ if(t-f.ghT>200){
+  f.ghT=t;
+  const sec=secs.eco;if(!sec)return;
+  const vivos={};
+  sec.querySelectorAll('.card,.cond,.comofunciona').forEach(el=>{
+   const r=el.getBoundingClientRect();
+   if(r.bottom<-40||r.top>f.H+40||r.width<60)return;
+   if(f.forbBox({l:r.left,r:r.right,t:r.top,b:r.bottom}))return;
+   const k=el.id||('x'+r.height.toFixed(0)+el.className);
+   vivos[k]={l:r.left,t:r.top,w:r.width,h:r.height,hd:Math.min(46,r.height*.3)};
+  });
+  /* casa o que já existe, nasce o que é novo (já na posição, para não voar da borda) */
+  const novos=[];
+  for(const k in vivos){
+   const antigo=f.gh.find(g=>g.k===k);
+   if(antigo){antigo.al=vivos[k].l;antigo.at=vivos[k].t;
+    antigo.aw=vivos[k].w;antigo.ah=vivos[k].h;antigo.hd=vivos[k].hd;novos.push(antigo);}
+   else novos.push({k,l:vivos[k].l,t:vivos[k].t,w:vivos[k].w,h:vivos[k].h,
+    al:vivos[k].l,at:vivos[k].t,aw:vivos[k].w,ah:vivos[k].h,hd:vivos[k].hd});
+  }
+  f.gh=novos;
+ }
+ /* a interpolação: quanto mais alta a banda, mais devagar o eco chega.
+    mas um salto GRANDE (trocar de santuário, pular para um card, rolar de página)
+    não é atraso de leitura — é outro layout. aí o eco não persegue: ele já está lá.
+    sem isto sobrava uma moldura solta atravessando o pórtico, vinda da tela anterior */
+ const k=Math.min(1,dt*(.0075-S.band*.0009));
+ for(const g of f.gh){
+  if(Math.abs(g.at-g.t)>170||Math.abs(g.al-g.l)>170){
+   g.l=g.al;g.t=g.at;g.w=g.aw;g.h=g.ah;continue;}
+  g.l+=(g.al-g.l)*k;g.t+=(g.at-g.t)*k;
+  g.w+=(g.aw-g.w)*k;g.h+=(g.ah-g.h)*k;
+ }
+}
+function ecoSched(f){clearTimeout(f.evT);
+ if(!f.on)return;
+ f.evT=setTimeout(()=>{f.evT=null;
+  const b=S.band,r=Math.random();
+  if(r<.42){const p=txPick(f,50);
+   if(p){p[0].classList.add('fx-stut');setTimeout(()=>p[0].classList.remove('fx-stut'),260);}}
+  else if(b>=2&&r<.72){const p=txPick(f,50);
+   if(p){p[0].classList.add('fx-loop');setTimeout(()=>p[0].classList.remove('fx-loop'),1400);}}
+  else if(b>=2){ecoFantasma(f);}
+  ecoSched(f);},S.band>=4?rnd(2400,6000):rnd(4200,11000));
+}
+/* o fantasma: um texto que você já passou volta escrito na margem */
+function ecoFantasma(f){
+ const sec=secAtual();if(!sec)return;
+ const ns=[...sec.querySelectorAll('.card-name')].filter(el=>{
+  const r=el.getBoundingClientRect();return r.bottom<40;});
+ if(!ns.length)return;
+ const el=pick(ns),tx=(el.textContent||'').trim().split('·')[0].trim();
+ if(!tx)return;
+ const d=document.createElement('div');d.className='fx-ghost';d.textContent=tx;
+ d.style.left=rnd(12,60)+'px';d.style.top=rnd(innerHeight*.25,innerHeight*.8)+'px';
+ document.body.appendChild(d);setTimeout(()=>d.remove(),1900);
+}
+
+/* ══ OS SUSSURROS — porte do whisperLoop da ficha ══ */
+let WT=null,WOFF=null;
+function susTier(el,b){const S2=SUS[el];if(!S2)return[];return b<=2?S2.lo:(b<=4?S2.mid:S2.hi);}
+/* a MARGEM: o sussurro mora na goteira, fora da coluna de leitura e fora do índice.
+   sem isto ele cai por cima do índice e vira uma linha de texto ilegível sobre outra */
+function whisperVaga(){
+ const sec=secAtual();
+ let esq=innerWidth,dir=innerWidth;
+ if(sec){const c=sec.querySelector('.corpo');
+  if(c){const r=c.getBoundingClientRect();esq=r.left;dir=innerWidth-r.right;}}
+ const ladoEsq=esq>=dir;
+ const larg=(ladoEsq?esq:dir)-20;
+ if(larg<86)return null;                 /* goteira estreita demais: fica calado */
+ return {esq:ladoEsq,larg:Math.min(250,larg)};
+}
+/* corte SECO. tirar só a classe deixa a frase esmaecendo pelos 2,4s da transição —
+   tempo de sobra para o sussurro de um elemento aparecer dentro do santuário de outro */
+function whisperOff(){
+ clearTimeout(WT);WT=null;clearTimeout(WOFF);WOFF=null;
+ const w=$('whisper');if(!w)return;
+ w.style.transition='none';
+ w.classList.remove('on');
+ void w.offsetWidth;                    /* força o reflow antes de devolver a transição */
+ w.style.transition='';
+}
+function whisperLoop(){
+ clearTimeout(WT);WT=null;
+ const w=$('whisper');if(!w)return;
+ if(!S.el||S.calm||RM()||S.band<1||document.hidden){w.classList.remove('on');return;}
+ const banco=susTier(S.el,S.band);
+ const vaga=whisperVaga();
+ const vis=3200+S.band*700;
+ const gap=S.band>=5?rnd(7000,14000):(S.band>=3?rnd(13000,26000):rnd(24000,46000));
+ if(banco.length&&vaga){
+  w.textContent=pick(banco);
+  w.style.maxWidth=vaga.larg+'px';
+  w.style.left=vaga.esq?rnd(10,Math.max(11,vaga.larg*.12+10))+'px':'auto';
+  w.style.right=vaga.esq?'auto':rnd(10,Math.max(11,vaga.larg*.12+10))+'px';
+  w.style.top=rnd(innerHeight*.22,innerHeight*.82)+'px';
+  w.classList.add('on');
+  clearTimeout(WOFF);
+  WOFF=setTimeout(()=>{WOFF=null;w.classList.remove('on');},vis);
+ }
+ WT=setTimeout(whisperLoop,vis+gap);
+}
+function whisperSync(){
+ if(!S.el||S.calm||RM()||document.hidden){whisperOff();return;}
+ if(!WT)WT=setTimeout(whisperLoop,rnd(4000,9000));
+}
+
+/* ══ O GRÃO — papel de 2002 fotocopiado. pintado UMA vez ══ */
+function grao(){
+ const g=$('fx-grain');if(!g)return;
+ const n=128,cv=document.createElement('canvas');cv.width=cv.height=n;
+ const c=cv.getContext('2d');if(!c)return;
+ const im=c.createImageData(n,n),d=im.data;
+ for(let i=0;i<d.length;i+=4){
+  const v=190+Math.random()*66|0;
+  d[i]=d[i+1]=d[i+2]=v;d[i+3]=255;
+ }
+ c.putImageData(im,0,0);
+ g.style.backgroundImage='url('+cv.toDataURL('image/png')+')';
+ g.style.backgroundSize=n+'px '+n+'px';
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   NAVEGAÇÃO — capa ⇄ seis santuários
+   ══════════════════════════════════════════════════════════════════════════════ */
+const secs={};
+ORDEM.forEach(id=>{secs[id]=$('s-'+id);});
+const capa=$('capa');
+function secAtual(){return S.view==='santuario'?secs[S.el]:null;}
+
+function setBand(b){
+ b=clamp(b|0,0,5);
+ if(b===S.band)return;
+ S.band=b;
+ B.dataset.band=b;
+ B.style.setProperty('--band',b);
+ const f=S.ativo;
+ if(f&&f.on&&f.h.band)f.h.band.call(f,b);
+}
+
+function go(dest,opt){
+ opt=opt||{};
+ const antes=S.el;
+ /* desliga o clima do que estava aberto ANTES de trocar o tema */
+ if(S.ativo){S.ativo.on&&S.ativo.tear();S.ativo.on=false;S.ativo=null;}
+ loopSync();
+ /* e o sussurro do elemento que ficou para trás cala NA HORA — deixá-lo terminar a
+    frase depois da troca fazia o Pacto falar dentro do santuário da Observação */
+ whisperOff();
+ document.querySelectorAll('.fx-ghost,.pac-sug,.pac-caret,.obs-reg,.ger-scar').forEach(e=>e.remove());
+ document.querySelectorAll('.vaz-sub,.vaz-cut,.fx-stut,.fx-loop,.asc-correct,.asc-rgb,.ger-swell')
+  .forEach(e=>e.classList.remove('vaz-sub','vaz-cut','fx-stut','fx-loop','asc-correct','asc-rgb','ger-swell'));
+
+ if(dest==='capa'||!ELS[dest]){
+  S.view='capa';S.el='';
+  B.dataset.view='capa';B.dataset.el='';
+  capa.classList.add('on');
+  ORDEM.forEach(id=>secs[id].classList.remove('on'));
+ }else{
+  S.view='santuario';S.el=dest;
+  B.dataset.view='santuario';B.dataset.el=dest;
+  capa.classList.remove('on');
+  ORDEM.forEach(id=>secs[id].classList.toggle('on',id===dest));
+ }
+ /* o trilho */
+ document.querySelectorAll('#rail .g').forEach(g=>{
+  const on=g.dataset.g===S.el;
+  g.classList.toggle('on',on);
+  g.setAttribute('aria-selected',String(on));
+ });
+ /* o atalho de teclado aponta para o que está aberto: a coluna de leitura ou a capa */
+ document.querySelectorAll('.leitura').forEach(l=>l.removeAttribute('id'));
+ const secAberta=S.el?secs[S.el]:null;
+ const lt=secAberta?secAberta.querySelector('.leitura'):null;
+ if(lt){lt.id='leitura-atual';lt.setAttribute('tabindex','-1');}
+ const sk=document.querySelector('.skip');
+ if(sk)sk.setAttribute('href',lt?'#leitura-atual':'#entradas');
+ temaSync();
+ setBand(0);
+ /* a rolagem: topo do santuário, a menos que a chamada peça um card */
+ if(opt.card){
+  const c=document.getElementById(opt.card);
+  /* behavior explícito: o html{scroll-behavior:smooth} animaria o salto de santuário */
+  if(c){rAF(()=>c.scrollIntoView({block:'start',behavior:'auto'}));}
+  else scrollTo({top:0,left:0,behavior:'auto'});
+ }else if(!opt.mantemScroll){scrollTo({top:0,left:0,behavior:'auto'});}
+ /* o hash */
+ if(!opt.semHash){
+  const h=opt.card?('#'+opt.card):(S.el?('#'+secs[S.el].dataset.hash):'');
+  if(h!==location.hash)history.replaceState(null,'',h||location.pathname+location.search);
+ }
+ /* e o clima do novo */
+ S.ativo=S.el?Clima.all[S.el]:null;
+ bandDaRolagem();
+ climaSync();
+ indiceAtivo();
+ if(antes!==S.el&&S.el)marcaRelido();
+}
+function climaSync(){
+ if(S.ativo)S.ativo.sync();
+ loopSync();
+ whisperSync();
+}
+
+/* ── a banda pela profundidade de leitura ── */
+let bandQ=false;
+function bandDaRolagem(){
+ if(S.view!=='santuario'){setBand(0);return;}
+ const sec=secs[S.el];if(!sec){setBand(0);return;}
+ const alt=sec.offsetHeight-innerHeight;
+ const p=alt>8?clamp((scrollY-sec.offsetTop)/alt,0,1):0;
+ /* dentro de um santuário o elemento está SEMPRE presente: a banda começa em 1 */
+ setBand(1+Math.min(4,Math.floor(p*4.999)));
+}
+addEventListener('scroll',()=>{
+ if(bandQ)return;bandQ=true;
+ rAF(()=>{bandQ=false;bandDaRolagem();indiceAtivo();});
+},{passive:true});
+addEventListener('resize',()=>{bandDaRolagem();if(S.ativo&&S.ativo.on)S.ativo.resize();},{passive:true});
+document.addEventListener('visibilitychange',climaSync);
+if(_mqRM&&_mqRM.addEventListener)_mqRM.addEventListener('change',()=>{climaSync();});
+
+/* ══ OS ÍNDICES — gerados a partir dos próprios cards, sem texto novo ══ */
+const CARDS=[];
+function montaIndices(){
+ ORDEM.forEach(id=>{
+  const sec=secs[id],nav=sec.querySelector('.indice');
+  const h=document.createElement('div');h.className='h';
+  h.textContent=ELS[id].n+' '+ELS[id].g;
+  nav.appendChild(h);
+  sec.querySelectorAll('.card').forEach(card=>{
+   const num=(card.querySelector('.card-num')||{}).textContent||'';
+   const nameEl=card.querySelector('.card-name');
+   let nome='';
+   if(nameEl){
+    const cl=nameEl.cloneNode(true);
+    const sub=cl.querySelector('.card-sub');if(sub)sub.remove();
+    nome=cl.textContent.trim();
+   }
+   const a=document.createElement('a');
+   a.href='#'+card.id;
+   a.dataset.alvo=card.id;
+   a.innerHTML='<b></b>';
+   a.firstChild.textContent=num.trim();
+   a.appendChild(document.createTextNode(nome));
+   nav.appendChild(a);
+   CARDS.push({el:id,id:card.id,nome,num:num.trim(),node:card,link:a,
+    busca:(nome+' '+(card.textContent||'')).toLowerCase()});
+  });
+ });
+}
+/* qual card está sendo lido agora */
+function indiceAtivo(){
+ const sec=secAtual();if(!sec)return;
+ const cards=sec.querySelectorAll('.card');
+ let ativo=null;
+ for(const c of cards){
+  const r=c.getBoundingClientRect();
+  if(r.top<innerHeight*.42)ativo=c;else break;
+ }
+ sec.querySelectorAll('.indice a').forEach(a=>{
+  const on=!!ativo&&a.dataset.alvo===ativo.id;
+  a.classList.toggle('here',on);
+  if(on&&a.offsetParent){
+   const nav=a.closest('.indice');
+   if(nav&&nav.scrollHeight>nav.clientHeight+4){
+    const ar=a.getBoundingClientRect(),nr=nav.getBoundingClientRect();
+    if(ar.top<nr.top+8||ar.bottom>nr.bottom-8)
+     nav.scrollTop+=ar.top-nr.top-nav.clientHeight*.4;
+   }
+  }
+ });
+}
+/* o sulco do Eco: o card relido ganha marca */
+const vistos=new Set();
+function marcaRelido(){
+ if(S.el!=='eco')return;
+ const sec=secs.eco;if(!sec)return;
+ sec.querySelectorAll('.card').forEach(c=>{
+  const r=c.getBoundingClientRect();
+  if(r.top>innerHeight||r.bottom<0)return;
+  if(vistos.has(c.id))c.setAttribute('data-relido','☊︎');
+  else vistos.add(c.id);
+ });
+}
+addEventListener('scroll',()=>{if(S.el==='eco')marcaRelido();},{passive:true});
+
+/* ══ A BUSCA — sobre as 43, de qualquer lugar do arquivo ══ */
+const bx=$('railsearch');
+let resBox=null;
+function resultados(q){
+ if(!resBox){
+  resBox=document.createElement('div');resBox.id='resultados';
+  document.body.appendChild(resBox);
+ }
+ q=q.trim().toLowerCase();
+ if(!q){resBox.classList.remove('on');resBox.innerHTML='';return;}
+ const hits=CARDS.filter(c=>c.busca.indexOf(q)!==-1).slice(0,11);
+ if(!hits.length){
+  resBox.innerHTML='<div class="busca-vazia">nada no arquivo</div>';
+  resBox.classList.add('on');return;
+ }
+ resBox.innerHTML='';
+ hits.forEach((c,i)=>{
+  const a=document.createElement('button');
+  a.className='res'+(i===0?' first':'');
+  a.dataset.el=c.el;a.dataset.card=c.id;
+  a.innerHTML='<i>'+ELS[c.el].g+'</i><span></span><em>'+ELS[c.el].n+'</em>';
+  a.querySelector('span').textContent=c.num+' · '+c.nome;
+  a.addEventListener('click',()=>{fechaBusca();go(c.el,{card:c.id});});
+  resBox.appendChild(a);
+ });
+ resBox.classList.add('on');
+ const r=bx.getBoundingClientRect();
+ resBox.style.left=Math.min(r.left,innerWidth-330)+'px';
+ resBox.style.top=(r.bottom+6)+'px';
+}
+function fechaBusca(){if(resBox){resBox.classList.remove('on');resBox.innerHTML='';}bx.blur();}
+if(bx){
+ bx.addEventListener('input',()=>resultados(bx.value));
+ bx.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){bx.value='';fechaBusca();e.stopPropagation();}
+  if(e.key==='Enter'){
+   const f=resBox&&resBox.querySelector('.res');
+   if(f)f.click();
+  }
+ });
+ bx.addEventListener('focus',()=>{if(bx.value)resultados(bx.value);});
+}
+addEventListener('click',e=>{
+ if(resBox&&resBox.classList.contains('on')&&!resBox.contains(e.target)&&e.target!==bx)fechaBusca();
+});
+
+/* ══ OS BOTÕES ══ */
+document.querySelectorAll('#rail .g').forEach(g=>{
+ g.addEventListener('click',()=>go(g.dataset.g));
+});
+document.querySelectorAll('[data-go]').forEach(b=>{
+ b.addEventListener('click',()=>go(b.dataset.go));
+});
+$('btnBack').addEventListener('click',()=>go('capa'));
+
+/* ── ligar/desligar efeitos, como o btnCalm da ficha ── */
+const btnCalm=$('btnCalm');
+function calmSync(){
+ B.classList.toggle('calm',S.calm);
+ btnCalm.classList.toggle('on',!S.calm);
+ btnCalm.setAttribute('aria-pressed',String(!S.calm));
+ btnCalm.title=S.calm?'ligar os efeitos visuais':'desligar os efeitos visuais';
+ btnCalm.textContent=S.calm?'🌫 Efeitos ○':'🌫 Efeitos ●';
+ climaSync();
+}
+btnCalm.addEventListener('click',()=>{
+ S.calm=!S.calm;
+ try{localStorage.setItem('arq6.calm',S.calm?'1':'0');}catch(e){}
+ calmSync();
+});
+
+/* ── teclado: Esc volta, ←/→ trocam de santuário ── */
+addEventListener('keydown',e=>{
+ const a=document.activeElement;
+ if(a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA'))return;
+ if(e.key==='Escape'&&S.view==='santuario'){go('capa');return;}
+ if(S.view!=='santuario')return;
+ const i=ORDEM.indexOf(S.el);
+ if(e.key==='ArrowRight'){go(ORDEM[(i+1)%6]);e.preventDefault();}
+ if(e.key==='ArrowLeft'){go(ORDEM[(i+5)%6]);e.preventDefault();}
+});
+
+/* ── o roteamento por hash: #vazio, #germe… e também #vaz-lanca ── */
+const HASHEL={};
+ORDEM.forEach(id=>{HASHEL[secs[id].dataset.hash]=id;});
+function daHash(){
+ const h=(location.hash||'').replace('#','');
+ if(!h)return {dest:'capa'};
+ if(HASHEL[h])return {dest:HASHEL[h]};
+ const c=CARDS.find(x=>x.id===h);
+ if(c)return {dest:c.el,card:c.id};
+ return {dest:'capa'};
+}
+addEventListener('hashchange',()=>{
+ const r=daHash();
+ go(r.dest,{card:r.card,semHash:true});
+});
+/* os links do índice: navegam sem recarregar o roteador */
+document.addEventListener('click',e=>{
+ const a=e.target.closest?e.target.closest('.indice a'):null;
+ if(!a)return;
+ e.preventDefault();
+ const c=document.getElementById(a.dataset.alvo);
+ if(c){c.scrollIntoView({block:'start',behavior:'smooth'});
+  history.replaceState(null,'','#'+a.dataset.alvo);}
+});
+
+/* ══ BOOT ══ */
+function boot(){
+ /* as epígrafes dos pórticos saem do mesmo objeto que a ficha usa */
+ document.querySelectorAll('[data-epigrafe]').forEach(p=>{
+  const e=ELS[p.dataset.epigrafe];if(e)p.textContent=e.fr;
+ });
+ montaIndices();
+ grao();
+ try{
+  const v=localStorage.getItem('arq6.calm');
+  if(v!==null)S.calm=v==='1';
+ }catch(e){}
+ if(RM())S.calm=true;   /* movimento reduzido: chega calmo, e o botão continua valendo */
+ calmSync();
+ const r=daHash();
+ go(r.dest,{card:r.card,semHash:true});
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);
+else boot();
+
+})();
+</script>
 </body>
 </html>
