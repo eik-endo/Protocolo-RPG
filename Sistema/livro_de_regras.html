@@ -339,7 +339,7 @@ body{
 
 /* ---------- o texto do livro ---------- */
 
-.corpo,.rolagem-caixa{
+.corpo,.corrido-caixa{
   font-family:var(--texto);
   font-size:17px;
   line-height:1.55;
@@ -349,7 +349,7 @@ body{
   text-justify:inter-word;
 }
 
-.corpo > *:first-child,.rolagem-caixa > *:first-child{margin-top:0}
+.corpo > *:first-child,.corrido-caixa > *:first-child{margin-top:0}
 
 p{margin:0 0 .72em}
 
@@ -417,6 +417,8 @@ a:hover{text-decoration-thickness:1px}
 ul,ol{margin:0 0 .8em;padding-left:1.35em}
 li{margin:0 0 .3em}
 li > ul,li > ol{margin:.3em 0 .35em}
+/* item que continua da pagina anterior: sem marcador de novo */
+li.corte-fim{list-style:none}
 
 /* enunciado das 30 regras */
 p.regra{
@@ -554,6 +556,8 @@ thead th{
   padding:.5em .7em .45em 0;
   border-bottom:1px solid var(--filete);
   vertical-align:bottom;
+  hyphens:none;
+  -webkit-hyphens:none;
 }
 tbody td{
   padding:.5em .7em .5em 0;
@@ -564,7 +568,14 @@ tbody td{
 }
 tbody tr:last-child td{border-bottom:0}
 th:last-child,td:last-child{padding-right:0}
-.tabela-glossario tbody td:first-child{font-weight:600}
+/* coluna dos termos: sem hifenizacao, e larga o bastante para
+   "condição grave" caber numa linha (com a fonte do livro ou com a Georgia) */
+.tabela-glossario tbody td:first-child{
+  font-weight:600;
+  width:8.6em;
+  hyphens:none;
+  -webkit-hyphens:none;
+}
 .tabela-glossario tbody td:last-child{white-space:nowrap}
 
 /* ---------- capa ---------- */
@@ -638,26 +649,26 @@ th:last-child,td:last-child{padding-right:0}
 #painel .sumario{text-align:left}
 
 /* ---------- marca da busca ---------- */
-.corpo mark,.rolagem-caixa mark{background:rgba(201,168,76,.3);color:var(--tinta);border-radius:1px}
+.corpo mark,.corrido-caixa mark{background:rgba(201,168,76,.3);color:var(--tinta);border-radius:1px}
 
-/* ---------- modo rolagem ---------- */
+/* ---------- modo corrido ---------- */
 
-#rolagem{display:none}
-body.modo-rolagem #mesa{display:none}
-body.modo-rolagem #rolagem{
+#corrido{display:none}
+body.modo-corrido #mesa{display:none}
+body.modo-corrido #corrido{
   display:block;
   padding:0 0 calc(var(--barra) + 40px);
 }
-body.modo-rolagem #barra #folio-barra{visibility:hidden}
-.rolagem-caixa{
+body.modo-corrido #barra #folio-barra{visibility:hidden}
+.corrido-caixa{
   max-width:40em;
   margin:0 auto;
   padding:52px 22px 0;
 }
-.rolagem-caixa h2{margin-top:2.4em}
-.rolagem-caixa > *:first-child{margin-top:0}
-.rolagem-caixa p.parte{height:auto;min-height:0;padding:3em 0;gap:1em}
-.rolagem-caixa .capa{height:auto;padding:0 0 3em}
+.corrido-caixa h2{margin-top:2.4em}
+.corrido-caixa > *:first-child{margin-top:0}
+.corrido-caixa p.parte{height:auto;min-height:0;padding:3em 0;gap:1em}
+.corrido-caixa .capa{height:auto;padding:0 0 3em}
 
 #medidor{
   position:absolute;
@@ -672,7 +683,7 @@ body.modo-rolagem #barra #folio-barra{visibility:hidden}
 
 @media (max-width:999px){
   body{font-size:16.5px}
-  .corpo,.rolagem-caixa{text-align:left;hyphens:manual;-webkit-hyphens:manual}
+  .corpo,.corrido-caixa{text-align:left;hyphens:manual;-webkit-hyphens:manual}
   tbody td{hyphens:manual}
   h2{font-size:32px}
   h3{font-size:22px}
@@ -685,7 +696,7 @@ body.modo-rolagem #barra #folio-barra{visibility:hidden}
   .lado.dir .folio{text-align:center}
   .virar{display:none}
   table{font-size:14px}
-  .rolagem-caixa{padding-top:30px}
+  .corrido-caixa{padding-top:30px}
   #barra{font-size:11px}
   #barra button{padding:7px 10px;font-size:11px}
 }
@@ -704,9 +715,9 @@ body.sem-anima #folha.anima{transition:none}
   html,body{height:auto;background:#fff;color:#000}
   body{font-size:11pt;line-height:1.45}
   #mesa,#barra,#painel,#medidor,.virar{display:none !important}
-  #rolagem{display:block !important;padding:0}
-  .rolagem-caixa{max-width:none;margin:0;padding:0}
-  .rolagem-caixa,.corpo{color:#000;text-align:left;hyphens:manual}
+  #corrido{display:block !important;padding:0}
+  .corrido-caixa{max-width:none;margin:0;padding:0}
+  .corrido-caixa,.corpo{color:#000;text-align:left;hyphens:manual}
   h2,h3,h4,h5,strong{color:#000}
   h2 .cap-nome,h2 .cap-rotulo,h5{color:#000}
   a{color:#000;text-decoration:none}
@@ -719,8 +730,8 @@ body.sem-anima #folha.anima{transition:none}
   table{border-top-color:#000}
   thead th{color:#333;border-bottom-color:#000}
   tbody td{border-bottom-color:#ccc}
-  .rolagem-caixa > h2,.rolagem-caixa > p.parte{break-before:page;page-break-before:always}
-  .rolagem-caixa > *:first-child{break-before:avoid;page-break-before:auto}
+  .corrido-caixa > h2,.corrido-caixa > p.parte{break-before:page;page-break-before:always}
+  .corrido-caixa > *:first-child{break-before:avoid;page-break-before:auto}
   tr,td,th{break-inside:avoid;page-break-inside:avoid}
   table{break-inside:auto}
   h2,h3,h4,h5{break-after:avoid;page-break-after:avoid}
@@ -750,8 +761,8 @@ body.sem-anima #folha.anima{transition:none}
   </div>
 </div>
 
-<div id="rolagem">
-  <div class="rolagem-caixa" id="caixa-livro">
+<div id="corrido">
+  <div class="corrido-caixa" id="caixa-livro">
 <div class="capa" id="capa"><p class="capa-selo">Protocolo RPG 2.0</p><div class="capa-filete"></div><p class="capa-nome">Livro de Regras</p></div><h2 id="sumario" data-cap="Sumário"><span class="cap-nome">Sumário</span></h2><div class="sumario"><p class="sum-cap"><span class="sum-num"></span><a href="#abertura">Abertura</a></p><p class="sum-parte">I · Jogar</p><p class="sum-cap"><span class="sum-num">1</span><a href="#capitulo-1">O teste</a></p><p class="sum-regras"><a href="#regra-1"><span class="sr-num">1</span> Quando rolar</a> · <a href="#regra-2"><span class="sr-num">2</span> O teste</a> · <a href="#regra-3"><span class="sr-num">3</span> As duplas</a> · <a href="#regra-4"><span class="sr-num">4</span> Vantagem e Desvantagem</a> · <a href="#regra-5"><span class="sr-num">5</span> Treino</a> · <a href="#regra-6"><span class="sr-num">6</span> Insistir</a> · <a href="#regra-7"><span class="sr-num">7</span> Agir em conjunto</a> · <a href="#regra-8"><span class="sr-num">8</span> Fôlego</a></p><p class="sum-cap"><span class="sum-num">2</span><a href="#capitulo-2">O que vocês enfrentam</a></p><p class="sum-regras"><a href="#regra-9"><span class="sr-num">9</span> Verdades</a> · <a href="#regra-10"><span class="sr-num">10</span> Pistas e Sinais</a> · <a href="#regra-11"><span class="sr-num">11</span> Reação</a></p><p class="sum-cap"><span class="sum-num">3</span><a href="#capitulo-3">Luta e ferimentos</a></p><p class="sum-regras"><a href="#regra-12"><span class="sr-num">12</span> A rodada de combate</a> · <a href="#regra-13"><span class="sr-num">13</span> Defesas</a> · <a href="#regra-14"><span class="sr-num">14</span> Vida e Abatido</a></p><p class="sum-cap"><span class="sum-num">4</span><a href="#capitulo-4">A cabeça</a></p><p class="sum-regras"><a href="#regra-15"><span class="sr-num">15</span> Lucidez</a> · <a href="#regra-16"><span class="sr-num">16</span> Primeira visão</a> · <a href="#regra-17"><span class="sr-num">17</span> Âncoras</a> · <a href="#regra-18"><span class="sr-num">18</span> Quando a cidade fica com você</a> · <a href="#regra-19"><span class="sr-num">19</span> Recuperação</a></p><p class="sum-parte">II · Quem você é</p><p class="sum-cap"><span class="sum-num">5</span><a href="#capitulo-5">O personagem</a></p><p class="sum-cap"><span class="sum-num">6</span><a href="#capitulo-6">O Fardo</a></p><p class="sum-cap"><span class="sum-num">7</span><a href="#capitulo-7">Subir de nível</a></p><p class="sum-cap"><span class="sum-num">8</span><a href="#capitulo-8">Os oito Fardos</a></p><p class="sum-parte">III · O Risco</p><p class="sum-cap"><span class="sum-num">9</span><a href="#capitulo-9">O Risco</a></p><p class="sum-regras"><a href="#regra-20"><span class="sr-num">20</span> Ruído</a> · <a href="#regra-21"><span class="sr-num">21</span> Marca</a> · <a href="#regra-22"><span class="sr-num">22</span> Vínculo, senha e recusa</a> · <a href="#regra-23"><span class="sr-num">23</span> A árvore</a> · <a href="#regra-24"><span class="sr-num">24</span> Combustível e Sintonia</a> · <a href="#regra-25"><span class="sr-num">25</span> O atributo do Risco</a> · <a href="#regra-26"><span class="sr-num">26</span> Conjurar</a> · <a href="#regra-27"><span class="sr-num">27</span> Grau</a> · <a href="#regra-28"><span class="sr-num">28</span> Aprender</a> · <a href="#regra-29"><span class="sr-num">29</span> Dano</a> · <a href="#regra-30"><span class="sr-num">30</span> Resistir</a></p><p class="sum-parte">IV · Talentos</p><p class="sum-cap"><span class="sum-num">10</span><a href="#capitulo-10">Talentos</a></p><p class="sum-parte">No fim</p><p class="sum-cap"><span class="sum-num"></span><a href="#glossario">Glossário</a></p><p class="sum-cap"><span class="sum-num"></span><a href="#tabelas">Tabelas de consulta</a></p><p class="sum-regras"><a href="#tabela-1"><span class="sr-num">1</span> O teste</a> · <a href="#tabela-2"><span class="sr-num">2</span> A rodada e as defesas</a> · <a href="#tabela-3"><span class="sr-num">3</span> Armas e proteções</a> · <a href="#tabela-4"><span class="sr-num">4</span> Condições e efeitos de Risco</a> · <a href="#tabela-5"><span class="sr-num">5</span> A Lucidez</a> · <a href="#tabela-6"><span class="sr-num">6</span> As Âncoras</a> · <a href="#tabela-7"><span class="sr-num">7</span> Os níveis</a> · <a href="#tabela-8"><span class="sr-num">8</span> Os Graus</a> · <a href="#tabela-9"><span class="sr-num">9</span> Os talentos</a></p></div><h2 id="abertura" data-cap="Abertura"><span class="cap-nome">Abertura</span></h2>
 <p class="epigrafe"><em>Vocês investigam o que não devia existir, e pagam para continuar.</em></p>
 <h3 id="o-jogo-em-uma-pagina">O jogo em uma página</h3>
@@ -1277,7 +1288,7 @@ body.sem-anima #folha.anima{transition:none}
 <li><strong>Apavorado:</strong> só vale com a fonte à vista. "Por vontade própria" quer dizer que alguém ainda pode te levar até ela.</li>
 <li><strong>Em Pânico:</strong> fugir é agir, e você rola; congelar é não agir, e você rola defesa se algo vier em você. A diferença para o Apavorado é que o Apavorado ainda age, com Desvantagem, e o Em Pânico não age contra a fonte.</li>
 <li><strong>Exausto:</strong> vale também para Resistência (Carne) e Esquiva (Nervo). Vem do último ponto de Fôlego (regra <a href="#regra-8">8</a>) e de algumas habilidades.</li>
-<li><strong>Sangrando:</strong> "ser tratado" é o Tratar da peça 2, e conta no limite de uma pessoa por dia.</li>
+<li><strong>Sangrando:</strong> "ser tratado" é o Tratar, e conta no limite de uma pessoa por dia.</li>
 <li><strong>Envenenado:</strong> o veneno diz qual das duas versões vale. A "Medicina" do "Como sai" também é o Tratar.</li>
 <li><strong>Abatido:</strong> é a regra <a href="#regra-14">14</a>.</li>
 <li><strong>Numa ameaça:</strong> funciona como nos efeitos de Risco. O que seria Desvantagem para ela vira Vantagem para quem age contra ela, e o que ela perderia (a vez, o lugar) ela perde. Uma Verdade dela pode dizer o contrário.</li>
@@ -1344,7 +1355,7 @@ body.sem-anima #folha.anima{transition:none}
 <p>Semeado conta como condição grave: o que tira condição grave também o tira. Nenhum efeito tira uma Verdade: Esvaziado não apaga uma Barreira, e Devedor não compra um Fim. Numa ameaça, o efeito funciona assim: o que seria Desvantagem para ela vira Vantagem para quem age contra ela, e o que ela pagaria o mestre descreve (o golpe dela vem como meio golpe, ela larga o que segura).</p>
 <p class="rotulo-linha"><span class="rotulo">Na prática</span></p>
 <ul>
-<li><strong>Regras de sempre:</strong> valem as mesmas da peça 3. As Desvantagens não se somam, e o mesmo efeito duas vezes não dobra.</li>
+<li><strong>Regras de sempre:</strong> valem as mesmas das condições. As Desvantagens não se somam, e o mesmo efeito duas vezes não dobra.</li>
 <li><strong>Semeado:</strong> Semeado 1 quer dizer que a semente começa tirando 1; na rodada seguinte, tira 2, e assim até o teto. Arrancar gasta a ação inteira de quem arranca, e pode ser você mesmo. Fora de combate, a conta é por hora: uma semente esquecida mata devagar.</li>
 <li><strong>Esvaziado:</strong> não é Desvantagem, é não ter. Esvaziado da visão é pior do que Cego: não há Desvantagem a rolar, porque você simplesmente não vê, e nada compensa.</li>
 <li><strong>Vigiado:</strong> os níveis se acumulam. O médio tem tudo do baixo, e o alto, tudo do médio.</li>
@@ -7946,7 +7957,7 @@ A Rita aceita. A Voz diz a senha, o jogador da Rita a escreve na ficha, e o mest
   <div class="painel-caixa">
     <div class="painel-topo">
       <input id="busca" type="search" placeholder="Buscar no livro" autocomplete="off" spellcheck="false">
-      <button id="bt-modo" type="button">Ler em rolagem</button>
+      <button id="bt-modo" type="button">Ler corrido</button>
       <button id="bt-fechar" type="button">Fechar</button>
     </div>
     <ul id="resultados"></ul>
@@ -7965,7 +7976,7 @@ A Rita aceita. A Voz diz a senha, o jogador da Rita a escreve na ficha, e o mest
 /* ===================================================================
    Protocolo · Livro de Regras
    Paginacao medida em blocos, livro aberto em duas paginas, virada de
-   folha, sumario com busca, modo rolagem e impressao corrida.
+   folha, sumario com busca, modo corrido e impressao corrida.
    =================================================================== */
 
 var CHAVE = "protocolo-livro-de-regras-v1";
@@ -7995,7 +8006,7 @@ var busca      = document.getElementById("busca");
 var resultados = document.getElementById("resultados");
 var painelSum  = document.getElementById("painel-sumario");
 var medidor    = document.getElementById("medidor");
-var rolagem    = document.getElementById("rolagem");
+var corrido    = document.getElementById("corrido");
 
 var blocos = [];             /* blocos de origem, em ordem */
 var paginas = [];            /* [{itens, tipo, cap, origem}] */
@@ -8025,16 +8036,10 @@ function semAnima(){
   }) === true;
 }
 
-function ehTitulo(el){
-  var t = el.tagName;
-  if (t === "H2" || t === "H3" || t === "H4" || t === "H5") return true;
-  return el.classList && el.classList.contains("rotulo-linha");
-}
-
 function ehCapa(el){ return el.classList && el.classList.contains("capa"); }
 function ehParte(el){ return el.classList && el.classList.contains("parte"); }
 
-/* clone pronto para a pagina: os id viram data-id, para nao repetir
+/* clone feito para a pagina: os id viram data-id, para nao repetir
    os id que ficam no texto corrido */
 function clonePagina(no){
   var c = no.cloneNode(true);
@@ -8114,46 +8119,101 @@ function usada(){
 var tetoAjuste = 0;
 function limite(){ return medCorpo.clientHeight - tetoAjuste; }
 function livre(){ return limite() - usada(); }
+/* altura de uma linha do texto corrido da pagina */
+function linhaBase(){
+  var lh = parseFloat(getComputedStyle(medCorpo).lineHeight);
+  return isFinite(lh) && lh > 0 ? lh : 26;
+}
+
+/* ------------------------------------------------------------------ */
+/* o que e titulo, anexo e quebra forcada                              */
+/* ------------------------------------------------------------------ */
+
+/* paragrafo que e so um negrito ou um rotulo ("Na pratica", "Lista do
+   Fardo", "Feridas (escolha uma)"): funciona como titulo */
+function ehParagrafoTitulo(el){
+  if (!el || el.tagName !== "P" || el.children.length !== 1) return false;
+  var cl = el.classList;
+  if (cl.contains("regra") || cl.contains("lembrar") || cl.contains("parte") ||
+      cl.contains("epigrafe") || cl.contains("origem")) return false;
+  var f = el.children[0];
+  var ok = f.tagName === "STRONG" || (f.tagName === "SPAN" && f.classList.contains("rotulo"));
+  return ok && el.textContent.trim() === f.textContent.trim();
+}
+
+function ehTitulo(el){
+  if (!el || el.nodeType !== 1) return false;
+  if (/^H[2-5]$/.test(el.tagName)) return true;
+  return ehParagrafoTitulo(el);
+}
+
+/* epigrafe e linha de origem andam com o titulo: nao contam como conteudo */
+function ehAnexo(el){
+  return !!el && el.tagName === "P" &&
+    (el.classList.contains("epigrafe") || el.classList.contains("origem"));
+}
+
+function quebraForcada(el){
+  return el.tagName === "H2" || ehParte(el) || ehCapa(el);
+}
 
 /* ------------------------------------------------------------------ */
 /* corte de blocos                                                     */
+/*                                                                     */
+/* Um paragrafo, uma caixa de regra, um titulo ou um item de lista     */
+/* simples nunca e cortado: se nao cabe, vai inteiro para a pagina     */
+/* seguinte. Listas e tabelas se partem entre itens e entre linhas.    */
+/* Um bloco so se parte por frases se for maior que uma pagina inteira */
+/* (ultimo recurso), para nada ficar escondido.                        */
 /* ------------------------------------------------------------------ */
 
+function ehBlocoFilho(n){
+  return n.nodeType === 1 && /^(UL|OL|P|DIV|TABLE|BLOCKQUOTE|H[1-6])$/.test(n.tagName);
+}
+
+/* um item de lista visto como sequencia de segmentos: o texto do comeco
+   (ou o primeiro paragrafo, nas listas soltas) e cada bloco de dentro */
+function segmentos(li){
+  var segs = [], run = null;
+  for (var i = 0; i < li.childNodes.length; i++){
+    var n = li.childNodes[i];
+    if (ehBlocoFilho(n)){
+      if (run){ segs.push({ bloco:false, nos:run }); run = null; }
+      segs.push({ bloco:true, no:n });
+    } else {
+      if (n.nodeType === 3 && !n.nodeValue.trim()){
+        if (run) run.push(n);
+        continue;
+      }
+      (run = run || []).push(n);
+    }
+  }
+  if (run) segs.push({ bloco:false, nos:run });
+  return segs;
+}
+
+/* como o bloco se parte sem cortar texto; null = o bloco e inteiro */
 function partes(el){
-  if (el.nodeType !== 1) return null;
+  if (!el || el.nodeType !== 1) return null;
   var tg = el.tagName;
   if (tg === "DIV" && el.classList.contains("tabela")){
     var t = el.querySelector("table");
-    if (t && t.tBodies[0] && t.tBodies[0].rows.length > 1){
-      return { tipo:"tabela", tabela:t };
-    }
+    if (t && t.tBodies[0] && t.tBodies[0].rows.length > 1) return { tipo:"tabela" };
     return null;
   }
-  if (tg === "UL" || tg === "OL"){
-    if (el.children.length > 1) return { tipo:"lista", filhos:[].slice.call(el.children) };
-    if (el.children.length === 1) return { tipo:"unico", filhos:[].slice.call(el.children) };
-    return null;
+  if (tg === "UL" || tg === "OL" || tg === "DIV"){
+    var f = [].slice.call(el.children);
+    return f.length ? { tipo:"lista", filhos:f } : null;
   }
-  if (tg === "DIV"){
-    if (el.children.length > 1) return { tipo:"lista", filhos:[].slice.call(el.children) };
-    if (el.children.length === 1) return { tipo:"unico", filhos:[].slice.call(el.children) };
+  if (tg === "LI"){
+    var segs = segmentos(el);
+    /* item com mais de um segmento, ou cujo unico segmento e uma lista
+       (a continuacao de um item cortado): parte-se entre os subitens */
+    if (segs.length > 1) return { tipo:"item", segs:segs };
+    if (segs.length === 1 && segs[0].bloco && partes(segs[0].no)) return { tipo:"item", segs:segs };
     return null;
-  }
-  if (tg === "LI" || tg === "P" || tg === "BLOCKQUOTE"){
-    var fb = [];
-    for (var i = 0; i < el.children.length; i++){
-      var n = el.children[i].tagName;
-      if (n === "UL" || n === "OL" || n === "P" || n === "DIV" || n === "TABLE") fb.push(el.children[i]);
-    }
-    if (fb.length) return { tipo:"misto", filhos:[].slice.call(el.childNodes) };
-    return { tipo:"inline" };
   }
   return null;
-}
-
-function divisivel(el){
-  var p = partes(el);
-  return !!p;
 }
 
 /* num corte, a ancora do bloco fica na primeira parte; a segunda perde
@@ -8165,15 +8225,13 @@ function semIdProprio(el){
 }
 
 /* corta uma tabela por linhas, repetindo o cabecalho */
-function cortaTabela(env, espaco, vazia, dentro){
+function cortaTabela(env, vazia, dentro){
   var tab = env.querySelector("table");
-  var corpoT = tab.tBodies[0];
-  var linhas = [].slice.call(corpoT.rows);
+  var linhas = [].slice.call(tab.tBodies[0].rows);
 
   var cab = env.cloneNode(false);
   var tc = tab.cloneNode(false);
-  var thead = tab.tHead ? tab.tHead.cloneNode(true) : null;
-  if (thead) tc.appendChild(thead);
+  if (tab.tHead) tc.appendChild(tab.tHead.cloneNode(true));
   var tb = document.createElement("tbody");
   tc.appendChild(tb); cab.appendChild(tc);
 
@@ -8203,52 +8261,106 @@ function cortaTabela(env, espaco, vazia, dentro){
   var tb2 = document.createElement("tbody");
   for (var j = n; j < linhas.length; j++) tb2.appendChild(linhas[j].cloneNode(true));
   tc2.appendChild(tb2); cauda.appendChild(tc2);
-  cauda.classList.add("corte-fim");
   cab.classList.add("corte-inicio");
+  cauda.classList.add("corte-fim");
   return [cab, cauda];
 }
 
-/* corta um container pelos filhos */
-function cortaContainer(el, filhos, espaco, vazia, dentro){
+/* corta uma lista (ou a caixa do Sintonizador) entre os filhos */
+function cortaLista(el, filhos, vazia, dentro){
   var cab = el.cloneNode(false);
   dentro.appendChild(cab);
-  var n = 0, restoPrim = null;
+  var n = 0, resto = null, alturaPrimeiro = 0;
   for (var i = 0; i < filhos.length; i++){
     cab.appendChild(filhos[i].cloneNode(true));
+    if (i === 0) alturaPrimeiro = cab.lastChild.getBoundingClientRect().height;
     if (usada() > limite()){
       cab.removeChild(cab.lastChild);
-      if (n === 0){
-        /* nem o primeiro filho cabe: tenta cortar o proprio filho,
-           medindo dentro do pai, para a largura ser a de verdade */
-        var sub = cortar(filhos[i], limite() - usada(), vazia, cab);
-        if (sub){ cab.appendChild(sub[0]); restoPrim = sub[1]; n = 1; }
+      /* o filho que nao coube: se ele tiver partes (subitens), corta
+         entre elas, medindo dentro do pai */
+      if (partes(filhos[i])){
+        var sub = cortar(filhos[i], vazia && n === 0, cab);
+        if (sub){ cab.appendChild(sub[0]); resto = sub[1]; }
       }
       break;
     }
     n++;
   }
   dentro.removeChild(cab);
-  if (n === 0) return null;
-  if (n >= filhos.length && !restoPrim) return null;
-  /* numa lista, nao deixa um item sozinho no pe da pagina */
-  if (!restoPrim && n < 2 && !vazia && filhos.length > 2) return null;
+  if (n === 0 && !resto) return null;
+  if (n >= filhos.length) return null;
+  /* um titulo de dentro (o negrito do comeco da caixa) nao fecha a parte */
+  while (n > 0 && !resto && ehTitulo(filhos[n - 1])){
+    n--;
+    cab.removeChild(cab.lastChild);
+  }
+  if (n === 0 && !resto) return null;
+  /* numa lista, nao deixa um item curto sozinho no pe da pagina; um item
+     de varias linhas (com subitens, por exemplo) pode ficar */
+  if (!resto && n < 2 && filhos.length > 2 && !vazia && alturaPrimeiro < 2.5 * linhaBase()) return null;
 
   var cauda = semIdProprio(el.cloneNode(false));
-  if (restoPrim) cauda.appendChild(restoPrim);
-  for (var j = (restoPrim ? n : n); j < filhos.length; j++){
-    if (restoPrim && j === n - 1) continue;
-    cauda.appendChild(filhos[j].cloneNode(true));
-  }
+  if (resto) cauda.appendChild(resto);
+  for (var j = n + (resto ? 1 : 0); j < filhos.length; j++) cauda.appendChild(filhos[j].cloneNode(true));
   if (el.tagName === "OL"){
     var ini = parseInt(el.getAttribute("start") || "1", 10);
-    cauda.setAttribute("start", String(ini + (restoPrim ? n - 1 : n)));
+    cauda.setAttribute("start", String(ini + n));
   }
   cab.classList.add("corte-inicio");
   cauda.classList.add("corte-fim");
   return [cab, cauda];
 }
 
-/* corta conteudo em linha, na fronteira de palavra */
+function poeSegmento(alvo, seg){
+  var postos = [];
+  if (seg.bloco){
+    var c = seg.no.cloneNode(true);
+    alvo.appendChild(c); postos.push(c);
+  } else {
+    for (var i = 0; i < seg.nos.length; i++){
+      var d = seg.nos[i].cloneNode(true);
+      alvo.appendChild(d); postos.push(d);
+    }
+  }
+  return postos;
+}
+
+/* corta um item de lista que tem subitens: entre os segmentos dele.
+   O comeco do item (o rotulo) nunca fica sozinho: vai com pelo menos
+   um pedaco do segmento seguinte. A continuacao nao repete o marcador. */
+function cortaItem(li, segs, vazia, dentro){
+  var cab = li.cloneNode(false);
+  dentro.appendChild(cab);
+  var n = 0, resto = null;
+  for (var s = 0; s < segs.length; s++){
+    var postos = poeSegmento(cab, segs[s]);
+    if (usada() > limite()){
+      for (var q = 0; q < postos.length; q++) cab.removeChild(postos[q]);
+      if (segs[s].bloco && partes(segs[s].no)){
+        var sub = cortar(segs[s].no, vazia && n === 0, cab);
+        if (sub){ cab.appendChild(sub[0]); resto = sub[1]; }
+      }
+      break;
+    }
+    n++;
+  }
+  dentro.removeChild(cab);
+  if (n === 0 && !resto) return null;
+  if (n >= segs.length) return null;
+  /* o rotulo do item (texto ou paragrafo do comeco) nao fica sozinho */
+  var comecaComRotulo = !segs[0].bloco || segs[0].no.tagName === "P";
+  if (n === 1 && !resto && comecaComRotulo) return null;
+
+  var cauda = semIdProprio(li.cloneNode(false));
+  if (resto) cauda.appendChild(resto);
+  for (var j = n + (resto ? 1 : 0); j < segs.length; j++) poeSegmento(cauda, segs[j]);
+  cab.classList.add("corte-inicio");
+  cauda.classList.add("corte-fim");
+  return [cab, cauda];
+}
+
+/* ---------- ultimo recurso: bloco maior que uma pagina inteira ---------- */
+
 function textosDe(el){
   var saida = [];
   var and = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
@@ -8283,54 +8395,67 @@ function truncar(el, k, manterInicio){
   return c;
 }
 
-function cortaInline(el, espaco, vazia, dentro){
-  var txt = el.textContent;
-  var total = txt.length;
-  if (total < 40) return null;
-  var lo = 0, hi = total, melhor = 0;
-  for (var passo = 0; passo < 14 && lo <= hi; passo++){
+/* pontos de corte: fim de frase primeiro; se nenhum servir, fim de palavra */
+function pontosDeCorte(txt, porFrase){
+  var p = [], m;
+  var re = porFrase ? /[.;:!?…]["”')\]]*(?=\s)/g : /\S(?=\s)/g;
+  while ((m = re.exec(txt))) p.push(m.index + m[0].length);
+  return p;
+}
+
+function cortaPorPontos(el, dentro, pontos){
+  var lo = 0, hi = pontos.length - 1, melhor = -1;
+  while (lo <= hi){
     var mid = (lo + hi) >> 1;
-    var k = mid;
-    while (k > 0 && k < txt.length && !/\s/.test(txt.charAt(k))) k--;
-    if (k <= 0){ lo = mid + 1; continue; }
-    var tst = truncar(el, k, true);
+    var tst = truncar(el, pontos[mid], true);
     dentro.appendChild(tst);
     var ok = usada() <= limite();
     dentro.removeChild(tst);
-    if (ok){ melhor = k; lo = mid + 1; } else { hi = mid - 1; }
+    if (ok){ melhor = mid; lo = mid + 1; } else { hi = mid - 1; }
   }
-  if (melhor <= 0) return null;
-  var cab = truncar(el, melhor, true);
-  var cauda = semIdProprio(truncar(el, melhor, false));
+  if (melhor < 0) return null;
+  var k = pontos[melhor];
+  var cab = truncar(el, k, true);
+  var cauda = semIdProprio(truncar(el, k, false));
   if (!cauda.textContent.trim()) return null;
   cab.classList.add("corte-inicio");
   cauda.classList.add("corte-fim");
+  /* marca de conferencia: este pedaco foi cortado no meio do texto */
+  cab.setAttribute("data-corte-texto", "1");
+  cauda.setAttribute("data-corte-texto", "1");
   return [cab, cauda];
 }
 
-/* corta el para caber em `espaco`; vazia = a pagina esta vazia */
-function cortar(el, espaco, vazia, dentro){
+/* cortes por frase da tentativa corrente; so entram no registro se a
+   tentativa for a usada */
+var recursoTentativa = [];
+
+function ultimoRecurso(el, dentro){
+  var txt = el.textContent;
+  if (txt.trim().length < 40) return null;
+  var r = cortaPorPontos(el, dentro, pontosDeCorte(txt, true));
+  if (!r) r = cortaPorPontos(el, dentro, pontosDeCorte(txt, false));
+  if (r) recursoTentativa.push({ pagina: paginas.length + 1, tag: el.tagName,
+                                  texto: txt.replace(/\s+/g, " ").slice(0, 60) });
+  return r;
+}
+
+/* o corte por frase so e liberado depois que nenhum corte entre blocos
+   serviu, e so numa pagina vazia */
+var recursoLiberado = false;
+
+/* corta el; vazia = nada mais na pagina alem dos titulos dele */
+function cortar(el, vazia, dentro){
   dentro = dentro || medCorpo;
-  if (!vazia && espaco < MIN_UTIL) return null;
-  var p = partes(el);
-  if (!p) return null;
-  if (p.tipo === "tabela") return cortaTabela(el, espaco, vazia, dentro);
-  if (p.tipo === "lista") return cortaContainer(el, p.filhos, espaco, vazia, dentro);
-  if (p.tipo === "unico"){
-    /* mede o filho dentro de uma copia do pai, para contar a borda e o
-       recheio do pai (a caixa do Sintonizador, por exemplo) */
-    var hosp = el.cloneNode(false);
-    dentro.appendChild(hosp);
-    var sub = cortar(p.filhos[0], espaco, vazia, hosp);
-    dentro.removeChild(hosp);
-    if (!sub) return null;
-    var a = el.cloneNode(false); a.appendChild(sub[0]);
-    var b = semIdProprio(el.cloneNode(false)); b.appendChild(sub[1]);
-    a.classList.add("corte-inicio"); b.classList.add("corte-fim");
-    return [a, b];
+  if (!vazia && livre() < MIN_UTIL) return null;
+  var p = partes(el), r = null;
+  if (p){
+    if (p.tipo === "tabela") r = cortaTabela(el, vazia, dentro);
+    else if (p.tipo === "lista") r = cortaLista(el, p.filhos, vazia, dentro);
+    else if (p.tipo === "item") r = cortaItem(el, p.segs, vazia, dentro);
   }
-  if (p.tipo === "misto" || p.tipo === "inline") return cortaInline(el, espaco, vazia, dentro);
-  return null;
+  if (!r && vazia && recursoLiberado) r = ultimoRecurso(el, dentro);
+  return r;
 }
 
 /* ------------------------------------------------------------------ */
@@ -8342,7 +8467,7 @@ var est = null;
 function iniciaPaginacao(){
   montaMedidor();
   paginas = []; mapaAncora = {}; ancoraPag = []; textoPag = [];
-  est = { i:0, itens:[], tipo:"normal", cap:"", origem:0, capAtual:"", ultAncora:"" };
+  est = { i:0, itens:[], tipo:"normal", cap:"", origem:0, capAtual:"", ultAncora:"", ultimos:[] };
   medCorpo.innerHTML = "";
 }
 
@@ -8382,13 +8507,15 @@ function alinhaDireita(){
   if ((paginas.length + 1) % 2 === 0) branca();
 }
 
+/* poe na pagina: o item e o clone medido andam sempre juntos */
 function poe(no, origem){
   est.itens.push({ no:no, origem:origem });
   medCorpo.appendChild(clonePagina(no));
 }
 
-/* tenta encaixar; devolve o resto ou null */
-function encaixa(no, origem){
+/* tenta encaixar; devolve o resto ou null. vaziaForcada: a pagina so tem
+   os titulos deste bloco, entao vale como vazia para o ultimo recurso */
+function encaixa(no, origem, vaziaForcada){
   var c = clonePagina(no);
   medCorpo.appendChild(c);
   if (usada() <= limite()){
@@ -8396,70 +8523,115 @@ function encaixa(no, origem){
     return null;
   }
   medCorpo.removeChild(c);
-  var vazia = paginaVazia();
+  var vazia = !!vaziaForcada || paginaVazia();
 
   /* corta e confere o corte no lugar: se a cabeca nao couber de verdade,
-     aperta o teto e corta de novo */
-  var sub = null, ultimo = null;
+     aperta o teto e corta de novo. Primeiro so entre blocos; o corte por
+     frase so entra se a pagina estiver vazia e nada mais servir. */
+  var sub = null, ultimo = null, regSub = [], regUltimo = [];
   var tetos = [0, 20, 48, 92, 150];
-  for (var t = 0; t < tetos.length; t++){
-    tetoAjuste = tetos[t];
-    var tentativa = cortar(no, livre(), vazia);
-    tetoAjuste = 0;
-    if (!tentativa) break;
-    ultimo = tentativa;
-    var teste = clonePagina(tentativa[0]);
-    medCorpo.appendChild(teste);
-    var cabe = usada() <= limite();
-    medCorpo.removeChild(teste);
-    if (cabe){ sub = tentativa; break; }
+  var passadas = vazia ? [false, true] : [false];
+  for (var ps = 0; ps < passadas.length && !sub; ps++){
+    recursoLiberado = passadas[ps];
+    for (var t = 0; t < tetos.length; t++){
+      tetoAjuste = tetos[t];
+      recursoTentativa = [];
+      var tentativa = cortar(no, vazia);
+      tetoAjuste = 0;
+      if (!tentativa) break;
+      ultimo = tentativa; regUltimo = recursoTentativa;
+      var teste = clonePagina(tentativa[0]);
+      medCorpo.appendChild(teste);
+      var cabe = usada() <= limite();
+      medCorpo.removeChild(teste);
+      if (cabe){ sub = tentativa; regSub = recursoTentativa; break; }
+    }
   }
+  recursoLiberado = false;
+  recursoTentativa = [];
   if (sub){
-    est.itens.push({ no:sub[0], origem:origem });
-    medCorpo.appendChild(clonePagina(sub[0]));
+    [].push.apply(est.ultimos, regSub);
+    poe(sub[0], origem);
     return sub[1];
   }
   if (vazia){
-    /* pagina vazia: usa o melhor corte que saiu, ou o bloco inteiro,
-       para nada ficar escondido */
+    /* pagina vazia: usa o melhor corte que saiu, ou o bloco inteiro */
     if (ultimo){
-      est.itens.push({ no:ultimo[0], origem:origem });
-      medCorpo.appendChild(clonePagina(ultimo[0]));
+      [].push.apply(est.ultimos, regUltimo);
+      poe(ultimo[0], origem);
       return ultimo[1];
     }
-    est.itens.push({ no:no, origem:origem });
+    poe(no, origem);
     return null;
   }
   return no;
 }
 
+/* um bloco que nao e titulo (ou o resto de um bloco cortado) */
 function colocaBloco(no, origem){
-  var pend = no;
-  var volta = 0;
+  var pend = no, volta = 0;
   while (pend){
     var antes = est.itens.length;
-    var resto = encaixa(pend, origem);
+    var resto = encaixa(pend, origem, false);
     if (resto === null) return;
     if (resto === pend && antes === est.itens.length){
-      /* nada foi colocado nesta pagina */
-      if (!paginaVazia()){
-        /* titulo nunca fica sozinho no pe da pagina */
-        if (est.itens.length > 1 && ehTitulo(est.itens[est.itens.length - 1].no)){
-          var t = est.itens.pop();
-          medCorpo.removeChild(medCorpo.lastChild);
-          fecha();
-          poe(t.no, t.origem);
-        } else {
-          fecha();
-        }
-        continue;
-      }
-      /* pagina vazia: encaixa() ja garantiu a colocacao */
-      return;
+      /* nada coube: vai inteiro para a pagina seguinte */
+      if (paginaVazia()) return;
+      fecha();
+      continue;
     }
     fecha();
     pend = resto;
     if (++volta > 4000) return;
+  }
+}
+
+/* um titulo puxa os que vem logo depois dele (outros titulos, epigrafes,
+   linhas de origem) e o primeiro bloco de conteudo */
+function cadeiaDe(i){
+  var idx = [i], j = i + 1;
+  while (j < blocos.length){
+    var x = blocos[j];
+    if (quebraForcada(x)) break;
+    if (ehTitulo(x) || ehAnexo(x)){ idx.push(j); j++; continue; }
+    break;
+  }
+  var k = (j < blocos.length && !quebraForcada(blocos[j])) ? j : -1;
+  return { idx:idx, k:k, fim:j };
+}
+
+function tentaCadeia(cad, forcar){
+  for (var a = 0; a < cad.idx.length; a++){
+    poe(blocos[cad.idx[a]], cad.idx[a]);
+    if (!forcar && usada() > limite()) return { ok:false };
+  }
+  if (cad.k < 0) return { ok:true, resto:null };
+  var antes = est.itens.length;
+  var resto = encaixa(blocos[cad.k], cad.k, forcar);
+  if (est.itens.length === antes){
+    return forcar ? { ok:true, resto:blocos[cad.k] } : { ok:false };
+  }
+  return { ok:true, resto:resto };
+}
+
+/* o titulo nunca fica no pe da pagina sem o primeiro bloco de conteudo:
+   se os dois nao cabem juntos, vao juntos para a pagina seguinte */
+function colocaCadeia(i){
+  var cad = cadeiaDe(i);
+  var marcaN = est.itens.length, marcaM = medCorpo.children.length;
+  var r = tentaCadeia(cad, false);
+  if (!r.ok){
+    while (est.itens.length > marcaN) est.itens.pop();
+    while (medCorpo.children.length > marcaM) medCorpo.removeChild(medCorpo.lastChild);
+    if (marcaN > 0) fecha();
+    r = tentaCadeia(cad, true);
+  }
+  if (cad.k >= 0){
+    est.i = cad.k;
+    if (r.resto) colocaBloco(r.resto, cad.k);
+    est.i = cad.k + 1;
+  } else {
+    est.i = cad.fim;
   }
 }
 
@@ -8491,6 +8663,7 @@ function passoBloco(){
     est.tipo = "abertura";
     est.origem = i;
   }
+  if (ehTitulo(b)){ colocaCadeia(i); return; }
   colocaBloco(b, i);
   est.i++;
 }
@@ -8670,7 +8843,7 @@ function salva(){
   guarda(function(){
     localStorage.setItem(CHAVE, JSON.stringify({
       p: atual,
-      m: document.body.classList.contains("modo-rolagem") ? "r" : "p"
+      m: document.body.classList.contains("modo-corrido") ? "r" : "p"
     }));
   });
 }
@@ -8771,7 +8944,7 @@ function saltaPara(id, guardaVolta){
   var p = paginaDoId(id);
   if (p >= 0){
     if (guardaVolta) pilhaVoltar.push(atual);
-    if (document.body.classList.contains("modo-rolagem")){
+    if (document.body.classList.contains("modo-corrido")){
       var el = document.getElementById(id);
       if (el) el.scrollIntoView({ block:"start" });
       atual = p; atualizaBarra(); salva();
@@ -8840,7 +9013,7 @@ function fazBusca(){
         pilhaVoltar.push(atual);
         termoMarca = termo;
         fechaPainel();
-        if (document.body.classList.contains("modo-rolagem")) modoPaginas();
+        if (document.body.classList.contains("modo-corrido")) modoPaginas();
         vaPara(pg, false);
       });
     })(i, q);
@@ -8853,9 +9026,9 @@ function fazBusca(){
 /* modos de leitura                                                    */
 /* ------------------------------------------------------------------ */
 
-function modoRolagem(){
+function modoCorrido(){
   var a = ancoraPag[atual];
-  document.body.classList.add("modo-rolagem");
+  document.body.classList.add("modo-corrido");
   btModo.textContent = "Ler em páginas";
   salva();
   if (a){
@@ -8865,25 +9038,25 @@ function modoRolagem(){
 }
 
 function modoPaginas(){
-  document.body.classList.remove("modo-rolagem");
-  btModo.textContent = "Ler em rolagem";
+  document.body.classList.remove("modo-corrido");
+  btModo.textContent = "Ler corrido";
   geometria();
   salva();
 }
 
 function alternaModo(){
-  if (document.body.classList.contains("modo-rolagem")){
+  if (document.body.classList.contains("modo-corrido")){
     var vis = ancoraVisivel();
     modoPaginas();
     if (vis) saltaPara(vis, false);
   } else {
-    modoRolagem();
+    modoCorrido();
   }
   fechaPainel();
 }
 
 function ancoraVisivel(){
-  var cands = rolagem.querySelectorAll("[id]");
+  var cands = corrido.querySelectorAll("[id]");
   var melhor = null;
   for (var i = 0; i < cands.length; i++){
     var r = cands[i].getBoundingClientRect();
@@ -8933,7 +9106,7 @@ btVoltar.addEventListener("click", function(){
   if (!pilhaVoltar.length) return;
   var p = pilhaVoltar.pop();
   termoMarca = "";
-  if (document.body.classList.contains("modo-rolagem")) modoPaginas();
+  if (document.body.classList.contains("modo-corrido")) modoPaginas();
   vaPara(p, false);
   atualizaBarra();
 });
@@ -8943,7 +9116,7 @@ busca.addEventListener("keydown", function(e){ if (e.key === "Escape") fechaPain
 document.addEventListener("keydown", function(e){
   if (e.key === "Escape"){ if (painel.classList.contains("aberto")) fechaPainel(); return; }
   if (painel.classList.contains("aberto")) return;
-  if (document.body.classList.contains("modo-rolagem")) return;
+  if (document.body.classList.contains("modo-corrido")) return;
   var t = e.target;
   if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA")) return;
   if (e.key === "ArrowRight" || e.key === "PageDown"){ e.preventDefault(); viraFrente(); }
@@ -8975,7 +9148,7 @@ window.addEventListener("resize", function(){
     espera = null;
     if (refRestauro === null) refRestauro = blocoCorrente();
     geometria();
-    if (document.body.classList.contains("modo-rolagem")) return;
+    if (document.body.classList.contains("modo-corrido")) return;
     paginar();
   }, 220);
 });
@@ -8991,20 +9164,20 @@ function arranca(){
 
   var salvo = guarda(function(){ return JSON.parse(localStorage.getItem(CHAVE) || "null"); });
   var hash = (location.hash || "").slice(1);
-  var querRolagem = !!(salvo && salvo.m === "r");
+  var querCorrido = !!(salvo && salvo.m === "r");
 
-  btModo.textContent = querRolagem ? "Ler em páginas" : "Ler em rolagem";
+  btModo.textContent = querCorrido ? "Ler em páginas" : "Ler corrido";
 
   if (hash) alvoInicial = { tipo:"ancora", valor:decodeURIComponent(hash) };
   else if (salvo && typeof salvo.p === "number") alvoInicial = { tipo:"pagina", valor:salvo.p };
 
   paginar(function(){
-    if (querRolagem) modoRolagem();
+    if (querCorrido) modoCorrido();
   });
 
   window.addEventListener("hashchange", function(){
     var id = decodeURIComponent((location.hash || "").slice(1));
-    if (id && mapaAncora[id] !== undefined && !document.body.classList.contains("modo-rolagem")){
+    if (id && mapaAncora[id] !== undefined && !document.body.classList.contains("modo-corrido")){
       if (mapaAncora[id] !== atual) vaPara(mapaAncora[id], false);
     }
   });
@@ -9014,7 +9187,7 @@ function arranca(){
 /* janela de conferencia (usada pelos testes)                          */
 /* ------------------------------------------------------------------ */
 
-/* texto com um espaco em toda fronteira de elemento, para o texto das
+/* texto com um espaco em toda fronteira de bloco ou marca, para o texto das
    paginas e o do livro inteiro poderem ser comparados palavra por palavra */
 function textoFronteira(el){
   var out = "", i, n;
@@ -9044,7 +9217,7 @@ window.__estado = {
   get completo(){ return completo; },
   resumo: function(){
     return { total:paginas.length, atual:atual, duplo:duplo,
-             modo: document.body.classList.contains("modo-rolagem") ? "rolagem" : "paginas" };
+             modo: document.body.classList.contains("modo-corrido") ? "corrido" : "paginas" };
   },
   vaAncora: function(id){ return saltaPara(id, false); },
   /* nenhum bloco pode passar da borda da pagina */
@@ -9096,6 +9269,163 @@ window.__estado = {
   },
   mapaDe: function(id){ return mapaAncora[id]; },
   quantasAncoras: function(){ return Object.keys(mapaAncora).length; },
+  /* blocos partidos por frase, so porque eram maiores que uma pagina */
+  cortesUltimoRecurso: function(){ return est ? est.ultimos.slice() : []; },
+  /* quanto cada pagina enche (paginas comuns seguidas de outra comum) */
+  preenchimento: function(){
+    montaMedidor();
+    var vazias = [], soma = 0, n = 0;
+    for (var i = 0; i < paginas.length - 1; i++){
+      var pg = paginas[i], prox = paginas[i + 1];
+      if (pg.tipo !== "normal" && pg.tipo !== "abertura") continue;
+      if (prox.tipo !== "normal") continue;   /* fim de capitulo nao conta */
+      medCorpo.innerHTML = "";
+      for (var j = 0; j < pg.itens.length; j++) medCorpo.appendChild(clonePagina(pg.itens[j].no));
+      var f = usada() / medCorpo.clientHeight;
+      soma += f; n++;
+      if (f < 0.7) vazias.push({ pagina:i + 1, cheia:Math.round(f * 100),
+        proxima: (prox.itens[0] && prox.itens[0].no.textContent || "").replace(/\s+/g, " ").slice(0, 40) });
+    }
+    medidor.innerHTML = "";
+    return { paginas:n, media:Math.round(soma / Math.max(n, 1) * 100), menosDe70:vazias.length, exemplos:vazias.slice(0, 12) };
+  },
+  /* cabecalhos de tabela e coluna dos termos do glossario: sem hifenizacao,
+     e "condição grave" numa linha so, medidos como na pagina */
+  hifenizacao: function(){
+    montaMedidor();
+    var r = { cabecalhos:0, cabecalhosComHifen:0, termos:0, termosComHifen:0,
+              termosEstouram:0, linhasCondicaoGrave:null, larguraColuna:null };
+    function linhas(el){
+      var rg = document.createRange(); rg.selectNodeContents(el);
+      var rs = rg.getClientRects(), tops = {};
+      for (var q = 0; q < rs.length; q++) if (rs[q].width > 0) tops[Math.round(rs[q].top)] = 1;
+      return Object.keys(tops).length;
+    }
+    for (var i = 0; i < paginas.length; i++){
+      var its = paginas[i].itens, temTab = false, j;
+      for (j = 0; j < its.length; j++) if (its[j].no.querySelector && its[j].no.querySelector("table")) temTab = true;
+      if (!temTab) continue;
+      medCorpo.innerHTML = "";
+      for (j = 0; j < its.length; j++) medCorpo.appendChild(clonePagina(its[j].no));
+      var ths = medCorpo.querySelectorAll("thead th");
+      for (j = 0; j < ths.length; j++){
+        r.cabecalhos++;
+        var hs = getComputedStyle(ths[j]);
+        if ((hs.hyphens || hs.webkitHyphens) !== "none") r.cabecalhosComHifen++;
+      }
+      var tds = medCorpo.querySelectorAll(".tabela-glossario tbody td:first-child");
+      for (j = 0; j < tds.length; j++){
+        r.termos++;
+        var cs = getComputedStyle(tds[j]);
+        if ((cs.hyphens || cs.webkitHyphens) !== "none") r.termosComHifen++;
+        if (tds[j].scrollWidth > tds[j].clientWidth + 1) r.termosEstouram++;
+        if (tds[j].textContent.trim() === "condição grave"){
+          r.linhasCondicaoGrave = linhas(tds[j]);
+          r.larguraColuna = Math.round(tds[j].getBoundingClientRect().width);
+        }
+      }
+    }
+    medidor.innerHTML = "";
+    return r;
+  },
+  /* as 30 regras: a caixa do enunciado inteira, na pagina do titulo */
+  regrasInteiras: function(){
+    var ruins = [], vistas = 0;
+    var paginaDeOrigem = {}, pedacos = {};
+    for (var i = 0; i < paginas.length; i++){
+      for (var j = 0; j < paginas[i].itens.length; j++){
+        var o = paginas[i].itens[j].origem;
+        (paginaDeOrigem[o] = paginaDeOrigem[o] || []).push(i);
+        pedacos[o] = (pedacos[o] || 0) + 1;
+      }
+    }
+    for (var b = 0; b < blocos.length; b++){
+      var h = blocos[b];
+      if (h.tagName !== "H3" || !h.classList.contains("regra-titulo")) continue;
+      vistas++;
+      var caixaR = blocos[b + 1];
+      if (!caixaR || !caixaR.classList.contains("regra")){ ruins.push(h.id + ": sem caixa"); continue; }
+      var pgsT = paginaDeOrigem[b] || [], pgsC = paginaDeOrigem[b + 1] || [];
+      if (pedacos[b + 1] !== 1) ruins.push(h.id + ": caixa em " + pedacos[b + 1] + " pedacos");
+      else if (pgsT[0] !== pgsC[0]) ruins.push(h.id + ": titulo na pag " + (pgsT[0]+1) + ", caixa na " + (pgsC[0]+1));
+    }
+    return { regras:vistas, ruins:ruins };
+  },
+  /* nenhum titulo fica no pe da pagina sem o primeiro bloco de conteudo */
+  titulosComConteudo: function(){
+    var ruins = [], vistos = 0, fimTitulo = 0;
+    var paginaDeOrigem = {};
+    for (var i = 0; i < paginas.length; i++){
+      var its = paginas[i].itens;
+      for (var j = 0; j < its.length; j++){
+        var o = its[j].origem;
+        if (paginaDeOrigem[o] === undefined) paginaDeOrigem[o] = i;
+      }
+      if (its.length){
+        var ult = its[its.length - 1].no;
+        if (ehTitulo(ult) || ehAnexo(ult)){
+          fimTitulo++;
+          if (ruins.length < 8) ruins.push("pag " + (i+1) + " termina em " + ult.tagName + ": " +
+                                           JSON.stringify(ult.textContent.replace(/\s+/g, " ").slice(0, 50)));
+        }
+      }
+    }
+    for (var b = 0; b < blocos.length; b++){
+      if (!ehTitulo(blocos[b])) continue;
+      vistos++;
+      var cad = cadeiaDe(b);
+      if (cad.k < 0) continue;
+      if (paginaDeOrigem[b] !== paginaDeOrigem[cad.k]){
+        if (ruins.length < 8) ruins.push("titulo " + JSON.stringify(blocos[b].textContent.replace(/\s+/g, " ").slice(0, 40)) +
+          " na pag " + (paginaDeOrigem[b]+1) + ", conteudo na " + (paginaDeOrigem[cad.k]+1));
+        fimTitulo++;
+      }
+    }
+    return { titulos:vistos, problemas:fimTitulo, ruins:ruins };
+  },
+  /* paragrafos e itens simples nunca se partem */
+  paragrafosCortados: function(){
+    var p = 0, li = 0, ex = [];
+    for (var i = 0; i < paginas.length; i++){
+      for (var j = 0; j < paginas[i].itens.length; j++){
+        var no = paginas[i].itens[j].no;
+        var ps = [];
+        if (no.tagName === "P" && /corte-/.test(no.className)) ps.push(no);
+        if (no.querySelectorAll){
+          [].push.apply(ps, [].slice.call(no.querySelectorAll("p.corte-inicio, p.corte-fim")));
+          /* um item cortado so pode ter sido cortado entre blocos: a primeira
+             parte termina num bloco e a segunda comeca num bloco */
+          var lis = no.querySelectorAll("li.corte-inicio, li.corte-fim");
+          for (var k = 0; k < lis.length; k++){
+            var segs = segmentos(lis[k]);
+            var ini = lis[k].classList.contains("corte-inicio");
+            var fim = lis[k].classList.contains("corte-fim");
+            var ruim = !segs.length ||
+                       (ini && !segs[segs.length - 1].bloco) ||
+                       (fim && !segs[0].bloco);
+            if (ruim){
+              li++;
+              if (ex.length < 6) ex.push("pag " + (i+1) + " item: " + lis[k].textContent.replace(/\s+/g, " ").slice(0, 50));
+            }
+          }
+        }
+        p += ps.length;
+        for (var q = 0; q < ps.length && ex.length < 6; q++){
+          ex.push("pag " + (i+1) + " paragrafo: " + ps[q].textContent.replace(/\s+/g, " ").slice(0, 50));
+        }
+      }
+    }
+    /* qualquer pedaco cortado no meio do texto, em qualquer nivel */
+    var texto = 0;
+    for (var a = 0; a < paginas.length; a++){
+      for (var c = 0; c < paginas[a].itens.length; c++){
+        var nn = paginas[a].itens[c].no;
+        if (nn.getAttribute && nn.getAttribute("data-corte-texto")) texto++;
+        if (nn.querySelectorAll) texto += nn.querySelectorAll("[data-corte-texto]").length;
+      }
+    }
+    return { paragrafos:p, itensSimples:li, cortesNoTexto:texto, exemplos:ex };
+  },
   /* na tela larga, toda abertura de capitulo cai numa pagina da direita */
   aberturas: function(){
     var erradas = [], total = 0;
@@ -9153,7 +9483,7 @@ if (document.readyState === "complete" || document.readyState === "interactive")
 if (document.fonts && document.fonts.ready){
   document.fonts.ready.then(function(){
     if (!completo && !tarefa) return;          /* ainda nem comecou */
-    if (document.body.classList.contains("modo-rolagem")) return;
+    if (document.body.classList.contains("modo-corrido")) return;
     if (!alvoInicial && refRestauro === null) refRestauro = blocoCorrente();
     paginar();
   });
